@@ -1,1 +1,26 @@
 * text=auto !eol
+de.xwic.cube/.classpath -text
+de.xwic.cube/.project -text
+de.xwic.cube/.settings/org.eclipse.jdt.ui.prefs -text
+de.xwic.cube/src/de/xwic/cube/DataPoolManagerFactory.java -text
+de.xwic.cube/src/de/xwic/cube/ICell.java -text
+de.xwic.cube/src/de/xwic/cube/ICube.java -text
+de.xwic.cube/src/de/xwic/cube/IDataPool.java -text
+de.xwic.cube/src/de/xwic/cube/IDataPoolManager.java -text
+de.xwic.cube/src/de/xwic/cube/IDimension.java -text
+de.xwic.cube/src/de/xwic/cube/IDimensionElement.java -text
+de.xwic.cube/src/de/xwic/cube/IIdentifyable.java -text
+de.xwic.cube/src/de/xwic/cube/IMeasure.java -text
+de.xwic.cube/src/de/xwic/cube/Key.java -text
+de.xwic.cube/src/de/xwic/cube/impl/Cell.java -text
+de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
+de.xwic.cube/src/de/xwic/cube/impl/DataPool.java -text
+de.xwic.cube/src/de/xwic/cube/impl/DataPoolManager.java -text
+de.xwic.cube/src/de/xwic/cube/impl/Dimension.java -text
+de.xwic.cube/src/de/xwic/cube/impl/DimensionElement.java -text
+de.xwic.cube/src/de/xwic/cube/impl/Identifyable.java -text
+de.xwic.cube/src/de/xwic/cube/impl/Measure.java -text
+de.xwic.cube/src/de/xwic/cube/util/DataDump.java -text
+de.xwic.cube/src_test/de/xwic/cube/CubeTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/DataPoolManagerTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/Demo.java -text

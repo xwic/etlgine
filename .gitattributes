@@ -1,4 +1,12 @@
 * text=auto !eol
+de.xwic.cube.webui/.classpath -text
+de.xwic.cube.webui/.project -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableCell.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableRenderer.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewer.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModel.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionNavigationProvider.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationProvider.java -text
 de.xwic.cube/.classpath -text
 de.xwic.cube/.cvsignore -text
 de.xwic.cube/.project -text

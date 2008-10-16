@@ -14,6 +14,7 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationElement.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationElementProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/NavigationSize.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/TotalNavigationProvider.java -text
 de.xwic.cube/.classpath -text
 de.xwic.cube/.cvsignore -text
 de.xwic.cube/.project -text

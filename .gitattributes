@@ -4,6 +4,7 @@ de.xwic.cube.webui/.project -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableCell.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableRenderer.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ContentInfo.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeFilter.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewer.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModel.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DefaultDimensionDataProvider.java -text

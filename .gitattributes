@@ -32,8 +32,16 @@ de.xwic.cube/src/de/xwic/cube/IDimension.java -text
 de.xwic.cube/src/de/xwic/cube/IDimensionElement.java -text
 de.xwic.cube/src/de/xwic/cube/IIdentifyable.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasure.java -text
+de.xwic.cube/src/de/xwic/cube/IMeasureFunction.java -text
+de.xwic.cube/src/de/xwic/cube/IValueFormat.java -text
+de.xwic.cube/src/de/xwic/cube/IValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/Key.java -text
 de.xwic.cube/src/de/xwic/cube/StorageException.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/DefaultValueFormat.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/DefaultValueFormatProvider.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormat.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormatProvider.java -text
+de.xwic.cube/src/de/xwic/cube/functions/DifferenceFunction.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cell.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPool.java -text

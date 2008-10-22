@@ -11,6 +11,7 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModel.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModelEvent.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DefaultDimensionDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionNavigationProvider.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionSelectorControl.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ICubeDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ICubeViewerModelListener.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationElement.java -text

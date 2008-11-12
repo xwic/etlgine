@@ -8,7 +8,11 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeFilter.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeFilter.vtl -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewer.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModel.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModelAdapter.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeViewerModelEvent.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeWriter.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeWriter.vtl -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CustomNavigationProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DefaultDimensionDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionNavigationProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionSelectorControl.java -text
@@ -20,7 +24,6 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/NavigationSize.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/TotalNavigationProvider.java -text
 de.xwic.cube/.classpath -text
-de.xwic.cube/.cvsignore -text
 de.xwic.cube/.project -text
 de.xwic.cube/.settings/org.eclipse.jdt.ui.prefs -text
 de.xwic.cube/src/de/xwic/cube/DataPoolManagerFactory.java -text

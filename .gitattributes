@@ -5,6 +5,7 @@ de.xwic.cube.webui.samples/src/de/xwic/cube/webui/samples/demo1/DemoApplication1
 de.xwic.cube.webui.samples/src/de/xwic/cube/webui/samples/demo1/DemoApplication1.vtl -text
 de.xwic.cube.webui/.classpath -text
 de.xwic.cube.webui/.project -text
+de.xwic.cube.webui/changes.txt -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/controls/DimensionSelectorControl.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/controls/LeafDimensionSelectorControl.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/controls/LeafDimensionSelectorControl.vtl -text

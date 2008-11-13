@@ -1,6 +1,9 @@
 * text=auto !eol
 de.xwic.cube.webui/.classpath -text
 de.xwic.cube.webui/.project -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/controls/DimensionSelectorControl.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/controls/LeafDimensionSelectorControl.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/controls/LeafDimensionSelectorControl.vtl -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableCell.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableRenderer.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ContentInfo.java -text
@@ -18,6 +21,7 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionNavigationProvider.jav
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionSelectorControl.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ICubeDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ICubeViewerModelListener.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/IDimensionFilter.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationElement.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationElementProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/INavigationProvider.java -text

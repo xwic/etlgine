@@ -1,4 +1,8 @@
 * text=auto !eol
+de.xwic.cube.webui.samples/.classpath -text
+de.xwic.cube.webui.samples/.project -text
+de.xwic.cube.webui.samples/src/de/xwic/cube/webui/samples/demo1/DemoApplication1.java -text
+de.xwic.cube.webui.samples/src/de/xwic/cube/webui/samples/demo1/DemoApplication1.vtl -text
 de.xwic.cube.webui/.classpath -text
 de.xwic.cube.webui/.project -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/controls/DimensionSelectorControl.java -text

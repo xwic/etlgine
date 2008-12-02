@@ -12,6 +12,11 @@ public class ETLException extends Exception {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 3204004770821027644L;
+
+	/**
+	 * 
+	 */
 	public ETLException() {
 		super();
 	}

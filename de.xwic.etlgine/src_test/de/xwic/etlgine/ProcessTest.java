@@ -61,6 +61,7 @@ public class ProcessTest extends TestCase {
 		process.setMonitor(new DefaultMonitor() {
 			@Override
 			public void onEvent(IETLContext context, EventType eventType) {
+				super.onEvent(context, eventType);
 				switch (eventType) {
 				case SOURCE_POST_OPEN: {
 					// after the open, check if the data source contains the right columns.

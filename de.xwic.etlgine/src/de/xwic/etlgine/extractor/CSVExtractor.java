@@ -1,7 +1,7 @@
 /*
  * de.xwic.etlgine.loader.CSVExtractor 
  */
-package de.xwic.etlgine.loader;
+package de.xwic.etlgine.extractor;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

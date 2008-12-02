@@ -12,6 +12,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IExtractor;
+import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
@@ -23,7 +24,8 @@ import de.xwic.etlgine.IMonitor.EventType;
 public class ETLProcess implements IETLProcess {
 
 	protected List<ISource> sources = new ArrayList<ISource>();
-	protected IExtractor loader = null;
+	protected List<ILoader> loaders = new ArrayList<ILoader>();
+	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
 
 	/**
@@ -43,17 +45,33 @@ public class ETLProcess implements IETLProcess {
 	}
 	
 	/**
+	 * Add a loader.
+	 * @param loader
+	 */
+	public void addLoader(ILoader loader) {
+		loaders.add(loader);
+	}
+	
+	/**
+	 * Returns the list of loaders.
+	 * @return
+	 */
+	public List<ILoader> getLoaders() {
+		return Collections.unmodifiableList(loaders);
+	}
+	
+	/**
 	 * @return the loader
 	 */
-	public IExtractor getLoader() {
-		return loader;
+	public IExtractor getExtractor() {
+		return extractor;
 	}
 
 	/**
 	 * @param loader the loader to set
 	 */
-	public void setLoader(IExtractor loader) {
-		this.loader = loader;
+	public void setExtractor(IExtractor extractor) {
+		this.extractor = extractor;
 	}
 	
 	/**
@@ -64,16 +82,20 @@ public class ETLProcess implements IETLProcess {
 		if (sources.size() == 0) {
 			throw new ETLException("No sources defined.");
 		}
-		if (loader == null) {
+		if (extractor == null) {
 			throw new ETLException("No loader defined.");
 		}
 		
 		// create the context
 		Context context = new Context();
 		
-		// initialize the loader
 		try {
-			loader.initialize(context);
+			// initialize the extractor
+			extractor.initialize(context);
+			// initialize loaders 
+			for (ILoader loader : loaders) {
+				loader.initialize(context);
+			}
 			
 			// iterate over sources
 			for (ISource source : sources) {
@@ -89,28 +111,44 @@ public class ETLProcess implements IETLProcess {
 					// let the loader open the source
 					IDataSet dataSet = new DataSet();
 					context.setDataSet(dataSet);
-					loader.openSource(source, dataSet);
+					extractor.openSource(source, dataSet);
 					
 					monitor.onEvent(context, EventType.SOURCE_POST_OPEN);
+
+					// initialize loaders by source
+					for (ILoader loader : loaders) {
+						loader.preSourceProcessing(context);
+					}
 					
 					// iterate over records
 					IRecord record;
-					while ((record = loader.getNextRecord()) != null) {
+					while ((record = extractor.getNextRecord()) != null) {
 						
+						for (ILoader loader : loaders) {
+							loader.processRecord(context, record);
+						}
 						
 						context.recordProcessed();
 					}
 					
+					// notify loaders the the source processing is done.
+					for (ILoader loader : loaders) {
+						loader.postSourceProcessing(context);
+					}
 					monitor.onEvent(context, EventType.SOURCE_FINISHED);
 				}
 				
+			}
+
+			for (ILoader loader : loaders) {
+				loader.onProcessFinished(context);
 			}
 			monitor.onEvent(context, EventType.PROCESS_FINISHED);
 			
 		} finally {
 			// close everything
-			if (loader != null) {
-				loader.close();
+			if (extractor != null) {
+				extractor.close();
 			}
 		}
 		

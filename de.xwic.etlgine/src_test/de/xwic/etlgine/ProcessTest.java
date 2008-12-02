@@ -3,7 +3,8 @@
  */
 package de.xwic.etlgine;
 
-import de.xwic.etlgine.loader.CSVExtractor;
+import de.xwic.etlgine.extractor.CSVExtractor;
+import de.xwic.etlgine.loader.CSVLoader;
 import de.xwic.etlgine.sources.FileSource;
 import junit.framework.TestCase;
 
@@ -46,10 +47,16 @@ public class ProcessTest extends TestCase {
 		process.addSource(srcFile);
 		assertEquals(1, process.getSources().size());
 		
-		CSVExtractor csvLoader = new CSVExtractor();
-		csvLoader.setSeparator('\t');
-		process.setLoader(csvLoader);
+		CSVExtractor csvExtractor = new CSVExtractor();
+		csvExtractor.setSeparator('\t');
+		process.setExtractor(csvExtractor);
 
+		// add CSV writer
+		CSVLoader loader = new CSVLoader();
+		loader.setFilename("test/export.csv");
+		loader.setSeparator(';');
+		process.addLoader(loader);
+		
 		// install monitor that does the various tests.
 		process.setMonitor(new DefaultMonitor() {
 			@Override

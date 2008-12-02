@@ -16,14 +16,14 @@ import java.util.List;
 public interface IETLProcess {
 
 	/**
-	 * @return the loader
+	 * @return the extractor
 	 */
-	public IExtractor getLoader();
+	public IExtractor getExtractor();
 
 	/**
-	 * @param loader the loader to set
+	 * @param extractor the IExtractor to set
 	 */
-	public void setLoader(IExtractor loader);
+	public void setExtractor(IExtractor extractor);
 
 	/**
 	 * Start the process.
@@ -51,6 +51,18 @@ public interface IETLProcess {
 	 * @param monitor the monitor to set
 	 */
 	public void setMonitor(IMonitor monitor);
+
+	/**
+	 * Add a loader.
+	 * @param loader
+	 */
+	public void addLoader(ILoader loader);
+
+	/**
+	 * Returns the list of loaders.
+	 * @return
+	 */
+	public List<ILoader> getLoaders();
 
 	
 	

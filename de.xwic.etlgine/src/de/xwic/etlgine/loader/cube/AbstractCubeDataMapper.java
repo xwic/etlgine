@@ -35,6 +35,14 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	public void initialize(IETLContext context, ICube cube) throws ETLException {
 		this.cube = cube;
 		configure(context);
+		
+		// notify mappings
+		for (DimensionMapping dm : dimMap.values()) {
+			dm.afterConfiguration(context, cube);
+		}
+		for (MeasureMapping mm : measureMap.values()) {
+			mm.afterConfiguration(context, cube);
+		}
 	}
 	
 	/**

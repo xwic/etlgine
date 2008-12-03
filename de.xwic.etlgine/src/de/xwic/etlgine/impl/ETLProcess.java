@@ -169,6 +169,10 @@ public class ETLProcess implements IETLProcess {
 						} else {
 							for (ILoader loader : loaders) {
 								loader.processRecord(context, record);
+								if (record.isInvalid()) {
+									monitor.logWarn("Invalid record : " + record.getInvalidReason());
+									break;
+								}
 							}
 						}
 						

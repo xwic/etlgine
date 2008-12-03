@@ -123,6 +123,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/AbstractCubeDataMapper.java -tex
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/CubeLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DataPoolInitializer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DimensionMapping.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ElementMapping.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ICubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/IDataPoolProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/MeasureMapping.java -text

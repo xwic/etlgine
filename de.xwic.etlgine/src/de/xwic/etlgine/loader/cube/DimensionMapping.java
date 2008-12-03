@@ -3,10 +3,14 @@
  */
 package de.xwic.etlgine.loader.cube;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IETLContext;
 import de.xwic.etlgine.IRecord;
 
 
@@ -20,6 +24,8 @@ public class DimensionMapping {
 	private boolean autoCreate = true;
 	private IDimensionElement unmappedElement = null;
 	
+	private List<ElementMapping> emList = null;
+	
 	/**
 	 * Constructor.
 	 * @param dimension
@@ -28,6 +34,48 @@ public class DimensionMapping {
 		this.dimension = dimension;
 	}
 	
+	/**
+	 * Add an empty ElementMapping
+	 * @return
+	 */
+	public ElementMapping addElementMapping() {
+		ElementMapping em = new ElementMapping(dimension);
+		addElementMapping(em);
+		return em;
+	}
+	
+	/**
+	 * Add an ElementMapping.
+	 * @param elementID
+	 * @param expression
+	 * @return
+	 */
+	public ElementMapping addElementMapping(String elementID, String expression) {
+		return addElementMapping(new ElementMapping(dimension, elementID, expression));
+	}
+	
+	/**
+	 * Add an ElementMapping.
+	 * @param elementID
+	 * @param expression
+	 * @return
+	 */
+	public ElementMapping addElementMapping(String elementID, String expression, boolean isRegExp) {
+		return addElementMapping(new ElementMapping(dimension, elementID, expression, isRegExp));
+	}
+	
+	/**
+	 * Add an ElementMapping.
+	 * @param em
+	 */
+	private ElementMapping addElementMapping(ElementMapping em) {
+		if (emList == null) {
+			emList = new ArrayList<ElementMapping>();
+		}
+		emList.add(em);
+		return em;
+	}
+
 	/**
 	 * @return the columnNames
 	 */
@@ -81,25 +129,52 @@ public class DimensionMapping {
 			}
 			sb.append(val);
 		}
-		String[] path = sb.toString().split("/");
-		IDimensionElement elm = dimension;
-		for (String key : path) {
-			if (elm.containsDimensionElement(key)) {
-				elm = elm.getDimensionElement(key);
-			} else {
-				if (autoCreate) {
-					elm = elm.createDimensionElement(key);
+		if (emList == null) {	// values are the keys.
+			String[] path = sb.toString().split("/");
+			IDimensionElement elm = dimension;
+			for (String key : path) {
+				if (elm.containsDimensionElement(key)) {
+					elm = elm.getDimensionElement(key);
 				} else {
-					if (unmappedElement != null) {
-						return unmappedElement;
+					if (autoCreate) {
+						elm = elm.createDimensionElement(key);
 					} else {
-						record.markInvalid("Element " + sb + " not found in dimension " + dimension.getKey() + " - cant mapp data.");
-						return null;
+						if (unmappedElement != null) {
+							return unmappedElement;
+						} else {
+							record.markInvalid("Element " + sb + " not found in dimension " + dimension.getKey() + " - cant map data.");
+							return null;
+						}
 					}
 				}
 			}
+			return elm;
+		} else {
+			String value = sb.toString();
+			for (ElementMapping em : emList) {
+				if (em.match(value)) {
+					return em.getElement();
+				}
+			}
+			if (unmappedElement != null) {
+				return unmappedElement;
+			}
+			record.markInvalid("No mapping found for element " + value + " in dimension " + dimension.getKey() + " - cant map data.");
+			return null;
 		}
-		return elm;
+	}
+
+	/**
+	 * @param context
+	 * @param cube
+	 */
+	public void afterConfiguration(IETLContext context, ICube cube) {
+		if (emList != null) {
+			for (ElementMapping em : emList) {
+				em.afterConfiguration(context, cube);
+			}
+		}
+		
 	}
 	
 }

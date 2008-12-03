@@ -5,6 +5,7 @@ package de.xwic.etlgine.loader.cube;
 
 import de.xwic.cube.ICube;
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IETLContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -54,6 +55,15 @@ public class MeasureMapping {
 	 */
 	public void setFixedValue(Double fixedValue) {
 		this.fixedValue = fixedValue;
+	}
+
+	/**
+	 * @param context
+	 * @param cube
+	 */
+	public void afterConfiguration(IETLContext context, ICube cube) {
+		
+		
 	}
 	
 }

@@ -22,6 +22,14 @@ public class DefaultMonitor implements IMonitor {
 	public void logError(String message) {
 		System.out.println("[ERROR] " + message);
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IMonitor#logError(java.lang.String, java.lang.Exception)
+	 */
+	public void logError(String message, Exception e) {
+		System.out.println("[ERROR] " + message);
+		e.printStackTrace();
+	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#logInfo(java.lang.String)

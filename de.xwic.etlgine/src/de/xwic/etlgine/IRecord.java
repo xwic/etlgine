@@ -56,4 +56,36 @@ public interface IRecord {
 	 */
 	public Object getData(IColumn column) throws ETLException;
 
+	/**
+	 * Returns the data with the specified column name.
+	 * @param columnName
+	 * @return
+	 * @throws ETLException
+	 */
+	public String getDataAsString(String columnName) throws ETLException;
+
+	/**
+	 * Returns the data in the specified column.
+	 * @param column
+	 * @return
+	 * @throws ETLException
+	 */
+	public String getDataAsString(IColumn column) throws ETLException;
+	
+	/**
+	 * Returns the data with the specified column name.
+	 * @param columnName
+	 * @return
+	 * @throws ETLException
+	 */
+	public Double getDataAsDouble(String columnName) throws ETLException;
+
+	/**
+	 * Returns the data in the specified column.
+	 * @param column
+	 * @return
+	 * @throws ETLException
+	 */
+	public Double getDataAsDouble(IColumn column) throws ETLException;
+
 }

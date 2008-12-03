@@ -197,6 +197,9 @@ public class ETLProcess implements IETLProcess {
 			}
 			monitor.onEvent(context, EventType.PROCESS_FINISHED);
 			
+		} catch (ETLException e) {
+			monitor.logError("Error during ETL processing: " + e, e);
+			throw e;
 		} finally {
 			// close everything
 			if (extractor != null) {

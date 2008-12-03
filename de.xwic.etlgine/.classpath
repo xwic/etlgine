@@ -4,6 +4,8 @@
 	<classpathentry kind="src" path="src_test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/opencsv-1.8.jar" sourcepath="C:/DATA_lippisch/development/tools/Open CSV/opencsv-1.8/src"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.5.7.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

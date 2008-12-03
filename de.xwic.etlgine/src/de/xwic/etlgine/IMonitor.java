@@ -33,5 +33,11 @@ public interface IMonitor {
 	 * @param message
 	 */
 	public void logError(String message);
+
+	/**
+	 * @param string
+	 * @param e
+	 */
+	public void logError(String string, Exception e);
 	
 }

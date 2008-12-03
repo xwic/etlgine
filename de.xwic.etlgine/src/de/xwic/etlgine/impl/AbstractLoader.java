@@ -23,9 +23,9 @@ public abstract class AbstractLoader implements ILoader {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.impl.Context)
+	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
-	public void onProcessFinished(Context context) throws ETLException {
+	public void onProcessFinished(IETLContext context) throws ETLException {
 
 	}
 

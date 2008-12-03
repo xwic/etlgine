@@ -12,6 +12,7 @@ public class Column implements IColumn {
 
 	private String name = null;
 	private int sourceIndex = -1;
+	private boolean exclude = false;
 
 	public Column() {
 		
@@ -22,6 +23,9 @@ public class Column implements IColumn {
 	 */
 	public Column(String name) {
 		super();
+		if (name == null) {
+			throw new NullPointerException("Column name must be not null");
+		}
 		this.name = name;
 	}
 
@@ -31,6 +35,9 @@ public class Column implements IColumn {
 	 */
 	public Column(String name, int sourceIndex) {
 		super();
+		if (name == null) {
+			throw new NullPointerException("Column name must be not null");
+		}
 		this.name = name;
 		this.sourceIndex = sourceIndex;
 	}
@@ -43,24 +50,10 @@ public class Column implements IColumn {
 	}
 
 	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
 	 * @return the sourceIndex
 	 */
 	public int getSourceIndex() {
 		return sourceIndex;
-	}
-
-	/**
-	 * @param sourceIndex the sourceIndex to set
-	 */
-	public void setSourceIndex(int sourceIndex) {
-		this.sourceIndex = sourceIndex;
 	}
 
 	/* (non-Javadoc)
@@ -95,6 +88,21 @@ public class Column implements IColumn {
 		if (sourceIndex != other.sourceIndex)
 			return false;
 		return true;
+	}
+
+	/**
+	 * @return the exclude
+	 */
+	public boolean isExclude() {
+		return exclude;
+	}
+
+	/**
+	 * If a column is excluded, the loader must ignore the column.
+	 * @param exclude the exclude to set
+	 */
+	public void setExclude(boolean exclude) {
+		this.exclude = exclude;
 	}
 	
 	

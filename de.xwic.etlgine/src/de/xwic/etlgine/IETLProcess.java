@@ -64,6 +64,23 @@ public interface IETLProcess {
 	 */
 	public List<ILoader> getLoaders();
 
+	/**
+	 * Add a transformer.
+	 * @param transformer
+	 */
+	public void addTransformer(ITransformer transformer);
+
+	/**
+	 * Returns the list of transformers.
+	 * @return
+	 */
+	public List<ITransformer> getTransformers();
+
+	/**
+	 * @return the name
+	 */
+	public String getName();
+
 	
 	
 }

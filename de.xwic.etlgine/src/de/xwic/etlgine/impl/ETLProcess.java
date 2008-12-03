@@ -16,6 +16,7 @@ import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
+import de.xwic.etlgine.ITransformer;
 import de.xwic.etlgine.IMonitor.EventType;
 
 /**
@@ -23,11 +24,21 @@ import de.xwic.etlgine.IMonitor.EventType;
  */
 public class ETLProcess implements IETLProcess {
 
+	protected String name;
 	protected List<ISource> sources = new ArrayList<ISource>();
+	protected List<ITransformer> transformers = new ArrayList<ITransformer>();
 	protected List<ILoader> loaders = new ArrayList<ILoader>();
 	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
 
+	/**
+	 * Construct a new process.
+	 * @param name
+	 */
+	public ETLProcess(String name) {
+		this.name = name;
+	}
+	
 	/**
 	 * Add a source.
 	 * @param source
@@ -61,6 +72,22 @@ public class ETLProcess implements IETLProcess {
 	}
 	
 	/**
+	 * Add a transformer.
+	 * @param transformer
+	 */
+	public void addTransformer(ITransformer transformer) {
+		transformers.add(transformer);
+	}
+	
+	/**
+	 * Returns the list of transformers.
+	 * @return
+	 */
+	public List<ITransformer> getTransformers() {
+		return Collections.unmodifiableList(transformers);
+	}
+	
+	/**
 	 * @return the loader
 	 */
 	public IExtractor getExtractor() {
@@ -86,12 +113,18 @@ public class ETLProcess implements IETLProcess {
 			throw new ETLException("No loader defined.");
 		}
 		
+		monitor.logInfo("Starting process '" + name + "'");
+		
 		// create the context
 		Context context = new Context();
 		
 		try {
 			// initialize the extractor
 			extractor.initialize(context);
+			// initialize transformer
+			for (ITransformer transformer : transformers) {
+				transformer.initialize(context);
+			}
 			// initialize loaders 
 			for (ILoader loader : loaders) {
 				loader.initialize(context);
@@ -116,6 +149,10 @@ public class ETLProcess implements IETLProcess {
 					monitor.onEvent(context, EventType.SOURCE_POST_OPEN);
 
 					// initialize loaders by source
+					for (ITransformer transformer : transformers) {
+						transformer.preSourceProcessing(context);
+					}
+					// initialize loaders by source
 					for (ILoader loader : loaders) {
 						loader.preSourceProcessing(context);
 					}
@@ -124,6 +161,9 @@ public class ETLProcess implements IETLProcess {
 					IRecord record;
 					while ((record = extractor.getNextRecord()) != null) {
 						
+						for (ITransformer transformer : transformers) {
+							transformer.processRecord(context, record);
+						}
 						for (ILoader loader : loaders) {
 							loader.processRecord(context, record);
 						}
@@ -131,6 +171,10 @@ public class ETLProcess implements IETLProcess {
 						context.recordProcessed();
 					}
 					
+					// notify transformers that the source processing is done.
+					for (ITransformer transformer : transformers) {
+						transformer.postSourceProcessing(context);
+					}
 					// notify loaders the the source processing is done.
 					for (ILoader loader : loaders) {
 						loader.postSourceProcessing(context);
@@ -140,6 +184,10 @@ public class ETLProcess implements IETLProcess {
 				
 			}
 
+			// notify transformers and loaders that we are done.
+			for (ITransformer transformer : transformers) {
+				transformer.onProcessFinished(context);
+			}
 			for (ILoader loader : loaders) {
 				loader.onProcessFinished(context);
 			}
@@ -166,6 +214,13 @@ public class ETLProcess implements IETLProcess {
 	 */
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
 	}
 	
 }

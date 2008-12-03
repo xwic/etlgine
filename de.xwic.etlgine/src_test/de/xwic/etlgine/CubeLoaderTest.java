@@ -26,7 +26,7 @@ public class CubeLoaderTest extends TestCase {
 
 	public void testCubeLoader() throws ETLException {
 		
-		IETLProcess process = ETLgine.createETLProcess("cubeLoadeTest");
+		IETLProcess process = ETLgine.createETLProcess("cubeLoaderTest");
 		FileSource srcFile = new FileSource("test/source_cube.csv");
 		process.addSource(srcFile);
 		assertEquals(1, process.getSources().size());

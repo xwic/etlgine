@@ -105,5 +105,46 @@ public class Record implements IRecord {
 	public void setInvalidReason(String invalidReason) {
 		this.invalidReason = invalidReason;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#getDataAsString(java.lang.String)
+	 */
+	public String getDataAsString(String columnName) throws ETLException {
+		IColumn column = dataSet.getColumn(columnName);
+		return getDataAsString(column);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#getDataAsString(de.xwic.etlgine.IColumn)
+	 */
+	public String getDataAsString(IColumn column) throws ETLException {
+		Object val = getData(column);
+		return val != null ? val.toString() : null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#getDataAsDouble(java.lang.String)
+	 */
+	public Double getDataAsDouble(String columnName) throws ETLException {
+		IColumn column = dataSet.getColumn(columnName);
+		return getDataAsDouble(column);
+	}
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#getDataAsDouble(de.xwic.etlgine.IColumn)
+	 */
+	public Double getDataAsDouble(IColumn column) throws ETLException {
+		Object val = getData(column);
+		if (val instanceof Double) {
+			return (Double)val;
+		} else if (val instanceof String) {
+			String s = (String)val;
+			if (s.length() == 0) {
+				return null;
+			}
+			return Double.parseDouble(s);
+		}
+		return null;
+		
+	}
 	
 }

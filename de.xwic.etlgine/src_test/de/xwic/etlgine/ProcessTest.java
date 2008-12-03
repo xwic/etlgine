@@ -13,7 +13,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import junit.framework.TestCase;
 import de.xwic.etlgine.extractor.CSVExtractor;
 import de.xwic.etlgine.impl.AbstractTransformer;
-import de.xwic.etlgine.loader.CSVLoader;
+import de.xwic.etlgine.loader.csv.CSVLoader;
 import de.xwic.etlgine.sources.FileSource;
 
 /**
@@ -96,7 +96,7 @@ public class ProcessTest extends TestCase {
 	}
 	
 	public void testTransformerAddColumn() throws Exception {
-		IETLProcess process = ETLgine.createETLProcess("testTransformerAddColumn");
+	IETLProcess process = ETLgine.createETLProcess("testTransformerAddColumn");
 		
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);

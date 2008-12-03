@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.etlgine.loader;
+package de.xwic.etlgine.loader.csv;
 
 import java.io.FileWriter;
 import java.io.IOException;

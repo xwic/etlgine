@@ -114,8 +114,8 @@ de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Column.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/impl/Context.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/DataSet.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/impl/ETLContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ETLProcess.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Record.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/csv/CSVLoader.java -text

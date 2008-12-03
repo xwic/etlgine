@@ -27,12 +27,14 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	
 	protected List<IMeasure> measures = new ArrayList<IMeasure>();
 	protected Map<IMeasure, MeasureMapping> measureMap = new HashMap<IMeasure, MeasureMapping>();
+	protected IETLContext context;
 	
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#initialize(de.xwic.etlgine.IETLContext, de.xwic.cube.ICube)
 	 */
 	public void initialize(IETLContext context, ICube cube) throws ETLException {
+		this.context = context;
 		this.cube = cube;
 		configure(context);
 		
@@ -96,7 +98,10 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	 */
 	public IDimensionElement getElement(IDimension dim, IRecord record) throws ETLException {
 		DimensionMapping dm = dimMap.get(dim);
-		return dm.mapElement(cube, record);
+		if (dm == null) {
+			throw new ETLException("No mapping for dimension " + dim.getKey());
+		}
+		return dm.mapElement(context, cube, record);
 	}
 
 	/* (non-Javadoc)

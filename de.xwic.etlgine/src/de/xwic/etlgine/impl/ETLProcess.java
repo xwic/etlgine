@@ -164,8 +164,12 @@ public class ETLProcess implements IETLProcess {
 						for (ITransformer transformer : transformers) {
 							transformer.processRecord(context, record);
 						}
-						for (ILoader loader : loaders) {
-							loader.processRecord(context, record);
+						if (record.isInvalid()) {
+							monitor.logWarn("Invalid record : " + record.getInvalidReason());
+						} else {
+							for (ILoader loader : loaders) {
+								loader.processRecord(context, record);
+							}
 						}
 						
 						context.recordProcessed();

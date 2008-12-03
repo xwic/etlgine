@@ -99,6 +99,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/IColumn.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IDataSet.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IETLContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IETLProcess.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/IETLProcessParticipant.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ILoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IMonitor.java -text
@@ -108,6 +109,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/ITransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/CSVExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractLoader.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Column.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Context.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/DataSet.java -text
@@ -117,4 +119,6 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/CSVLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/ProcessTest.java -text
 de.xwic.etlgine/test/export.csv -text
+de.xwic.etlgine/test/export2.csv -text
+de.xwic.etlgine/test/export3.csv -text
 de.xwic.etlgine/test/source.csv -text

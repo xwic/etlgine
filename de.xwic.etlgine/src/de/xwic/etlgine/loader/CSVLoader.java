@@ -14,7 +14,6 @@ import de.xwic.etlgine.IETLContext;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.impl.AbstractLoader;
-import de.xwic.etlgine.impl.Context;
 
 /**
  * Writes the data into a CSV file.
@@ -27,6 +26,9 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	private char quoteChar = '"';
 	private String filename = null;
 	private CSVWriter writer;
+	
+	private int colCount = 0;
+	private IColumn[] exportCols = null;
 	
 	/**
 	 * @return the filename
@@ -99,10 +101,10 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.impl.Context)
+	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void onProcessFinished(Context context) throws ETLException {
+	public void onProcessFinished(IETLContext context) throws ETLException {
 		try {
 			writer.flush();
 			writer.close();
@@ -119,9 +121,19 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 
 		if (containsHeader) {
 			List<IColumn> columns = context.getDataSet().getColumns();
-			String[] data = new String[columns.size()];
-			for (int i = 0; i < data.length; i++) {
-				data[i] = columns.get(i).getName();
+			for (IColumn col : columns) {
+				if (!col.isExclude()) {
+					colCount++;
+				}
+			}
+			String[] data = new String[colCount];
+			exportCols = new IColumn[colCount];
+			int i = 0;
+			for (IColumn col : columns) {
+				if (!col.isExclude()) {
+					exportCols[i] = col;
+					data[i++] = col.getName();
+				}
 			}
 			writer.writeNext(data);
 		}
@@ -133,15 +145,12 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	 */
 	public void processRecord(IETLContext context, IRecord record) throws ETLException {
 
-		List<IColumn> columns = context.getDataSet().getColumns();
-		String[] data = new String[columns.size()];
+		String[] data = new String[colCount];
 		for (int i = 0; i < data.length; i++) {
-			IColumn column = columns.get(i);
-			Object value = record.getData(column);
+			Object value = record.getData(exportCols[i]);
 			data[i] = value != null ? value.toString() : "";
 		}
 		writer.writeNext(data);
-
 		
 	}
 

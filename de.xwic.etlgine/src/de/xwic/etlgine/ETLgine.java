@@ -15,8 +15,8 @@ public class ETLgine {
 	 * Create a new EtlProcess.
 	 * @return
 	 */
-	public static IETLProcess createETLProcess() {
-		return new ETLProcess();
+	public static IETLProcess createETLProcess(String name) {
+		return new ETLProcess(name);
 	}
 	
 }

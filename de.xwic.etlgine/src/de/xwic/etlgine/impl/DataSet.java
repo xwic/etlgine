@@ -29,9 +29,7 @@ public class DataSet implements IDataSet {
 	 * @throws ETLException 
 	 */
 	public IColumn addColumn(String name) throws ETLException {
-		IColumn column = new Column(name); 
-		addColumn(column);
-		return column;
+		return addColumn(name, -1);
 	}
 	
 	/**
@@ -42,6 +40,14 @@ public class DataSet implements IDataSet {
 	 * @throws ETLException 
 	 */
 	public IColumn addColumn(String name, int idx) throws ETLException {
+		if (name == null) {
+			String baseName = "Col-" + columns.size();
+			name = baseName;
+			int i = 0;
+			while (columnMap.containsKey(name)) {
+				name = baseName + "." + (i++);
+			}
+		}
 		IColumn column = new Column(name, idx); 
 		addColumn(column);
 		return column;
@@ -56,15 +62,7 @@ public class DataSet implements IDataSet {
 		if (column == null) {
 			throw new NullPointerException("Column must be not null");
 		}
-		if (column.getName() == null) {
-			String baseName = "Col-" + columns.size();
-			String name = baseName;
-			int idx = 0;
-			while (columnMap.containsKey(name)) {
-				name = baseName + "." + (idx++);
-			}
-			column.setName(name);
-		} else if (columnMap.containsKey(column.getName())) {
+		if (columnMap.containsKey(column.getName())) {
 			throw new ETLException("A column with that name already exists in this dataset.");
 		}
 		

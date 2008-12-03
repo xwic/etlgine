@@ -5,6 +5,8 @@ package de.xwic.etlgine;
 
 import java.util.List;
 
+import de.xwic.etlgine.impl.ETLContext;
+
 /**
  * Defines the whole process of extracting, transformation and loading.
  * An ETL process has one IExtractor, none to many ITransformer and one
@@ -80,6 +82,11 @@ public interface IETLProcess {
 	 * @return the name
 	 */
 	public String getName();
+
+	/**
+	 * @return the context
+	 */
+	public ETLContext getContext();
 
 	
 	

@@ -30,6 +30,7 @@ public class ETLProcess implements IETLProcess {
 	protected List<ILoader> loaders = new ArrayList<ILoader>();
 	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
+	protected ETLContext context;
 
 	/**
 	 * Construct a new process.
@@ -37,6 +38,7 @@ public class ETLProcess implements IETLProcess {
 	 */
 	public ETLProcess(String name) {
 		this.name = name;
+		context = new ETLContext();
 	}
 	
 	/**
@@ -114,9 +116,6 @@ public class ETLProcess implements IETLProcess {
 		}
 		
 		monitor.logInfo("Starting process '" + name + "'");
-		
-		// create the context
-		Context context = new Context();
 		
 		try {
 			// initialize the extractor
@@ -232,6 +231,13 @@ public class ETLProcess implements IETLProcess {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return the context
+	 */
+	public ETLContext getContext() {
+		return context;
 	}
 	
 }

@@ -22,6 +22,8 @@ public class DimensionMapping {
 	private IDimension dimension = null;
 	private String[] columnNames = null;
 	private boolean autoCreate = true;
+	private String unmappedElementPath = null;
+	private String contextPropertyName = null;
 	private IDimensionElement unmappedElement = null;
 	
 	private List<ElementMapping> emList = null;
@@ -103,7 +105,7 @@ public class DimensionMapping {
 	/**
 	 * @return the unmappedElementKey
 	 */
-	public IDimensionElement getUnmappedElementKey() {
+	public IDimensionElement getUnmappedElement() {
 		return unmappedElement;
 	}
 	/**
@@ -120,17 +122,29 @@ public class DimensionMapping {
 	 * @return
 	 * @throws ETLException
 	 */
-	public IDimensionElement mapElement(ICube cube, IRecord record) throws ETLException {
-		StringBuilder sb = new StringBuilder();
-		for (String col : columnNames) {
-			String val = record.getDataAsString(col);
-			if (sb.length() != 0) {
-				sb.append("/");
+	public IDimensionElement mapElement(IETLContext context, ICube cube, IRecord record) throws ETLException {
+		
+		String value;
+		if (contextPropertyName != null) {
+			value = context.getProperty(contextPropertyName);
+			if (value == null) {
+				throw new ETLException("Specified context property '" + contextPropertyName + "' contains null.");
 			}
-			sb.append(val);
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for (String col : columnNames) {
+				String val = record.getDataAsString(col);
+				if (sb.length() != 0) {
+					sb.append("/");
+				}
+				sb.append(val);
+			}
+			value = sb.toString();
 		}
+		
+		
 		if (emList == null) {	// values are the keys.
-			String[] path = sb.toString().split("/");
+			String[] path = value.split("/");
 			IDimensionElement elm = dimension;
 			for (String key : path) {
 				if (elm.containsDimensionElement(key)) {
@@ -142,7 +156,7 @@ public class DimensionMapping {
 						if (unmappedElement != null) {
 							return unmappedElement;
 						} else {
-							record.markInvalid("Element " + sb + " not found in dimension " + dimension.getKey() + " - cant map data.");
+							record.markInvalid("Element " + value + " not found in dimension " + dimension.getKey() + " - cant map data.");
 							return null;
 						}
 					}
@@ -150,7 +164,6 @@ public class DimensionMapping {
 			}
 			return elm;
 		} else {
-			String value = sb.toString();
 			for (ElementMapping em : emList) {
 				if (em.match(value)) {
 					return em.getElement();
@@ -174,7 +187,38 @@ public class DimensionMapping {
 				em.afterConfiguration(context, cube);
 			}
 		}
-		
+		if (unmappedElement == null && unmappedElementPath != null) {
+			unmappedElement = dimension.parsePath(unmappedElementPath);
+		}
+	}
+
+	/**
+	 * @return the unmappedElementPath
+	 */
+	public String getUnmappedElementPath() {
+		return unmappedElementPath;
+	}
+
+	/**
+	 * @param unmappedElementPath the unmappedElementPath to set
+	 */
+	public void setUnmappedElementPath(String unmappedElementPath) {
+		this.unmappedElementPath = unmappedElementPath;
+	}
+
+	/**
+	 * @return the contextPropertyName
+	 */
+	public String getContextPropertyName() {
+		return contextPropertyName;
+	}
+
+	/**
+	 * The name of a context property that contains the value.
+	 * @param contextPropertyName the contextPropertyName to set
+	 */
+	public void setContextPropertyName(String contextPropertyName) {
+		this.contextPropertyName = contextPropertyName;
 	}
 	
 }

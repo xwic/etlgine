@@ -1,7 +1,10 @@
 * text=auto !eol
 de.xwic.cube.webui.samples/.classpath -text
 de.xwic.cube.webui.samples/.project -text
+de.xwic.cube.webui.samples/jetty/jetty-6.1.9.jar -text
+de.xwic.cube.webui.samples/jetty/jetty-util-6.1.9.jar -text
 de.xwic.cube.webui.samples/jetty/jetty.xml -text
+de.xwic.cube.webui.samples/jetty/start.jar -text
 de.xwic.cube.webui.samples/jetty/webdefault.xml -text
 de.xwic.cube.webui.samples/src/de/xwic/cube/webui/samples/demo1/DemoApplication1.java -text
 de.xwic.cube.webui.samples/src/de/xwic/cube/webui/samples/demo1/DemoApplication1.vtl -text

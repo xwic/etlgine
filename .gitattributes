@@ -102,9 +102,17 @@ de.xwic.cube.webui.samples/web_root/sample/jwic.page -text
 de.xwic.cube.webui.samples/web_root/sample/jwic_layer.page -text
 de.xwic.cube.webui.samples/web_root/sample/sample.css -text
 de.xwic.cube.webui.samples/web_root/test.html -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/I.png -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/L.png -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/Lminus.png -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/Lplus.png -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/T.png -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/Thumbs.db -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/Tminus.png -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/Tplus.png -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/action_back.gif -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/action_forward.gif -text
+de.xwic.cube.webui.samples/web_root/xwiccube/images/blank.png -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/collapse.png -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/expand.png -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/left_a.gif -text
@@ -117,6 +125,7 @@ de.xwic.cube.webui.samples/web_root/xwiccube/images/resultset_previous.png -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/resultset_previous_dis.gif -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/right_a.gif -text
 de.xwic.cube.webui.samples/web_root/xwiccube/images/right_i.gif -text
+de.xwic.cube.webui.samples/web_root/xwiccube/json2.js -text
 de.xwic.cube.webui.samples/web_root/xwiccube/xwiccube.css -text
 de.xwic.cube.webui.samples/web_root/xwiccube/xwiccube.js -text
 de.xwic.cube.webui/.classpath -text

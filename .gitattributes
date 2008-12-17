@@ -312,6 +312,17 @@ external/org.apache.commons.logging/about.html -text
 external/org.apache.commons.logging/about_files/LICENSE.txt -text
 external/org.apache.commons.logging/org.apache.commons.logging_1.0.4.v20080605-1930.jar -text
 external/org.apache.commons.logging/plugin.properties -text
+external/org.apache.log4j/.classpath -text
+external/org.apache.log4j/.project -text
+external/org.apache.log4j/.settings/org.eclipse.jdt.core.prefs -text
+external/org.apache.log4j/META-INF/ECLIPSE.RSA -text
+external/org.apache.log4j/META-INF/ECLIPSE.SF -text
+external/org.apache.log4j/META-INF/MANIFEST.MF -text
+external/org.apache.log4j/META-INF/eclipse.inf -text
+external/org.apache.log4j/about.html -text
+external/org.apache.log4j/about_files/LICENSE.txt -text
+external/org.apache.log4j/org.apache.log4j_1.2.13.v200706111418.jar -text
+external/org.apache.log4j/plugin.properties -text
 external/org.json/.classpath -text
 external/org.json/.project -text
 external/org.json/src/org/json/CDL.java -text

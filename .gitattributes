@@ -301,6 +301,17 @@ external/libs.common.jwic/lib/log4j-1.2.8.jar -text
 external/libs.common.jwic/lib/servlet-api-2.5-6.1.9.jar -text
 external/libs.common.jwic/lib/spring-1.2.6.jar -text
 external/libs.common.jwic/lib/velocity-1.4.jar -text
+external/org.apache.commons.logging/.classpath -text
+external/org.apache.commons.logging/.project -text
+external/org.apache.commons.logging/.settings/org.eclipse.jdt.core.prefs -text
+external/org.apache.commons.logging/META-INF/ECLIPSE.RSA -text
+external/org.apache.commons.logging/META-INF/ECLIPSE.SF -text
+external/org.apache.commons.logging/META-INF/MANIFEST.MF -text
+external/org.apache.commons.logging/META-INF/eclipse.inf -text
+external/org.apache.commons.logging/about.html -text
+external/org.apache.commons.logging/about_files/LICENSE.txt -text
+external/org.apache.commons.logging/org.apache.commons.logging_1.0.4.v20080605-1930.jar -text
+external/org.apache.commons.logging/plugin.properties -text
 external/org.json/.classpath -text
 external/org.json/.project -text
 external/org.json/src/org/json/CDL.java -text

@@ -721,6 +721,12 @@ external/org.apache.log4j/about.html -text
 external/org.apache.log4j/about_files/LICENSE.txt -text
 external/org.apache.log4j/org.apache.log4j_1.2.13.v200706111418.jar -text
 external/org.apache.log4j/plugin.properties -text
+external/org.dom4j/.classpath -text
+external/org.dom4j/.project -text
+external/org.dom4j/META-INF/MANIFEST.MF -text
+external/org.dom4j/build.properties -text
+external/org.dom4j/dom4j-1.5.2.jar -text
+external/org.dom4j/plugin.properties -text
 external/org.json/.classpath -text
 external/org.json/.project -text
 external/org.json/src/org/json/CDL.java -text

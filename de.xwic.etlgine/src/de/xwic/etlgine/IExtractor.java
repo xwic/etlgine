@@ -6,7 +6,7 @@ package de.xwic.etlgine;
 /**
  * @author lippisch
  */
-public interface IExtractor {
+public interface IExtractor extends IETLProcessParticipant {
 
 	/**
 	 * Initialize the loader.

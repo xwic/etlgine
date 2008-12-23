@@ -5,7 +5,6 @@ package de.xwic.etlgine;
 
 import java.util.List;
 
-import de.xwic.etlgine.impl.ETLContext;
 
 /**
  * Defines the whole process of extracting, transformation and loading.
@@ -86,7 +85,7 @@ public interface IETLProcess {
 	/**
 	 * @return the context
 	 */
-	public ETLContext getContext();
+	public IETLContext getContext();
 
 	
 	

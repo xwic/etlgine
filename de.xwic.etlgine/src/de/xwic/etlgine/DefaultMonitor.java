@@ -8,11 +8,26 @@ package de.xwic.etlgine;
  */
 public class DefaultMonitor implements IMonitor {
 
+	private long startTime = 0;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#onEvent(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IMonitor.EventType)
 	 */
 	public void onEvent(IETLContext context, EventType eventType) {
-		System.out.println("[EVENT] " + eventType.name());
+		if (eventType != EventType.RECORD_PROCESSED) {
+			System.out.println("[EVENT] " + eventType.name());
+		}
+		
+		switch (eventType) {
+		case PROCESS_START:
+			startTime = System.currentTimeMillis();
+			break;
+		case PROCESS_FINISHED:
+			long duration = System.currentTimeMillis() - startTime;
+			logInfo("Total duration (in ms): " + duration);
+			logInfo("Records processed:      " + context.getRecordsProcessed());
+			break;
+		}
 		
 	}
 	

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -15,6 +16,7 @@ import de.xwic.etlgine.IRecord;
  */
 public class ETLContext implements IETLContext {
 
+	protected IMonitor monitor = null;
 	protected IDataSet dataSet = null;
 	protected IRecord currentRecord = null;
 	protected int recordsProcessed = 0;
@@ -122,6 +124,20 @@ public class ETLContext implements IETLContext {
 			return defaultObject;
 		}
 		return value;
+	}
+
+	/**
+	 * @return the monitor
+	 */
+	public IMonitor getMonitor() {
+		return monitor;
+	}
+
+	/**
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(IMonitor monitor) {
+		this.monitor = monitor;
 	}
 
 }

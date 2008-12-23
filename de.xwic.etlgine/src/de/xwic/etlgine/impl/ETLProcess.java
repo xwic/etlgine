@@ -10,6 +10,7 @@ import java.util.List;
 import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IDataSet;
+import de.xwic.etlgine.IETLContext;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
@@ -39,6 +40,7 @@ public class ETLProcess implements IETLProcess {
 	public ETLProcess(String name) {
 		this.name = name;
 		context = new ETLContext();
+		context.setMonitor(monitor);
 	}
 	
 	/**
@@ -116,6 +118,7 @@ public class ETLProcess implements IETLProcess {
 		}
 		
 		monitor.logInfo("Starting process '" + name + "'");
+		monitor.onEvent(context, EventType.PROCESS_START);
 		
 		try {
 			// initialize the extractor
@@ -143,10 +146,15 @@ public class ETLProcess implements IETLProcess {
 					// let the loader open the source
 					IDataSet dataSet = new DataSet();
 					context.setDataSet(dataSet);
+					
+					monitor.logInfo("Opening source " + source.getName());
+					
 					extractor.openSource(source, dataSet);
 					
 					monitor.onEvent(context, EventType.SOURCE_POST_OPEN);
 
+					extractor.preSourceProcessing(context);
+					
 					// initialize loaders by source
 					for (ITransformer transformer : transformers) {
 						transformer.preSourceProcessing(context);
@@ -176,6 +184,7 @@ public class ETLProcess implements IETLProcess {
 						}
 						
 						context.recordProcessed();
+						monitor.onEvent(context, EventType.RECORD_PROCESSED);
 					}
 					
 					// notify transformers that the source processing is done.
@@ -186,6 +195,8 @@ public class ETLProcess implements IETLProcess {
 					for (ILoader loader : loaders) {
 						loader.postSourceProcessing(context);
 					}
+					
+					extractor.postSourceProcessing(context);
 					monitor.onEvent(context, EventType.SOURCE_FINISHED);
 				}
 				
@@ -198,6 +209,9 @@ public class ETLProcess implements IETLProcess {
 			for (ILoader loader : loaders) {
 				loader.onProcessFinished(context);
 			}
+			
+			extractor.onProcessFinished(context);
+			
 			monitor.onEvent(context, EventType.PROCESS_FINISHED);
 			
 		} catch (ETLException e) {
@@ -224,6 +238,7 @@ public class ETLProcess implements IETLProcess {
 	 */
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
+		context.setMonitor(monitor);
 	}
 
 	/**
@@ -236,7 +251,7 @@ public class ETLProcess implements IETLProcess {
 	/**
 	 * @return the context
 	 */
-	public ETLContext getContext() {
+	public IETLContext getContext() {
 		return context;
 	}
 	

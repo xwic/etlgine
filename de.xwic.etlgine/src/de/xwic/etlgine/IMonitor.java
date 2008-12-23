@@ -9,7 +9,9 @@ package de.xwic.etlgine;
 public interface IMonitor {
 
 	public enum EventType {
+		PROCESS_START,
 		SOURCE_POST_OPEN,
+		RECORD_PROCESSED,
 		SOURCE_FINISHED,
 		PROCESS_FINISHED
 	}

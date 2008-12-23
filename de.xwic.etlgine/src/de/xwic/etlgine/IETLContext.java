@@ -74,4 +74,14 @@ public interface IETLContext {
 	 */
 	public Object getGlobal(String name, Object defaultObject);
 
+	/**
+	 * @return the monitor
+	 */
+	public IMonitor getMonitor();
+
+	/**
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(IMonitor monitor);
+
 }

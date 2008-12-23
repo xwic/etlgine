@@ -32,6 +32,15 @@ public class FileSource implements ISource {
 		file = new File(filename);
 	}
 	
+	/**
+	 * Construct a new FileSource from a file.
+	 * @param file
+	 */
+	public FileSource(File file) {
+		this.file = file;
+		this.filename = file.getAbsolutePath();
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ISource#getName()
 	 */

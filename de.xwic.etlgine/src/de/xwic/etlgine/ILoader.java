@@ -8,7 +8,7 @@ package de.xwic.etlgine;
  * @author lippisch
  *
  */
-public interface ILoader extends IETLProcessParticipant {
+public interface ILoader extends IProcessParticipant {
 
 	/**
 	 * Load the record.
@@ -16,7 +16,7 @@ public interface ILoader extends IETLProcessParticipant {
 	 * @param record
 	 * @throws ETLException 
 	 */
-	public void processRecord(IETLContext context, IRecord record) throws ETLException;
+	public void processRecord(IContext context, IRecord record) throws ETLException;
 
 	
 }

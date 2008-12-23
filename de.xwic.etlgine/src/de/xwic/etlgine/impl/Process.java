@@ -10,8 +10,8 @@ import java.util.List;
 import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IDataSet;
-import de.xwic.etlgine.IETLContext;
-import de.xwic.etlgine.IETLProcess;
+import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IMonitor;
@@ -23,7 +23,7 @@ import de.xwic.etlgine.IMonitor.EventType;
 /**
  * @author lippisch
  */
-public class ETLProcess implements IETLProcess {
+public class Process implements IProcess {
 
 	protected String name;
 	protected List<ISource> sources = new ArrayList<ISource>();
@@ -31,15 +31,15 @@ public class ETLProcess implements IETLProcess {
 	protected List<ILoader> loaders = new ArrayList<ILoader>();
 	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
-	protected ETLContext context;
+	protected Context context;
 
 	/**
 	 * Construct a new process.
 	 * @param name
 	 */
-	public ETLProcess(String name) {
+	public Process(String name) {
 		this.name = name;
-		context = new ETLContext();
+		context = new Context();
 		context.setMonitor(monitor);
 	}
 	
@@ -251,7 +251,7 @@ public class ETLProcess implements IETLProcess {
 	/**
 	 * @return the context
 	 */
-	public IETLContext getContext() {
+	public IContext getContext() {
 		return context;
 	}
 	

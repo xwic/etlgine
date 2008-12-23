@@ -10,7 +10,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 
 
@@ -122,7 +122,7 @@ public class DimensionMapping {
 	 * @return
 	 * @throws ETLException
 	 */
-	public IDimensionElement mapElement(IETLContext context, ICube cube, IRecord record) throws ETLException {
+	public IDimensionElement mapElement(IContext context, ICube cube, IRecord record) throws ETLException {
 		
 		String value;
 		if (contextPropertyName != null) {
@@ -181,7 +181,7 @@ public class DimensionMapping {
 	 * @param context
 	 * @param cube
 	 */
-	public void afterConfiguration(IETLContext context, ICube cube) {
+	public void afterConfiguration(IContext context, ICube cube) {
 		if (emList != null) {
 			for (ElementMapping em : emList) {
 				em.afterConfiguration(context, cube);

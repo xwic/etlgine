@@ -3,7 +3,8 @@
  */
 package de.xwic.etlgine;
 
-import de.xwic.etlgine.impl.ETLProcess;
+import de.xwic.etlgine.impl.Process;
+import de.xwic.etlgine.impl.ProcessChain;
 
 /**
  * 
@@ -12,11 +13,11 @@ import de.xwic.etlgine.impl.ETLProcess;
 public class ETLgine {
 
 	/**
-	 * Create a new EtlProcess.
+	 * Create a new ProcessChain.
 	 * @return
 	 */
-	public static IETLProcess createETLProcess(String name) {
-		return new ETLProcess(name);
+	public static IProcessChain createProcessChain(String name) {
+		return new ProcessChain(name);
 	}
-	
+
 }

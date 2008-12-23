@@ -10,7 +10,7 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -25,7 +25,7 @@ public interface ICubeDataMapper {
 	 * @param cube
 	 * @throws ETLException 
 	 */
-	public void initialize(IETLContext context, ICube cube) throws ETLException;
+	public void initialize(IContext context, ICube cube) throws ETLException;
 	
 	/**
 	 * Returns the target element for the specified dimension.

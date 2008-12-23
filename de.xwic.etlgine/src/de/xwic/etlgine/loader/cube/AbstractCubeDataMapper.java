@@ -13,7 +13,7 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -27,13 +27,13 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	
 	protected List<IMeasure> measures = new ArrayList<IMeasure>();
 	protected Map<IMeasure, MeasureMapping> measureMap = new HashMap<IMeasure, MeasureMapping>();
-	protected IETLContext context;
+	protected IContext context;
 	
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#initialize(de.xwic.etlgine.IETLContext, de.xwic.cube.ICube)
 	 */
-	public void initialize(IETLContext context, ICube cube) throws ETLException {
+	public void initialize(IContext context, ICube cube) throws ETLException {
 		this.context = context;
 		this.cube = cube;
 		configure(context);
@@ -52,7 +52,7 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	 * @param context
 	 * @throws ETLException 
 	 */
-	protected abstract void configure(IETLContext context) throws ETLException;
+	protected abstract void configure(IContext context) throws ETLException;
 	
 	/**
 	 * Add a mapping where the columnName and dimension name is the same.

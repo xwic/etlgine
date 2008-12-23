@@ -10,7 +10,7 @@ import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.impl.AbstractLoader;
 
@@ -40,7 +40,7 @@ public class CubeLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void initialize(IETLContext context) throws ETLException {
+	public void initialize(IContext context) throws ETLException {
 		super.initialize(context);
 		dataPool = dataPoolProvider.getDataPool();
 		if (targetCubeKey == null) {
@@ -67,7 +67,7 @@ public class CubeLoader extends AbstractLoader {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IETLContext context, IRecord record) throws ETLException {
+	public void processRecord(IContext context, IRecord record) throws ETLException {
 
 		Key key = cube.createKey("");
 		int idx = 0;

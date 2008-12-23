@@ -9,28 +9,7 @@ package de.xwic.etlgine;
  * 
  * @author lippisch
  */
-public interface IETLContext {
-
-	/**
-	 * @return the dataSet
-	 */
-	public IDataSet getDataSet();
-
-	/**
-	 * @return the recordsProcessed
-	 */
-	public int getRecordsProcessed();
-
-	/**
-	 * Create a new record.
-	 * @return
-	 */
-	public IRecord newRecord();
-
-	/**
-	 * @return the currentRecord
-	 */
-	public IRecord getCurrentRecord();
+public interface IGlobalContext {
 
 	/**
 	 * Set a global property.

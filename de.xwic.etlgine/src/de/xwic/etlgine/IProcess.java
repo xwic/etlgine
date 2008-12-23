@@ -14,7 +14,7 @@ import java.util.List;
  * 
  * @author lippisch
  */
-public interface IETLProcess {
+public interface IProcess {
 
 	/**
 	 * @return the extractor
@@ -27,7 +27,7 @@ public interface IETLProcess {
 	public void setExtractor(IExtractor extractor);
 
 	/**
-	 * Start the process.
+	 * Start the process. Usualy this method is invoked from the IProcessChain.
 	 */
 	public void start() throws ETLException;
 
@@ -85,7 +85,7 @@ public interface IETLProcess {
 	/**
 	 * @return the context
 	 */
-	public IETLContext getContext();
+	public IContext getContext();
 
 	
 	

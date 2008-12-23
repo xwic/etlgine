@@ -1,68 +1,22 @@
 /*
- * de.xwic.etlgine.impl.Context 
+ * de.xwic.etlgine.impl.GlobalContext 
  */
 package de.xwic.etlgine.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xwic.etlgine.IDataSet;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IGlobalContext;
 import de.xwic.etlgine.IMonitor;
-import de.xwic.etlgine.IRecord;
 
 /**
  * @author lippisch
  */
-public class ETLContext implements IETLContext {
+public class GlobalContext implements IGlobalContext {
 
 	protected IMonitor monitor = null;
-	protected IDataSet dataSet = null;
-	protected IRecord currentRecord = null;
-	protected int recordsProcessed = 0;
 	protected Map<String, String> properties = new HashMap<String, String>();
 	protected Map<String, Object> globals = new HashMap<String, Object>();
-	
-	/**
-	 * @return the dataSet
-	 */
-	public IDataSet getDataSet() {
-		return dataSet;
-	}
-
-	/**
-	 * @param dataSet the dataSet to set
-	 */
-	public void setDataSet(IDataSet dataSet) {
-		this.dataSet = dataSet;
-	}
-
-	public IRecord newRecord() {
-		currentRecord = new Record(dataSet);
-		return currentRecord;
-	}
-	
-	/**
-	 * @return the currentRecord
-	 */
-	public IRecord getCurrentRecord() {
-		return currentRecord;
-	}
-
-	/**
-	 * A record has been processed. 
-	 * NOTE: this method is invoked by the process itself.
-	 */
-	public void recordProcessed() {
-		recordsProcessed++;
-	}
-	
-	/**
-	 * @return the recordsProcessed
-	 */
-	public int getRecordsProcessed() {
-		return recordsProcessed;
-	}
 	
 	/**
 	 * Set a global property.

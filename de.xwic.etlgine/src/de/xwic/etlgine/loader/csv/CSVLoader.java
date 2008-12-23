@@ -10,7 +10,7 @@ import java.util.List;
 import au.com.bytecode.opencsv.CSVWriter;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.impl.AbstractLoader;
@@ -90,7 +90,7 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	 * @see de.xwic.etlgine.ILoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void initialize(IETLContext context) throws ETLException {
+	public void initialize(IContext context) throws ETLException {
 		
 		try {
 			writer = new CSVWriter(new FileWriter(filename), separator, quoteChar);
@@ -104,7 +104,7 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void onProcessFinished(IETLContext context) throws ETLException {
+	public void onProcessFinished(IContext context) throws ETLException {
 		try {
 			writer.flush();
 			writer.close();
@@ -117,7 +117,7 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	 * @see de.xwic.etlgine.ILoader#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void preSourceProcessing(IETLContext context) {
+	public void preSourceProcessing(IContext context) {
 
 		if (containsHeader) {
 			List<IColumn> columns = context.getDataSet().getColumns();
@@ -143,7 +143,7 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IETLContext context, IRecord record) throws ETLException {
+	public void processRecord(IContext context, IRecord record) throws ETLException {
 
 		String[] data = new String[colCount];
 		for (int i = 0; i < data.length; i++) {

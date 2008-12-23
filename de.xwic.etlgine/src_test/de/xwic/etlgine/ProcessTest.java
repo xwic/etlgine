@@ -28,10 +28,11 @@ public class ProcessTest extends TestCase {
 	 */
 	public void testStartChecks() {
 		
-		IETLProcess process = ETLgine.createETLProcess("testStartChecks");
+		IProcessChain pc = ETLgine.createProcessChain("Test");
+		IProcess process = pc.createProcess("testStartChecks");
 		assertNotNull(process);
 		try {
-			process.start();
+			pc.start();
 			fail("No exception alert");
 		} catch (ETLException e) {
 			// expected behaivior
@@ -40,7 +41,7 @@ public class ProcessTest extends TestCase {
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
 		try {
-			process.start();
+			pc.start();
 			fail("No exception and no loader defined");
 		} catch (ETLException e) {
 			// expected behaivior. -> should not start without a loader
@@ -50,7 +51,8 @@ public class ProcessTest extends TestCase {
 	
 	public void testProcess() throws ETLException {
 		
-		IETLProcess process = ETLgine.createETLProcess("testProcess");
+		IProcessChain pc = ETLgine.createProcessChain("Test");
+		IProcess process = pc.createProcess("testStartChecks");
 		
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
@@ -69,7 +71,7 @@ public class ProcessTest extends TestCase {
 		// install monitor that does the various tests.
 		process.setMonitor(new DefaultMonitor() {
 			@Override
-			public void onEvent(IETLContext context, EventType eventType) {
+			public void onEvent(IContext context, EventType eventType) {
 				super.onEvent(context, eventType);
 				switch (eventType) {
 				case SOURCE_POST_OPEN: {
@@ -96,7 +98,9 @@ public class ProcessTest extends TestCase {
 	}
 	
 	public void testTransformerAddColumn() throws Exception {
-	IETLProcess process = ETLgine.createETLProcess("testTransformerAddColumn");
+		
+		IProcessChain pc = ETLgine.createProcessChain("Test");
+		IProcess process = pc.createProcess("testStartChecks");
 		
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
@@ -118,7 +122,7 @@ public class ProcessTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#preSourceProcessing(de.xwic.etlgine.IETLContext)
 			 */
 			@Override
-			public void preSourceProcessing(IETLContext context) throws ETLException {
+			public void preSourceProcessing(IContext context) throws ETLException {
 				colTest = context.getDataSet().addColumn("Test");
 				flags.add("preSourceProcessing");
 			}
@@ -126,7 +130,7 @@ public class ProcessTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 			 */
 			@Override
-			public void processRecord(IETLContext context, IRecord record) {
+			public void processRecord(IContext context, IRecord record) {
 				record.setData(colTest, new Date());
 				flags.add("processRecord");
 			}
@@ -152,7 +156,9 @@ public class ProcessTest extends TestCase {
 	}
 
 	public void testTransformerHideColumn() throws Exception {
-		IETLProcess process = ETLgine.createETLProcess("testTransformerHideColumn");
+		
+		IProcessChain pc = ETLgine.createProcessChain("Test");
+		IProcess process = pc.createProcess("testStartChecks");
 			
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
@@ -173,7 +179,7 @@ public class ProcessTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#preSourceProcessing(de.xwic.etlgine.IETLContext)
 			 */
 			@Override
-			public void preSourceProcessing(IETLContext context) throws ETLException {
+			public void preSourceProcessing(IContext context) throws ETLException {
 				IColumn col = context.getDataSet().getColumn("ID");
 				col.setExclude(true);
 			}

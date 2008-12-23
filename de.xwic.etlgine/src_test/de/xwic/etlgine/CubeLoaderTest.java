@@ -26,7 +26,8 @@ public class CubeLoaderTest extends TestCase {
 
 	public void testCubeLoader() throws ETLException {
 		
-		IETLProcess process = ETLgine.createETLProcess("cubeLoaderTest");
+		IProcessChain pc = ETLgine.createProcessChain("cubeLoaderTest");
+		IProcess process = pc.createProcess("cl");
 		FileSource srcFile = new FileSource("test/source_cube.csv");
 		process.addSource(srcFile);
 		assertEquals(1, process.getSources().size());
@@ -54,7 +55,7 @@ public class CubeLoaderTest extends TestCase {
 		cubeLoader.setDataMapper(new ScriptedCubeDataMapper(new File("scripts/testcube.mapping.groovy")));
 		process.addLoader(cubeLoader);
 
-		process.start();
+		pc.start();
 
 		//DataDump.printStructure(System.out, pool.getDimension("Area"));
 		DataDump.printValues(System.out, pool.getCube("Test"), pool.getDimension("Area"), pool.getDimension("Name"), pool.getMeasure("Bookings"));

@@ -16,7 +16,7 @@ public interface IMonitor {
 		PROCESS_FINISHED
 	}
 	
-	public void onEvent(IETLContext context, EventType eventType);
+	public void onEvent(IContext context, EventType eventType);
 	
 	/**
 	 * Log a warning.

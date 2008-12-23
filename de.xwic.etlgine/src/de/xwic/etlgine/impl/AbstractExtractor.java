@@ -4,7 +4,7 @@
 package de.xwic.etlgine.impl;
 
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IExtractor;
 
 /**
@@ -12,31 +12,31 @@ import de.xwic.etlgine.IExtractor;
  */
 public abstract class AbstractExtractor implements IExtractor {
 
-	protected IETLContext context = null;
+	protected IContext context = null;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
-	public void initialize(IETLContext context) {
+	public void initialize(IContext context) {
 		this.context = context;
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
-	public void onProcessFinished(IETLContext context) throws ETLException {
+	public void onProcessFinished(IContext context) throws ETLException {
 		
 	}
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#postSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
-	public void postSourceProcessing(IETLContext context) throws ETLException {
+	public void postSourceProcessing(IContext context) throws ETLException {
 		
 	}
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
-	public void preSourceProcessing(IETLContext context) throws ETLException {
+	public void preSourceProcessing(IContext context) throws ETLException {
 		
 	}
 }

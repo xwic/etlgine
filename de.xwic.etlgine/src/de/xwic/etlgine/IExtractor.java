@@ -6,13 +6,13 @@ package de.xwic.etlgine;
 /**
  * @author lippisch
  */
-public interface IExtractor extends IETLProcessParticipant {
+public interface IExtractor extends IProcessParticipant {
 
 	/**
 	 * Initialize the loader.
 	 * @param context
 	 */
-	public void initialize(IETLContext context) throws ETLException;
+	public void initialize(IContext context) throws ETLException;
 	
 	/**
 	 * Initialize the DataSet.

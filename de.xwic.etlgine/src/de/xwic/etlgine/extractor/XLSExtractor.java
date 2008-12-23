@@ -18,7 +18,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IDataSet;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.impl.AbstractExtractor;
@@ -66,7 +66,7 @@ public class XLSExtractor extends AbstractExtractor {
 	 * @see de.xwic.etlgine.impl.AbstractExtractor#postSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void postSourceProcessing(IETLContext context) throws ETLException {
+	public void postSourceProcessing(IContext context) throws ETLException {
 		super.postSourceProcessing(context);
 		close();
 	}

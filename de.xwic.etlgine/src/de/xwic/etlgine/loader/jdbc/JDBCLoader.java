@@ -14,7 +14,7 @@ import java.util.Map;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
-import de.xwic.etlgine.IETLContext;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.impl.AbstractLoader;
 
@@ -39,7 +39,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void initialize(IETLContext context) throws ETLException {
+	public void initialize(IContext context) throws ETLException {
 		super.initialize(context);
 		
 		// initialize the driver
@@ -71,7 +71,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void onProcessFinished(IETLContext context) throws ETLException {
+	public void onProcessFinished(IContext context) throws ETLException {
 		if (connection != null) {
 			try {
 				connection.close();
@@ -86,7 +86,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void preSourceProcessing(IETLContext context) throws ETLException {
+	public void preSourceProcessing(IContext context) throws ETLException {
 		super.preSourceProcessing(context);
 		
 		// check target table
@@ -154,7 +154,7 @@ public class JDBCLoader extends AbstractLoader {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IETLContext context, IRecord record) throws ETLException {
+	public void processRecord(IContext context, IRecord record) throws ETLException {
 
 		
 		

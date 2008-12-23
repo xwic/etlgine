@@ -13,7 +13,7 @@ public class DefaultMonitor implements IMonitor {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#onEvent(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IMonitor.EventType)
 	 */
-	public void onEvent(IETLContext context, EventType eventType) {
+	public void onEvent(IContext context, EventType eventType) {
 		if (eventType != EventType.RECORD_PROCESSED) {
 			System.out.println("[EVENT] " + eventType.name());
 		}

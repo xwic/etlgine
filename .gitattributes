@@ -621,7 +621,6 @@ de.xwic.etlgine/src/de/xwic/etlgine/DefaultMonitor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ETLException.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ETLgine.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IColumn.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/IColumnMapping.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IDataSet.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IExtractor.java -text

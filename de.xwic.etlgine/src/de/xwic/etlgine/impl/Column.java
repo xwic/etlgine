@@ -10,9 +10,22 @@ import de.xwic.etlgine.IColumn;
  */
 public class Column implements IColumn {
 
+	public enum DataType {
+		UNKNOWN,
+		STRING,
+		INT,
+		LONG,
+		DOUBLE,
+		DATE,
+		DATETIME
+	}
+	
 	private String name = null;
+	private String targetName = null;
+
 	private int sourceIndex = -1;
 	private boolean exclude = false;
+	private DataType typeHint = DataType.UNKNOWN; 
 
 	public Column() {
 		
@@ -104,7 +117,33 @@ public class Column implements IColumn {
 	public void setExclude(boolean exclude) {
 		this.exclude = exclude;
 	}
-	
-	
+
+	/**
+	 * @return the targetName
+	 */
+	public String getTargetName() {
+		return targetName;
+	}
+
+	/**
+	 * @param targetName the targetName to set
+	 */
+	public void setTargetName(String targetName) {
+		this.targetName = targetName;
+	}
+
+	/**
+	 * @return the typeHint
+	 */
+	public DataType getTypeHint() {
+		return typeHint;
+	}
+
+	/**
+	 * @param typeHint the typeHint to set
+	 */
+	public void setTypeHint(DataType typeHint) {
+		this.typeHint = typeHint;
+	}
 	
 }

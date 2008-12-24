@@ -9,7 +9,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.xwic.etlgine.ETLException;
@@ -31,7 +35,7 @@ public class JDBCLoader extends AbstractLoader {
 	private String password = null;
 	private String catalogName = null;
 	private String tablename = null;
-	
+	private boolean autoCreateColumns = false;
 	
 	private Connection connection = null;
 	
@@ -115,13 +119,25 @@ public class JDBCLoader extends AbstractLoader {
 				columns.put(name, colDef);
 			}
 			
+			List<IColumn> missingCols = new ArrayList<IColumn>();
 			
 			// Check if the columns apply.
 			for (IColumn column : context.getDataSet().getColumns()) {
-				if (!columns.containsKey(column.getName())) {
-					System.out.println("Column missing: " + column.getName());
+				if (!column.isExclude() && !columns.containsKey(column.computeTargetName())) {
+					context.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
+					missingCols.add(column);
 				}
 			}
+			if (missingCols.size() > 0) {
+				if (autoCreateColumns) {
+					createColumns(missingCols, columns);
+				} else {
+					throw new ETLException("The source contains columns that do not exist in the target table.");
+				}
+			}
+			
+			// build prepared statement..
+			
 			
 		} catch (SQLException se) {
 			throw new ETLException("Error initializing target database/tables: " + se, se);
@@ -129,10 +145,79 @@ public class JDBCLoader extends AbstractLoader {
 	}
 	
 	/**
+	 * @param missingCols
+	 * @param columns 
+	 * @throws SQLException 
+	 */
+	private void createColumns(List<IColumn> missingCols, Map<String, DbColumnDef> columns) throws SQLException {
+
+		StringBuilder sql = new StringBuilder();
+		sql.append("ALTER TABLE [" + tablename + "] ADD ");
+		boolean first = true;
+		
+		for (IColumn col : missingCols) {
+			
+			DbColumnDef dbcd = new DbColumnDef(col.computeTargetName());
+			
+			if (first) {
+				first = false;
+			} else {
+				sql.append(", ");
+			}
+			
+			sql.append("[")
+			   .append(col.computeTargetName())
+			   .append("] ");
+			
+			String type;;
+			switch (col.getTypeHint()) {
+			case DATE:
+				type = "DATETIME";
+				dbcd.setType(Types.TIMESTAMP);
+				break;
+			case DATETIME:
+				type = "DATETIME";
+				dbcd.setType(Types.TIMESTAMP);
+				break;
+			case DOUBLE:
+				type = "FLOAT";
+				dbcd.setType(Types.FLOAT);
+				break;
+			case INT:
+				type = "INT";
+				dbcd.setType(Types.INTEGER);
+				break;
+			case LONG:
+				type = "BIGINT";
+				dbcd.setType(Types.BIGINT);
+				break;
+			default:
+				type = "VARCHAR(255)";
+				dbcd.setType(Types.VARCHAR);
+				dbcd.setSize(255);
+				break;
+			}
+			
+			sql.append(type)
+			   .append(" NULL");
+			
+			dbcd.setAllowsNull(true);
+			columns.put(dbcd.getName(), dbcd);
+			
+		}
+		
+		context.getMonitor().logInfo("Creating missing columns: \n" + sql.toString());
+
+		Statement stmt = connection.createStatement();
+		stmt.execute(sql.toString());
+		
+	}
+
+	/**
 	 * @param rs
 	 * @throws SQLException 
 	 */
-	private void dumpResultSet(ResultSet rs) throws SQLException {
+	protected void dumpResultSet(ResultSet rs) throws SQLException {
 		
 		ResultSetMetaData rsmd = rs.getMetaData();
 		for (int i = 0; i < rsmd.getColumnCount(); i++) {
@@ -242,6 +327,20 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setCatalogName(String catalogName) {
 		this.catalogName = catalogName;
+	}
+
+	/**
+	 * @return the autoCreateColumns
+	 */
+	public boolean isAutoCreateColumns() {
+		return autoCreateColumns;
+	}
+
+	/**
+	 * @param autoCreateColumns the autoCreateColumns to set
+	 */
+	public void setAutoCreateColumns(boolean autoCreateColumns) {
+		this.autoCreateColumns = autoCreateColumns;
 	}
 
 }

@@ -15,6 +15,15 @@ public class DbColumnDef {
 	private boolean allowsNull = false;
 	
 	/**
+	 * Construct just with a name.
+	 * @param name
+	 */
+	public DbColumnDef(String name) {
+		super();
+		this.name = name;
+	}
+	
+	/**
 	 * @param name
 	 * @param type
 	 */

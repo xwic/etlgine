@@ -3,13 +3,23 @@
  */
 package de.xwic.etlgine;
 
-import de.xwic.etlgine.impl.Column.DataType;
 
 /**
  * @author lippisch
  */
 public interface IColumn {
 
+	public enum DataType {
+		UNKNOWN,
+		STRING,
+		INT,
+		LONG,
+		DOUBLE,
+		DATE,
+		DATETIME
+	}
+	
+	
 	/**
 	 * Remove the column name.
 	 * @return
@@ -52,5 +62,11 @@ public interface IColumn {
 	 * @param typeHint the typeHint to set
 	 */
 	public void setTypeHint(DataType typeHint);
+
+	/**
+	 * Returns the name for this column used by the loader.
+	 * @return
+	 */
+	public String computeTargetName();
 
 }

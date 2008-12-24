@@ -10,16 +10,6 @@ import de.xwic.etlgine.IColumn;
  */
 public class Column implements IColumn {
 
-	public enum DataType {
-		UNKNOWN,
-		STRING,
-		INT,
-		LONG,
-		DOUBLE,
-		DATE,
-		DATETIME
-	}
-	
 	private String name = null;
 	private String targetName = null;
 
@@ -55,6 +45,17 @@ public class Column implements IColumn {
 		this.sourceIndex = sourceIndex;
 	}
 
+	/**
+	 * Returns the name for this column used by the loader.
+	 * @return
+	 */
+	public String computeTargetName() {
+		if (targetName != null) {
+			return targetName;
+		}
+		return name;
+	}
+	
 	/**
 	 * @return the name
 	 */

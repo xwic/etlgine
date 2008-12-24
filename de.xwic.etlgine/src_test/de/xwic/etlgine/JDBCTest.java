@@ -3,21 +3,16 @@
  */
 package de.xwic.etlgine;
 
-import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Locale;
 
-import de.xwic.cube.DataPoolManagerFactory;
-import de.xwic.cube.IDataPool;
-import de.xwic.cube.IDataPoolManager;
-import de.xwic.cube.IDataPoolStorageProvider;
-import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
+import junit.framework.TestCase;
 import de.xwic.etlgine.extractor.CSVExtractor;
-import de.xwic.etlgine.loader.cube.CubeLoader;
-import de.xwic.etlgine.loader.cube.DataPoolInitializer;
-import de.xwic.etlgine.loader.cube.IDataPoolProvider;
-import de.xwic.etlgine.loader.cube.ScriptedCubeDataMapper;
+import de.xwic.etlgine.impl.AbstractTransformer;
 import de.xwic.etlgine.loader.jdbc.JDBCLoader;
 import de.xwic.etlgine.sources.FileSource;
-import junit.framework.TestCase;
 
 /**
  * @author Developer
@@ -46,12 +41,56 @@ public class JDBCTest extends TestCase {
 		process.setExtractor(csvExtractor);
 		
 
+		// add transformer that gives some "type" hints
+		ITransformer colTrans = new AbstractTransformer() {
+			 /* (non-Javadoc)
+			 * @see de.xwic.etlgine.impl.AbstractTransformer#postSourceProcessing(de.xwic.etlgine.IContext)
+			 */
+			@Override
+			public void preSourceProcessing(IContext context) throws ETLException {
+				IDataSet ds = context.getDataSet();
+				if (ds.containsColumn("gebdate")) {
+					ds.getColumn("gebdate").setTypeHint(IColumn.DataType.DATE);
+				}
+				if (ds.containsColumn("Booking")) {
+					ds.getColumn("Booking").setTypeHint(IColumn.DataType.DOUBLE);
+				}	
+			}
+			
+			/* (non-Javadoc)
+			 * @see de.xwic.etlgine.impl.AbstractTransformer#processRecord(de.xwic.etlgine.IContext, de.xwic.etlgine.IRecord)
+			 */
+			@Override
+			public void processRecord(IContext context, IRecord record) throws ETLException {
+				
+				String sGebDate = record.getDataAsString("gebdate");
+				if (sGebDate == null || sGebDate.trim().length() == 0) {
+					record.setData("gebdate", null);
+				} else {
+					// try to parse
+					try {
+						DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN);
+						Date date = df.parse(sGebDate);
+						record.setData("gebdate", date);
+					} catch (ParseException pe) {
+						record.markInvalid("Unparsable Date: " + sGebDate + " Exception: " + pe);
+					}
+				}
+				
+			}
+			
+		};
+		
+		process.addTransformer(colTrans);
+		
 		JDBCLoader jdbcLoader = new JDBCLoader();
 		jdbcLoader.setCatalogName("etlgine_test");
 		jdbcLoader.setConnectionUrl("jdbc:jtds:sqlserver://localhost/etlgine_test");
 		jdbcLoader.setUsername("etlgine");
 		jdbcLoader.setPassword("etl");
 		jdbcLoader.setTablename("LOAD_TEST");
+		jdbcLoader.setAutoCreateColumns(true);
+		
 		
 		
 		process.addLoader(jdbcLoader);

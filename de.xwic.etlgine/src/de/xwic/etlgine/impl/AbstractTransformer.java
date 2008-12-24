@@ -19,7 +19,7 @@ public abstract class AbstractTransformer implements ITransformer {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ITransformer#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IContext context, IRecord record) {
+	public void processRecord(IContext context, IRecord record) throws ETLException {
 
 	}
 

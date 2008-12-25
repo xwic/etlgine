@@ -18,15 +18,15 @@ public class Launch {
 	 */
 	public static void main(String[] args) {
 		
-		String path = "config";
+		String path = "server";
 		if (args.length > 0) {
 			path = args[0];
 		}
 		
-		System.setProperty("root", new File(".").getAbsolutePath());
+		System.setProperty("root", new File(path).getAbsolutePath());
 		
 		ETLgineServer server = new ETLgineServer();
-		server.setConfigPath(path);
+		server.setRootPath(path);
 		
 		// start ETLgine server.
 		SwtRunner.launch(server, true);

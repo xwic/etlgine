@@ -4,9 +4,15 @@
 package de.xwic.etlgine.server;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintStream;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.mortbay.jetty.webapp.WebAppContext;
+import org.mortbay.xml.XmlConfiguration;
 
 import eu.lippisch.jscreen.Color;
 import eu.lippisch.jscreen.Input;
@@ -20,9 +26,10 @@ import eu.lippisch.jscreen.app.JScreenApplication;
  */
 public class ETLgineServer extends JScreenApplication {
 	
-	private String configPath = "config";
+	private String rootPath = ".";
 	private Screen screen;
 	private Input input;
+	private Server jetty;
 
 	/* (non-Javadoc)
 	 * @see eu.lippisch.jscreen.app.JScreenApplication#run(eu.lippisch.jscreen.Screen, eu.lippisch.jscreen.Input)
@@ -34,10 +41,30 @@ public class ETLgineServer extends JScreenApplication {
 		this.screen = screen;
 		this.input = input;
 		
-		initialize();
+		if (!initialize()) {
+			screen.println("Server start failed. Press any key to exit.");
+			input.readKey(true);
+			return;
+		}
 		
 		screen.println("Server started. Press ESC to exit.");
 		
+		handleKeyboardInput();
+		
+		try {
+			jetty.stop();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	private void handleKeyboardInput() {
+
 		boolean exit = false;
 		while (!exit) {
 			Key key = input.readKey(true);
@@ -51,11 +78,11 @@ public class ETLgineServer extends JScreenApplication {
 		}
 		
 	}
-	
+
 	/**
 	 * Initialize the server.
 	 */
-	private void initialize() {
+	private boolean initialize() {
 		
 		screen.setColor(Color.WHITE, Color.BLACK);
 		screen.println("Loading ETLgine Server");
@@ -63,24 +90,56 @@ public class ETLgineServer extends JScreenApplication {
 		
 		screen.setForegroundColor(Color.GRAY);
 		
-		File path = new File(configPath);
+		File path = new File(rootPath);
 		if (!path.exists()) {
-			error("Config path " + path.getAbsolutePath() + " does not exist.");
-			return;
+			error("Root path " + path.getAbsolutePath() + " does not exist.");
+			return false;
 		}
 		
+		File pathConfig = new File(path, "config");
+		if (!pathConfig.exists()) {
+			error("Config path " + pathConfig.getAbsolutePath() + " does not exist.");
+			return false;
+		}
 		screen.println("Redirecting System.out");
 		System.setOut(new PrintStream(new ScreenOutputStream(screen)));
 
-		File configFile = new File(path, "log4j.properties");
+		File configFile = new File(pathConfig, "log4j.properties");
 		if (!configFile.exists()) {
 			error("Log4J config file log4j.properties does not exist.");
-			return;
+			return false;
 		}
 		
 		screen.println("Initializing Log4J");
 		PropertyConfigurator.configure(configFile.getAbsolutePath());
 		
+		screen.println("Initializing Webserver (Jetty)");
+		try {
+			jetty = new Server();
+			XmlConfiguration conf = new XmlConfiguration(new FileInputStream(new File(pathConfig, "jetty.xml")));
+			conf.configure(jetty);
+
+			Handler[] handlers = jetty.getHandlers();
+		    ContextHandlerCollection context = null;
+		    for (Handler h : handlers) {
+		    	if (h instanceof ContextHandlerCollection) {
+		    		context = (ContextHandlerCollection)h;
+		    		break;
+		    	}
+		    }
+		    if (context == null) {
+		    	error("Invalid Jetty Configuration - no ContextHandlerCollection found.");
+		    	return false;
+		    }
+			WebAppContext wc = new WebAppContext(context, new File(path, "web").getAbsolutePath(), "etlgine");
+			wc.setDefaultsDescriptor(new File(pathConfig, "webdefault.xml").getAbsolutePath());
+			
+			jetty.start();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return true;
 		
 	}
 	
@@ -111,17 +170,17 @@ public class ETLgineServer extends JScreenApplication {
 	}
 
 	/**
-	 * @return the configPath
+	 * @return the rootPath
 	 */
-	public String getConfigPath() {
-		return configPath;
+	public String getRootPath() {
+		return rootPath;
 	}
 
 	/**
-	 * @param configPath the configPath to set
+	 * @param rootPath the rootPath to set
 	 */
-	public void setConfigPath(String configPath) {
-		this.configPath = configPath;
+	public void setRootPath(String rootPath) {
+		this.rootPath = rootPath;
 	}
 
 	

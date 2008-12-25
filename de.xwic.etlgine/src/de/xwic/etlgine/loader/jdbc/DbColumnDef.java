@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.loader.jdbc;
 
+import de.xwic.etlgine.IColumn;
+
 /**
  * @author lippisch
  *
@@ -10,6 +12,7 @@ package de.xwic.etlgine.loader.jdbc;
 public class DbColumnDef {
 
 	private String name = null;
+	private IColumn column = null;
 	private int type = 0;
 	private int size = 0;
 	private boolean allowsNull = false;
@@ -95,6 +98,20 @@ public class DbColumnDef {
 	 */
 	public void setAllowsNull(boolean allowsNull) {
 		this.allowsNull = allowsNull;
+	}
+
+	/**
+	 * @return the column
+	 */
+	public IColumn getColumn() {
+		return column;
+	}
+
+	/**
+	 * @param column the column to set
+	 */
+	public void setColumn(IColumn column) {
+		this.column = column;
 	}
 	
 	

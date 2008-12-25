@@ -55,6 +55,10 @@ public class JDBCTest extends TestCase {
 				if (ds.containsColumn("Booking")) {
 					ds.getColumn("Booking").setTypeHint(IColumn.DataType.DOUBLE);
 				}	
+				if (ds.containsColumn("ID")) {
+					ds.getColumn("ID").setTargetName("SV_ID");
+					ds.getColumn("ID").setTypeHint(IColumn.DataType.INT);
+				}	
 			}
 			
 			/* (non-Javadoc)

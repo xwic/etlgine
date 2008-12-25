@@ -6,13 +6,15 @@ package de.xwic.etlgine.loader.jdbc;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,8 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean autoCreateColumns = false;
 	
 	private Connection connection = null;
+	private PreparedStatement psInsert = null;
+	private Map<String, DbColumnDef> columns;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
@@ -109,7 +113,7 @@ public class JDBCLoader extends AbstractLoader {
 			rs = metaData.getColumns(catalogName, null, tablename, null);
 			//dumpResultSet(rs);
 			
-			Map<String, DbColumnDef> columns = new HashMap<String, DbColumnDef>();
+			columns = new LinkedHashMap<String, DbColumnDef>();
 			while (rs.next()) {
 				String name = rs.getString("COLUMN_NAME");
 				int type = rs.getInt("DATA_TYPE");
@@ -123,9 +127,14 @@ public class JDBCLoader extends AbstractLoader {
 			
 			// Check if the columns apply.
 			for (IColumn column : context.getDataSet().getColumns()) {
-				if (!column.isExclude() && !columns.containsKey(column.computeTargetName())) {
-					context.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
-					missingCols.add(column);
+				if (!column.isExclude()) {
+					DbColumnDef dbc = columns.get(column.computeTargetName());
+					if (dbc != null) {
+						dbc.setColumn(column);
+					} else {
+						context.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
+						missingCols.add(column);
+					}
 				}
 			}
 			if (missingCols.size() > 0) {
@@ -137,7 +146,34 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			
 			// build prepared statement..
+			StringBuilder sql = new StringBuilder();
+			StringBuilder sqlValues = new StringBuilder();
+			sql.append("INSERT INTO [").append(tablename).append("] (");
+			sqlValues.append("(");
 			
+			boolean first = true;
+			for (DbColumnDef colDef : columns.values()) {
+				if (colDef.getColumn() != null) {
+					if (first) {
+						first = false;
+					} else {
+						sql.append(", ");
+						sqlValues.append(", ");
+					}
+					sql.append("[");
+					sql.append(colDef.getName());
+					sql.append("]");
+					sqlValues.append("?");
+				} else {
+					monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
+				}
+			}
+			sqlValues.append(")");
+			sql.append(") VALUES").append(sqlValues);
+			
+			monitor.logInfo("INSERT Statement: " + sql);
+			
+			psInsert = connection.prepareStatement(sql.toString());
 			
 		} catch (SQLException se) {
 			throw new ETLException("Error initializing target database/tables: " + se, se);
@@ -158,6 +194,7 @@ public class JDBCLoader extends AbstractLoader {
 		for (IColumn col : missingCols) {
 			
 			DbColumnDef dbcd = new DbColumnDef(col.computeTargetName());
+			dbcd.setColumn(col);
 			
 			if (first) {
 				first = false;
@@ -241,7 +278,62 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void processRecord(IContext context, IRecord record) throws ETLException {
 
-		
+		try {
+			psInsert.clearParameters();
+			
+			int idx = 1;
+			for (DbColumnDef colDef : columns.values()) {
+				if (colDef.getColumn() != null) {
+					
+					Object value = record.getData(colDef.getColumn());
+					if (value == null) {
+						psInsert.setNull(idx, colDef.getType());
+					} else {
+						switch (colDef.getType()) {
+						case Types.VARCHAR:
+						case Types.CHAR:
+						case Types.LONGVARCHAR:
+						case Types.NVARCHAR:
+							psInsert.setString(idx, value.toString());
+							break;
+						case Types.INTEGER:
+						case Types.BIGINT:
+							if (value instanceof Integer) {
+								psInsert.setInt(idx, (Integer)value);
+							} else if (value instanceof String) {
+								psInsert.setInt(idx, Integer.parseInt((String)value));
+							}
+							break;
+						case Types.DOUBLE:
+						case Types.FLOAT:
+							if (value instanceof Integer) {
+								psInsert.setInt(idx, (Integer)value);
+							} else if (value instanceof String) {
+								psInsert.setDouble(idx, Double.parseDouble((String)value));
+							} else if (value instanceof Double) {
+								psInsert.setDouble(idx, (Double)value);
+							}
+							break;							
+						case Types.TIMESTAMP:
+						case Types.DATE:
+							psInsert.setDate(idx, new java.sql.Date(((Date)value).getTime()));
+							break;
+						default:
+							throw new ETLException("Unknown datatype: "+ colDef.getType());
+						}
+						
+					}
+					idx++;
+				}
+			}
+			
+			int count = psInsert.executeUpdate();
+			if (count != 1) {
+				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+			}
+		} catch (SQLException se) {
+			throw new ETLException("An SQLException occured during INSERT: " + se, se);
+		}
 		
 	}
 

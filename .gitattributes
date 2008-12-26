@@ -618,12 +618,13 @@ de.xwic.etlgine/scripts/testcube.init.groovy -text
 de.xwic.etlgine/scripts/testcube.mapping.groovy -text
 de.xwic.etlgine/server/config/jetty.xml -text
 de.xwic.etlgine/server/config/log4j.properties -text
-de.xwic.etlgine/server/config/server.groovy -text
+de.xwic.etlgine/server/config/server.properties -text
 de.xwic.etlgine/server/config/webdefault.xml -text
 de.xwic.etlgine/server/jetty/jetty-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/jetty-util-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/servlet-api-2.5-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/start.jar -text
+de.xwic.etlgine/server/jobs/Testjob.groovy -text
 de.xwic.etlgine/server/web/index.html -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractLoader.java -text
@@ -669,6 +670,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineServer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/Launch.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenOutputStream.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenPrintStream.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/ServerContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/CubeLoaderTest.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/JDBCTest.java -text

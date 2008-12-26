@@ -53,7 +53,7 @@ public interface IProcessChain {
 	 * @throws FileNotFoundException 
 	 * @throws ETLException 
 	 */
-	public IProcess createProcessFromScript(String filename) throws FileNotFoundException, ETLException;
+	public IProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException;
 
 
 }

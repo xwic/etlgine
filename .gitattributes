@@ -612,6 +612,7 @@ de.xwic.etlgine/lib/jtds-1.2.2.jar -text
 de.xwic.etlgine/lib/opencsv-1.8.jar -text
 de.xwic.etlgine/lib/poi-3.1-FINAL-20080629.jar -text
 de.xwic.etlgine/lib/swt.jar -text
+de.xwic.etlgine/scripts/TestRnd2JDBC.groovy -text
 de.xwic.etlgine/scripts/test.groovy -text
 de.xwic.etlgine/scripts/testcube.init.groovy -text
 de.xwic.etlgine/scripts/testcube.mapping.groovy -text
@@ -624,6 +625,9 @@ de.xwic.etlgine/server/jetty/jetty-util-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/servlet-api-2.5-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/start.jar -text
 de.xwic.etlgine/server/web/index.html -text
+de.xwic.etlgine/src/de/xwic/etlgine/AbstractExtractor.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/AbstractLoader.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/AbstractTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/DefaultMonitor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ETLException.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ETLgine.java -text
@@ -642,9 +646,6 @@ de.xwic.etlgine/src/de/xwic/etlgine/ISource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/CSVExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/XLSExtractor.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractExtractor.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractLoader.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/impl/AbstractTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Column.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Context.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/DataSet.java -text
@@ -672,6 +673,10 @@ de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/CubeLoaderTest.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/JDBCTest.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/ProcessTest.java -text
+de.xwic.etlgine/src_test/de/xwic/etlgine/TestRnd2JDBCFromScriptTest.java -text
+de.xwic.etlgine/src_test/de/xwic/etlgine/TestRndExtractor.java -text
+de.xwic.etlgine/src_test/de/xwic/etlgine/TestRndExtractor2JDBCTest.java -text
+de.xwic.etlgine/src_test/de/xwic/etlgine/TestRndSource.java -text
 de.xwic.etlgine/test/export.csv -text
 de.xwic.etlgine/test/export2.csv -text
 de.xwic.etlgine/test/export3.csv -text

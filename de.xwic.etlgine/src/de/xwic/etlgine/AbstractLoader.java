@@ -1,12 +1,8 @@
 /**
  * 
  */
-package de.xwic.etlgine.impl;
+package de.xwic.etlgine;
 
-import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
-import de.xwic.etlgine.ILoader;
-import de.xwic.etlgine.IMonitor;
 
 /**
  * @author Lippisch

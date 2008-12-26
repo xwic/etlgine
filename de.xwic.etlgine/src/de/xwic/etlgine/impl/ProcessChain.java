@@ -3,6 +3,11 @@
  */
 package de.xwic.etlgine.impl;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +39,33 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public IProcess createProcess(String name) {
 		IProcess process = new Process(name);
+		processList.add(process);
+		return process;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#createProcessFromScript(java.lang.String)
+	 */
+	public IProcess createProcessFromScript(String filename) throws FileNotFoundException, ETLException {
+		
+		File file = new File(filename);
+		if (!file.exists()) {
+			throw new FileNotFoundException(file.getAbsolutePath());
+		}
+		
+		IProcess process = new Process(file.getName());
+		
+		Binding binding = new Binding();
+		binding.setVariable("process", process);
+		binding.setVariable("processchain", this);
+
+		GroovyShell shell = new GroovyShell(binding);
+		try {
+			shell.evaluate(file);
+		} catch (Exception e) {
+			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
+		}
+
 		processList.add(process);
 		return process;
 	}

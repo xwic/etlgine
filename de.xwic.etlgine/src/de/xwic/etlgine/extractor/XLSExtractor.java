@@ -15,13 +15,13 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
+import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
-import de.xwic.etlgine.impl.AbstractExtractor;
 import de.xwic.etlgine.sources.FileSource;
 
 /**

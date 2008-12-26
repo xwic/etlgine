@@ -8,13 +8,13 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import au.com.bytecode.opencsv.CSVReader;
+import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
-import de.xwic.etlgine.impl.AbstractExtractor;
 import de.xwic.etlgine.sources.FileSource;
 
 /**

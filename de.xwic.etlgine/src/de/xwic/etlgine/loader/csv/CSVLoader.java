@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IRecord;
-import de.xwic.etlgine.impl.AbstractLoader;
 
 /**
  * Writes the data into a CSV file.

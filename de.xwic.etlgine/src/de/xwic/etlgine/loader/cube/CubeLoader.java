@@ -9,10 +9,10 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
+import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
-import de.xwic.etlgine.impl.AbstractLoader;
 
 /**
  * Loads the data into a cube.

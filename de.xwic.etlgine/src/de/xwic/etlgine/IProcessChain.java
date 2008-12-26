@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine;
 
+import java.io.FileNotFoundException;
+
 /**
  * Adds one or more IProcess into a chain, executing each process
  * after the other, if no error condition is set. 
@@ -44,6 +46,14 @@ public interface IProcessChain {
 	 * @param monitor the monitor to set
 	 */
 	public void setMonitor(IMonitor monitor);
+
+	/**
+	 * Create a new process from a script file.
+	 * @param string
+	 * @throws FileNotFoundException 
+	 * @throws ETLException 
+	 */
+	public IProcess createProcessFromScript(String filename) throws FileNotFoundException, ETLException;
 
 
 }

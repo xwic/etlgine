@@ -1,12 +1,8 @@
 /*
  * de.xwic.etlgine.impl.AbstractTransformer 
  */
-package de.xwic.etlgine.impl;
+package de.xwic.etlgine;
 
-import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
-import de.xwic.etlgine.IRecord;
-import de.xwic.etlgine.ITransformer;
 
 /**
  * Abstract class for ITransformer.

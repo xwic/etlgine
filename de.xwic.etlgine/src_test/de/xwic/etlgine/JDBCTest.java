@@ -10,7 +10,6 @@ import java.util.Locale;
 
 import junit.framework.TestCase;
 import de.xwic.etlgine.extractor.CSVExtractor;
-import de.xwic.etlgine.impl.AbstractTransformer;
 import de.xwic.etlgine.loader.jdbc.JDBCLoader;
 import de.xwic.etlgine.sources.FileSource;
 

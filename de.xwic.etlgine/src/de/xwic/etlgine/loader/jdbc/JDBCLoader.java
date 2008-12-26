@@ -14,15 +14,17 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IRecord;
-import de.xwic.etlgine.impl.AbstractLoader;
 
 /**
  * @author lippisch
@@ -42,6 +44,7 @@ public class JDBCLoader extends AbstractLoader {
 	private Connection connection = null;
 	private PreparedStatement psInsert = null;
 	private Map<String, DbColumnDef> columns;
+	private Set<String> ignoredColumns = new HashSet<String>();
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
@@ -165,7 +168,9 @@ public class JDBCLoader extends AbstractLoader {
 					sql.append("]");
 					sqlValues.append("?");
 				} else {
-					monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
+					if (!ignoredColumns.contains(colDef.getName())) {
+						monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
+					}
 				}
 			}
 			sqlValues.append(")");
@@ -435,4 +440,17 @@ public class JDBCLoader extends AbstractLoader {
 		this.autoCreateColumns = autoCreateColumns;
 	}
 
+	/**
+	 * Add columns that exist in the target table but are not touched. This eleminates
+	 * a warning about columns that exist int he table but do not come from the source.
+	 * @param columns
+	 */
+	public void addIgnoreableColumns(String... columns) {
+		
+		for (String s : columns) {
+			ignoredColumns.add(s);
+		}
+		
+	}
+	
 }

@@ -1,11 +1,8 @@
 /*
  * de.xwic.etlgine.impl.AbstractLoader 
  */
-package de.xwic.etlgine.impl;
+package de.xwic.etlgine;
 
-import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
-import de.xwic.etlgine.IExtractor;
 
 /**
  * @author lippisch

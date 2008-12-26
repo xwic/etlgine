@@ -3,7 +3,6 @@
  */
 package de.xwic.etlgine;
 
-import de.xwic.etlgine.impl.Process;
 import de.xwic.etlgine.impl.ProcessChain;
 
 /**

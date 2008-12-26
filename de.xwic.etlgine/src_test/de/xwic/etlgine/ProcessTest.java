@@ -12,7 +12,6 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import junit.framework.TestCase;
 import de.xwic.etlgine.extractor.CSVExtractor;
-import de.xwic.etlgine.impl.AbstractTransformer;
 import de.xwic.etlgine.loader.csv.CSVLoader;
 import de.xwic.etlgine.sources.FileSource;
 

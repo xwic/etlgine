@@ -155,7 +155,7 @@
     </Call>
     -->
     
-    <!-- --> 
+    <!-- 
     <New id="defaultApp" class="org.mortbay.jetty.webapp.WebAppContext">
       <Arg><Ref id="contexts"/></Arg>
       <Arg>server/web/</Arg>
@@ -170,7 +170,7 @@
         </Set>
       </Get>
     </New>
- 	<!-- -->
+ 	-->
  	
     <!-- =========================================================== -->
     <!-- Configure Realms                                            -->

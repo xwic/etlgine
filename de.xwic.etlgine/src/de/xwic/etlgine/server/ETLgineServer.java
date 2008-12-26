@@ -5,7 +5,10 @@ package de.xwic.etlgine.server;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Handler;
@@ -19,6 +22,7 @@ import eu.lippisch.jscreen.Input;
 import eu.lippisch.jscreen.Key;
 import eu.lippisch.jscreen.Screen;
 import eu.lippisch.jscreen.app.JScreenApplication;
+import eu.lippisch.jscreen.util.InputUtil;
 
 /**
  * @author Developer
@@ -30,6 +34,8 @@ public class ETLgineServer extends JScreenApplication {
 	private Screen screen;
 	private Input input;
 	private Server jetty;
+	
+	private ServerContext serverContext = new ServerContext();
 
 	/* (non-Javadoc)
 	 * @see eu.lippisch.jscreen.app.JScreenApplication#run(eu.lippisch.jscreen.Screen, eu.lippisch.jscreen.Input)
@@ -52,9 +58,11 @@ public class ETLgineServer extends JScreenApplication {
 		handleKeyboardInput();
 		
 		try {
-			jetty.stop();
+			if (jetty != null) {
+				screen.println("Stopping Webserver...");
+				jetty.stop();
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -71,7 +79,11 @@ public class ETLgineServer extends JScreenApplication {
 			
 			switch (key.action) {
 			case ESCAPE:
-				exit = true;
+				screen.print("Are you sure? (Enter yes to exit): ");
+				String inp = InputUtil.inputLine(screen, input);
+				if (inp.startsWith("y")) {
+					exit = true;
+				}
 				break;
 			}
 			
@@ -110,35 +122,70 @@ public class ETLgineServer extends JScreenApplication {
 			return false;
 		}
 		
+		File fileServerConf = new File(pathConfig, "server.properties");
+		if (!fileServerConf.exists()) {
+			error("server.properties not found.");
+			return false;
+		}
+		
+		Properties props = new Properties();
+		try {
+			props.load(new FileReader(fileServerConf));
+		} catch (IOException e) {
+			error("Error reading server.properties: " + e);
+			return false;
+		}
+
+		
+		// copy properties to server context
+		for (Object key : props.keySet()) {
+			String sKey = (String)key;
+			serverContext.setProperty(sKey, props.getProperty(sKey));
+		}
+
+		// Initialize logging
 		screen.println("Initializing Log4J");
 		PropertyConfigurator.configure(configFile.getAbsolutePath());
 		
-		screen.println("Initializing Webserver (Jetty)");
-		try {
-			jetty = new Server();
-			XmlConfiguration conf = new XmlConfiguration(new FileInputStream(new File(pathConfig, "jetty.xml")));
-			conf.configure(jetty);
-
-			Handler[] handlers = jetty.getHandlers();
-		    ContextHandlerCollection context = null;
-		    for (Handler h : handlers) {
-		    	if (h instanceof ContextHandlerCollection) {
-		    		context = (ContextHandlerCollection)h;
-		    		break;
-		    	}
-		    }
-		    if (context == null) {
-		    	error("Invalid Jetty Configuration - no ContextHandlerCollection found.");
-		    	return false;
-		    }
-			WebAppContext wc = new WebAppContext(context, new File(path, "web").getAbsolutePath(), "etlgine");
-			wc.setDefaultsDescriptor(new File(pathConfig, "webdefault.xml").getAbsolutePath());
-			
-			jetty.start();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		// load jobs
+		File jobPath = new File(path, serverContext.getProperty("jobpath", "jobs"));
+		if (!jobPath.exists()) {
+			error("The job directory does not exist: " + jobPath.getAbsolutePath());
+			return false;
 		}
+
+		
+		// load webserver
+		if (serverContext.getPropertyBoolean("webserver.start", false)) {
+			screen.println("Initializing Webserver (Jetty)");
+			try {
+				jetty = new Server();
+				XmlConfiguration conf = new XmlConfiguration(new FileInputStream(new File(pathConfig, "jetty.xml")));
+				conf.configure(jetty);
+	
+				Handler[] handlers = jetty.getHandlers();
+			    ContextHandlerCollection context = null;
+			    for (Handler h : handlers) {
+			    	if (h instanceof ContextHandlerCollection) {
+			    		context = (ContextHandlerCollection)h;
+			    		break;
+			    	}
+			    }
+			    if (context == null) {
+			    	error("Invalid Jetty Configuration - no ContextHandlerCollection found.");
+			    	return false;
+			    }
+				WebAppContext wc = new WebAppContext(context, new File(path, "web").getAbsolutePath(), "etlgine");
+				wc.setDefaultsDescriptor(new File(pathConfig, "webdefault.xml").getAbsolutePath());
+				
+				jetty.start();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
 		return true;
 		
 	}
@@ -181,6 +228,13 @@ public class ETLgineServer extends JScreenApplication {
 	 */
 	public void setRootPath(String rootPath) {
 		this.rootPath = rootPath;
+	}
+
+	/**
+	 * @return the serverContext
+	 */
+	public ServerContext getServerContext() {
+		return serverContext;
 	}
 
 	

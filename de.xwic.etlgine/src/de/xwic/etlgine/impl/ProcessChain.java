@@ -46,14 +46,14 @@ public class ProcessChain implements IProcessChain {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#createProcessFromScript(java.lang.String)
 	 */
-	public IProcess createProcessFromScript(String filename) throws FileNotFoundException, ETLException {
+	public IProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException {
 		
 		File file = new File(filename);
 		if (!file.exists()) {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		
-		IProcess process = new Process(file.getName());
+		IProcess process = new Process(name);
 		
 		Binding binding = new Binding();
 		binding.setVariable("process", process);

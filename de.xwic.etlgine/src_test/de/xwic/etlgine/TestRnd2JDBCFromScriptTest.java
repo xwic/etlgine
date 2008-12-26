@@ -22,7 +22,7 @@ public class TestRnd2JDBCFromScriptTest extends TestCase {
 		
 		IProcessChain pc = ETLgine.createProcessChain("testChain");
 
-		pc.createProcessFromScript("scripts/TestRnd2JDBC.groovy");
+		pc.createProcessFromScript("TestRnd2JDBC", "scripts/TestRnd2JDBC.groovy");
 		
 		pc.start();
 

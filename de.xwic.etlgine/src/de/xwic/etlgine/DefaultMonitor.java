@@ -13,7 +13,7 @@ public class DefaultMonitor implements IMonitor {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#onEvent(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IMonitor.EventType)
 	 */
-	public void onEvent(IContext context, EventType eventType) {
+	public void onEvent(IProcessContext processContext, EventType eventType) {
 		if (eventType != EventType.RECORD_PROCESSED) {
 			System.out.println("[EVENT] " + eventType.name());
 		}
@@ -25,7 +25,7 @@ public class DefaultMonitor implements IMonitor {
 		case PROCESS_FINISHED:
 			long duration = System.currentTimeMillis() - startTime;
 			logInfo("Total duration (in ms): " + duration);
-			logInfo("Records processed:      " + context.getRecordsProcessed());
+			logInfo("Records processed:      " + processContext.getRecordsProcessed());
 			break;
 		}
 		

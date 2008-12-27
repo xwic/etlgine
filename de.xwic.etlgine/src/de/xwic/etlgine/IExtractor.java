@@ -10,9 +10,9 @@ public interface IExtractor extends IProcessParticipant {
 
 	/**
 	 * Initialize the loader.
-	 * @param context
+	 * @param processContext
 	 */
-	public void initialize(IContext context) throws ETLException;
+	public void initialize(IProcessContext processContext) throws ETLException;
 	
 	/**
 	 * Initialize the DataSet.

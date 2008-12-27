@@ -11,10 +11,10 @@ public interface ITransformer extends IProcessParticipant {
 
 	/**
 	 * Apply transformations to a record.
-	 * @param context
+	 * @param processContext
 	 * @param record
 	 * @throws ETLException 
 	 */
-	public void processRecord(IContext context, IRecord record) throws ETLException;
+	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException;
 	
 }

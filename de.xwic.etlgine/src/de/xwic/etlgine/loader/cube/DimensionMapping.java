@@ -10,7 +10,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
 
@@ -122,11 +122,11 @@ public class DimensionMapping {
 	 * @return
 	 * @throws ETLException
 	 */
-	public IDimensionElement mapElement(IContext context, ICube cube, IRecord record) throws ETLException {
+	public IDimensionElement mapElement(IProcessContext processContext, ICube cube, IRecord record) throws ETLException {
 		
 		String value;
 		if (contextPropertyName != null) {
-			value = context.getProperty(contextPropertyName);
+			value = processContext.getProperty(contextPropertyName);
 			if (value == null) {
 				throw new ETLException("Specified context property '" + contextPropertyName + "' contains null.");
 			}
@@ -178,13 +178,13 @@ public class DimensionMapping {
 	}
 
 	/**
-	 * @param context
+	 * @param processContext
 	 * @param cube
 	 */
-	public void afterConfiguration(IContext context, ICube cube) {
+	public void afterConfiguration(IProcessContext processContext, ICube cube) {
 		if (emList != null) {
 			for (ElementMapping em : emList) {
-				em.afterConfiguration(context, cube);
+				em.afterConfiguration(processContext, cube);
 			}
 		}
 		if (unmappedElement == null && unmappedElementPath != null) {

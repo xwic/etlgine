@@ -56,7 +56,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		if (!reachedEnd) {
 			recordNumber++;
 			try {
-				IRecord record = context.newRecord();
+				IRecord record = processContext.newRecord();
 				String[] data = reader.readNext();
 				if (data == null) {
 					reachedEnd = true;

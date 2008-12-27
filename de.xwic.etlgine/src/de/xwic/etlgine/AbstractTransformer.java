@@ -10,40 +10,40 @@ package de.xwic.etlgine;
  */
 public abstract class AbstractTransformer implements ITransformer {
 
-	protected IContext context = null;
+	protected IProcessContext processContext = null;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ITransformer#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IContext context, IRecord record) throws ETLException {
+	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#initialize(de.xwic.etlgine.IETLContext)
 	 */
-	public void initialize(IContext context) throws ETLException {
-		this.context = context;
+	public void initialize(IProcessContext processContext) throws ETLException {
+		this.processContext = processContext;
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#onProcessFinished(de.xwic.etlgine.impl.Context)
 	 */
-	public void onProcessFinished(IContext context) throws ETLException {
+	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#postSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
-	public void postSourceProcessing(IContext context) throws ETLException {
+	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
 
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
-	public void preSourceProcessing(IContext context) throws ETLException {
+	public void preSourceProcessing(IProcessContext processContext) throws ETLException {
 		// TODO Auto-generated method stub
 
 	}

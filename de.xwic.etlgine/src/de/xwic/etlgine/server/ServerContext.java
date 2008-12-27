@@ -3,108 +3,69 @@
  */
 package de.xwic.etlgine.server;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IProcessChain;
+import de.xwic.etlgine.ETLgine;
+import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.impl.Context;
+import de.xwic.etlgine.impl.Job;
 
 /**
  * 
  * @author Developer
  */
-public class ServerContext {
+public class ServerContext extends Context {
 
-	private Map<String, IProcessChain> processChains = new HashMap<String, IProcessChain>(); 
-	protected Map<String, String> properties = new HashMap<String, String>();
-	protected Map<String, Object> objects = new HashMap<String, Object>();
+	public static final String PROPERTY_SCRIPTPATH = "scriptpath";
 	
-	/**
-	 * Set a global property.
-	 * @param name
-	 * @param value
-	 */
-	public void setProperty(String name, String value) {
-		properties.put(name, value);
-	}
+	private Map<String, IJob> jobs = new HashMap<String, IJob>(); 
 
 	/**
-	 * Returns a global property.
-	 * @param name
-	 * @return
-	 */
-	public String getProperty(String name) {
-		return getProperty(name, null);
-	}
-	
-	/**
-	 * Get a global property.
-	 * @param name
-	 * @param value
-	 */
-	public String getProperty(String name, String defaultValue) {
-		String value = properties.get(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value;
-	}
-	
-	/**
-	 * Returns the property value as boolean value. The value is true if
-	 * it is either "true", "yes" or "1".
-	 * 
-	 * @param name
-	 * @param defaultValue
-	 * @return
-	 */
-	public boolean getPropertyBoolean(String name, boolean defaultValue) {
-		String value = properties.get(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") || value.equals("1");
-	}
-
-	/**
-	 * Set a global object.
-	 * @param name
-	 * @param object
-	 */
-	public void setObject(String name, Object object) {
-		objects.put(name, object);
-	}
-
-	/**
-	 * Returns a global object.
-	 * @param name
-	 * @return
-	 */
-	public Object getObject(String name) {
-		return getObject(name, null);
-	}
-	
-	/**
-	 * Returns a global object.
-	 * @param name
-	 * @param object
-	 */
-	public Object getObject(String name, Object defaultObject) {
-		Object value = objects.get(name);
-		if (value == null) {
-			return defaultObject;
-		}
-		return value;
-	}
-	
-	/**
-	 * Load a ProcessChain from a script.
+	 * Load a Job from a script.
 	 * @param name
 	 * @param scriptFile
 	 */
-	public void loadProcessChain(String name, String scriptFile) throws ETLException {
+	public IJob loadJob(String name, String scriptFile) throws ETLException {
 		
+		if (jobs.containsKey(name)) {
+			throw new ETLException("A job with the name already exist. (" + name + ")");
+		}
+		IJob job = new Job(name);
+		job.setProcessChain(ETLgine.createProcessChain(this, name));
+		
+		Binding binding = new Binding();
+		binding.setVariable("job", job);
+		binding.setVariable("processChain", job.getProcessChain());
+
+		GroovyShell shell = new GroovyShell(binding);
+		
+		File jobPath = new File(getProperty(PROPERTY_SCRIPTPATH, "."));
+		if (!jobPath.exists()) {
+			throw new ETLException("The job path " + jobPath.getAbsolutePath() + " does not exist.");
+		}
+		File file = new File(jobPath, scriptFile);
+		if (!file.exists()) {
+			throw new ETLException("The script file " + file.getAbsolutePath() + " does not exist.");
+		}
+		
+		try {
+			shell.evaluate(file);
+		} catch (Exception e) {
+			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
+		}
+
+
+		
+		
+		jobs.put(name, job);
+		return job;
 	}
 	
 	/**
@@ -112,11 +73,11 @@ public class ServerContext {
 	 * @param chain
 	 * @throws ETLException
 	 */
-	public void addProcessChain(IProcessChain chain) throws ETLException {
-		if (processChains.containsKey(chain.getName())) {
-			throw new ETLException("A ProcessChain with this name already exists.");
+	public void addJob(IJob job) throws ETLException {
+		if (jobs.containsKey(job.getName())) {
+			throw new ETLException("A job with this name already exists. (" + job.getName() + ")");
 		}
-		processChains.put(chain.getName(), chain);
+		jobs.put(job.getName(), job);
 	}
 	
 	/**
@@ -124,16 +85,16 @@ public class ServerContext {
 	 * @param name
 	 * @return
 	 */
-	public IProcessChain getProcessChain(String name) {
-		return processChains.get(name);
+	public IJob getJob(String name) {
+		return jobs.get(name);
 	}
 	
 	/**
 	 * Returns the list of ProcessChains.
 	 * @return
 	 */
-	public Collection<IProcessChain> getProcessChains() {
-		return processChains.values();
+	public Collection<IJob> getJobs() {
+		return jobs.values();
 	}
 	
 }

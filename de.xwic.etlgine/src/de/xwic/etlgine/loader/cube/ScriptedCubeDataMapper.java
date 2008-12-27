@@ -9,7 +9,7 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 
 /**
  * This data mapper uses groovy script files to configure the mapping.
@@ -28,10 +28,10 @@ public class ScriptedCubeDataMapper extends AbstractCubeDataMapper {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.AbstractCubeDataMapper#configure(de.xwic.etlgine.IETLContext)
 	 */
-	protected void configure(IContext context) throws ETLException {
+	protected void configure(IProcessContext processContext) throws ETLException {
 		
 		Binding binding = new Binding();
-		binding.setVariable("context", context);
+		binding.setVariable("context", processContext);
 		binding.setVariable("mapper", this);
 
 		GroovyShell shell = new GroovyShell(binding);

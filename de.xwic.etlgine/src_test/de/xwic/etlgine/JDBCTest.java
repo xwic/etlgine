@@ -46,8 +46,8 @@ public class JDBCTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#postSourceProcessing(de.xwic.etlgine.IContext)
 			 */
 			@Override
-			public void preSourceProcessing(IContext context) throws ETLException {
-				IDataSet ds = context.getDataSet();
+			public void preSourceProcessing(IProcessContext processContext) throws ETLException {
+				IDataSet ds = processContext.getDataSet();
 				if (ds.containsColumn("gebdate")) {
 					ds.getColumn("gebdate").setTypeHint(IColumn.DataType.DATE);
 				}
@@ -64,7 +64,7 @@ public class JDBCTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#processRecord(de.xwic.etlgine.IContext, de.xwic.etlgine.IRecord)
 			 */
 			@Override
-			public void processRecord(IContext context, IRecord record) throws ETLException {
+			public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 				
 				String sGebDate = record.getDataAsString("gebdate");
 				if (sGebDate == null || sGebDate.trim().length() == 0) {

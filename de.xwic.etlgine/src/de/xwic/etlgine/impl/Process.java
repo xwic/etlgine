@@ -9,8 +9,9 @@ import java.util.List;
 
 import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IDataSet;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
@@ -31,7 +32,7 @@ public class Process implements IProcess {
 	protected List<ILoader> loaders = new ArrayList<ILoader>();
 	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
-	protected Context context;
+	protected ProcessContext processContext;
 
 	/**
 	 * Construct a new process.
@@ -39,10 +40,20 @@ public class Process implements IProcess {
 	 */
 	public Process(String name) {
 		this.name = name;
-		context = new Context();
-		context.setMonitor(monitor);
+		processContext = new ProcessContext();
+		processContext.setMonitor(monitor);
 	}
-	
+
+	/**
+	 * Construct a new process.
+	 * @param name
+	 */
+	public Process(IContext context, String name) {
+		this.name = name;
+		processContext = new ProcessContext(context);
+		processContext.setMonitor(monitor);
+	}
+
 	/**
 	 * Add a source.
 	 * @param source
@@ -118,18 +129,18 @@ public class Process implements IProcess {
 		}
 		
 		monitor.logInfo("Starting process '" + name + "'");
-		monitor.onEvent(context, EventType.PROCESS_START);
+		monitor.onEvent(processContext, EventType.PROCESS_START);
 		
 		try {
 			// initialize the extractor
-			extractor.initialize(context);
+			extractor.initialize(processContext);
 			// initialize transformer
 			for (ITransformer transformer : transformers) {
-				transformer.initialize(context);
+				transformer.initialize(processContext);
 			}
 			// initialize loaders 
 			for (ILoader loader : loaders) {
-				loader.initialize(context);
+				loader.initialize(processContext);
 			}
 			
 			// iterate over sources
@@ -145,23 +156,23 @@ public class Process implements IProcess {
 					
 					// let the loader open the source
 					IDataSet dataSet = new DataSet();
-					context.setDataSet(dataSet);
+					processContext.setDataSet(dataSet);
 					
 					monitor.logInfo("Opening source " + source.getName());
 					
 					extractor.openSource(source, dataSet);
 					
-					monitor.onEvent(context, EventType.SOURCE_POST_OPEN);
+					monitor.onEvent(processContext, EventType.SOURCE_POST_OPEN);
 
-					extractor.preSourceProcessing(context);
+					extractor.preSourceProcessing(processContext);
 					
 					// initialize loaders by source
 					for (ITransformer transformer : transformers) {
-						transformer.preSourceProcessing(context);
+						transformer.preSourceProcessing(processContext);
 					}
 					// initialize loaders by source
 					for (ILoader loader : loaders) {
-						loader.preSourceProcessing(context);
+						loader.preSourceProcessing(processContext);
 					}
 					
 					// iterate over records
@@ -169,13 +180,13 @@ public class Process implements IProcess {
 					while ((record = extractor.getNextRecord()) != null) {
 						
 						for (ITransformer transformer : transformers) {
-							transformer.processRecord(context, record);
+							transformer.processRecord(processContext, record);
 						}
 						if (record.isInvalid()) {
 							monitor.logWarn("Invalid record : " + record.getInvalidReason());
 						} else {
 							for (ILoader loader : loaders) {
-								loader.processRecord(context, record);
+								loader.processRecord(processContext, record);
 								if (record.isInvalid()) {
 									monitor.logWarn("Invalid record : " + record.getInvalidReason());
 									break;
@@ -183,36 +194,36 @@ public class Process implements IProcess {
 							}
 						}
 						
-						context.recordProcessed();
-						monitor.onEvent(context, EventType.RECORD_PROCESSED);
+						processContext.recordProcessed();
+						monitor.onEvent(processContext, EventType.RECORD_PROCESSED);
 					}
 					
 					// notify transformers that the source processing is done.
 					for (ITransformer transformer : transformers) {
-						transformer.postSourceProcessing(context);
+						transformer.postSourceProcessing(processContext);
 					}
 					// notify loaders the the source processing is done.
 					for (ILoader loader : loaders) {
-						loader.postSourceProcessing(context);
+						loader.postSourceProcessing(processContext);
 					}
 					
-					extractor.postSourceProcessing(context);
-					monitor.onEvent(context, EventType.SOURCE_FINISHED);
+					extractor.postSourceProcessing(processContext);
+					monitor.onEvent(processContext, EventType.SOURCE_FINISHED);
 				}
 				
 			}
 
 			// notify transformers and loaders that we are done.
 			for (ITransformer transformer : transformers) {
-				transformer.onProcessFinished(context);
+				transformer.onProcessFinished(processContext);
 			}
 			for (ILoader loader : loaders) {
-				loader.onProcessFinished(context);
+				loader.onProcessFinished(processContext);
 			}
 			
-			extractor.onProcessFinished(context);
+			extractor.onProcessFinished(processContext);
 			
-			monitor.onEvent(context, EventType.PROCESS_FINISHED);
+			monitor.onEvent(processContext, EventType.PROCESS_FINISHED);
 			
 		} catch (ETLException e) {
 			monitor.logError("Error during ETL processing: " + e, e);
@@ -238,7 +249,7 @@ public class Process implements IProcess {
 	 */
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
-		context.setMonitor(monitor);
+		processContext.setMonitor(monitor);
 	}
 
 	/**
@@ -251,8 +262,8 @@ public class Process implements IProcess {
 	/**
 	 * @return the context
 	 */
-	public IContext getContext() {
-		return context;
+	public IProcessContext getContext() {
+		return processContext;
 	}
 	
 }

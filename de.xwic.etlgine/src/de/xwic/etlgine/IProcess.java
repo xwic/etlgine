@@ -85,7 +85,7 @@ public interface IProcess {
 	/**
 	 * @return the context
 	 */
-	public IContext getContext();
+	public IProcessContext getContext();
 
 	
 	

@@ -9,36 +9,36 @@ package de.xwic.etlgine;
  */
 public abstract class AbstractLoader implements ILoader {
 
-	protected IContext context;
+	protected IProcessContext processContext;
 	protected IMonitor monitor;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
-	public void initialize(IContext context) throws ETLException {
-		this.context = context;
-		monitor = context.getMonitor();
+	public void initialize(IProcessContext processContext) throws ETLException {
+		this.processContext = processContext;
+		monitor = processContext.getMonitor();
 
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
-	public void onProcessFinished(IContext context) throws ETLException {
+	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#postSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
-	public void postSourceProcessing(IContext context) throws ETLException {
+	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
 
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
-	public void preSourceProcessing(IContext context) throws ETLException {
+	public void preSourceProcessing(IProcessContext processContext) throws ETLException {
 
 	}
 

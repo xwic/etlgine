@@ -12,30 +12,30 @@ public interface IProcessParticipant {
 
 	/**
 	 * Initialize.
-	 * @param context
+	 * @param processContext
 	 * @throws ETLException 
 	 */
-	public void initialize(IContext context) throws ETLException;
+	public void initialize(IProcessContext processContext) throws ETLException;
 	
 	/**
 	 * Invoked before a source is processed. This method is normally used
 	 * to open the target store (i.e. file, connection, ...).
-	 * @param context
+	 * @param processContext
 	 */
-	public void preSourceProcessing(IContext context) throws ETLException;
+	public void preSourceProcessing(IProcessContext processContext) throws ETLException;
 	
 	/**
 	 * Invoked after a source has been processed. This method is normally used
 	 * to close the target store/connection.
-	 * @param context
+	 * @param processContext
 	 */
-	public void postSourceProcessing(IContext context) throws ETLException;
+	public void postSourceProcessing(IProcessContext processContext) throws ETLException;
 	
 	/**
 	 * The process has been finished.
-	 * @param context
+	 * @param processContext
 	 */
-	public void onProcessFinished(IContext context) throws ETLException;
+	public void onProcessFinished(IProcessContext processContext) throws ETLException;
 
 	
 }

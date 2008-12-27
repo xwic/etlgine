@@ -19,7 +19,7 @@ import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IDataSet;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.sources.FileSource;
@@ -66,8 +66,8 @@ public class XLSExtractor extends AbstractExtractor {
 	 * @see de.xwic.etlgine.impl.AbstractExtractor#postSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void postSourceProcessing(IContext context) throws ETLException {
-		super.postSourceProcessing(context);
+	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
+		super.postSourceProcessing(processContext);
 		close();
 	}
 
@@ -78,7 +78,7 @@ public class XLSExtractor extends AbstractExtractor {
 		
 		if (!reachedEnd) {
 			try {
-				IRecord record = context.newRecord();
+				IRecord record = processContext.newRecord();
 				HSSFRow row;
 				// read until we find a row that contains data.
 				while ((row = sheet.getRow(currRow)) == null && currRow <= maxRow) {
@@ -156,13 +156,13 @@ public class XLSExtractor extends AbstractExtractor {
 					sheet = workbook.getSheetAt(sheetIndex);
 				}
 				if (sheet == null) {
-					context.getMonitor().logError("The specified sheet was not found!");
+					processContext.getMonitor().logError("The specified sheet was not found!");
 					reachedEnd = true;
 				} else {
 					HSSFRow row = sheet.getRow(startRow);
 					if (row == null) {
 						// file is empty!
-						context.getMonitor().logWarn("The specified header row does not exist. Assume that the file is empty.");
+						processContext.getMonitor().logWarn("The specified header row does not exist. Assume that the file is empty.");
 						reachedEnd = true;
 					} else {
 						int lastNum = row.getLastCellNum();

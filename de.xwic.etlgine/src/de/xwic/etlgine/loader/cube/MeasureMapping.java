@@ -5,7 +5,7 @@ package de.xwic.etlgine.loader.cube;
 
 import de.xwic.cube.ICube;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -58,10 +58,10 @@ public class MeasureMapping {
 	}
 
 	/**
-	 * @param context
+	 * @param processContext
 	 * @param cube
 	 */
-	public void afterConfiguration(IContext context, ICube cube) {
+	public void afterConfiguration(IProcessContext processContext, ICube cube) {
 		
 		
 	}

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 
 /**
  * Maps values into DimensionElements.
@@ -136,10 +136,10 @@ public class ElementMapping {
 	}
 
 	/**
-	 * @param context
+	 * @param processContext
 	 * @param cube
 	 */
-	public void afterConfiguration(IContext context, ICube cube) {
+	public void afterConfiguration(IProcessContext processContext, ICube cube) {
 		
 		if (element == null && elementID != null) {
 			element = dimension.parsePath(elementID);

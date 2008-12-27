@@ -23,7 +23,7 @@ import java.util.Set;
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -50,8 +50,8 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void initialize(IContext context) throws ETLException {
-		super.initialize(context);
+	public void initialize(IProcessContext processContext) throws ETLException {
+		super.initialize(processContext);
 		
 		// initialize the driver
 		try {
@@ -82,7 +82,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void onProcessFinished(IContext context) throws ETLException {
+	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		if (connection != null) {
 			try {
 				connection.close();
@@ -97,8 +97,8 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void preSourceProcessing(IContext context) throws ETLException {
-		super.preSourceProcessing(context);
+	public void preSourceProcessing(IProcessContext processContext) throws ETLException {
+		super.preSourceProcessing(processContext);
 		
 		// check target table
 		if (tablename == null) {
@@ -129,13 +129,13 @@ public class JDBCLoader extends AbstractLoader {
 			List<IColumn> missingCols = new ArrayList<IColumn>();
 			
 			// Check if the columns apply.
-			for (IColumn column : context.getDataSet().getColumns()) {
+			for (IColumn column : processContext.getDataSet().getColumns()) {
 				if (!column.isExclude()) {
 					DbColumnDef dbc = columns.get(column.computeTargetName());
 					if (dbc != null) {
 						dbc.setColumn(column);
 					} else {
-						context.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
+						processContext.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
 						missingCols.add(column);
 					}
 				}
@@ -248,7 +248,7 @@ public class JDBCLoader extends AbstractLoader {
 			
 		}
 		
-		context.getMonitor().logInfo("Creating missing columns: \n" + sql.toString());
+		processContext.getMonitor().logInfo("Creating missing columns: \n" + sql.toString());
 
 		Statement stmt = connection.createStatement();
 		stmt.execute(sql.toString());
@@ -281,7 +281,7 @@ public class JDBCLoader extends AbstractLoader {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IContext context, IRecord record) throws ETLException {
+	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 
 		try {
 			psInsert.clearParameters();

@@ -70,12 +70,12 @@ public class ProcessTest extends TestCase {
 		// install monitor that does the various tests.
 		process.setMonitor(new DefaultMonitor() {
 			@Override
-			public void onEvent(IContext context, EventType eventType) {
-				super.onEvent(context, eventType);
+			public void onEvent(IProcessContext processContext, EventType eventType) {
+				super.onEvent(processContext, eventType);
 				switch (eventType) {
 				case SOURCE_POST_OPEN: {
 					// after the open, check if the data source contains the right columns.
-					IDataSet dataSet = context.getDataSet();
+					IDataSet dataSet = processContext.getDataSet();
 					assertNotNull(dataSet);
 					assertEquals(5, dataSet.getColumns().size());
 					assertTrue(dataSet.containsColumn("Name"));
@@ -85,7 +85,7 @@ public class ProcessTest extends TestCase {
 					break;
 				}
 				case SOURCE_FINISHED: {
-					assertEquals(3, context.getRecordsProcessed());
+					assertEquals(3, processContext.getRecordsProcessed());
 					break;
 				}
 				}
@@ -121,15 +121,15 @@ public class ProcessTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#preSourceProcessing(de.xwic.etlgine.IETLContext)
 			 */
 			@Override
-			public void preSourceProcessing(IContext context) throws ETLException {
-				colTest = context.getDataSet().addColumn("Test");
+			public void preSourceProcessing(IProcessContext processContext) throws ETLException {
+				colTest = processContext.getDataSet().addColumn("Test");
 				flags.add("preSourceProcessing");
 			}
 			/* (non-Javadoc)
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 			 */
 			@Override
-			public void processRecord(IContext context, IRecord record) {
+			public void processRecord(IProcessContext processContext, IRecord record) {
 				record.setData(colTest, new Date());
 				flags.add("processRecord");
 			}
@@ -178,8 +178,8 @@ public class ProcessTest extends TestCase {
 			 * @see de.xwic.etlgine.impl.AbstractTransformer#preSourceProcessing(de.xwic.etlgine.IETLContext)
 			 */
 			@Override
-			public void preSourceProcessing(IContext context) throws ETLException {
-				IColumn col = context.getDataSet().getColumn("ID");
+			public void preSourceProcessing(IProcessContext processContext) throws ETLException {
+				IColumn col = processContext.getDataSet().getColumn("ID");
 				col.setExclude(true);
 			}
 		});

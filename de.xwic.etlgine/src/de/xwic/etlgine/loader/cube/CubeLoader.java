@@ -11,7 +11,7 @@ import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -40,8 +40,8 @@ public class CubeLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void initialize(IContext context) throws ETLException {
-		super.initialize(context);
+	public void initialize(IProcessContext processContext) throws ETLException {
+		super.initialize(processContext);
 		dataPool = dataPoolProvider.getDataPool();
 		if (targetCubeKey == null) {
 			throw new ETLException("The target cube key is not specified.");
@@ -61,13 +61,13 @@ public class CubeLoader extends AbstractLoader {
 			throw new ETLException("The DataPool does not contain a cube with the key " + targetCubeKey + ".");
 		}
 		cube = dataPool.getCube(targetCubeKey);
-		dataMapper.initialize(context, cube);
+		dataMapper.initialize(processContext, cube);
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IContext context, IRecord record) throws ETLException {
+	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 
 		Key key = cube.createKey("");
 		int idx = 0;

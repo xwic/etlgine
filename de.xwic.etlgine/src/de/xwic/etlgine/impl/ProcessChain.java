@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IGlobalContext;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcess;
@@ -25,20 +26,34 @@ public class ProcessChain implements IProcessChain {
 
 	private final String name;
 	private IMonitor monitor;
-	private IGlobalContext globalContext = new GlobalContext();
+	private IGlobalContext globalContext;
 
 	private List<IProcess> processList = new ArrayList<IProcess>();
 	
+	/**
+	 * Constructor.
+	 * @param name
+	 */
 	public ProcessChain(String name) {
 		this.name = name;
-		
+		this.globalContext = new GlobalContext();
 	}
-	
+
+	/**
+	 * 
+	 * @param parentContext
+	 * @param name
+	 */
+	public ProcessChain(IContext parentContext, String name) {
+		this.name = name;
+		this.globalContext = new GlobalContext(parentContext);
+	}
+
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#addProcess(de.xwic.etlgine.IProcess)
 	 */
 	public IProcess createProcess(String name) {
-		IProcess process = new Process(name);
+		IProcess process = new Process(globalContext, name);
 		processList.add(process);
 		return process;
 	}
@@ -48,12 +63,17 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public IProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException {
 		
-		File file = new File(filename);
+		File jobPath = new File(globalContext.getProperty("scriptpath", "."));
+		if (!jobPath.exists()) {
+			throw new ETLException("The job path " + jobPath.getAbsolutePath() + " does not exist.");
+		}
+		
+		File file = new File(jobPath, filename);
 		if (!file.exists()) {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		
-		IProcess process = new Process(name);
+		IProcess process = new Process(globalContext, name);
 		
 		Binding binding = new Binding();
 		binding.setVariable("process", process);

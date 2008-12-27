@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.mortbay.jetty.Handler;
@@ -16,6 +17,9 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.xml.XmlConfiguration;
+
+import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IJob;
 
 import eu.lippisch.jscreen.Color;
 import eu.lippisch.jscreen.Input;
@@ -53,7 +57,7 @@ public class ETLgineServer extends JScreenApplication {
 			return;
 		}
 		
-		screen.println("Server started. Press ESC to exit.");
+		screen.println("Server started. Press ESC to exit, F5 to start a job.");
 		
 		handleKeyboardInput();
 		
@@ -77,14 +81,38 @@ public class ETLgineServer extends JScreenApplication {
 		while (!exit) {
 			Key key = input.readKey(true);
 			
-			switch (key.action) {
-			case ESCAPE:
-				screen.print("Are you sure? (Enter yes to exit): ");
-				String inp = InputUtil.inputLine(screen, input);
-				if (inp.startsWith("y")) {
-					exit = true;
+			if (key.action != null) {
+				switch (key.action) {
+				case F5:
+					screen.println("Joblist:");
+					int idx = 1;
+					for (IJob job : serverContext.getJobs()) {
+						screen.printf(" %d - %s%n", idx++, job.getName());
+					}
+					screen.print("Enter job name to start: ");
+					String inpName = InputUtil.inputLine(screen, input);
+					if (inpName.trim().length() != 0) {
+						IJob job = serverContext.getJob(inpName);
+						if (job != null) {
+							screen.println("Executing Job " + job.getName());
+							try {
+								job.execute();
+							} catch (ETLException e) {
+								error("Error during execution: " + e);
+							}
+						} else {
+							error("Job with the name " + inpName + " does not exist.");
+						}
+					}
+					break;
+				case ESCAPE:
+					screen.print("Are you sure? (Enter yes to exit): ");
+					String inp = InputUtil.inputLine(screen, input);
+					if (inp.startsWith("y")) {
+						exit = true;
+					}
+					break;
 				}
-				break;
 			}
 			
 		}
@@ -93,6 +121,7 @@ public class ETLgineServer extends JScreenApplication {
 
 	/**
 	 * Initialize the server.
+	 * @throws ETLException 
 	 */
 	private boolean initialize() {
 		
@@ -148,10 +177,28 @@ public class ETLgineServer extends JScreenApplication {
 		PropertyConfigurator.configure(configFile.getAbsolutePath());
 		
 		// load jobs
-		File jobPath = new File(path, serverContext.getProperty("jobpath", "jobs"));
+		File jobPath = new File(path, serverContext.getProperty(ServerContext.PROPERTY_SCRIPTPATH, "jobs"));
 		if (!jobPath.exists()) {
 			error("The job directory does not exist: " + jobPath.getAbsolutePath());
 			return false;
+		}
+		serverContext.setProperty(ServerContext.PROPERTY_SCRIPTPATH, jobPath.getAbsolutePath());
+		
+		StringTokenizer stk = new StringTokenizer(serverContext.getProperty("loadJobs", ""), ",; ");
+		while (stk.hasMoreTokens()) {
+			String scriptName = stk.nextToken();
+			String jobName = scriptName;
+			if (jobName.toLowerCase().endsWith(".groovy")) {
+				jobName = jobName.substring(0, jobName.length() - ".groovy".length());
+			}
+			try {
+				screen.println("Loading Job " + jobName + " from file " + scriptName);
+				serverContext.loadJob(jobName, scriptName);
+			} catch (Exception e) {
+				error("An error occured during loading of the job " + scriptName + ": " + e);
+				e.printStackTrace();
+				return false;
+			}
 		}
 
 		
@@ -213,6 +260,7 @@ public class ETLgineServer extends JScreenApplication {
 		
 		screen.setForegroundColor(Color.HI_RED);
 		screen.println(string);
+		screen.setForegroundColor(Color.GRAY);
 		
 	}
 

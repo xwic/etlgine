@@ -13,7 +13,7 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -27,32 +27,32 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	
 	protected List<IMeasure> measures = new ArrayList<IMeasure>();
 	protected Map<IMeasure, MeasureMapping> measureMap = new HashMap<IMeasure, MeasureMapping>();
-	protected IContext context;
+	protected IProcessContext processContext;
 	
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#initialize(de.xwic.etlgine.IETLContext, de.xwic.cube.ICube)
 	 */
-	public void initialize(IContext context, ICube cube) throws ETLException {
-		this.context = context;
+	public void initialize(IProcessContext processContext, ICube cube) throws ETLException {
+		this.processContext = processContext;
 		this.cube = cube;
-		configure(context);
+		configure(processContext);
 		
 		// notify mappings
 		for (DimensionMapping dm : dimMap.values()) {
-			dm.afterConfiguration(context, cube);
+			dm.afterConfiguration(processContext, cube);
 		}
 		for (MeasureMapping mm : measureMap.values()) {
-			mm.afterConfiguration(context, cube);
+			mm.afterConfiguration(processContext, cube);
 		}
 	}
 	
 	/**
 	 * Implementors must setup the configuration here.
-	 * @param context
+	 * @param processContext
 	 * @throws ETLException 
 	 */
-	protected abstract void configure(IContext context) throws ETLException;
+	protected abstract void configure(IProcessContext processContext) throws ETLException;
 	
 	/**
 	 * Add a mapping where the columnName and dimension name is the same.
@@ -101,7 +101,7 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 		if (dm == null) {
 			throw new ETLException("No mapping for dimension " + dim.getKey());
 		}
-		return dm.mapElement(context, cube, record);
+		return dm.mapElement(processContext, cube, record);
 	}
 
 	/* (non-Javadoc)

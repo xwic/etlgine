@@ -16,5 +16,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.log4j"/>
 	<classpathentry kind="lib" path="server/jetty/jetty-6.1.9.jar"/>
 	<classpathentry kind="lib" path="server/jetty/jetty-util-6.1.9.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.libs.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.dom4j"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.webui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

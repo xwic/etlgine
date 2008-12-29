@@ -175,16 +175,16 @@
     <!-- =========================================================== -->
     <!-- Configure Realms                                            -->
     <!-- =========================================================== -->
-    <!--  <Set name="UserRealms">
+    <Set name="UserRealms">
       <Array type="org.mortbay.jetty.security.UserRealm">
         <Item>
           <New class="org.mortbay.jetty.security.HashUserRealm">
-            <Set name="name">Test Realm</Set>
-            <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>
+            <Set name="name">etlgine</Set>
+            <Set name="config">server/config/realm.properties</Set>
           </New>
         </Item>
       </Array>
-    </Set> -->
+    </Set>
     
 
     <!-- =========================================================== -->

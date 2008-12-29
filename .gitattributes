@@ -629,6 +629,8 @@ de.xwic.etlgine/server/jetty/start.jar -text
 de.xwic.etlgine/server/jobs/Testjob.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcess.groovy -text
 de.xwic.etlgine/server/web/index.html -text
+de.xwic.etlgine/server/xcube/ETLpoolInit.groovy -text
+de.xwic.etlgine/server/xcube/etl.datapool -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractTransformer.java -text

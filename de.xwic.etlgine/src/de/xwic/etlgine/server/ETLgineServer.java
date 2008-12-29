@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -20,7 +19,6 @@ import org.mortbay.xml.XmlConfiguration;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
-
 import eu.lippisch.jscreen.Color;
 import eu.lippisch.jscreen.Input;
 import eu.lippisch.jscreen.Key;
@@ -34,6 +32,8 @@ import eu.lippisch.jscreen.util.InputUtil;
  */
 public class ETLgineServer extends JScreenApplication {
 	
+	private static ETLgineServer instance = null;
+	
 	private String rootPath = ".";
 	private Screen screen;
 	private Input input;
@@ -41,6 +41,21 @@ public class ETLgineServer extends JScreenApplication {
 	
 	private ServerContext serverContext = new ServerContext();
 
+	/**
+	 * 
+	 */
+	public ETLgineServer() {
+		instance = this;
+	}
+	
+	/**
+	 * Returns the server instance.
+	 * @return
+	 */
+	public static ETLgineServer getInstance() {
+		return instance;
+	}
+	
 	/* (non-Javadoc)
 	 * @see eu.lippisch.jscreen.app.JScreenApplication#run(eu.lippisch.jscreen.Screen, eu.lippisch.jscreen.Input)
 	 */
@@ -137,13 +152,15 @@ public class ETLgineServer extends JScreenApplication {
 			return false;
 		}
 		
+		serverContext.setProperty(ServerContext.PROPERTY_ROOTPATH, path.getAbsolutePath());
+		
 		File pathConfig = new File(path, "config");
 		if (!pathConfig.exists()) {
 			error("Config path " + pathConfig.getAbsolutePath() + " does not exist.");
 			return false;
 		}
-		screen.println("Redirecting System.out");
-		System.setOut(new PrintStream(new ScreenOutputStream(screen)));
+		//screen.println("Redirecting System.out");
+		//System.setOut(new PrintStream(new ScreenOutputStream(screen)));
 
 		File configFile = new File(pathConfig, "log4j.properties");
 		if (!configFile.exists()) {
@@ -201,6 +218,9 @@ public class ETLgineServer extends JScreenApplication {
 			}
 		}
 
+		// load DataPool(s)
+		serverContext.loadDataPools();
+		screen.println("Loaded " + serverContext.getDataPoolManagerKeys().size() + " DataPool(s).");
 		
 		// load webserver
 		if (serverContext.getPropertyBoolean("webserver.start", false)) {
@@ -222,7 +242,7 @@ public class ETLgineServer extends JScreenApplication {
 			    	error("Invalid Jetty Configuration - no ContextHandlerCollection found.");
 			    	return false;
 			    }
-				WebAppContext wc = new WebAppContext(context, new File(path, "web").getAbsolutePath(), "etlgine");
+				WebAppContext wc = new WebAppContext(context, new File(path, "web").getAbsolutePath(), "/etlgine");
 				wc.setDefaultsDescriptor(new File(pathConfig, "webdefault.xml").getAbsolutePath());
 				
 				jetty.start();
@@ -232,7 +252,7 @@ public class ETLgineServer extends JScreenApplication {
 			}
 		}
 		
-		
+		//System.setOut(oldPS);
 		return true;
 		
 	}

@@ -1,0 +1,11 @@
+#if($control.heightHint != "" || $control.widthHint != "")
+<table #if($control.heightHint != "")height="$control.heightHint"#end #if($control.widthHint != "")width="$control.widthHint"#end cellspacing="0" cellpadding="0">
+<tr>
+<td valign="top">
+$insert.control($control.currentControlName)
+</td>
+</tr>
+</table>
+#else
+$insert.control($control.currentControlName)
+#end

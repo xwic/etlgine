@@ -860,6 +860,7 @@ de.xwic.etlgine/server/web/img/add.png -text
 de.xwic.etlgine/server/web/img/bricks.png -text
 de.xwic.etlgine/server/web/img/database.png -text
 de.xwic.etlgine/server/web/img/database_lightning.png -text
+de.xwic.etlgine/server/web/img/database_save.png -text
 de.xwic.etlgine/server/web/img/door_out.png -text
 de.xwic.etlgine/server/web/img/headerfade4.png -text
 de.xwic.etlgine/server/web/img/pencil.png -text
@@ -1006,6 +1007,8 @@ de.xwic.etlgine/src/de/xwic/etlgine/impl/Process.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ProcessChain.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ProcessContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Record.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/jdbc/DbColumnDef.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/jdbc/JDBCUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/csv/CSVLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/AbstractCubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/CubeLoader.java -text
@@ -1016,7 +1019,6 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ICubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/IDataPoolProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/MeasureMapping.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ScriptedCubeDataMapper.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/DbColumnDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/JDBCLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineServer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/Launch.java -text

@@ -3,18 +3,22 @@
  */
 package de.xwic.etlgine.server.admin.datapool;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
+import de.jwic.ecolib.controls.ErrorWarningControl;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
 import de.xwic.cube.IDimension;
+import de.xwic.cube.util.JDBCSerializerUtil;
 import de.xwic.cube.webui.controls.DimensionElementSelector;
+import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
 import de.xwic.etlgine.server.admin.BaseContentContainer;
@@ -31,6 +35,11 @@ public class DPDetailsControl extends BaseContentContainer {
 	private IDataPool dataPool;
 
 	private Map<IDimension, DimensionElementSelector> selectorMap = new HashMap<IDimension, DimensionElementSelector>();
+	private ButtonControl btSave;
+	private String syncTableConnectionName;
+	private ServerContext context;
+	
+	private ErrorWarningControl errInfo;
 	
 	/**
 	 * @param container
@@ -40,7 +49,10 @@ public class DPDetailsControl extends BaseContentContainer {
 		super(container, name);
 		this.dataPoolManagerKey = dataPoolManagerKey;
 		
+		context = ETLgineServer.getInstance().getServerContext();
 		setTitle("DataPool Details (" + dataPoolManagerKey + ")");
+		
+		errInfo = new ErrorWarningControl(this, "errInfo");
 		
 		ActionBarControl abar = new ActionBarControl(this, "actionBar");
 		
@@ -53,10 +65,42 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 
+		btSave = new ButtonControl(abar, "save");
+		btSave.setIconEnabled(ImageLibrary.IMAGE_DATABASE_SAVE);
+		btSave.setTitle("Save to InitTable");
+		btSave.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onSaveToInit();
+			}
+		});
+		
 		loadDataPoolInfo();
 		
 	}
 	
+	/**
+	 * 
+	 */
+	protected void onSaveToInit() {
+		
+		try {
+			Connection connection = JDBCUtil.openConnection(context, syncTableConnectionName);
+			try {
+				JDBCSerializerUtil.storeMeasures(connection, dataPool, "XCUBE_MEASURES");
+				
+				JDBCSerializerUtil.storeDimensions(connection, dataPool, "XCUBE_DIMENSIONS", "XCUBE_DIMENSION_ELEMENTS");
+				
+				errInfo.showWarning("Database Updated");
+			} finally {
+				connection.close();
+			}
+		} catch (Exception e) {
+			log.error("Error saving to sync table.", e);
+			errInfo.showError(e);
+		}
+		
+	}
+
 	/**
 	 * 
 	 */
@@ -73,8 +117,8 @@ public class DPDetailsControl extends BaseContentContainer {
 	 */
 	private void loadDataPoolInfo() {
 		
-		ServerContext context = ETLgineServer.getInstance().getServerContext();
 		String key = context.getProperty(dataPoolManagerKey + ".datapool.key", null);
+		syncTableConnectionName = context.getProperty(dataPoolManagerKey + ".datapool.syncTables.connection");
 		
 		if (key != null) {
 			try {
@@ -92,6 +136,7 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		}
 		
+		btSave.setEnabled(syncTableConnectionName != null);
 	}
 
 	/**

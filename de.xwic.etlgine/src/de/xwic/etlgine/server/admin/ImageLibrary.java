@@ -12,6 +12,7 @@ import de.jwic.base.ImageRef;
 public class ImageLibrary {
 
 	public static final ImageRef IMAGE_DATABASE = new ImageRef("img/database.png");
+	public static final ImageRef IMAGE_DATABASE_SAVE = new ImageRef("img/database_save.png");
 	public static final ImageRef IMAGE_DATABASE_INIT = new ImageRef("img/database_lightning.png");
 	public static final ImageRef IMAGE_REPORT = new ImageRef("img/report.png");
 	public static final ImageRef IMAGE_SCRIPT = new ImageRef("img/script.png");

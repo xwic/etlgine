@@ -25,6 +25,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
+import de.xwic.etlgine.jdbc.DbColumnDef;
 
 /**
  * @author lippisch

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.etlgine.loader.jdbc;
+package de.xwic.etlgine.jdbc;
 
 import de.xwic.etlgine.IColumn;
 

@@ -599,6 +599,7 @@ de.xwic.cube/src/de/xwic/cube/impl/Identifyable.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Measure.java -text
 de.xwic.cube/src/de/xwic/cube/storage/impl/FileDataPoolStorageProvider.java -text
 de.xwic.cube/src/de/xwic/cube/util/DataDump.java -text
+de.xwic.cube/src/de/xwic/cube/util/JDBCSerializerUtil.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/DataPoolManagerTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/Demo.java -text

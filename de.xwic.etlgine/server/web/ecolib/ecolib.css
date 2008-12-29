@@ -1,0 +1,22 @@
+/** This file contains default css styles for common ecolib controls */
+
+/* StackPanelControl styles */
+
+.stackpanel{
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	border-collapse: collapse;
+}
+.stackpanel-item{
+	width: 100%;
+}
+.stackpanel-item-header{
+	font-weight: bold;
+	background-color: #CCCCCC;
+	text-align: center;
+	cursor: hand;
+}
+.stackpanel-item-content{
+	padding-left: 10px;
+}

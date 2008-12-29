@@ -1,0 +1,47 @@
+</head>
+<body onLoad="#if($page.forceFocusElement != "")jWic().forceFocus('$page.forceFocusElement');$page.setForceFocusElement("")#end #if($page.clientLeft)window.scrollTo($page.clientLeft, $page.clientTop);#end" leftmargin="7">
+	<script language="JavaScript">
+	#* Initialize the DHTML History library if it's script file is loaded, but must be initialized here.
+	 * The library is bundled with the ecolib library. See the dhtmlHistory.js file for details.
+	 *#
+		if (window.dhtmlHistory) {
+			window.historyStorage.init();
+			window.dhtmlHistory.create("$contextPath/ecolib/history/");
+		}
+	</script>
+	<div id="click_blocker" style="position:absolute; z-index: 999; visibility: hidden;">
+	<table width="100%" height="100%">
+		<tr>
+			<td valign="center" align="center">
+			<iframe id="click_blocker_message" name="clickBlockFrame" frameborder="0" style="width:200px; height:65px;" src="$contextPath/jwic/blank.html"></iframe>
+			</td>
+		</tr>
+	</table>
+	</div>
+	<script language="javascript">
+
+		var pleaseWaitHTML = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"><html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"$contextPath/jwic/pleaseWait.css\"></head>' +
+			'<body class="pwait"><p class="pwait">Please Wait....<br><img src=\"$contextPath/jwic/gfx/loading.gif\" width=128 height=24></p></body></html>'; 
+		var cbFrame = document.getElementById("click_blocker_message");
+		cbFrame.contentWindow.document.write(pleaseWaitHTML);
+		cbFrame.contentWindow.document.close();
+		if (!parent.doNotForward)
+			history.forward(); 
+		parent.doNotForward = false;
+		jWicInit();
+		#if($reloaded == "1")
+			alert("The application has been restarted. A possible reason is that you have been inactive for to long so that your session expired.");
+		#end
+	</script>
+	
+	<form name="jwicform" method="POST" enctype=#if($page.multipart)"multipart/form-data"#else"text/html;charset=iso-8859-1"#end onsubmit="return false">
+		<input type="hidden" name="_msid" value="$context.sessionId">
+		<input type="hidden" name="__ticket" value="$context.getRequestTicket($layerid)">
+		<input type="hidden" name="__ctrlid" value="">
+		<input type="hidden" name="__action" value="">
+		<input type="hidden" name="__acpara" value="">
+		<input type="hidden" name="__sysinfo" value="">
+		<input type="hidden" name="__mouseevent" value="">
+		<input type="hidden" name="layerid" value="$!layerid">		
+
+		

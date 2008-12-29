@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+#if($exception)
+	<exception><![CDATA[$exception.toString()]]></exception>
+#else
+	<ticket>$context.getRequestTicket($layerid)</ticket>
+	#if($context.requireRedraw)
+	<redraw><sessionId>$context.sessionId</sessionId></redraw>
+	#else
+		#foreach ($entry in $updateables.entrySet())
+	<controlcontent id="$entry.key"><![CDATA[$entry.value]]></controlcontent>
+		#end
+	#end
+#end
+	#if($page.forceFocusElement != "")<focus>$page.forceFocusElement</focus>$page.setForceFocusElement("")#end
+</response>

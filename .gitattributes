@@ -628,6 +628,16 @@ de.xwic.etlgine/server/jetty/servlet-api-2.5-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/start.jar -text
 de.xwic.etlgine/server/jobs/Testjob.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcess.groovy -text
+de.xwic.etlgine/server/web/WEB-INF/jwic-setup.xml -text
+de.xwic.etlgine/server/web/WEB-INF/jwic/ctrl_vtls/info.txt -text
+de.xwic.etlgine/server/web/WEB-INF/jwic/jsp/de.jwic.tutorial.jsp.SomeControl.jsp -text
+de.xwic.etlgine/server/web/WEB-INF/jwic/jsp/jwic.jsp -text
+de.xwic.etlgine/server/web/WEB-INF/jwic/pages/jwic.ajax.page -text
+de.xwic.etlgine/server/web/WEB-INF/jwic/pages/jwic_error.page -text
+de.xwic.etlgine/server/web/WEB-INF/jwic/velocity.WebEngine.properties -text
+de.xwic.etlgine/server/web/WEB-INF/velocity.WebEngine.log.1 -text
+de.xwic.etlgine/server/web/WEB-INF/velocity.log.1 -text
+de.xwic.etlgine/server/web/WEB-INF/web.xml -text
 de.xwic.etlgine/server/web/admin.xwic.xml -text
 de.xwic.etlgine/server/web/byebye.html -text
 de.xwic.etlgine/server/web/etladmin.css -text

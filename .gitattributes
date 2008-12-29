@@ -620,6 +620,7 @@ de.xwic.etlgine/server/config/jetty.xml -text
 de.xwic.etlgine/server/config/log4j.properties -text
 de.xwic.etlgine/server/config/server.properties -text
 de.xwic.etlgine/server/config/webdefault.xml -text
+de.xwic.etlgine/server/doc/init_xcube_tables.sql -text
 de.xwic.etlgine/server/jetty/jetty-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/jetty-util-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/servlet-api-2.5-6.1.9.jar -text

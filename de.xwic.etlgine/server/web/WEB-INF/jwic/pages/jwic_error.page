@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title>jWic Exception</title>
+	<SCRIPT LANGUAGE="JavaScript" SRC="jwic.js">
+	</SCRIPT>
+<style>
+<!--
+body         { font-family: Sans-Serif; font-size: 10pt; color: #000000 } 
+h1           { font-family: Sans-Serif; font-size: 12pt; color: #800000; font-style: 
+               italic; font-weight: bold }
+-->
+</style>
+
+</head>
+<body>
+
+<h1>An exception occured during execution</h1>
+
+<p><b>Original Exception</b>
+<table border="0" width="100%" cellspacing="0" cellpadding="4">
+  <tr>
+    <td width="100%" bgcolor="#FFFFCC"><pre style="font-size: 9pt;">$exception</pre></td>
+  </tr>
+</table>
+
+<p><b>Stacktrace</b>
+<table border="0" width="100%" cellspacing="0" cellpadding="4">
+  <tr>
+    <td width="100%" bgcolor="#FFFFCC"><pre style="font-size: 9pt;">#foreach ($stk in $exception.stackTrace)
+  $stk
+    #end</pre></td>
+  </tr>
+</table>
+<hr>
+<center><span style="font-size: 8pt;">jWic Framework - &copy; 2005 - jWic Group - <a href="www.jwic.de" target="_blank">www.jwic.de</a> </center>
+</body>
+</html>

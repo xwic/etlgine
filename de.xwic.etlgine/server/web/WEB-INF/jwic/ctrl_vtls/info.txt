@@ -1,0 +1,5 @@
+In this directory you can place the Velocity template of your Web Application.
+VTL-Files in this directory over rule the templates that may exists in the java package.
+Their name should be classname.vtl e.g. de.test.MyFirstControl.vtl.
+
+Note: This behaivior works only if the VelocityEngine is setup correct.

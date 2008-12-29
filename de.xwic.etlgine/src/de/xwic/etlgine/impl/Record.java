@@ -18,6 +18,7 @@ public class Record implements IRecord {
 
 	protected final IDataSet dataSet;
 	protected boolean invalid = false;
+	protected boolean skip = false;
 	protected String invalidReason = null;
 	protected Map<IColumn, Object> data = new HashMap<IColumn, Object>();
 	
@@ -145,6 +146,20 @@ public class Record implements IRecord {
 		}
 		return null;
 		
+	}
+
+	/**
+	 * @return the skip
+	 */
+	public boolean isSkip() {
+		return skip;
+	}
+
+	/**
+	 * @param skip the skip to set
+	 */
+	public void setSkip(boolean skip) {
+		this.skip = skip;
 	}
 	
 }

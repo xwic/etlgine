@@ -27,6 +27,14 @@ public abstract class AbstractTransformer implements ITransformer {
 	}
 
 	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessParticipant#preSourceOpening(de.xwic.etlgine.IProcessContext)
+	 */
+	public void preSourceOpening(IProcessContext processContext)
+			throws ETLException {
+		
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IETLProcessParticipant#onProcessFinished(de.xwic.etlgine.impl.Context)
 	 */
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {

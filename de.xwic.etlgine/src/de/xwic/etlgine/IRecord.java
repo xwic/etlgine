@@ -88,4 +88,19 @@ public interface IRecord {
 	 */
 	public Double getDataAsDouble(IColumn column) throws ETLException;
 
+	/**
+	 * Returns true if this record should be skipped. The normal reason for
+	 * this is when the record does not match certain filter criterias.
+	 * @return
+	 */
+	public boolean isSkip();
+	
+	/**
+	 * Set if this record should be skipped. Records that are marked as "skip" are
+	 * not passed to the loader(s).
+	 * 
+	 * @param skip
+	 */
+	public void setSkip(boolean skip);
+	
 }

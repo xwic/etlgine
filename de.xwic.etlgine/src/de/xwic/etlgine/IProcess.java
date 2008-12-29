@@ -87,6 +87,15 @@ public interface IProcess {
 	 */
 	public IProcessContext getContext();
 
+	/**
+	 * Add a process finalizer.
+	 */
+	public void addProcessFinalizer(IProcessFinalizer finalizer);
 	
+	/**
+	 * Returns the process finalizers.
+	 * @return
+	 */
+	public List<IProcessFinalizer> getProcessFinalizers();
 	
 }

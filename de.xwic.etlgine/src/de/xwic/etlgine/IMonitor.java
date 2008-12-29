@@ -40,6 +40,6 @@ public interface IMonitor {
 	 * @param string
 	 * @param e
 	 */
-	public void logError(String string, Exception e);
+	public void logError(String string, Throwable t);
 	
 }

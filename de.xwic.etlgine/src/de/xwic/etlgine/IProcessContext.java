@@ -12,6 +12,18 @@ package de.xwic.etlgine;
 public interface IProcessContext extends IContext {
 
 	/**
+	 * Returns the hosting process.
+	 * @return
+	 */
+	public IProcess getProcess();
+	
+	/**
+	 * Returns the source that is currently processed.
+	 * @return
+	 */
+	public ISource getCurrentSource();
+	
+	/**
 	 * @return the dataSet
 	 */
 	public IDataSet getDataSet();

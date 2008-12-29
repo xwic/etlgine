@@ -17,6 +17,14 @@ public interface IDataSet {
 	 * @throws ETLException 
 	 */
 	public void addColumn(IColumn column) throws ETLException;
+	
+	/**
+	 * Add an alias name for the specified column.
+	 * @param column
+	 * @param alias
+	 * @throws ETLException
+	 */
+	public void addAlias(IColumn column, String alias) throws ETLException;
 
 	/**
 	 * Returns the list of columns.

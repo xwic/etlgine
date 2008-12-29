@@ -22,6 +22,13 @@ public abstract class AbstractLoader implements ILoader {
 	}
 
 	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessParticipant#preSourceOpening(de.xwic.etlgine.IProcessContext)
+	 */
+	public void preSourceOpening(IProcessContext processContext)
+			throws ETLException {
+		
+	}
+	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {

@@ -6,31 +6,37 @@ package de.xwic.etlgine.impl;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IMonitor;
+import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
+import de.xwic.etlgine.ISource;
 
 /**
  * @author lippisch
  */
 public class ProcessContext extends Context implements IProcessContext {
 
+	protected ISource currentSource = null;
 	protected IMonitor monitor = null;
 	protected IDataSet dataSet = null;
 	protected IRecord currentRecord = null;
 	protected int recordsProcessed = 0;
+	protected IProcess process = null;
 	
 	/**
 	 * 
 	 */
-	public ProcessContext() {
+	public ProcessContext(IProcess process) {
 		super();
+		this.process = process;
 	}
 
 	/**
 	 * @param parentContext
 	 */
-	public ProcessContext(IContext parentContext) {
+	public ProcessContext(IProcess process, IContext parentContext) {
 		super(parentContext);
+		this.process = process;
 	}
 
 	/**
@@ -86,6 +92,27 @@ public class ProcessContext extends Context implements IProcessContext {
 	 */
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
+	}
+
+	/**
+	 * @return the currentSource
+	 */
+	public ISource getCurrentSource() {
+		return currentSource;
+	}
+
+	/**
+	 * @param currentSource the currentSource to set
+	 */
+	public void setCurrentSource(ISource currentSource) {
+		this.currentSource = currentSource;
+	}
+
+	/**
+	 * @return the process
+	 */
+	public IProcess getProcess() {
+		return process;
 	}
 
 }

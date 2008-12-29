@@ -18,6 +18,13 @@ public interface IProcessParticipant {
 	public void initialize(IProcessContext processContext) throws ETLException;
 	
 	/**
+	 * Invoked before the source is opened by the extractor.
+	 * @param processContext
+	 * @throws ETLException
+	 */
+	public void preSourceOpening(IProcessContext processContext) throws ETLException;
+	
+	/**
 	 * Invoked before a source is processed. This method is normally used
 	 * to open the target store (i.e. file, connection, ...).
 	 * @param processContext

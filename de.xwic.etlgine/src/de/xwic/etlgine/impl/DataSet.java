@@ -20,6 +20,7 @@ public class DataSet implements IDataSet {
 
 	protected List<IColumn> columns = new ArrayList<IColumn>();
 	protected Map<String, IColumn> columnMap = new HashMap<String, IColumn>();
+	protected Map<String, IColumn> aliasMap = new HashMap<String, IColumn>();
 	protected Map<Integer, IColumn> columnIndexMap = new HashMap<Integer, IColumn>();
 	
 	/**
@@ -77,6 +78,22 @@ public class DataSet implements IDataSet {
 		columnMap.put(column.getName(), column);
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IDataSet#addAlias(de.xwic.etlgine.IColumn, java.lang.String)
+	 */
+	public void addAlias(IColumn column, String alias) throws ETLException {
+		if (!columns.contains(column)) {
+			throw new ETLException("The column is not in the column list.");
+		}
+		if (columnMap.containsKey(alias)) {
+			throw new ETLException("A column with this alias name already exists.");
+		}
+		if (aliasMap.containsKey(alias)) {
+			throw new ETLException("This alias is already in use.");
+		}
+		aliasMap.put(alias, column);
+	}
+	
 	/**
 	 * Returns the list of columns.
 	 * @return
@@ -94,7 +111,10 @@ public class DataSet implements IDataSet {
 	public IColumn getColumn(String name) throws ETLException {
 		IColumn col = columnMap.get(name);
 		if (col == null) {
-			throw new ETLException("A column with the name " + name + " does not exist.");
+			col = aliasMap.get(name);
+			if (col == null) {
+				throw new ETLException("A column with the name " + name + " does not exist.");
+			}
 		}
 		return col;
 	}
@@ -119,7 +139,7 @@ public class DataSet implements IDataSet {
 	 * @return
 	 */
 	public boolean containsColumn(String name) {
-		return columnMap.containsKey(name);
+		return columnMap.containsKey(name) || aliasMap.containsKey(name);
 	}
 	
 }

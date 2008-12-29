@@ -40,6 +40,7 @@ public class JDBCLoader extends AbstractLoader {
 	private String catalogName = null;
 	private String tablename = null;
 	private boolean autoCreateColumns = false;
+	private boolean ignoreMissingTargetColumns = false;
 	
 	private Connection connection = null;
 	private PreparedStatement psInsert = null;
@@ -144,7 +145,9 @@ public class JDBCLoader extends AbstractLoader {
 				if (autoCreateColumns) {
 					createColumns(missingCols, columns);
 				} else {
-					throw new ETLException("The source contains columns that do not exist in the target table.");
+					if (!ignoreMissingTargetColumns) {
+						throw new ETLException("The source contains columns that do not exist in the target table.");
+					}
 				}
 			}
 			
@@ -198,53 +201,56 @@ public class JDBCLoader extends AbstractLoader {
 		
 		for (IColumn col : missingCols) {
 			
-			DbColumnDef dbcd = new DbColumnDef(col.computeTargetName());
-			dbcd.setColumn(col);
-			
-			if (first) {
-				first = false;
-			} else {
-				sql.append(", ");
+			// if a column is used twice, we must make sure that it is not created twice as well!
+			if (!columns.containsKey(col.computeTargetName())) {
+				DbColumnDef dbcd = new DbColumnDef(col.computeTargetName());
+				dbcd.setColumn(col);
+				
+				if (first) {
+					first = false;
+				} else {
+					sql.append(", ");
+				}
+				
+				sql.append("[")
+				   .append(col.computeTargetName())
+				   .append("] ");
+				
+				String type;;
+				switch (col.getTypeHint()) {
+				case DATE:
+					type = "DATETIME";
+					dbcd.setType(Types.TIMESTAMP);
+					break;
+				case DATETIME:
+					type = "DATETIME";
+					dbcd.setType(Types.TIMESTAMP);
+					break;
+				case DOUBLE:
+					type = "FLOAT";
+					dbcd.setType(Types.FLOAT);
+					break;
+				case INT:
+					type = "INT";
+					dbcd.setType(Types.INTEGER);
+					break;
+				case LONG:
+					type = "BIGINT";
+					dbcd.setType(Types.BIGINT);
+					break;
+				default:
+					type = "VARCHAR(255)";
+					dbcd.setType(Types.VARCHAR);
+					dbcd.setSize(255);
+					break;
+				}
+				
+				sql.append(type)
+				   .append(" NULL");
+				
+				dbcd.setAllowsNull(true);
+				columns.put(dbcd.getName(), dbcd);
 			}
-			
-			sql.append("[")
-			   .append(col.computeTargetName())
-			   .append("] ");
-			
-			String type;;
-			switch (col.getTypeHint()) {
-			case DATE:
-				type = "DATETIME";
-				dbcd.setType(Types.TIMESTAMP);
-				break;
-			case DATETIME:
-				type = "DATETIME";
-				dbcd.setType(Types.TIMESTAMP);
-				break;
-			case DOUBLE:
-				type = "FLOAT";
-				dbcd.setType(Types.FLOAT);
-				break;
-			case INT:
-				type = "INT";
-				dbcd.setType(Types.INTEGER);
-				break;
-			case LONG:
-				type = "BIGINT";
-				dbcd.setType(Types.BIGINT);
-				break;
-			default:
-				type = "VARCHAR(255)";
-				dbcd.setType(Types.VARCHAR);
-				dbcd.setSize(255);
-				break;
-			}
-			
-			sql.append(type)
-			   .append(" NULL");
-			
-			dbcd.setAllowsNull(true);
-			columns.put(dbcd.getName(), dbcd);
 			
 		}
 		
@@ -451,6 +457,20 @@ public class JDBCLoader extends AbstractLoader {
 			ignoredColumns.add(s);
 		}
 		
+	}
+
+	/**
+	 * @return the ignoreMissingTargetColumns
+	 */
+	public boolean isIgnoreMissingTargetColumns() {
+		return ignoreMissingTargetColumns;
+	}
+
+	/**
+	 * @param ignoreMissingTargetColumns the ignoreMissingTargetColumns to set
+	 */
+	public void setIgnoreMissingTargetColumns(boolean ignoreMissingTargetColumns) {
+		this.ignoreMissingTargetColumns = ignoreMissingTargetColumns;
 	}
 	
 }

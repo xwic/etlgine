@@ -16,6 +16,7 @@ import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IMonitor;
+import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.ITransformer;
@@ -30,6 +31,8 @@ public class Process implements IProcess {
 	protected List<ISource> sources = new ArrayList<ISource>();
 	protected List<ITransformer> transformers = new ArrayList<ITransformer>();
 	protected List<ILoader> loaders = new ArrayList<ILoader>();
+	protected List<IProcessFinalizer> finalizers = new ArrayList<IProcessFinalizer>();
+	
 	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
 	protected ProcessContext processContext;
@@ -40,7 +43,7 @@ public class Process implements IProcess {
 	 */
 	public Process(String name) {
 		this.name = name;
-		processContext = new ProcessContext();
+		processContext = new ProcessContext(this);
 		processContext.setMonitor(monitor);
 	}
 
@@ -50,7 +53,7 @@ public class Process implements IProcess {
 	 */
 	public Process(IContext context, String name) {
 		this.name = name;
-		processContext = new ProcessContext(context);
+		processContext = new ProcessContext(this, context);
 		processContext.setMonitor(monitor);
 	}
 
@@ -84,6 +87,21 @@ public class Process implements IProcess {
 	 */
 	public List<ILoader> getLoaders() {
 		return Collections.unmodifiableList(loaders);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcess#addProcessFinalizer(de.xwic.etlgine.IProcessFinalizer)
+	 */
+	public void addProcessFinalizer(IProcessFinalizer finalizer) {
+		finalizers.add(finalizer);
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcess#getProcessFinalizers()
+	 */
+	public List<IProcessFinalizer> getProcessFinalizers() {
+		return Collections.unmodifiableList(finalizers);
 	}
 	
 	/**
@@ -153,11 +171,22 @@ public class Process implements IProcess {
 						monitor.logError("The mandatory source " + source.getName() + " is not availble. Import aborted.");
 					}
 				} else {
+					processContext.setCurrentSource(source);
 					
 					// let the loader open the source
 					IDataSet dataSet = new DataSet();
 					processContext.setDataSet(dataSet);
 					
+
+					// invoke preSourceOpening event methods.
+					extractor.preSourceOpening(processContext);
+					for (ITransformer transformer : transformers) {
+						transformer.preSourceOpening(processContext);
+					}
+					for (ILoader loader : loaders) {
+						loader.preSourceOpening(processContext);
+					}
+
 					monitor.logInfo("Opening source " + source.getName());
 					
 					extractor.openSource(source, dataSet);
@@ -184,7 +213,7 @@ public class Process implements IProcess {
 						}
 						if (record.isInvalid()) {
 							monitor.logWarn("Invalid record : " + record.getInvalidReason());
-						} else {
+						} else if (!record.isSkip()) {
 							for (ILoader loader : loaders) {
 								loader.processRecord(processContext, record);
 								if (record.isInvalid()) {
@@ -232,6 +261,14 @@ public class Process implements IProcess {
 			// close everything
 			if (extractor != null) {
 				extractor.close();
+			}
+			// fun finalizers
+			for (IProcessFinalizer finalizer : finalizers) {
+				try {
+					finalizer.onFinish(processContext);
+				} catch (Throwable t) {
+					monitor.logError("Error executing finalizer!", t);
+				}
 			}
 		}
 		

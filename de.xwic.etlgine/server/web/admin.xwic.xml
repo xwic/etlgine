@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC '-//jWic//DTD xwic 3.2//EN' 'http://jwic.sourceforge.net/xwic-3.2.dtd'>
+<application>
+
+	<name>ETLgineAdmin</name>
+	<class>de.xwic.etlgine.server.admin.AdminApplication</class>
+	<singlesession>true</singlesession>
+	<requireauth>false</requireauth>
+	<serializable>false</serializable>
+	
+</application>

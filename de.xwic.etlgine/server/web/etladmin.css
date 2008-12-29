@@ -1,0 +1,76 @@
+ body	{ font-family: Verdana,Helvetica; font-size: 10pt; background-color: #ffffff; margin: 0px; padding: 0px; }
+
+ #header {
+ 	color: #ffffff;
+ 	background-color: #2020A0;
+ 	padding: 5px;
+ 	margin-bottom: 40px;
+ 	font-weight: bold;
+ }
+ 
+ #content {
+ 	margin: 0px auto;
+ 	width: 800px;
+ 	background-color: #F0F0F0;
+ 	border: 1px solid #808080;
+ }
+ 
+ div.title {
+ 	background-color: #E0E0E0;
+ 	background: url(img/headerfade4.png);
+ 	border-bottom: 1px solid #A0A0A0;
+ 	font-weight: bold;
+ 	padding: 2px;
+ }
+ 
+ div.detailView {
+ 	background-color: #ffffff;
+ 	padding: 3px;
+ }
+ h3 {
+ 	margin-top: 0px;
+ }
+ 
+ td		{ font-size: 10pt; }
+ 
+ table.tbl {
+ 	border-collapse: collapse;
+ }
+ 
+ table.tbl th     {
+     font-size: 10pt;
+     text-align: left;
+     font-weight: bold;
+     border: 1px solid #D0D0D0;
+     /*border-bottom: 1px solid #808080;*/
+     background-color: #c0c0c0;
+ }
+
+ table.tbl td.data  {
+     font-size: 10pt;
+     text-align: left;
+     border: 1px solid #D0D0D0;
+ }
+ table.tbl ul {
+     margin-top: 0px;
+     margin-bottom: 0px;
+ }
+ 
+ a {
+     text-decoration: none;
+     color: #0000ff;
+ }
+ a:visited {
+     color: #0000ff;
+ }
+ 
+ a:hover {
+     text-decoration: underline;
+ }
+ 
+ td.caption { color: #4040FF; font-weight: bold; }
+ 
+ table.errorMessage {
+ 	background-color: #FF0000;
+ }
+ 

@@ -21,5 +21,11 @@ public class ImageLibrary {
 	public static final ImageRef IMAGE_BRICKS = new ImageRef("img/bricks.png");
 	public static final ImageRef IMAGE_EDIT = new ImageRef("img/pencil.png");
 	public static final ImageRef IMAGE_ADD = new ImageRef("img/add.png");
-	
+	public static final ImageRef IMAGE_TABLE_RELATIONSHIP = new ImageRef("img/table_relationship.png");
+	public static final ImageRef IMAGE_TABLE = new ImageRef("img/table.png");
+	public static final ImageRef IMAGE_TABLE_ADD = new ImageRef("img/table_add.png");
+	public static final ImageRef IMAGE_TABLE_EDIT = new ImageRef("img/table_edit.png");
+	public static final ImageRef IMAGE_TABLE_SAVE = new ImageRef("img/table_save.png");
+	public static final ImageRef IMAGE_TABLE_DELETE = new ImageRef("img/table_delete.png");
+		
 }

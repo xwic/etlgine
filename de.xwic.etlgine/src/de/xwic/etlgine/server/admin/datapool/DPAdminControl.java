@@ -20,6 +20,7 @@ import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
+import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.loader.cube.DataPoolInitializer;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
@@ -37,6 +38,7 @@ public class DPAdminControl extends BaseContentContainer {
 	private ButtonControl btInitialize;
 	private ButtonControl btOpen;
 	private TableModel tableModel;
+	private CubeHandler cubeHandler;
 	
 	/**
 	 * @param container
@@ -44,15 +46,14 @@ public class DPAdminControl extends BaseContentContainer {
 	 */
 	public DPAdminControl(IControlContainer container, String name) {
 		super(container, name);
+		cubeHandler = CubeHandler.getCubeHandler(ETLgineServer.getInstance().getServerContext());
 		
 		setTitle("DataPoolManager Overview");
-		
 		setupActionBar();
 		
 		table = new TableViewer(this, "table");
-		
 		List<String> keyList = new ArrayList<String>();
-		keyList.addAll(ETLgineServer.getInstance().getServerContext().getDataPoolManagerKeys());
+		keyList.addAll(cubeHandler.getDataPoolManagerKeys());
 		
 		table.setContentProvider(new ListContentProvider(keyList) {
 			public String getUniqueKey(Object object) {
@@ -141,13 +142,14 @@ public class DPAdminControl extends BaseContentContainer {
 	 */
 	protected void doDbInitialize() {
 		
+		
 		ServerContext context = ETLgineServer.getInstance().getServerContext();
 		String dpmKey = tableModel.getFirstSelectedKey();
 		String key = context.getProperty(dpmKey + ".datapool.key", null);
 		
 		if (key != null) {
 			try {
-				IDataPoolManager dpm = context.getDataPoolManager(dpmKey);
+				IDataPoolManager dpm = cubeHandler.getDataPoolManager(dpmKey);
 				IDataPool pool;
 				if (!dpm.containsDataPool(key)) {
 					pool = dpm.createDataPool(key);
@@ -162,7 +164,7 @@ public class DPAdminControl extends BaseContentContainer {
 					File fDP = new File(fRoot, path);
 					File fScript = new File(fDP, initScript);
 					if (fScript.exists()) {
-						DataPoolInitializer dpInit = new DataPoolInitializer(fScript);
+						DataPoolInitializer dpInit = new DataPoolInitializer(context, fScript);
 						dpInit.verify(pool);
 					} else {
 						log.warn("Init Script: " + initScript + " does not exist.");

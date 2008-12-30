@@ -6,7 +6,6 @@ package de.xwic.etlgine.server.admin;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.controls.StackedContainer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.server.admin.datapool.DPAdminControl;

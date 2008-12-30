@@ -19,6 +19,7 @@ import org.mortbay.xml.XmlConfiguration;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.cube.CubeHandler;
 import eu.lippisch.jscreen.Color;
 import eu.lippisch.jscreen.Input;
 import eu.lippisch.jscreen.Key;
@@ -219,8 +220,8 @@ public class ETLgineServer extends JScreenApplication {
 		}
 
 		// load DataPool(s)
-		serverContext.loadDataPools();
-		screen.println("Loaded " + serverContext.getDataPoolManagerKeys().size() + " DataPool(s).");
+		CubeHandler cubeHandler = CubeHandler.getCubeHandler(serverContext);
+		screen.println("Loaded " + cubeHandler.getDataPoolManagerKeys().size() + " DataPool(s).");
 		
 		// load webserver
 		if (serverContext.getPropertyBoolean("webserver.start", false)) {

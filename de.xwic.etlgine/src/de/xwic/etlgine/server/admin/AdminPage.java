@@ -5,7 +5,6 @@ package de.xwic.etlgine.server.admin;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
-import de.jwic.ecolib.controls.StackedContainer;
 
 /**
  * @author Developer
@@ -32,6 +31,7 @@ public class AdminPage extends Page {
 		
 		content = new StackedContentContainer(this, "content");
 		
+		new BreadCrumpControl(this, "breadcrump", content);
 		new MainMenuControl(content, "mm");
 		
 	}

@@ -3,9 +3,6 @@
  */
 package de.xwic.etlgine.server.admin.datapool;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
@@ -21,7 +18,6 @@ import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
-import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.admin.BaseContentContainer;
 import de.xwic.etlgine.server.admin.ImageLibrary;
 
@@ -153,9 +149,16 @@ public class DimensionEditorControl extends BaseContentContainer {
 				}
 				elm.setTitle(title.length() == 0 ? null : title);
 				elm.setWeight(Double.parseDouble(inpWeight.getText()));
+				
+				inpKey.setText("");
+				inpKey.forceFocus();
+				inpTitle.setText("");
+				inpWeight.setText("1.0");
+		
 			} catch (Exception e) {
 				errInfo.showError(e);
 			}
+			
 		}
 		tableModel.clearSelection();
 		table.setRequireRedraw(true);
@@ -193,9 +196,6 @@ public class DimensionEditorControl extends BaseContentContainer {
 	private void setupTable() {
 		
 		table = new TableViewer(this, "table");
-		
-		List<String> keyList = new ArrayList<String>();
-		keyList.addAll(ETLgineServer.getInstance().getServerContext().getDataPoolManagerKeys());
 		
 		table.setContentProvider(new DimensionContentProvider(dimension));
 		table.setTableLabelProvider(new DimensionEditorLabelProvider());

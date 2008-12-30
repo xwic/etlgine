@@ -19,6 +19,8 @@
  */
 package de.xwic.etlgine.server.admin;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Stack;
 
 import de.jwic.base.Control;
@@ -39,6 +41,8 @@ public class StackedContentContainer extends ControlContainer {
 	private Stack<String> stack = new Stack<String>();
 	private String widthHint = "";
 	private String heightHint = "";
+	
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	/**
 	 * @param container
@@ -55,6 +59,22 @@ public class StackedContentContainer extends ControlContainer {
 		super(container);
 	}
 	
+	/**
+	 * Add a PropetyChangeListener.
+	 * @param listener
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+	
+	/**
+	 * Remove a PropertyChangeListener.
+	 * @param listener
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(listener);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.jwic.base.ControlContainer#registerControl(de.jwic.base.Control, java.lang.String)
 	 */
@@ -65,6 +85,7 @@ public class StackedContentContainer extends ControlContainer {
 			currentControlName = control.getName();
 			requireRedraw();
 		}
+		pcs.firePropertyChange("Stack", true, false);
 	}
 
 	/* (non-Javadoc)
@@ -79,6 +100,7 @@ public class StackedContentContainer extends ControlContainer {
 				currentControlName = null;
 			}
 		}
+		pcs.firePropertyChange("Stack", true, false);
 		super.unregisterControl(control);
 	}
 	

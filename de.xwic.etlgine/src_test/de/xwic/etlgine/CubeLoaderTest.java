@@ -51,7 +51,7 @@ public class CubeLoaderTest extends TestCase {
 		};
 		CubeLoader cubeLoader = new CubeLoader(dpp);
 		cubeLoader.setTargetCubeKey("Test");
-		cubeLoader.setDataPoolInitializer(new DataPoolInitializer(new File("scripts/testcube.init.groovy")));
+		cubeLoader.setDataPoolInitializer(new DataPoolInitializer(process.getContext(), new File("scripts/testcube.init.groovy")));
 		cubeLoader.setDataMapper(new ScriptedCubeDataMapper(new File("scripts/testcube.mapping.groovy")));
 		process.addLoader(cubeLoader);
 

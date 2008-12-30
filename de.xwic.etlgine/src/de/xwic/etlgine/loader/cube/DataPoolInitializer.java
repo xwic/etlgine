@@ -8,6 +8,8 @@ import groovy.lang.GroovyShell;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -17,6 +19,10 @@ import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.util.JDBCSerializerUtil;
+import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
  * Initializes and verifies the DataPool
@@ -25,6 +31,7 @@ import de.xwic.cube.IMeasure;
 public class DataPoolInitializer {
 
 	private File scriptFile;
+	private final IContext context;
 
 	/**
 	 * Utility class for the initializer scripts.
@@ -101,13 +108,26 @@ public class DataPoolInitializer {
 			}
 			return pool.getCube(key);
 		}
+		
+		public void initFromDatabase(String dbProfile) throws ETLException, SQLException {
+			
+			Connection connection = JDBCUtil.openConnection(context, dbProfile);
+			try {
+				JDBCSerializerUtil.restoreDimensions(connection, pool, "XCUBE_DIMENSIONS", "XCUBE_DIMENSION_ELEMENTS");
+			} finally {
+				connection.close();
+			}
+			
+		}
+		
 	}
 	
 	/**
 	 * @param scriptFile
 	 */
-	public DataPoolInitializer(File scriptFile) {
+	public DataPoolInitializer(IContext context, File scriptFile) {
 		super();
+		this.context = context;
 		this.scriptFile = scriptFile;
 	}
 

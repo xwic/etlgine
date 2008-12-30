@@ -14,10 +14,10 @@ import de.jwic.ecolib.controls.ErrorWarningControl;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
-import de.xwic.cube.IDataPoolManager;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.util.JDBCSerializerUtil;
 import de.xwic.cube.webui.controls.DimensionElementSelector;
+import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
@@ -36,10 +36,12 @@ public class DPDetailsControl extends BaseContentContainer {
 
 	private Map<IDimension, DimensionElementSelector> selectorMap = new HashMap<IDimension, DimensionElementSelector>();
 	private ButtonControl btSave;
+	private ButtonControl btMapping;
 	private String syncTableConnectionName;
 	private ServerContext context;
 	
 	private ErrorWarningControl errInfo;
+	private CubeHandler cubeHandler;
 	
 	/**
 	 * @param container
@@ -50,6 +52,8 @@ public class DPDetailsControl extends BaseContentContainer {
 		this.dataPoolManagerKey = dataPoolManagerKey;
 		
 		context = ETLgineServer.getInstance().getServerContext();
+		cubeHandler = CubeHandler.getCubeHandler(context);
+		
 		setTitle("DataPool Details (" + dataPoolManagerKey + ")");
 		
 		errInfo = new ErrorWarningControl(this, "errInfo");
@@ -74,10 +78,31 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 		
+		btMapping = new ButtonControl(abar, "mapping");
+		btMapping.setIconEnabled(ImageLibrary.IMAGE_TABLE_RELATIONSHIP);
+		btMapping.setTitle("Edit Mappings");
+		btMapping.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onEditMappings();
+			}
+		});
+
+		
 		loadDataPoolInfo();
 		
 	}
 	
+	/**
+	 * 
+	 */
+	protected void onEditMappings() {
+		
+		StackedContentContainer sc = (StackedContentContainer)getContainer();
+		DPMappingControl dpMapEditor = new DPMappingControl(sc, null, dataPoolManagerKey, syncTableConnectionName);
+		sc.setCurrentControlName(dpMapEditor.getName());		
+		
+	}
+
 	/**
 	 * 
 	 */
@@ -117,26 +142,21 @@ public class DPDetailsControl extends BaseContentContainer {
 	 */
 	private void loadDataPoolInfo() {
 		
-		String key = context.getProperty(dataPoolManagerKey + ".datapool.key", null);
 		syncTableConnectionName = context.getProperty(dataPoolManagerKey + ".datapool.syncTables.connection");
 		
-		if (key != null) {
-			try {
-				IDataPoolManager dpm = context.getDataPoolManager(dataPoolManagerKey);
-				if (dpm.containsDataPool(key)) {
-					dataPool = dpm.getDataPool(key);
-					for (IDimension dim : dataPool.getDimensions()) {
-						DimensionElementSelector dsc = new DimensionElementSelector(this, null, dim);
-						dsc.setWidth(148);
-						selectorMap.put(dim, dsc);
-					}
-				}
-			} catch (Exception e) {
-				log.error("Error loading datapool: " + e, e);
+		try {
+			dataPool = cubeHandler.openDataPool(dataPoolManagerKey);
+			for (IDimension dim : dataPool.getDimensions()) {
+				DimensionElementSelector dsc = new DimensionElementSelector(this, null, dim);
+				dsc.setWidth(148);
+				selectorMap.put(dim, dsc);
 			}
+		} catch (Exception e) {
+			log.error("Error loading datapool: " + e, e);
 		}
 		
 		btSave.setEnabled(syncTableConnectionName != null);
+		btMapping.setEnabled(syncTableConnectionName != null);
 	}
 
 	/**

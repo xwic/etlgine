@@ -8,7 +8,7 @@ import de.jwic.ecolib.tableviewer.ITableLabelProvider;
 import de.jwic.ecolib.tableviewer.RowContext;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.xwic.cube.IDataPoolManager;
-import de.xwic.cube.StorageException;
+import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
 import de.xwic.etlgine.server.admin.ImageLibrary;
@@ -37,17 +37,14 @@ public class DPTableLabelProvider implements ITableLabelProvider {
 				cell.text = dpKey;
 			}
 		} else if ("status".equals(column.getUserObject())) {
-			ServerContext context = ETLgineServer.getInstance().getServerContext(); 
+			ServerContext context = ETLgineServer.getInstance().getServerContext();
 			String dpKey = context.getProperty(key + ".datapool.key", null);
-			IDataPoolManager dpm = context.getDataPoolManager(key);
+			CubeHandler cubeHandler = CubeHandler.getCubeHandler(context);
+			IDataPoolManager dpm = cubeHandler.getDataPoolManager(key);
 			if (dpm == null) {
-				cell.text = "NOT LOADED!";
+				cell.text = "CONFIG ERROR";
 			} else {
-				try {
-					cell.text = dpm.containsDataPool(dpKey) ? "Initialized" : "Not Initialized";
-				} catch (StorageException e) {
-					cell.text = "Error";
-				}
+				cell.text = dpm.isDataPoolLoaded(dpKey) ? "Loaded" : "Not Loaded";
 			}
 		}
 		return cell;

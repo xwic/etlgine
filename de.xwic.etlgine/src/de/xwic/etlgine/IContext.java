@@ -9,6 +9,11 @@ package de.xwic.etlgine;
  */
 public interface IContext {
 	
+	public static final String PROPERTY_SCRIPTPATH = "scriptpath";
+	public static final String PROPERTY_ROOTPATH = "rootPath";
+	
+	public static final String DATA_CUBEHANDLER = "cubeHandler";
+	
 	/**
 	 * Set a global property.
 	 * @param name

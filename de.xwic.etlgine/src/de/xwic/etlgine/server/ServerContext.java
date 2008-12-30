@@ -10,14 +10,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.cube.DataPoolManagerFactory;
-import de.xwic.cube.IDataPoolManager;
-import de.xwic.cube.storage.impl.FileDataPoolStorageProvider;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.ETLgine;
 import de.xwic.etlgine.IJob;
@@ -32,12 +28,7 @@ public class ServerContext extends Context {
 
 	protected final Log log = LogFactory.getLog(getClass());
 	
-	public static final String PROPERTY_SCRIPTPATH = "scriptpath";
-	public static final String PROPERTY_DATAPOOLS = "datapools";
-	public static final String PROPERTY_ROOTPATH = "rootPath";
-	
 	private Map<String, IJob> jobs = new HashMap<String, IJob>();
-	private Map<String, IDataPoolManager> dataPoolManagerMap = new HashMap<String, IDataPoolManager>(); 
 
 	/**
 	 * Load a Job from a script.
@@ -109,52 +100,5 @@ public class ServerContext extends Context {
 		return jobs.values();
 	}
 
-	/**
-	 * 
-	 */
-	public void loadDataPools() {
-		
-		String pools = getProperty(PROPERTY_DATAPOOLS, null);
-		if(pools != null)  {
-			
-			StringTokenizer stk = new StringTokenizer(pools, ",; ");
-			while (stk.hasMoreTokens()) {
-				String poolKey = stk.nextToken();
-				
-				String path = getProperty(poolKey + ".datapool.path", null);
-				
-				if (path != null) {
-					
-					File fRoot = new File(getProperty(PROPERTY_ROOTPATH, "."));
-					File fDP = new File(fRoot, path);
-					if (fDP.exists()) {
-						FileDataPoolStorageProvider storageProvider = new FileDataPoolStorageProvider(fDP);
-						IDataPoolManager dpMngr = DataPoolManagerFactory.createDataPoolManager(storageProvider);
-						dataPoolManagerMap.put(poolKey, dpMngr);
-					} 
-				}
-				
-			}
-			
-		}
-		
-	}
-	
-	/**
-	 * Returns the DataPoolManager with the specified key.
-	 * @param key
-	 * @return
-	 */
-	public IDataPoolManager getDataPoolManager(String key) {
-		return dataPoolManagerMap.get(key);
-	}
-	
-	/**
-	 * Returns a collection of loaded data pool managers.
-	 * @return
-	 */
-	public Collection<String> getDataPoolManagerKeys() {
-		return dataPoolManagerMap.keySet();
-	}
 	
 }

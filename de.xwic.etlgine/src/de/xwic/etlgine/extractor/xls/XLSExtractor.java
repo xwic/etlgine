@@ -33,7 +33,6 @@ public class XLSExtractor extends AbstractExtractor {
 
 	public final static String COL_SHEETNAME = "_XLS_SHEETNAME";
 	
-	private IDataSet dataSet;
 	private InputStream inputStream;
 	private HSSFWorkbook workbook;
 	
@@ -140,8 +139,6 @@ public class XLSExtractor extends AbstractExtractor {
 	 * @see de.xwic.etlgine.IExtractor#openSource(de.xwic.etlgine.ISource, de.xwic.etlgine.IDataSet)
 	 */
 	public void openSource(ISource source, IDataSet dataSet) throws ETLException {
-		
-		this.dataSet = dataSet;
 		
 		IColumn col = dataSet.addColumn(COL_SHEETNAME);
 		col.setExclude(true);

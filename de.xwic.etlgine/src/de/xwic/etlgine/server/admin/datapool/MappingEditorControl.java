@@ -25,6 +25,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.cube.mapping.DimMappingDef;
 import de.xwic.etlgine.cube.mapping.DimMappingDefDAO;
+import de.xwic.etlgine.cube.mapping.DimMappingElementDefDAO;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
@@ -46,6 +47,8 @@ public class MappingEditorControl extends BaseContentContainer {
 	private DimensionElementSelector elmSelector;
 	private ErrorWarningControl errInfo;
 
+	private MappingElementEditorControl mapEditor;
+	
 	private ButtonControl btSave;
 	
 	private IDataPool dataPool;
@@ -75,9 +78,36 @@ public class MappingEditorControl extends BaseContentContainer {
 		setTitle("Mapping Editor (" + key + ")");
 		
 		errInfo = new ErrorWarningControl(this, "errInfo");
-		
+		mapEditor = new MappingElementEditorControl(this, "mapEditor", dataPool);
+
 		setupActionBar();
 		createDimMappingEditor();
+		
+		
+		// load childs if its not a new one
+		if (!isNew) {
+			loadMappingElements();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void loadMappingElements() {
+		ServerContext context = ETLgineServer.getInstance().getServerContext();
+		String syncTableConnectionName = context.getProperty(dpManagerKey + ".datapool.syncTables.connection");
+		try {
+			Connection connection = JDBCUtil.openConnection(context, syncTableConnectionName);
+			try {
+				DimMappingElementDefDAO dao = new DimMappingElementDefDAO(connection);
+				mapEditor.setMappingList(dao.listMappings(dimMapping.getKey()));
+			} finally {
+				connection.close();
+			}
+		} catch (Exception e) {
+			errInfo.showError(e);
+			log.error("Error loading mapping elements: ", e);
+		}
 		
 	}
 
@@ -249,6 +279,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			IDimension dimension = dataPool.getDimension(element);
 			elmSelector = new DimensionElementSelector(this, "elmSelector", dimension);
 			elmSelector.setSelectLeafsOnly(true);
+			mapEditor.setDimension(dimension);
 		} else {
 			elmSelector = null;
 			new LabelControl(this, "elmSelector").setText("");

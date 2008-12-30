@@ -1,4 +1,4 @@
- body	{ font-family: Verdana,Helvetica; font-size: 10pt; background-color: #ffffff; margin: 0px; padding: 0px; }
+ body	{ font-family: Arial,Helvetica; font-size: 10pt; background-color: #ffffff; margin: 0px; padding: 0px; }
 
  #header {
  	color: #ffffff;
@@ -160,5 +160,8 @@
  	color: #000000;
  } 
  
- 
+ textarea {
+ 	font-family: Arial;
+ 	font-size: 10pt;
+ }
  

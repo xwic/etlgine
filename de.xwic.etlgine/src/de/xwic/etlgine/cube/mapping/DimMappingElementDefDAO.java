@@ -23,6 +23,7 @@ public class DimMappingElementDefDAO {
 	private Connection connection;
 	private PreparedStatement psInsert;
 	private PreparedStatement psUpdate;
+	private PreparedStatement psDeleteByDimMapKey;
 	
 	/**
 	 * @param connection
@@ -34,6 +35,7 @@ public class DimMappingElementDefDAO {
 		
 		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord) VALUES (?, ?, ?, ?, ?, ?)");
 		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP_ELEMENTS] SET Expression=?, isRegExp=?, IgnoreCase=?, ElementPath=?, SkipRecord=? WHERE ID = ?");
+		psDeleteByDimMapKey = connection.prepareStatement("DELETE FROM [XCUBE_DIMMAP_ELEMENTS] WHERE DimMapKey = ?");
 		
 	}
 
@@ -143,6 +145,18 @@ public class DimMappingElementDefDAO {
 		if (rs.next()) {
 			dimMapElm.setId(rs.getInt(1));
 		}
+		
+	}
+
+	/**
+	 * @param key
+	 * @throws SQLException 
+	 */
+	public int deleteByDimMapKey(String key) throws SQLException {
+
+		psDeleteByDimMapKey.clearParameters();
+		psDeleteByDimMapKey.setString(1, key);
+		return psDeleteByDimMapKey.executeUpdate();
 		
 	}
 	

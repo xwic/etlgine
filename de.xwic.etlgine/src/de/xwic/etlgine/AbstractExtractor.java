@@ -9,13 +9,13 @@ package de.xwic.etlgine;
  */
 public abstract class AbstractExtractor implements IExtractor {
 
-	protected IProcessContext processContext = null;
+	protected IProcessContext context = null;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	public void initialize(IProcessContext processContext) {
-		this.processContext = processContext;
+		this.context = processContext;
 	}
 
 	/* (non-Javadoc)

@@ -4,6 +4,7 @@
 package de.xwic.etlgine.server.admin.datapool;
 
 import java.sql.Connection;
+import java.util.List;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
@@ -25,6 +26,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.cube.mapping.DimMappingDef;
 import de.xwic.etlgine.cube.mapping.DimMappingDefDAO;
+import de.xwic.etlgine.cube.mapping.DimMappingElementDef;
 import de.xwic.etlgine.cube.mapping.DimMappingElementDefDAO;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.server.ETLgineServer;
@@ -78,7 +80,7 @@ public class MappingEditorControl extends BaseContentContainer {
 		setTitle("Mapping Editor (" + key + ")");
 		
 		errInfo = new ErrorWarningControl(this, "errInfo");
-		mapEditor = new MappingElementEditorControl(this, "mapEditor", dataPool);
+		mapEditor = new MappingElementEditorControl(this, "mapEditor");
 
 		setupActionBar();
 		createDimMappingEditor();
@@ -100,7 +102,11 @@ public class MappingEditorControl extends BaseContentContainer {
 			Connection connection = JDBCUtil.openConnection(context, syncTableConnectionName);
 			try {
 				DimMappingElementDefDAO dao = new DimMappingElementDefDAO(connection);
-				mapEditor.setMappingList(dao.listMappings(dimMapping.getKey()));
+				List<DimMappingElementDef> list = dao.listMappings(dimMapping.getKey());
+				for (DimMappingElementDef me : list) {
+					me.setDimensionKey(dimMapping.getDimensionKey());	// for security...
+				}
+				mapEditor.setMappingList(list);
 			} finally {
 				connection.close();
 			}
@@ -136,6 +142,14 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		});
 
+		ButtonControl btAdd = new ButtonControl(abar, "insert");
+		btAdd.setTitle("Create Element");
+		btAdd.setIconEnabled(ImageLibrary.IMAGE_ADD);
+		btAdd.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				mapEditor.createNewElement();
+			}
+		});
 		
 	}
 	/**
@@ -168,6 +182,16 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		}
 		
+		// now check the dimension mapping table
+		List<DimMappingElementDef> mappingList = mapEditor.getMappingList();
+		for (DimMappingElementDef me : mappingList) {
+			if (me.getDimensionKey() == null || !me.getDimensionKey().equals(dimKey)) {
+				errInfo.showError("The mapping table contains elements for other dimensions then the selected one.");
+				return;
+			}
+			me.setDimMapKey(key);
+		}
+		
 		dimMapping.setKey(key);
 		dimMapping.setDimensionKey(dimKey);
 		dimMapping.setDescription(inpDescription.getText());
@@ -179,14 +203,28 @@ public class MappingEditorControl extends BaseContentContainer {
 		try {
 			Connection connection = JDBCUtil.openConnection(context, syncTableConnectionName);
 			try {
+				connection.setAutoCommit(false);
 				DimMappingDefDAO dao = new DimMappingDefDAO(connection);
 				if (isNew) {
 					dao.insert(dimMapping);
 				} else {
 					dao.update(dimMapping);
 				}
+				
+				// insert dimMappings
+				DimMappingElementDefDAO daoME = new DimMappingElementDefDAO(connection);
+				daoME.deleteByDimMapKey(key);
+				for (DimMappingElementDef me : mappingList) {
+					daoME.insert(me);
+				}
+				
+				connection.commit();
+				connection.setAutoCommit(true);
 				close();
 			} finally {
+				if (!connection.getAutoCommit()) {
+					connection.rollback();
+				}
 				connection.close();
 			}
 		} catch (Exception e) {

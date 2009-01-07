@@ -33,7 +33,7 @@ public class TestRndExtractor extends AbstractExtractor {
 		}
 		count++;
 
-		IRecord record = processContext.newRecord();
+		IRecord record = context.newRecord();
 		
 		// randomize date
 		Calendar cal = Calendar.getInstance();

@@ -82,7 +82,7 @@ public class XLSExtractor extends AbstractExtractor {
 		
 		if (!reachedEnd) {
 			try {
-				IRecord record = processContext.newRecord();
+				IRecord record = context.newRecord();
 				HSSFRow row;
 				// read until we find a row that contains data.
 				while ((row = currSheet.getRow(currRow)) == null) {
@@ -164,14 +164,14 @@ public class XLSExtractor extends AbstractExtractor {
 					sheetNames.add(Integer.toString(currSource.getSheetIndex()));
 				}
 				if (sheets.size() == 0) {
-					processContext.getMonitor().logError("The specified sheet(s) can not be found!");
+					context.getMonitor().logError("The specified sheet(s) can not be found!");
 					reachedEnd = true;
 				} else {
 					for (HSSFSheet sheet : sheets) {
 						HSSFRow row = sheet.getRow(currSource.getStartRow());
 						if (row == null) {
 							// file is empty!
-							processContext.getMonitor().logWarn("The specified header row does not exist. Assume that the file is empty.");
+							context.getMonitor().logWarn("The specified header row does not exist. Assume that the file is empty.");
 							reachedEnd = true;
 						} else {
 							int lastNum = row.getLastCellNum();
@@ -210,6 +210,8 @@ public class XLSExtractor extends AbstractExtractor {
 	 * @param i
 	 */
 	private void initSheet(int idx) {
+		
+		context.getMonitor().logInfo("Now switching to sheet " + idx);
 		
 		sheetIdx = idx;
 		currSheet = sheets.get(sheetIdx);

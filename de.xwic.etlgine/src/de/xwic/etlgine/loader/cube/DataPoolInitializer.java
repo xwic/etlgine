@@ -30,6 +30,9 @@ import de.xwic.etlgine.jdbc.JDBCUtil;
  */
 public class DataPoolInitializer {
 
+	private final static String[] MONTH_KEYS = { "Jan", "Feb", "Mar", "Apr",
+		"May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
 	private File scriptFile;
 	private final IContext context;
 
@@ -56,6 +59,19 @@ public class DataPoolInitializer {
 			return pool.getDimension(key);
 		}
 		/**
+		 * Ensure that a specified dimension exists.
+		 * @param key
+		 * @return
+		 */
+		public IDimension ensureDimension(String key, String title) {
+			if (!pool.containsDimension(key)) {
+				IDimension dim = pool.createDimension(key) ;
+				dim.setTitle(title);
+				return dim;
+			}
+			return pool.getDimension(key);
+		}
+		/**
 		 * Ensure that the specified measure exists.
 		 * @param key
 		 * @return
@@ -63,6 +79,19 @@ public class DataPoolInitializer {
 		public IMeasure ensureMeasure(String key) {
 			if (!pool.containsMeasure(key)) {
 				return pool.createMeasure(key) ;
+			}
+			return pool.getMeasure(key);
+		}
+		/**
+		 * Ensure that the specified measure exists.
+		 * @param key
+		 * @return
+		 */
+		public IMeasure ensureMeasure(String key, String title) {
+			if (!pool.containsMeasure(key)) {
+				IMeasure measure = pool.createMeasure(key) ;
+				measure.setTitle(title);
+				return measure;
 			}
 			return pool.getMeasure(key);
 		}
@@ -86,7 +115,40 @@ public class DataPoolInitializer {
 			}
 			return elm;
 		}
-		
+		/**
+		 * Creates a time hierachy with Year/Quater/Month.
+		 * 
+		 * @param timeDimension
+		 * @param year
+		 * @param firstMonth
+		 */
+		public void ensureTimeElements(IDimension timeDimension, int year, int firstMonth) {
+	
+			String keyYear = Integer.toString(year);
+			IDimensionElement deYear = timeDimension
+					.containsDimensionElement(keyYear) ? timeDimension
+					.getDimensionElement(keyYear) : timeDimension
+					.createDimensionElement(keyYear);
+	
+			int month = firstMonth;
+			for (int i = 1; i < 5; i++) {
+				String keyQ = "Q" + i;
+				IDimensionElement deQ = deYear.containsDimensionElement(keyQ) ? deYear
+						.getDimensionElement(keyQ)
+						: deYear.createDimensionElement(keyQ);
+				for (int m = 0; m < 3; m++) {
+					if (!deQ.containsDimensionElement(MONTH_KEYS[month])) {
+						deQ.createDimensionElement(MONTH_KEYS[month]);
+					}
+					month++;
+					if (month >= MONTH_KEYS.length) {
+						month = 0;
+					}
+				}
+			}
+	
+		}
+
 		/**
 		 * Ensure that the specified cube exists. If it does not exist, it is created.
 		 * @param key

@@ -5,7 +5,6 @@ package de.xwic.etlgine.server;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -177,7 +176,7 @@ public class ETLgineServer extends JScreenApplication {
 		
 		Properties props = new Properties();
 		try {
-			props.load(new FileReader(fileServerConf));
+			props.load(new FileInputStream(fileServerConf));
 		} catch (IOException e) {
 			error("Error reading server.properties: " + e);
 			return false;

@@ -305,7 +305,7 @@ public class JDBCLoader extends AbstractLoader {
 						case Types.VARCHAR:
 						case Types.CHAR:
 						case Types.LONGVARCHAR:
-						case Types.NVARCHAR:
+						case -9: //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
 							psInsert.setString(idx, value.toString());
 							break;
 						case Types.INTEGER:

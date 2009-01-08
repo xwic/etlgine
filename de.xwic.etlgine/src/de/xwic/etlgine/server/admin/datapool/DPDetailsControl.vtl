@@ -34,7 +34,7 @@ $insert.control("errInfo")
 			</tr>
 		#foreach($dim in $pool.dimensions)
 			<tr>
-				<td class="data"><a href="$control.createActionURL("dimEdit", $dim.key)">$dim.key <img src="img/pencil.png" border="0"></a></td>
+				<td class="data"><a href="$control.createActionURL("dimEdit", $dim.key)"><img src="img/pencil.png" border="0"> $dim.key</a></td>
 				<td class="data">$!dim.title</td>
 				<td class="data">$insert.control($control.getSelectorName($dim))</td>
 				<td class="data">$dim.totalSize()</td>

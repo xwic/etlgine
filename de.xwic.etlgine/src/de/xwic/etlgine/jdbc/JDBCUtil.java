@@ -5,6 +5,8 @@ package de.xwic.etlgine.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import de.xwic.etlgine.ETLException;
@@ -48,5 +50,28 @@ public class JDBCUtil {
 		return DriverManager.getConnection(url, username, password);
 		
 	}
-	
+	/**
+	 * @param rs
+	 * @throws SQLException 
+	 */
+	public static void dumpResultSet(ResultSet rs) throws SQLException {
+		
+		ResultSetMetaData rsmd = rs.getMetaData();
+		for (int i = 0; i < rsmd.getColumnCount(); i++) {
+			System.out.print(rsmd.getColumnName(i + 1));
+			System.out.print(" ");
+		}
+		System.out.println("");
+		while (rs.next()) {
+			for (int i = 0; i < rsmd.getColumnCount(); i++) {
+				System.out.print(rs.getString(i + 1));
+				System.out.print(" ");
+			}
+			System.out.println();
+		}
+
+		
+	}
+
+
 }

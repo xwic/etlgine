@@ -14,7 +14,7 @@ public abstract class AbstractExtractor implements IExtractor {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
-	public void initialize(IProcessContext processContext) {
+	public void initialize(IProcessContext processContext) throws ETLException {
 		this.context = processContext;
 	}
 

@@ -3,7 +3,13 @@
  */
 package de.xwic.etlgine;
 
+import org.apache.log4j.BasicConfigurator;
+
+import au.com.bytecode.opencsv.CSVWriter;
 import junit.framework.TestCase;
+import de.xwic.etlgine.extractor.jdbc.JDBCExtractor;
+import de.xwic.etlgine.extractor.jdbc.JDBCSource;
+import de.xwic.etlgine.loader.csv.CSVLoader;
 import de.xwic.etlgine.loader.jdbc.JDBCLoader;
 
 /**
@@ -12,6 +18,14 @@ import de.xwic.etlgine.loader.jdbc.JDBCLoader;
  */
 public class TestRndExtractor2JDBCTest extends TestCase {
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
+		BasicConfigurator.configure();
+	}
+	
 	/**
 	 * Test the loading of source data into a JDBC table.
 	 * @throws ETLException 
@@ -41,8 +55,33 @@ public class TestRndExtractor2JDBCTest extends TestCase {
 		pc.start();
 
 		//DataDump.printStructure(System.out, pool.getDimension("Area"));
-
 		
 	}
+	
+	/**
+	 * Read from a table.
+	 */
+	public void testJDBCExtractor() throws Exception {
+		IProcessChain pc = ETLgine.createProcessChain("testChain");
+		IProcess process = pc.createProcess("jdbcExtract");
+		
+		JDBCSource source = new JDBCSource();
+		source.setConnectionUrl("jdbc:jtds:sqlserver://localhost/etlgine_test");
+		source.setUsername("etlgine");
+		source.setPassword("etl");
+		source.setSqlSelectString("SELECT * FROM LOAD_TEST_RND");
+		process.addSource(source);
+		
+		process.setExtractor(new JDBCExtractor());
+		
+		CSVLoader csvLoader = new CSVLoader();
+		csvLoader.setFilename("test/jdbc_extract.csv");
+		
+		process.addLoader(csvLoader);
+		
+		pc.start();
+
+	}
+	
 	
 }

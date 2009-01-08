@@ -3,24 +3,38 @@
  */
 package de.xwic.etlgine;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author lippisch
  */
 public class DefaultMonitor implements IMonitor {
 
-	private long startTime = 0;
+	public final static long STATUS_INTERVALL = 30 * 1000; // 30 sec.
+	
+	protected long startTime = 0;
+	protected long nextStatus = 0;
+	protected Log log = LogFactory.getLog(DefaultMonitor.class);
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#onEvent(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IMonitor.EventType)
 	 */
 	public void onEvent(IProcessContext processContext, EventType eventType) {
 		if (eventType != EventType.RECORD_PROCESSED) {
-			System.out.println("[EVENT] " + eventType.name());
+			log.debug("[EVENT] " + eventType.name());
+		} else {
+			if (System.currentTimeMillis() > nextStatus) {
+				nextStatus = System.currentTimeMillis() + STATUS_INTERVALL;
+				String sourceName = processContext.getCurrentSource() != null ? processContext.getCurrentSource().getName() : "NO-SOURCE";
+				log.info("Processed: " + processContext.getRecordsProcessed() + " records from " + sourceName);
+			}
 		}
 		
 		switch (eventType) {
 		case PROCESS_START:
 			startTime = System.currentTimeMillis();
+			nextStatus = startTime + STATUS_INTERVALL;
 			break;
 		case PROCESS_FINISHED:
 			long duration = System.currentTimeMillis() - startTime;
@@ -35,29 +49,28 @@ public class DefaultMonitor implements IMonitor {
 	 * @see de.xwic.etlgine.IMonitor#logError(java.lang.String)
 	 */
 	public void logError(String message) {
-		System.out.println("[ERROR] " + message);
+		log.error(message);
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#logError(java.lang.String, java.lang.Exception)
 	 */
 	public void logError(String message, Throwable e) {
-		System.out.println("[ERROR] " + message);
-		e.printStackTrace();
+		log.error(message, e);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#logInfo(java.lang.String)
 	 */
 	public void logInfo(String message) {
-		System.out.println("[INFO ] " + message);
+		log.info(message);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IMonitor#logWarn(java.lang.String)
 	 */
 	public void logWarn(String message) {
-		System.out.println("[WARN ] " + message);
+		log.warn(message);
 	}
 	
 }

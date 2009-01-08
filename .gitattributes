@@ -1006,6 +1006,8 @@ de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/CSVExtractor.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCExtractor.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSFileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSTool.java -text
@@ -1080,6 +1082,7 @@ de.xwic.etlgine/src_test/de/xwic/etlgine/TestRndSource.java -text
 de.xwic.etlgine/test/export.csv -text
 de.xwic.etlgine/test/export2.csv -text
 de.xwic.etlgine/test/export3.csv -text
+de.xwic.etlgine/test/jdbc_extract.csv -text
 de.xwic.etlgine/test/source.csv -text
 de.xwic.etlgine/test/source_cube.csv -text
 de.xwic.libs.common/.classpath -text

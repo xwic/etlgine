@@ -8,7 +8,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
@@ -20,12 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.mortbay.log.Log;
+
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.jdbc.DbColumnDef;
+import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
  * @author lippisch
@@ -33,6 +35,7 @@ import de.xwic.etlgine.jdbc.DbColumnDef;
  */
 public class JDBCLoader extends AbstractLoader {
 
+	private String connectionName = null;
 	// by default use the JTDS driver...
 	private String driverName = "net.sourceforge.jtds.jdbc.Driver";
 	private String connectionUrl = null;
@@ -55,28 +58,38 @@ public class JDBCLoader extends AbstractLoader {
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
 		
-		// initialize the driver
-		try {
-			Class.forName(driverName);
-		} catch (ClassNotFoundException e) {
-			throw new ETLException("The specified driver (" + driverName + ") can not be found.", e);
+		if (connectionName == null) {
+			if (connectionUrl == null) {
+				throw new ETLException("No connection NAME or URL specified");
+			}
+			if (username == null) {
+				throw new ETLException("No username specified");
+			}
+			if (password == null) {
+				throw new ETLException("No password specified");
+			}
+			try {
+				Log.info("Using direct connection - URL: " + connectionUrl);
+				// initialize the driver
+				try {
+					Class.forName(driverName);
+				} catch (ClassNotFoundException e) {
+					throw new ETLException("The specified driver (" + driverName + ") can not be found.", e);
+				}
+				
+				connection = DriverManager.getConnection(connectionUrl, username, password);
+			} catch (SQLException e) {
+				throw new ETLException("Error opening connect: " + e, e);
+			}
+		} else {
+			Log.info("Using named connection: " + connectionName);
+			try {
+				connection = JDBCUtil.openConnection(processContext, connectionName);
+			} catch (SQLException e) {
+				throw new ETLException("Error opening connect: " + e, e);
+			}
 		}
 		
-		if (connectionUrl == null) {
-			throw new ETLException("No connection URL specified");
-		}
-		if (username == null) {
-			throw new ETLException("No username specified");
-		}
-		if (password == null) {
-			throw new ETLException("No password specified");
-		}
-		
-		try {
-			connection = DriverManager.getConnection(connectionUrl, username, password);
-		} catch (SQLException e) {
-			throw new ETLException("Error opening connect: " + e, e);
-		}
 		
 	}
 	
@@ -259,29 +272,6 @@ public class JDBCLoader extends AbstractLoader {
 
 		Statement stmt = connection.createStatement();
 		stmt.execute(sql.toString());
-		
-	}
-
-	/**
-	 * @param rs
-	 * @throws SQLException 
-	 */
-	protected void dumpResultSet(ResultSet rs) throws SQLException {
-		
-		ResultSetMetaData rsmd = rs.getMetaData();
-		for (int i = 0; i < rsmd.getColumnCount(); i++) {
-			System.out.print(rsmd.getColumnName(i + 1));
-			System.out.print(" ");
-		}
-		System.out.println("");
-		while (rs.next()) {
-			for (int i = 0; i < rsmd.getColumnCount(); i++) {
-				System.out.print(rs.getString(i + 1));
-				System.out.print(" ");
-			}
-			System.out.println();
-		}
-
 		
 	}
 
@@ -472,6 +462,20 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setIgnoreMissingTargetColumns(boolean ignoreMissingTargetColumns) {
 		this.ignoreMissingTargetColumns = ignoreMissingTargetColumns;
+	}
+
+	/**
+	 * @return the connectionName
+	 */
+	public String getConnectionName() {
+		return connectionName;
+	}
+
+	/**
+	 * @param connectionName the connectionName to set
+	 */
+	public void setConnectionName(String connectionName) {
+		this.connectionName = connectionName;
 	}
 	
 }

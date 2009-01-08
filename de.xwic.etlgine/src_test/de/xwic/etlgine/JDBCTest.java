@@ -101,8 +101,6 @@ public class JDBCTest extends TestCase {
 		pc.start();
 
 		//DataDump.printStructure(System.out, pool.getDimension("Area"));
-
 		
 	}
-	
 }

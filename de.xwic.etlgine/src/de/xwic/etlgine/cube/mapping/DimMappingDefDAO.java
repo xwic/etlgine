@@ -32,7 +32,7 @@ public class DimMappingDefDAO {
 		super();
 		this.connection = connection;
 		
-		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP] (DimMapKey, Description, DimensionKey, UnmappedPath, OnUnmapped) VALUES (?, ?, ?, ?, ?, ?)");
+		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP] (DimMapKey, Description, DimensionKey, UnmappedPath, OnUnmapped) VALUES (?, ?, ?, ?, ?)");
 		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP] SET Description=?, DimensionKey=?, UnmappedPath=?, OnUnmapped=? WHERE DimMapKey = ?");
 		
 	}

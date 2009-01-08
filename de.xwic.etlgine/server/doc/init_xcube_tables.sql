@@ -9,7 +9,9 @@ GO
 CREATE TABLE [dbo].[XCUBE_MEASURES](
 	[Key] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Title] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
- CONSTRAINT [PK_XCUBE_MEASURES] PRIMARY KEY CLUSTERED 
+	[FunctionClass] [varchar](300) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[ValueFormatProvider] [varchar](300) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+  CONSTRAINT [PK_XCUBE_MEASURES] PRIMARY KEY CLUSTERED 
 (
 	[Key] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -49,7 +51,7 @@ CREATE TABLE [dbo].[XCUBE_DIMENSION_ELEMENTS](
 	[ParentID] [varchar](900) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[DimensionKey] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Key] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Title] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	[Title] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[weight] [float] NOT NULL
 ) ON [PRIMARY]
 

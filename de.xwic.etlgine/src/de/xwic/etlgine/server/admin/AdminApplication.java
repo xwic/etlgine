@@ -18,6 +18,7 @@ public class AdminApplication extends Application {
 	 */
 	@Override
 	public Control createRootControl(IControlContainer container) {
+		container.getSessionContext().setExitURL("byebye.html");
 		AdminPage page = new AdminPage(container);
 		return page;
 	}

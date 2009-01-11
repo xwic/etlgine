@@ -66,15 +66,15 @@ GO
 SET ANSI_PADDING ON
 GO
 CREATE TABLE [dbo].[XCUBE_DIMMAP](
-	[DimMapKey] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Description] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-	[DimensionKey] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[UnmappedPath] [varchar](900) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-	[OnUnmapped] [varchar](50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL CONSTRAINT [DF_XCUBE_DIMMAP_OnUnmapped]  DEFAULT ('CREATE'),
+	[DimMapKey] [varchar](255) NOT NULL,
+	[Description] [text] NULL,
+	[DimensionKey] [varchar](255) NOT NULL,
+	[UnmappedPath] [varchar](900) NULL,
+	[OnUnmapped] [varchar](50) NOT NULL CONSTRAINT [DF_XCUBE_DIMMAP_OnUnmapped]  DEFAULT ('CREATE'),
  CONSTRAINT [PK_XCUBE_DIMMAP] PRIMARY KEY CLUSTERED 
 (
 	[DimMapKey] ASC
-)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 GO
@@ -89,16 +89,16 @@ SET ANSI_PADDING ON
 GO
 CREATE TABLE [dbo].[XCUBE_DIMMAP_ELEMENTS](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
-	[DimMapKey] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Expression] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	[DimMapKey] [varchar](255) NOT NULL,
+	[Expression] [text]  NOT NULL,
 	[isRegExp] [bit] NOT NULL,
 	[IgnoreCase] [bit] NOT NULL,
-	[ElementPath] [varchar](900) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[ElementPath] [varchar](900) NULL,
 	[SkipRecord] [bit] NOT NULL,
  CONSTRAINT [PK_XCUBE_DIMMAP_ELEMENTS] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
-)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 GO

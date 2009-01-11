@@ -21,6 +21,7 @@ public class Job implements IJob {
 	private Date lastRun = null;
 	private String name = null;
 	private boolean executing = false;
+	private String chainScriptName = null; 
 	
 	/**
 	 * @param name
@@ -91,6 +92,20 @@ public class Job implements IJob {
 	 */
 	public Date getLastRun() {
 		return lastRun;
+	}
+
+	/**
+	 * @return the chainScriptName
+	 */
+	public String getChainScriptName() {
+		return chainScriptName;
+	}
+
+	/**
+	 * @param chainScriptName the chainScriptName to set
+	 */
+	public void setChainScriptName(String chainScriptName) {
+		this.chainScriptName = chainScriptName;
 	}
 	
 }

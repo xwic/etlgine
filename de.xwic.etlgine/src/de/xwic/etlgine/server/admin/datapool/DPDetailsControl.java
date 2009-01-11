@@ -148,7 +148,7 @@ public class DPDetailsControl extends BaseContentContainer {
 			dataPool = cubeHandler.openDataPool(dataPoolManagerKey);
 			for (IDimension dim : dataPool.getDimensions()) {
 				DimensionElementSelector dsc = new DimensionElementSelector(this, null, dim);
-				dsc.setWidth(148);
+				dsc.setWidth(248);
 				selectorMap.put(dim, dsc);
 			}
 		} catch (Exception e) {

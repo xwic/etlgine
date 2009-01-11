@@ -15,7 +15,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.ETLgine;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.impl.Context;
 import de.xwic.etlgine.impl.Job;
@@ -41,11 +40,9 @@ public class ServerContext extends Context {
 			throw new ETLException("A job with the name already exist. (" + name + ")");
 		}
 		IJob job = new Job(name);
-		job.setProcessChain(ETLgine.createProcessChain(this, name));
 		
 		Binding binding = new Binding();
 		binding.setVariable("job", job);
-		binding.setVariable("processChain", job.getProcessChain());
 
 		GroovyShell shell = new GroovyShell(binding);
 		

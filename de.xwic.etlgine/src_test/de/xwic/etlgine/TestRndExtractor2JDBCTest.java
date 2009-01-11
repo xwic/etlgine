@@ -3,10 +3,10 @@
  */
 package de.xwic.etlgine;
 
+import junit.framework.TestCase;
+
 import org.apache.log4j.BasicConfigurator;
 
-import au.com.bytecode.opencsv.CSVWriter;
-import junit.framework.TestCase;
 import de.xwic.etlgine.extractor.jdbc.JDBCExtractor;
 import de.xwic.etlgine.extractor.jdbc.JDBCSource;
 import de.xwic.etlgine.loader.csv.CSVLoader;

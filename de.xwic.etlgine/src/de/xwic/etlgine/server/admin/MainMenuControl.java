@@ -8,6 +8,7 @@ import de.jwic.base.ImageRef;
 import de.jwic.controls.ButtonControl;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.admin.datapool.DPAdminControl;
 import de.xwic.etlgine.server.admin.jobs.JobAdminControl;
 
@@ -45,6 +46,28 @@ public class MainMenuControl extends BaseContentContainer {
 			}
 		});
 
+		ButtonControl btShutDown = new ButtonControl(this, "btShutDown");
+		btShutDown.setTitle("Shut Down");
+		btShutDown.setWidth(120);
+		btShutDown.setConfirmMsg("Do you realy want to SHUT DOWN the ETLgine Server?");
+		btShutDown.setIconEnabled(ImageLibrary.IMAGE_RETURN);
+		btShutDown.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onShutDown();
+			}
+		});
+
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onShutDown() {
+		
+		ETLgineServer.getInstance().exitServer();
+		getSessionContext().exit();
+		
 	}
 
 	/**

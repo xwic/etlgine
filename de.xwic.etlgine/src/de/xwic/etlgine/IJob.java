@@ -59,4 +59,14 @@ public interface IJob {
 	 */
 	public abstract IProcessChain getProcessChain();
 
+	/**
+	 * @return the chainScriptName
+	 */
+	public String getChainScriptName();
+
+	/**
+	 * @param chainScriptName the chainScriptName to set
+	 */
+	public void setChainScriptName(String chainScriptName);
+
 }

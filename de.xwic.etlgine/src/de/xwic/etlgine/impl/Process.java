@@ -36,6 +36,8 @@ public class Process implements IProcess {
 	protected IExtractor extractor = null;
 	protected IMonitor monitor = new DefaultMonitor();
 	protected ProcessContext processContext;
+	
+	protected int stopAfterRecords = 0;
 
 	/**
 	 * Construct a new process.
@@ -225,6 +227,12 @@ public class Process implements IProcess {
 						
 						processContext.recordProcessed();
 						monitor.onEvent(processContext, EventType.RECORD_PROCESSED);
+						
+						if (stopAfterRecords > 0 && processContext.getRecordsProcessed() >= stopAfterRecords) {
+							monitor.logWarn("Stopped after " + stopAfterRecords + " records because of stop condition.");
+							break;
+						}
+						
 					}
 					
 					// notify transformers that the source processing is done.
@@ -301,6 +309,20 @@ public class Process implements IProcess {
 	 */
 	public IProcessContext getContext() {
 		return processContext;
+	}
+
+	/**
+	 * @return the stopAfterRecords
+	 */
+	public int getStopAfterRecords() {
+		return stopAfterRecords;
+	}
+
+	/**
+	 * @param stopAfterRecords the stopAfterRecords to set
+	 */
+	public void setStopAfterRecords(int stopAfterRecords) {
+		this.stopAfterRecords = stopAfterRecords;
 	}
 	
 }

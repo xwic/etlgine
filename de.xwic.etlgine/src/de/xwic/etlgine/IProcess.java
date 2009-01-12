@@ -97,5 +97,15 @@ public interface IProcess {
 	 * @return
 	 */
 	public List<IProcessFinalizer> getProcessFinalizers();
+
+	/**
+	 * @return the stopAfterRecords
+	 */
+	public int getStopAfterRecords();
+
+	/**
+	 * @param stopAfterRecords the stopAfterRecords to set
+	 */
+	public void setStopAfterRecords(int stopAfterRecords);
 	
 }

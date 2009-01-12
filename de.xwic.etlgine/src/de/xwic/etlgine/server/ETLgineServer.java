@@ -19,6 +19,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.xml.XmlConfiguration;
 
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.cube.CubeHandler;
 
 /**
@@ -39,6 +40,7 @@ public class ETLgineServer implements Runnable {
 	private ServerContext serverContext = new ServerContext();
 	
 	private boolean doExit = false;
+	private boolean exitAfterFinish = false;
 
 	/**
 	 * 
@@ -67,20 +69,33 @@ public class ETLgineServer implements Runnable {
 	 */
 	public void run() {
 
-		
-		if (!initialize()) {
-			log.error("Server start failed. Press any key to exit.");
-			return;
-		}
-		
 		log.info("Server started.");
 		
 		while (!doExit) {
+			
+			if (exitAfterFinish) {
+				boolean allEmpty = true;
+				for (JobQueue queue : serverContext.getJobQueues()) {
+					if (!queue.isEmpty() || queue.getActiveJob() != null) {
+						allEmpty = false;
+						break;
+					}
+				}
+				if (allEmpty) {
+					break; // exit the WHILE loop 
+				}
+			}
+			
 			try {
 				Thread.sleep(SLEEP_TIME);
 			} catch (InterruptedException e) {
 				// nothing unexpected.
 			}
+		}
+		
+		// exit all queues
+		for (JobQueue queue : serverContext.getJobQueues()) {
+			queue.stopQueue();
 		}
 		
 		try {
@@ -93,12 +108,19 @@ public class ETLgineServer implements Runnable {
 		
 	}
 	
+	/**
+	 * Add the job to the default execution queue.
+	 * @param job
+	 */
+	public void enqueueJob(IJob job) {
+		serverContext.getDefaultJobQueue().addJob(job);
+	}
 
 	/**
 	 * Initialize the server.
 	 * @throws ETLException 
 	 */
-	private boolean initialize() {
+	public boolean initialize() {
 		
 		File path = new File(rootPath);
 		if (!path.exists()) {
@@ -231,6 +253,20 @@ public class ETLgineServer implements Runnable {
 	 */
 	public ServerContext getServerContext() {
 		return serverContext;
+	}
+
+	/**
+	 * @return the exitAfterFinish
+	 */
+	public boolean isExitAfterFinish() {
+		return exitAfterFinish;
+	}
+
+	/**
+	 * @param exitAfterFinish the exitAfterFinish to set
+	 */
+	public void setExitAfterFinish(boolean exitAfterFinish) {
+		this.exitAfterFinish = exitAfterFinish;
 	}
 
 	

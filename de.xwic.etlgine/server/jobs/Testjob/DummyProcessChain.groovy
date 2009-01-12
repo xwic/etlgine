@@ -1,0 +1,1 @@
+processChain.createProcessFromScript("Testjob", "Testjob/DummyProcess.groovy");

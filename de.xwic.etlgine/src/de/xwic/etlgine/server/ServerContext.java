@@ -25,10 +25,20 @@ import de.xwic.etlgine.impl.Job;
  */
 public class ServerContext extends Context {
 
+	public final static String DEFAULT_QUEUE = "default";
+	
 	protected final Log log = LogFactory.getLog(getClass());
 	
 	private Map<String, IJob> jobs = new HashMap<String, IJob>();
+	private Map<String, JobQueue> queues = new HashMap<String, JobQueue>();
 
+	/**
+	 * 
+	 */
+	public ServerContext() {
+		queues.put(DEFAULT_QUEUE, new JobQueue(this, DEFAULT_QUEUE));
+	}
+	
 	/**
 	 * Load a Job from a script.
 	 * @param name
@@ -61,11 +71,33 @@ public class ServerContext extends Context {
 			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
 		}
 
-
-		
-		
 		jobs.put(name, job);
 		return job;
+	}
+	
+	/**
+	 * Returns the default job queue.
+	 * @return
+	 */
+	public JobQueue getDefaultJobQueue() {
+		return queues.get(DEFAULT_QUEUE);
+	}
+	
+	/**
+	 * Returns the queue with the specified name.
+	 * @param name
+	 * @return
+	 */
+	public JobQueue getJobQueue(String name) {
+		return queues.get(name);
+	}
+	
+	/**
+	 * Returns all job queues.
+	 * @return
+	 */
+	public Collection<JobQueue> getJobQueues() {
+		return queues.values();
 	}
 	
 	/**

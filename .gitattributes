@@ -629,6 +629,7 @@ de.xwic.etlgine/server/jetty/servlet-api-2.5-6.1.9.jar -text
 de.xwic.etlgine/server/jetty/start.jar -text
 de.xwic.etlgine/server/jobs/Testjob.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcess.groovy -text
+de.xwic.etlgine/server/jobs/Testjob/DummyProcessChain.groovy -text
 de.xwic.etlgine/server/web/WEB-INF/jwic-setup.xml -text
 de.xwic.etlgine/server/web/WEB-INF/jwic/ctrl_vtls/info.txt -text
 de.xwic.etlgine/server/web/WEB-INF/jwic/jsp/de.jwic.tutorial.jsp.SomeControl.jsp -text
@@ -1036,6 +1037,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ScriptedCubeDataMapper.java -tex
 de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/JDBCLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineConsole.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineServer.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/JobQueue.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/Launch.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenOutputStream.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenPrintStream.java -text

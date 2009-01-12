@@ -21,7 +21,7 @@ public interface IJob {
 	 * Execute the job.
 	 * @throws ETLException 
 	 */
-	public abstract void execute() throws ETLException;
+	public abstract void execute(IContext context) throws ETLException;
 	
 	/**
 	 * Returns the date when the job was executed the last time.

@@ -3,5 +3,5 @@
  */
 
 
-job.chainScriptName = "Testjob/DummyProcess.groovy";
+job.chainScriptName = "Testjob/DummyProcessChain.groovy";
 

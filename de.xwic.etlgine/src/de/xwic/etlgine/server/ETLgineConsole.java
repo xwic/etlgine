@@ -92,7 +92,7 @@ public class ETLgineConsole extends JScreenApplication {
 							if (job != null) {
 								screen.println("Executing Job " + job.getName());
 								try {
-									job.execute();
+									job.execute(serverContext);
 								} catch (Throwable e) {
 									screen.println("Error during execution: " + e);
 								}

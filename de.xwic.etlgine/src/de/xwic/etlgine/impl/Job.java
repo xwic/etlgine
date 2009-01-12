@@ -3,9 +3,15 @@
  */
 package de.xwic.etlgine.impl;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+import java.io.File;
 import java.util.Date;
 
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.ETLgine;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.ITrigger;
@@ -34,15 +40,56 @@ public class Job implements IJob {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IJob#execute()
 	 */
-	public synchronized void execute() throws ETLException {
+	public synchronized void execute(IContext context) throws ETLException {
 		
 		if (executing) {
 			throw new ETLException("The job is already beeing executed.");
 		}
 		executing = true;
-		processChain.start();
-		executing = false;
-		lastRun = new Date();
+		try {
+			if (processChain == null) {
+				if (chainScriptName == null) {
+					throw new ETLException("No processChain or chainScriptName given.");
+				}
+				loadChainFromScript(context);
+			}
+			processChain.start();
+		} finally {
+			executing = false;
+			lastRun = new Date();
+			processChain = null;
+		}
+	}
+
+	/**
+	 * @throws ETLException 
+	 * 
+	 */
+	private void loadChainFromScript(IContext context) throws ETLException {
+		
+		processChain = ETLgine.createProcessChain(context, chainScriptName);
+		
+		Binding binding = new Binding();
+		binding.setVariable("job", this);
+		binding.setVariable("processChain", processChain);
+		
+		GroovyShell shell = new GroovyShell(binding);
+		
+		File jobPath = new File(context.getProperty(IContext.PROPERTY_SCRIPTPATH, "."));
+		if (!jobPath.exists()) {
+			throw new ETLException("The job path " + jobPath.getAbsolutePath() + " does not exist.");
+		}
+		File file = new File(jobPath, chainScriptName);
+		if (!file.exists()) {
+			throw new ETLException("The script file " + file.getAbsolutePath() + " does not exist.");
+		}
+		
+		try {
+			shell.evaluate(file);
+		} catch (Exception e) {
+			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
+		}
+		
 	}
 
 	/* (non-Javadoc)

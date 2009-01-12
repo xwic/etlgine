@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import de.xwic.etlgine.IJob;
+
 import eu.lippisch.jscreen.runner.SwingRunner;
 import eu.lippisch.jscreen.runner.SwtRunner;
 
@@ -63,26 +65,36 @@ public class Launch {
 		
 		ETLgineServer server = new ETLgineServer();
 		server.setRootPath(path);
+		if (!server.initialize()) {
+			System.out.println("Server start failed.");
+			return;
+		}
 		
+
 		String runJob = prop.getProperty(PARAM_RUN);
-		if (runJob != null) {
-			// only execute the specified job
-			
-		} else {
-			// startup the server.
-			Thread serverThread = new Thread(server, "ETLgineServer");
-			serverThread.setDaemon(false);
-			serverThread.start();
-			if (prop.getProperty(PARAM_CONSOLE) != null) {
-				ETLgineConsole console = new ETLgineConsole(server);
-				if ("swing".equals(prop.getProperty(PARAM_CONSOLE))) {
-					SwingRunner.launch(console, true);
-				} else {
-					SwtRunner.launch(console, true);
-				}
+
+		// startup the server.
+		Thread serverThread = new Thread(server, "ETLgineServer");
+		serverThread.setDaemon(false);
+		serverThread.start();
+		if (prop.getProperty(PARAM_CONSOLE) != null) {
+			ETLgineConsole console = new ETLgineConsole(server);
+			if ("swing".equals(prop.getProperty(PARAM_CONSOLE))) {
+				SwingRunner.launch(console, true);
+			} else {
+				SwtRunner.launch(console, true);
 			}
 		}
 		
+		if (runJob != null) {
+			IJob job = server.getServerContext().getJob(runJob);
+			if (job == null) {
+				System.out.println("The specified job does not exist: " + runJob);
+			} else {
+				server.enqueueJob(job);
+			}
+			server.setExitAfterFinish(true);
+		}
 
 	}
 

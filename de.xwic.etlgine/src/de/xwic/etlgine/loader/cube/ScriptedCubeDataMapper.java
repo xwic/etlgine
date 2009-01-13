@@ -16,7 +16,7 @@ import de.xwic.etlgine.IProcessContext;
  * 
  * @author lippisch
  */
-public class ScriptedCubeDataMapper extends AbstractCubeDataMapper {
+public class ScriptedCubeDataMapper extends BaseCubeDataMapper {
 
 	private final File scriptFile;
 

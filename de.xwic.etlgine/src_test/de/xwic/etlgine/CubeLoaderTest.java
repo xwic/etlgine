@@ -45,7 +45,7 @@ public class CubeLoaderTest extends TestCase {
 			/* (non-Javadoc)
 			 * @see de.xwic.etlgine.loader.cube.IDataPoolProvider#getDataPool()
 			 */
-			public IDataPool getDataPool() {
+			public IDataPool getDataPool(IContext context) {
 				return pool;
 			}
 		};

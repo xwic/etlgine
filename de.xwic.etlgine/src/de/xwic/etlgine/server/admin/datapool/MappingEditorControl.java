@@ -271,14 +271,7 @@ public class MappingEditorControl extends BaseContentContainer {
 		chkOptions.addElement("Create", "CREATE");
 		chkOptions.addElement("Skip", "SKIP");
 		chkOptions.addElement("Assign To", "ASSIGN");
-		chkOptions.addElementSelectedListener(new ElementSelectedListener() {
-			public void elementSelected(ElementSelectedEvent event) {
-				boolean isAssign = ("ASSIGN".equals(chkOptions.getSelectedKey()));
-				if (elmSelector != null) {
-					elmSelector.setVisible(isAssign);
-				}
-			}
-		});
+		chkOptions.addElement("Fail", "FAIL");
 		
 		new LabelControl(this, "elmSelector").setText("");
 		elmSelector = null;

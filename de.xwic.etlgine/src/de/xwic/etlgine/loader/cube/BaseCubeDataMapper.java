@@ -20,7 +20,7 @@ import de.xwic.etlgine.IRecord;
  * Default mapping implementation.
  * @author lippisch
  */
-public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
+public class BaseCubeDataMapper implements ICubeDataMapper {
 
 	protected ICube cube = null;
 	protected Map<IDimension, DimensionMapping> dimMap = new HashMap<IDimension, DimensionMapping>();
@@ -52,7 +52,9 @@ public abstract class AbstractCubeDataMapper implements ICubeDataMapper {
 	 * @param processContext
 	 * @throws ETLException 
 	 */
-	protected abstract void configure(IProcessContext processContext) throws ETLException;
+	protected void configure(IProcessContext processContext) throws ETLException {
+		
+	}
 	
 	/**
 	 * Add a mapping where the columnName and dimension name is the same.

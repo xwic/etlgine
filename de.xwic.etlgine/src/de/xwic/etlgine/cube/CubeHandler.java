@@ -169,5 +169,14 @@ public class CubeHandler {
 		}
 		throw new ETLException("A DataPool for this manager is not available.");
 	}
+
+	/**
+	 * Returns the connection name for the syncTables of the specified dataPoolKey.
+	 * @param dataPoolKey
+	 * @return
+	 */
+	public String getConnectionName(String dataPoolKey) {
+		return context.getProperty(dataPoolKey + ".datapool.syncTables.connection");
+	}
 	
 }

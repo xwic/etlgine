@@ -176,7 +176,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			// no mapping found
 			switch (mappingDef.getOnUnmapped()) {
 			case ASSIGN:
-				processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
+				//processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
 				record.setData(targetColumn, mappingDef.getUnmappedPath());
 				break;
 			case CREATE: {

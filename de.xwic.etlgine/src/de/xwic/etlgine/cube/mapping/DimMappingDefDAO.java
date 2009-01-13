@@ -65,6 +65,31 @@ public class DimMappingDefDAO {
 	}
 
 	/**
+	 * Find the mapping with the specified key.
+	 * @param dimMapKey
+	 * @return
+	 * @throws SQLException
+	 */
+	public DimMappingDef findMapping(String dimMapKey) throws SQLException {
+		DimMappingDef dmd = null;
+		String sql = "SELECT [DimMapKey], [Description], [DimensionKey], [UnmappedPath], [OnUnmapped] FROM XCUBE_DIMMAP WHERE [DimMapKey] = ?";
+		PreparedStatement stmt = connection.prepareStatement(sql);
+		stmt.setString(1, dimMapKey);
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next()) {
+			dmd = new DimMappingDef();
+			dmd.setKey(rs.getString("DimMapKey"));
+			dmd.setDescription(rs.getString("Description"));
+			dmd.setDimensionKey(rs.getString("DimensionKey"));
+			dmd.setUnmappedPath(rs.getString("UnmappedPath"));
+			dmd.setOnUnmapped(DimMappingDef.Action.valueOf(rs.getString("OnUnmapped")));
+		}
+		rs.close();
+		stmt.close();
+		return dmd;
+	}
+	
+	/**
 	 * @param dimMapping
 	 * @throws SQLException 
 	 */

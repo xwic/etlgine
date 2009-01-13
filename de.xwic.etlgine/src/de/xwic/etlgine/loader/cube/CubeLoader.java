@@ -9,6 +9,7 @@ import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
 import de.xwic.cube.Key;
+import de.xwic.cube.StorageException;
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
@@ -28,6 +29,8 @@ public class CubeLoader extends AbstractLoader {
 	private String targetCubeKey = null;
 	private ICubeDataMapper dataMapper = null;
 	
+	private boolean saveDataPoolOnFinish = false;
+	
 	/**
 	 * Constructor.
 	 * @param dataPoolProvider
@@ -42,7 +45,7 @@ public class CubeLoader extends AbstractLoader {
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
-		dataPool = dataPoolProvider.getDataPool();
+		dataPool = dataPoolProvider.getDataPool(processContext);
 		if (targetCubeKey == null) {
 			throw new ETLException("The target cube key is not specified.");
 		}
@@ -90,6 +93,23 @@ public class CubeLoader extends AbstractLoader {
 		}
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.AbstractLoader#onProcessFinished(de.xwic.etlgine.IProcessContext)
+	 */
+	@Override
+	public void onProcessFinished(IProcessContext processContext) throws ETLException {
+		super.onProcessFinished(processContext);
+		if (isSaveDataPoolOnFinish()) {
+			try {
+				processContext.getMonitor().logInfo("Storing DataPool...");
+				dataPool.save();
+				processContext.getMonitor().logInfo("Storing DataPool finished...");
+			} catch (StorageException e) {
+				throw new ETLException("Error saving dataPool");
+			}
+		}
+	}
 
 	/**
 	 * @return the targetCubeKey
@@ -131,6 +151,20 @@ public class CubeLoader extends AbstractLoader {
 	 */
 	public void setDataMapper(ICubeDataMapper dataMapper) {
 		this.dataMapper = dataMapper;
+	}
+
+	/**
+	 * @return the saveDataPoolOnFinish
+	 */
+	public boolean isSaveDataPoolOnFinish() {
+		return saveDataPoolOnFinish;
+	}
+
+	/**
+	 * @param saveDataPoolOnFinish the saveDataPoolOnFinish to set
+	 */
+	public void setSaveDataPoolOnFinish(boolean saveDataPoolOnFinish) {
+		this.saveDataPoolOnFinish = saveDataPoolOnFinish;
 	}
 	
 }

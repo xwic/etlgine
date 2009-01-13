@@ -1002,6 +1002,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/ISource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeHandler.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDef.java -text
@@ -1025,14 +1026,16 @@ de.xwic.etlgine/src/de/xwic/etlgine/impl/Record.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/jdbc/DbColumnDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/jdbc/JDBCUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/csv/CSVLoader.java -text
-de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/AbstractCubeDataMapper.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/BaseCubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/CubeLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DataPoolInitializer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DimensionMapping.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DimensionMappingTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ElementMapping.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ICubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/IDataPoolProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/MeasureMapping.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/NamedDataPoolProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ScriptedCubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/JDBCLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineConsole.java -text
@@ -1075,6 +1078,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobAdminControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobAdminControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/util/Validate.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/CubeLoaderTest.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/JDBCTest.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/ProcessTest.java -text

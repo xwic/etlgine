@@ -8,7 +8,7 @@ package de.xwic.etlgine.cube.mapping;
  */
 public class DimMappingDef {
 
-	public enum Action { CREATE, SKIP, ASSIGN };
+	public enum Action { CREATE, SKIP, ASSIGN, FAIL };
 	
 	private String key = null;
 	private String description = null; 

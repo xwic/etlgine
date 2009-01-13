@@ -42,6 +42,7 @@ public class MappingElementEditorControl extends ControlContainer {
 	private ButtonControl btUpdate, btDelete;
 	
 	private DimMappingElementDef currElement = null;
+	private MappingElementTableLabelProvider labelProvider;
 
 	/**
 	 * @param container
@@ -149,7 +150,9 @@ public class MappingElementEditorControl extends ControlContainer {
 		table = new TableViewer(this, "table");
 		
 		table.setContentProvider(new ListContentProvider(mappingList));
-		table.setTableLabelProvider(new MappingElementTableLabelProvider());
+		labelProvider = new MappingElementTableLabelProvider();
+		
+		table.setTableLabelProvider(labelProvider);
 		table.setWidth(793);
 		table.setHeight(300);
 		table.setResizeableColumns(true);
@@ -232,6 +235,9 @@ public class MappingElementEditorControl extends ControlContainer {
 		removeControl("selElement");
 		selElement = new DimensionElementSelector(this, "selElement", dimension);
 		selElement.setWidth(400);
+		
+		labelProvider.setDimension(dimension);
+		
 	}
 
 }

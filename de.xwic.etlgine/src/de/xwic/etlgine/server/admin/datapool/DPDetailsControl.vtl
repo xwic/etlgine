@@ -50,7 +50,7 @@ $insert.control("errInfo")
 				<th>Title</th>
 				<th width="170">Dimensions</th>
 				<th width="170">Measures</th>
-				<th width="80">Cells</th>
+				<th width="120">Size*</th>
 			</tr>
 		#foreach($cube in $pool.cubes)
 			<tr>
@@ -66,10 +66,15 @@ $insert.control("errInfo")
 						<li>$me.key</li>
 					#end</ul>
 				</td>
-				<td class="data" valign="top">$cube.getSize()</td>
+				<td class="data" valign="top">
+					$cube.getSize() Cells<br>
+#set($totalSize = ($cube.getSize() * (($cube.measures.size() * 8) + ($cube.dimensions.size() * 4) + 32)) / 1024)
+					$totalSize kB					
+					</td>
 			</tr>
 		#end
 		</table>
+		* KB Size is estimated for 32-bit OS and may vary. 
 	</p>
 	
 #end

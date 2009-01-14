@@ -586,6 +586,8 @@ de.xwic.cube/src/de/xwic/cube/Key.java -text
 de.xwic.cube/src/de/xwic/cube/StorageException.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/DefaultValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/DefaultValueFormatProvider.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/KValueFormat.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/KValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/functions/DifferenceFunction.java -text

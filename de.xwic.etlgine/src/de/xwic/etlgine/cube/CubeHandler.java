@@ -132,37 +132,40 @@ public class CubeHandler {
 		if (key != null) {
 			IDataPoolManager dpm = getDataPoolManager(dataPoolManagerKey);
 			try {
+				boolean firstLoad = !dpm.containsDataPool(key) || !dpm.isDataPoolLoaded(key);
+				IDataPool dataPool;
 				if (dpm.containsDataPool(key)) {
-					boolean firstLoad = !dpm.isDataPoolLoaded(key);
-					IDataPool dataPool = dpm.getDataPool(key);
-					
-					if (firstLoad) {
-						log.info("Initializing DataPool");
-						String initScript = context.getProperty(dataPoolManagerKey + ".datapool.initScript", null);
-						if (initScript != null) {
-							String path = context.getProperty(dataPoolManagerKey + ".datapool.path", null);
-							File fRoot = new File(context.getProperty(ServerContext.PROPERTY_ROOTPATH, "."));
-							File fDP = new File(fRoot, path);
-							File fScript = new File(fDP, initScript);
-							if (fScript.exists()) {
-								DataPoolInitializer dpInit = new DataPoolInitializer(context, fScript);
-								try {
-									dpInit.verify(dataPool);
-								} catch (Exception e) {
-									log.error("Error initializing DataPool: " + e, e);
-									dpm.releaseDataPool(dataPool); // release
-									throw new ETLException("Error initializing DataPool: " + e, e);
-								}
-							} else {
-								log.warn("Init Script: " + initScript + " does not exist.");
+					dataPool = dpm.getDataPool(key);
+				} else {
+					dataPool = dpm.createDataPool(key);
+				}
+				
+				if (firstLoad) {
+					log.info("Initializing DataPool");
+					String initScript = context.getProperty(dataPoolManagerKey + ".datapool.initScript", null);
+					if (initScript != null) {
+						String path = context.getProperty(dataPoolManagerKey + ".datapool.path", null);
+						File fRoot = new File(context.getProperty(ServerContext.PROPERTY_ROOTPATH, "."));
+						File fDP = new File(fRoot, path);
+						File fScript = new File(fDP, initScript);
+						if (fScript.exists()) {
+							DataPoolInitializer dpInit = new DataPoolInitializer(context, fScript);
+							try {
+								dpInit.verify(dataPool);
+							} catch (Exception e) {
+								log.error("Error initializing DataPool: " + e, e);
+								dpm.releaseDataPool(dataPool); // release
+								throw new ETLException("Error initializing DataPool: " + e, e);
 							}
-
+						} else {
+							log.warn("Init Script: " + initScript + " does not exist.");
 						}
 
 					}
-					
-					return dataPool;
+
 				}
+				
+				return dataPool;
 			} catch (StorageException e) {
 				throw new ETLException("Error opening DataPool " + dataPoolManagerKey + " / " + key);
 			}

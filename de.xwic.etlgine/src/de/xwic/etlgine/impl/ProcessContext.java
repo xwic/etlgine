@@ -20,7 +20,9 @@ public class ProcessContext extends Context implements IProcessContext {
 	protected IMonitor monitor = null;
 	protected IDataSet dataSet = null;
 	protected IRecord currentRecord = null;
-	protected int recordsProcessed = 0;
+	protected int recordsCount = 0;
+	protected int skippedCount = 0;
+	protected int invalidCount = 0;
 	protected IProcess process = null;
 	
 	/**
@@ -69,15 +71,33 @@ public class ProcessContext extends Context implements IProcessContext {
 	 * A record has been processed. 
 	 * NOTE: this method is invoked by the process itself.
 	 */
-	public void recordProcessed() {
-		recordsProcessed++;
+	public void recordProcessed(IRecord record) {
+		recordsCount++;
+		if (record.isInvalid()) invalidCount ++;
+		if (record.isSkip()) skippedCount++;
 	}
 	
 	/**
 	 * @return the recordsProcessed
 	 */
-	public int getRecordsProcessed() {
-		return recordsProcessed;
+	public int getRecordsCount() {
+		return recordsCount;
+	}
+	
+	/**
+	 * Returns the number of records skipped.
+	 * @return
+	 */
+	public int getSkippedCount() {
+		return skippedCount;
+	}
+	
+	/**
+	 * Returns the number of records that have become invalid.
+	 * @return
+	 */
+	public int getInvalidCount() {
+		return invalidCount;
 	}
 
 	/**

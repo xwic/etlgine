@@ -27,7 +27,11 @@ public class DefaultMonitor implements IMonitor {
 			if (System.currentTimeMillis() > nextStatus) {
 				nextStatus = System.currentTimeMillis() + STATUS_INTERVALL;
 				String sourceName = processContext.getCurrentSource() != null ? processContext.getCurrentSource().getName() : "NO-SOURCE";
-				log.info("Processed: " + processContext.getRecordsProcessed() + " records from " + sourceName);
+				log.info("Processing: " 
+						+ processContext.getRecordsCount() 
+						+ " records from " + sourceName 
+						+ " (" + processContext.getSkippedCount() + " skipped, " 
+						+ processContext.getInvalidCount() + " invalid)");
 			}
 		}
 		
@@ -39,7 +43,9 @@ public class DefaultMonitor implements IMonitor {
 		case PROCESS_FINISHED:
 			long duration = System.currentTimeMillis() - startTime;
 			logInfo("Total duration (in ms): " + duration);
-			logInfo("Records processed:      " + processContext.getRecordsProcessed());
+			logInfo("Records processed:      " + processContext.getRecordsCount());
+			logInfo("Records skipped:        " + processContext.getSkippedCount());
+			logInfo("Records invalid:        " + processContext.getInvalidCount());
 			break;
 		}
 		

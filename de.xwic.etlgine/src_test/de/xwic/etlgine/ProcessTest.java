@@ -85,7 +85,7 @@ public class ProcessTest extends TestCase {
 					break;
 				}
 				case SOURCE_FINISHED: {
-					assertEquals(3, processContext.getRecordsProcessed());
+					assertEquals(3, processContext.getRecordsCount());
 					break;
 				}
 				}

@@ -30,6 +30,7 @@ public class CubeLoader extends AbstractLoader {
 	private ICubeDataMapper dataMapper = null;
 	
 	private boolean saveDataPoolOnFinish = false;
+	private boolean clearCubeBeforeStart = false;
 	
 	/**
 	 * Constructor.
@@ -65,6 +66,11 @@ public class CubeLoader extends AbstractLoader {
 		}
 		cube = dataPool.getCube(targetCubeKey);
 		dataMapper.initialize(processContext, cube);
+		
+		if (isClearCubeBeforeStart()) {
+			cube.clear();
+		}
+		
 	}
 	
 	/* (non-Javadoc)
@@ -165,6 +171,20 @@ public class CubeLoader extends AbstractLoader {
 	 */
 	public void setSaveDataPoolOnFinish(boolean saveDataPoolOnFinish) {
 		this.saveDataPoolOnFinish = saveDataPoolOnFinish;
+	}
+
+	/**
+	 * @return the clearCubeBeforeStart
+	 */
+	public boolean isClearCubeBeforeStart() {
+		return clearCubeBeforeStart;
+	}
+
+	/**
+	 * @param clearCubeBeforeStart the clearCubeBeforeStart to set
+	 */
+	public void setClearCubeBeforeStart(boolean clearCubeBeforeStart) {
+		this.clearCubeBeforeStart = clearCubeBeforeStart;
 	}
 	
 }

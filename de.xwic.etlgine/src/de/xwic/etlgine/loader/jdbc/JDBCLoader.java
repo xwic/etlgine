@@ -320,6 +320,15 @@ public class JDBCLoader extends AbstractLoader {
 						case Types.DATE:
 							psInsert.setDate(idx, new java.sql.Date(((Date)value).getTime()));
 							break;
+						case Types.TINYINT:
+							if (value instanceof Integer) {
+								Integer valInt = (Integer) value;
+								psInsert.setBoolean(idx, valInt == 1 ? true : false);
+							} else if (value instanceof String) {
+								Integer valInt = Integer.parseInt((String) value);
+								psInsert.setBoolean(idx, valInt == 1 ? true : false);
+							}
+							break;
 						default:
 							throw new ETLException("Unknown datatype: "+ colDef.getType());
 						}

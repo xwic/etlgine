@@ -308,6 +308,16 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/ControlPropert
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/InputboxMapper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/MappingException.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/PropertyMapper.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistorySelectionModel.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistoryVersion.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/PropertyVersionHelper.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryCompareTableContentProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryCompareTableLabelProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryCompareWizPage.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryContentProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryLabelProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistorySelWizPage.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistorySelectionWizard.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/ExtendedApplication.java -text
@@ -330,6 +340,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/AbstractLis
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/BaseLabelProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/BaseView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/BaseView.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/DeleteFailedException.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/IEntityListBoxControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/ListModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/SiteWizardContainer.java -text
@@ -342,6 +353,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/login/LoginControl.jav
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/login/LoginControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/login/LoginModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/model/AbstractModel.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/model/IModelEventSupport.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/model/IModelListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/model/ModelEvent.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/model/ModelEventSupport.java -text

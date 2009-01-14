@@ -225,10 +225,10 @@ public class Process implements IProcess {
 							}
 						}
 						
-						processContext.recordProcessed();
+						processContext.recordProcessed(record);
 						monitor.onEvent(processContext, EventType.RECORD_PROCESSED);
 						
-						if (stopAfterRecords > 0 && processContext.getRecordsProcessed() >= stopAfterRecords) {
+						if (stopAfterRecords > 0 && processContext.getRecordsCount() >= stopAfterRecords) {
 							monitor.logWarn("Stopped after " + stopAfterRecords + " records because of stop condition.");
 							break;
 						}

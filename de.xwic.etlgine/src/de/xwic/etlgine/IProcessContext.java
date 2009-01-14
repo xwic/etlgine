@@ -31,7 +31,19 @@ public interface IProcessContext extends IContext {
 	/**
 	 * @return the recordsProcessed
 	 */
-	public int getRecordsProcessed();
+	public int getRecordsCount();
+	
+	/**
+	 * Returns the number of records skipped.
+	 * @return
+	 */
+	public int getSkippedCount();
+	
+	/**
+	 * Returns the number of records that have become invalid.
+	 * @return
+	 */
+	public int getInvalidCount();
 
 	/**
 	 * Create a new record.

@@ -88,7 +88,7 @@ public class CubeLoader extends AbstractLoader {
 		for (IMeasure measure : dataMapper.getMeasures()) {
 			Double value = dataMapper.getValue(measure, record);
 			if (value != null) {
-				cube.setCellValue(key, measure, value);
+				cube.addCellValue(key, measure, value);
 			}
 		}
 		

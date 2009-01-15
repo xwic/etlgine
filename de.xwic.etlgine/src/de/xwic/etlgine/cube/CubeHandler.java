@@ -135,6 +135,9 @@ public class CubeHandler {
 				boolean firstLoad = !dpm.containsDataPool(key) || !dpm.isDataPoolLoaded(key);
 				IDataPool dataPool;
 				if (dpm.containsDataPool(key)) {
+					if (firstLoad) {
+						log.info("Loading DataPool " + key);
+					}
 					dataPool = dpm.getDataPool(key);
 				} else {
 					dataPool = dpm.createDataPool(key);

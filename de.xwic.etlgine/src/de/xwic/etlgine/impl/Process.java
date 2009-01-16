@@ -11,11 +11,11 @@ import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IDataSet;
-import de.xwic.etlgine.IProcessContext;
-import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IMonitor;
+import de.xwic.etlgine.IProcess;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
@@ -145,7 +145,7 @@ public class Process implements IProcess {
 			throw new ETLException("No sources defined.");
 		}
 		if (extractor == null) {
-			throw new ETLException("No loader defined.");
+			throw new ETLException("No extractor defined.");
 		}
 		
 		monitor.logInfo("Starting process '" + name + "'");
@@ -211,7 +211,14 @@ public class Process implements IProcess {
 					while ((record = extractor.getNextRecord()) != null) {
 						
 						for (ITransformer transformer : transformers) {
+							List<IRecord> duplicates = record.getDuplicates();
+							int duplicatesSize = duplicates.size();
 							transformer.processRecord(processContext, record);
+							// process duplicates
+							for (int i = 0; i < duplicatesSize; i++) {
+								IRecord duplicate = duplicates.get(i);
+								transformer.processRecord(processContext, duplicate);
+							}
 						}
 						if (record.isInvalid()) {
 							monitor.logWarn("Invalid record : " + record.getInvalidReason());
@@ -222,11 +229,19 @@ public class Process implements IProcess {
 									monitor.logWarn("Invalid record : " + record.getInvalidReason());
 									break;
 								}
+								// process duplicates
+								for (IRecord duplicate : record.getDuplicates()) {
+									loader.processRecord(processContext, duplicate);
+									if (duplicate.isInvalid()) {
+										monitor.logWarn("Invalid record : " + duplicate.getInvalidReason());
+										break;
+									}
+								}
 							}
 						}
 						
 						processContext.recordProcessed(record);
-						monitor.onEvent(processContext, EventType.RECORD_PROCESSED);
+						// TODO track duplcates as well and inform
 						
 						if (stopAfterRecords > 0 && processContext.getRecordsCount() >= stopAfterRecords) {
 							monitor.logWarn("Stopped after " + stopAfterRecords + " records because of stop condition.");

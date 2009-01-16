@@ -74,7 +74,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 				connection = JDBCUtil.openConnection(processContext, conName);
 				DimMappingDefDAO dmdDAO = new DimMappingDefDAO(connection);
 				mappingDef = dmdDAO.findMapping(mappingName);
-				Validate.notNull(mappingDef, "A mapping with the specified name does not exist.");
+				Validate.notNull(mappingDef, "A mapping with the name '" + mappingName + "' does not exist.");
 				
 				DimMappingElementDefDAO dmeDAO = new DimMappingElementDefDAO(connection);
 				mappingElements = dmeDAO.listMappings(mappingName);

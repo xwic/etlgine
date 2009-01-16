@@ -19,6 +19,10 @@ public class XLSFileSource extends FileSource {
 	protected int sheetIndex = 0;
 	protected int startRow = 0;
 
+	public XLSFileSource() {
+		
+	}
+	
 	public XLSFileSource(String fileName) {
 		super(fileName);
 	}

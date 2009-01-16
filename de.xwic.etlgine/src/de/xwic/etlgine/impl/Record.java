@@ -3,7 +3,9 @@
  */
 package de.xwic.etlgine.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.xwic.etlgine.ETLException;
@@ -14,13 +16,14 @@ import de.xwic.etlgine.IRecord;
 /**
  * @author lippisch
  */
-public class Record implements IRecord {
+public class Record implements IRecord, Cloneable {
 
 	protected final IDataSet dataSet;
 	protected boolean invalid = false;
 	protected boolean skip = false;
 	protected String invalidReason = null;
 	protected Map<IColumn, Object> data = new HashMap<IColumn, Object>();
+	protected List<IRecord> duplicates = new ArrayList<IRecord>();
 	
 	/**
 	 * @param dataSet
@@ -162,4 +165,29 @@ public class Record implements IRecord {
 		this.skip = skip;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Record clone() {
+		Record clone = new Record(dataSet);
+		clone.data.putAll(data);
+		return clone;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#duplicate()
+	 */
+	public IRecord duplicate() {
+		IRecord clone = clone();
+		duplicates.add(clone);
+		return clone;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#getDuplicates()
+	 */
+	public List<IRecord> getDuplicates() {
+		return duplicates;
+	}
 }

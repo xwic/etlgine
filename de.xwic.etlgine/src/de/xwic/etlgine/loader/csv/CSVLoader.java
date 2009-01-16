@@ -3,16 +3,20 @@
  */
 package de.xwic.etlgine.loader.csv;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.List;
 
+import sun.nio.cs.StreamEncoder;
 import au.com.bytecode.opencsv.CSVWriter;
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
-import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.ILoader;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
 /**
@@ -29,6 +33,8 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	
 	private int colCount = 0;
 	private IColumn[] exportCols = null;
+	
+	private String encoding = null;
 	
 	/**
 	 * @return the filename
@@ -93,7 +99,9 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	public void initialize(IProcessContext processContext) throws ETLException {
 		
 		try {
-			writer = new CSVWriter(new FileWriter(filename), separator, quoteChar);
+			OutputStream out = new FileOutputStream(filename);
+			Writer w = new BufferedWriter(StreamEncoder.forOutputStreamWriter(out, filename, encoding));
+			writer = new CSVWriter(w, separator, quoteChar);
 		} catch (IOException e) {
 			throw new ETLException("Error creating file " + filename + ": " + e, e);
 		}
@@ -154,4 +162,17 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 		
 	}
 
+	/**
+	 * @return the encoding
+	 */
+	public String getEncoding() {
+		return encoding;
+	}
+	
+	/**
+	 * @param encoding the encoding to set
+	 */
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
 }

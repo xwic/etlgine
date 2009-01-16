@@ -15,6 +15,7 @@ public class FileSource implements ISource {
 	protected String filename = null;
 	protected File file = null;
 	protected boolean optional = false;
+	protected String encoding = null;
 	
 	/**
 	 * Default Constructor.
@@ -103,4 +104,17 @@ public class FileSource implements ISource {
 		this.optional = optional;
 	}
 
+	/**
+	 * @return the encoding
+	 */
+	public String getEncoding() {
+		return encoding;
+	}
+	
+	/**
+	 * @param encoding the encoding to set
+	 */
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
 }

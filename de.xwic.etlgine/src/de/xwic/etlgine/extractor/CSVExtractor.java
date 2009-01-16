@@ -3,10 +3,13 @@
  */
 package de.xwic.etlgine.extractor;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 
+import sun.nio.cs.StreamDecoder;
 import au.com.bytecode.opencsv.CSVReader;
 import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
@@ -96,7 +99,23 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		try {
 			recordNumber = 0;
 			reachedEnd = false;
-			reader  = new CSVReader(new FileReader(fsrc.getFile()), separator, quoteChar, skipLines);
+			
+			InputStream in = new FileInputStream(fsrc.getFile());
+			
+			// determine encoding
+			if (fsrc.getEncoding() == null) {
+				String encoding = null; // java default
+				byte[] encoding_tag = new byte[2];
+				// find source encoding
+				if (in.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == -1 && encoding_tag[1] == -2) {
+					// used by Cognos CSV reports
+					encoding = "UTF-16LE";
+				} else {
+					in.reset();
+				}
+				fsrc.setEncoding(encoding);
+			}
+			reader  = new CSVReader(new BufferedReader(StreamDecoder.forInputStreamReader(in, fsrc.getFile(), fsrc.getEncoding())), separator, quoteChar, skipLines);
 			if (containsHeader) {
 				String[] header = reader.readNext();
 				if (header == null) {

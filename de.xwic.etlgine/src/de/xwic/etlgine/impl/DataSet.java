@@ -64,12 +64,12 @@ public class DataSet implements IDataSet {
 			throw new NullPointerException("Column must be not null");
 		}
 		if (columnMap.containsKey(column.getName())) {
-			throw new ETLException("A column with that name already exists in this dataset.");
+			throw new ETLException("A column with name '" + column + "' already exists in this dataset.");
 		}
 		
 		if (column.getSourceIndex() != -1) {
 			if (columnIndexMap.containsKey(column.getSourceIndex())) {
-				throw new ETLException("A column with that source index already exists in this dataset.");
+				throw new ETLException("A column with source index '" + column.getSourceIndex() + "' already exists in this dataset.");
 			}
 			columnIndexMap.put(column.getSourceIndex(), column);
 		}
@@ -113,7 +113,7 @@ public class DataSet implements IDataSet {
 		if (col == null) {
 			col = aliasMap.get(name);
 			if (col == null) {
-				throw new ETLException("A column with the name " + name + " does not exist.");
+				throw new ETLException("A column with the name '" + name + "' does not exist.");
 			}
 		}
 		return col;

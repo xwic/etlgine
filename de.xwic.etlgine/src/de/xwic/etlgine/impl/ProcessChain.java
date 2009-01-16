@@ -77,7 +77,7 @@ public class ProcessChain implements IProcessChain {
 		
 		Binding binding = new Binding();
 		binding.setVariable("process", process);
-		binding.setVariable("processchain", this);
+		binding.setVariable("processChain", this);
 
 		GroovyShell shell = new GroovyShell(binding);
 		try {

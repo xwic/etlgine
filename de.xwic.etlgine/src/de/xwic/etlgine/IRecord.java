@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine;
 
+import java.util.List;
+
 /**
  * A single data record.
  * @author lippisch
@@ -103,4 +105,22 @@ public interface IRecord {
 	 */
 	public void setSkip(boolean skip);
 	
+	/**
+	 * Cloning must be implemented.
+	 * @return
+	 */
+	public IRecord clone();
+	
+	/**
+	 * Duplicate this record by calling clone() and adds it to duplicates.
+	 * This method should be could during transformer processing 
+	 * and are passed to all following transformers.
+	 */
+	public IRecord duplicate();
+	
+	/**
+	 * Returns the records created with duplicate().
+	 * @return
+	 */
+	public List<IRecord> getDuplicates();
 }

@@ -214,6 +214,7 @@ public class MappingEditorControl extends BaseContentContainer {
 				// insert dimMappings
 				DimMappingElementDefDAO daoME = new DimMappingElementDefDAO(connection);
 				daoME.deleteByDimMapKey(key);
+				daoME.setOrderIndex(0);
 				for (DimMappingElementDef me : mappingList) {
 					daoME.insert(me);
 				}

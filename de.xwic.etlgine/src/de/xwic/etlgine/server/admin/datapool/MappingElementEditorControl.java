@@ -39,7 +39,7 @@ public class MappingElementEditorControl extends ControlContainer {
 	private InputBoxControl inpExpression;
 	private DimensionElementSelector selElement;
 	private CheckboxControl chkOptions;
-	private ButtonControl btUpdate, btDelete;
+	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown;
 	
 	private DimMappingElementDef currElement = null;
 	private MappingElementTableLabelProvider labelProvider;
@@ -88,6 +88,28 @@ public class MappingElementEditorControl extends ControlContainer {
 		btDelete.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {
 				onDelete();
+			}
+		});
+		
+		btMoveUp = new ButtonControl(this, "btMoveUp");
+		btMoveUp.setTitle("Move Up");
+		btMoveUp.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onMoveUp();
+			} 
+		});
+		
+		btMoveDown = new ButtonControl(this, "btMoveDown");
+		btMoveDown.setTitle("Move Down");
+		btMoveDown.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onMoveDown();				
 			}
 		});
 		
@@ -140,6 +162,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		}
 		btUpdate.setTitle("Insert");
 		btDelete.setEnabled(false);
+		refreshMoveButtons();
 	}
 	
 	/**
@@ -201,7 +224,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		
 		btUpdate.setTitle("Update");
 		btDelete.setEnabled(true);
-		
+	
+		refreshMoveButtons();
 	}
 
 	/**
@@ -240,4 +264,53 @@ public class MappingElementEditorControl extends ControlContainer {
 		
 	}
 
+	/**
+	 * 
+	 */
+	protected void onMoveDown() {
+		int idx = mappingList.indexOf(currElement) + 1;
+		reindex(currElement, idx);
+		tableModel.selection(String.valueOf(idx)); // set new index selected
+		table.setRequireRedraw(true);
+		refreshMoveButtons(); // refresh buttons
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onMoveUp() {
+		int idx = mappingList.indexOf(currElement) - 1;
+		if (idx >= 0) {
+			reindex(currElement, idx);
+			tableModel.selection(String.valueOf(idx)); // set new index selected
+			table.setRequireRedraw(true);
+			refreshMoveButtons(); // refresh buttons
+		}
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void refreshMoveButtons() {
+		int idx = currElement == null ? -1 : mappingList.indexOf(currElement);
+		btMoveUp.setEnabled(currElement != null && idx > 0);
+		btMoveDown.setEnabled(currElement != null && idx + 1 < mappingList.size());
+	}
+	
+	/**
+	 * @param mapping
+	 * @param newIndex
+	 */
+	protected void reindex(DimMappingElementDef mapping, int newIndex) {
+		if (newIndex > (mappingList.size() - 1)) {
+			// simply put at the end of the list.
+			mappingList.remove(mapping);
+			mappingList.add(mapping);
+		} else {
+			mappingList.remove(mapping);
+			mappingList.add(newIndex, mapping);
+		}
+	}
 }

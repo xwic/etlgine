@@ -24,6 +24,7 @@ public class DimMappingElementDefDAO {
 	private PreparedStatement psInsert;
 	private PreparedStatement psUpdate;
 	private PreparedStatement psDeleteByDimMapKey;
+	private int orderIndex = 0;
 	
 	/**
 	 * @param connection
@@ -33,7 +34,7 @@ public class DimMappingElementDefDAO {
 		super();
 		this.connection = connection;
 		
-		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord) VALUES (?, ?, ?, ?, ?, ?)");
+		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)");
 		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP_ELEMENTS] SET Expression=?, isRegExp=?, IgnoreCase=?, ElementPath=?, SkipRecord=? WHERE ID = ?");
 		psDeleteByDimMapKey = connection.prepareStatement("DELETE FROM [XCUBE_DIMMAP_ELEMENTS] WHERE DimMapKey = ?");
 		
@@ -49,7 +50,7 @@ public class DimMappingElementDefDAO {
 		List<DimMappingElementDef> list = new ArrayList<DimMappingElementDef>(); 
 		
 		Statement stmt = connection.createStatement();
-		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord FROM XCUBE_DIMMAP_ELEMENTS";
+		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord FROM XCUBE_DIMMAP_ELEMENTS ORDER BY DimMapKey, order_index ASC";
 		ResultSet rs = stmt.executeQuery(sql);
 		while (rs.next()) {
 			DimMappingElementDef dmElm = new DimMappingElementDef();
@@ -77,7 +78,7 @@ public class DimMappingElementDefDAO {
 		
 		List<DimMappingElementDef> list = new ArrayList<DimMappingElementDef>(); 
 		
-		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord FROM XCUBE_DIMMAP_ELEMENTS WHERE DimMapKey = ?";
+		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord FROM XCUBE_DIMMAP_ELEMENTS WHERE DimMapKey = ? ORDER BY order_index ASC";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		stmt.setString(1, dimMapKey);
 		ResultSet rs = stmt.executeQuery();
@@ -137,6 +138,7 @@ public class DimMappingElementDefDAO {
 		psInsert.setBoolean(idx++, dimMapElm.isIgnoreCase());
 		psInsert.setString(idx++, dimMapElm.getElementPath());
 		psInsert.setBoolean(idx++, dimMapElm.isSkipRecord());
+		psInsert.setInt(idx++, orderIndex++);
 		int count = psInsert.executeUpdate(); 
 		if (count != 1) {
 			throw new SQLException("Error inserting DimMappingElementDef " + dimMapElm.getId() + ": Updated " + count + " but expected 1");
@@ -159,5 +161,18 @@ public class DimMappingElementDefDAO {
 		return psDeleteByDimMapKey.executeUpdate();
 		
 	}
+
+	/**
+	 * @return the orderIndex
+	 */
+	public int getOrderIndex() {
+		return orderIndex;
+	}
 	
+	/**
+	 * @param orderIndex the orderIndex to set
+	 */
+	public void setOrderIndex(int orderIndex) {
+		this.orderIndex = orderIndex;
+	}
 }

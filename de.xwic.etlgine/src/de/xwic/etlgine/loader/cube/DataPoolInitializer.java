@@ -97,7 +97,7 @@ public class DataPoolInitializer {
 		}
 		
 		/**
-		 * Ensure that the specified dimemsion element exists.
+		 * Ensure that the specified dimension element exists.
 		 * @param dimKey
 		 * @param elmPath
 		 * @return

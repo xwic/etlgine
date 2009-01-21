@@ -33,7 +33,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 	
 	private LabelControl lblParent;
 	private InputBoxControl inpKey, inpTitle, inpWeight;
-	private ButtonControl btUpdate, btDelete;
+	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown;
 	
 	private IDimensionElement editedElement = null;
 	private boolean insertMode = false;
@@ -70,6 +70,8 @@ public class DimensionEditorControl extends BaseContentContainer {
 		inpWeight.setEnabled(enabled);
 		btUpdate.setEnabled(enabled);
 		btDelete.setEnabled(enabled);
+		btMoveUp.setEnabled(enabled && !insertMode && editedElement.getIndex() > 0);
+		btMoveDown.setEnabled(enabled && !insertMode && editedElement.getIndex() + 1 < editedElement.getParent().getDimensionElements().size());
 	}
 
 	/**
@@ -111,6 +113,51 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 		
+		btMoveUp = new ButtonControl(this, "btMoveUp");
+		btMoveUp.setTitle("Move Up");
+		btMoveUp.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onMoveUp();
+			} 
+		});
+		
+		btMoveDown = new ButtonControl(this, "btMoveDown");
+		btMoveDown.setTitle("Move Down");
+		btMoveDown.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onMoveDown();				
+			}
+		});
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onMoveDown() {
+		
+		editedElement.getParent().reindex(editedElement, editedElement.getIndex() + 1);
+		table.setRequireRedraw(true);
+		setEditorEnabled(true); // refresh buttons
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onMoveUp() {
+		
+		if (editedElement.getIndex() > 0) {
+			editedElement.getParent().reindex(editedElement, editedElement.getIndex() - 1);
+			table.setRequireRedraw(true);
+			setEditorEnabled(true); // refresh buttons
+		}
 		
 	}
 

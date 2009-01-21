@@ -15,6 +15,7 @@ import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
+import de.xwic.cube.StorageException;
 import de.xwic.cube.util.JDBCSerializerUtil;
 import de.xwic.cube.webui.controls.DimensionElementSelector;
 import de.xwic.etlgine.cube.CubeHandler;
@@ -87,11 +88,36 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 
+		ButtonControl btSavePool = new ButtonControl(abar, "savePool");
+		btSavePool.setTitle("Save Datapool");
+		btSavePool.setIconEnabled(ImageLibrary.IMAGE_DATABASE_SAVE);
+		btSavePool.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onSavePool();
+			}
+		});
 		
 		loadDataPoolInfo();
 		
 	}
 	
+	/**
+	 * 
+	 */
+	protected void onSavePool() {
+
+		try {
+			dataPool.save();
+			errInfo.showWarning("DataPool saved.");
+		} catch (StorageException e) {
+			errInfo.showError(e);
+		}
+		
+	}
+
 	/**
 	 * 
 	 */

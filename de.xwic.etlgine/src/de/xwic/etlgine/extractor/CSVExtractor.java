@@ -111,7 +111,8 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 					// used by Cognos CSV reports
 					encoding = "UTF-16LE";
 				} else {
-					in.reset();
+					in.close();
+					in = new FileInputStream(fsrc.getFile());
 				}
 				fsrc.setEncoding(encoding);
 			}

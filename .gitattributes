@@ -646,6 +646,8 @@ de.xwic.etlgine/server/jetty/start.jar -text
 de.xwic.etlgine/server/jobs/Testjob.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcess.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcessChain.groovy -text
+de.xwic.etlgine/server/run.bat -text
+de.xwic.etlgine/server/setcp.bat -text
 de.xwic.etlgine/server/web/WEB-INF/jwic-setup.xml -text
 de.xwic.etlgine/server/web/WEB-INF/jwic/ctrl_vtls/info.txt -text
 de.xwic.etlgine/server/web/WEB-INF/jwic/jsp/de.jwic.tutorial.jsp.SomeControl.jsp -text

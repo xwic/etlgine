@@ -311,14 +311,25 @@ public class JDBCLoader extends AbstractLoader {
 							if (value instanceof Integer) {
 								psInsert.setInt(idx, (Integer)value);
 							} else if (value instanceof String) {
-								psInsert.setDouble(idx, Double.parseDouble((String)value));
+								String s = (String)value;
+								if (s.length() == 0) {
+									psInsert.setNull(idx, colDef.getType());
+								} else {
+									psInsert.setDouble(idx, Double.parseDouble(s));
+								}
 							} else if (value instanceof Double) {
 								psInsert.setDouble(idx, (Double)value);
 							}
 							break;							
 						case Types.TIMESTAMP:
 						case Types.DATE:
-							psInsert.setDate(idx, new java.sql.Date(((Date)value).getTime()));
+							if (value instanceof Date) {
+								psInsert.setDate(idx, new java.sql.Date(((Date)value).getTime()));
+							} else if (value instanceof String) {
+								// let database worry about the format for now
+								// TODO parse String to Date
+								psInsert.setString(idx, (String)value);
+							}
 							break;
 						case Types.TINYINT:
 							if (value instanceof Integer) {
@@ -343,6 +354,7 @@ public class JDBCLoader extends AbstractLoader {
 				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
 			}
 		} catch (SQLException se) {
+			monitor.logError("Error during INSERT record: " + record, se);
 			throw new ETLException("An SQLException occured during INSERT: " + se, se);
 		}
 		
@@ -486,5 +498,4 @@ public class JDBCLoader extends AbstractLoader {
 	public void setConnectionName(String connectionName) {
 		this.connectionName = connectionName;
 	}
-	
 }

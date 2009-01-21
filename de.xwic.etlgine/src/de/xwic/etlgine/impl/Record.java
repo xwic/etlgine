@@ -190,4 +190,12 @@ public class Record implements IRecord, Cloneable {
 	public List<IRecord> getDuplicates() {
 		return duplicates;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return data.toString();
+	}
 }

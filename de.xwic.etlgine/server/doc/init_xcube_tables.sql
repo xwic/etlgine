@@ -47,12 +47,18 @@ GO
 SET ANSI_PADDING ON
 GO
 CREATE TABLE [dbo].[XCUBE_DIMENSION_ELEMENTS](
+	[dbid] [int] IDENTITY(1,1) NOT NULL,
 	[ID] [varchar](900) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[ParentID] [varchar](900) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[DimensionKey] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Key] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Title] [varchar](255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[weight] [float] NOT NULL
+	[order_index] [int] NOT NULL DEFAULT ((0)),
+	 CONSTRAINT [PK_XCUBE_DIMENSION_ELEMENTS] PRIMARY KEY CLUSTERED 
+(
+	[dbid] ASC
+)
 ) ON [PRIMARY]
 
 GO

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+
+<project name="ETLgine" basedir="." default="build">
+	
+	<property name="buildDir" value="${basedir}/_build" />
+	<property name="classDir" value="${buildDir}/classes" />
+	<property name="buildLibDir" value="${buildDir}/lib" />
+
+	
+	<path id="xwicClasspath" >
+		<fileset dir="${basedir}/lib" includes="*.jar"/>
+		<fileset dir="${basedir}/server/jetty" includes="*.jar"/>
+		<fileset dir="${basedir}/../de.xwic.libs.common/lib" includes="*.jar"/>
+		<fileset dir="${basedir}/../org.apache.commons.logging" includes="*.jar"/>
+	</path>
+	
+	<path id="buildClasspath">
+		<fileset dir="${buildLibDir}" includes="*.jar" />
+		<path refid="xwicClasspath" />
+	</path>
+	
+	<target name="build" depends="clean,etlgine">
+		<copy todir="${buildLibDir}">
+			<path refid="xwicClasspath" />
+		</copy>
+		<delete dir="${classDir}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${buildDir}" />
+		<mkdir dir="${buildDir}"/>
+		<mkdir dir="${buildLibDir}"/>
+	</target>
+		
+	
+	<target name="make-jar">
+		<delete dir="${classDir}"/>
+		<mkdir dir="${classDir}"/>
+		<javac fork="java$$javac.exe" target="1.5" compiler="javac1.5" destdir="${classDir}" classpathref="buildClasspath">
+			<src path="${jar-sources}"/>
+		</javac>
+
+		<jar jarfile="${buildLibDir}/${jar-file}">
+			<fileset dir="${classDir}"/>
+		</jar>
+	</target>
+
+	<target name="etlgine" depends="xwic-cube-webui">
+		<antcall target="make-jar">
+			<param name="jar-file" value="xwic-etlgine.jar" />
+			<param name="jar-sources" value="${basedir}/src" />
+		</antcall>
+	</target>
+
+	<target name="xwic-cube">
+		<antcall target="make-jar">
+			<param name="jar-file" value="xwic-cube.jar" />
+			<param name="jar-sources" value="../de.xwic.cube/src" />
+		</antcall>
+	</target>
+	
+	<target name="xwic-cube-webui" depends="xwic-cube,json">
+		<antcall target="make-jar">
+			<param name="jar-file" value="xwic-cube-webui.jar" />
+			<param name="jar-sources" value="../de.xwic.cube.webui/src" />
+		</antcall>
+	</target>
+	
+	<target name="json">
+		<antcall target="make-jar">
+			<param name="jar-file" value="json.jar" />
+			<param name="jar-sources" value="../org.json/src" />
+		</antcall>
+	</target>
+	
+</project>	

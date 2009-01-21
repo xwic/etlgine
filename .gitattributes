@@ -622,6 +622,7 @@ de.xwic.cube/src_test/de/xwic/cube/SizeOptimizationTest.java -text
 de.xwic.etlgine/.classpath -text
 de.xwic.etlgine/.project -text
 de.xwic.etlgine/.settings/org.eclipse.jdt.ui.prefs -text
+de.xwic.etlgine/build.xml -text
 de.xwic.etlgine/lib/groovy-all-1.5.7.jar -text
 de.xwic.etlgine/lib/jscreen-1.0.jar -text
 de.xwic.etlgine/lib/jtds-1.2.2.jar -text

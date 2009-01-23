@@ -41,10 +41,10 @@ public class JDBCLoader extends AbstractLoader {
 	private String connectionUrl = null;
 	private String username = null;
 	private String password = null;
-	private String catalogName = null;
 	private String tablename = null;
 	private boolean autoCreateColumns = false;
 	private boolean ignoreMissingTargetColumns = false;
+	private boolean truncateTable = false;
 	
 	private Connection connection = null;
 	private PreparedStatement psInsert = null;
@@ -90,6 +90,15 @@ public class JDBCLoader extends AbstractLoader {
 			}
 		}
 		
+		if (truncateTable) {
+			try {
+				Statement stmt = connection.createStatement();
+				int rows = stmt.executeUpdate("DELETE FROM " + tablename);
+				processContext.getMonitor().logInfo("TRUNCATED TABLE " + tablename + " - " + rows + " rows have been deleted.");
+			} catch (SQLException e) {
+				throw new ETLException("Error truncating table: " + e, e);
+			}
+		}
 		
 	}
 	
@@ -123,12 +132,12 @@ public class JDBCLoader extends AbstractLoader {
 		// does the table exist?
 		try {
 			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs = metaData.getTables(catalogName, null, tablename, null);
+			ResultSet rs = metaData.getTables(connection.getCatalog(), null, tablename, null);
 			if (!rs.next()) {
 				throw new ETLException("The target table '" + tablename + "' does not exist.");
 			}
 			
-			rs = metaData.getColumns(catalogName, null, tablename, null);
+			rs = metaData.getColumns(connection.getCatalog(), null, tablename, null);
 			//dumpResultSet(rs);
 			
 			columns = new LinkedHashMap<String, DbColumnDef>();
@@ -431,17 +440,11 @@ public class JDBCLoader extends AbstractLoader {
 	}
 
 	/**
-	 * @return the catalogName
-	 */
-	public String getCatalogName() {
-		return catalogName;
-	}
-
-	/**
 	 * @param catalogName the catalogName to set
+	 * @deprecated no longer required.
 	 */
 	public void setCatalogName(String catalogName) {
-		this.catalogName = catalogName;
+		// do nothing.
 	}
 
 	/**
@@ -497,5 +500,19 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setConnectionName(String connectionName) {
 		this.connectionName = connectionName;
+	}
+
+	/**
+	 * @return the truncateTable
+	 */
+	public boolean isTruncateTable() {
+		return truncateTable;
+	}
+
+	/**
+	 * @param truncateTable the truncateTable to set
+	 */
+	public void setTruncateTable(boolean truncateTable) {
+		this.truncateTable = truncateTable;
 	}
 }

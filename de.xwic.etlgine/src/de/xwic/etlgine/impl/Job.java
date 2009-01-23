@@ -24,9 +24,11 @@ public class Job implements IJob {
 
 	private IProcessChain processChain = null;
 	private ITrigger trigger = null;
-	private Date lastRun = null;
+	private Date lastStarted = null;
+	private Date lastFinished = null;
 	private String name = null;
 	private boolean executing = false;
+	private boolean disabled = false;
 	private String chainScriptName = null; 
 	
 	private State state = State.NEW;
@@ -49,6 +51,8 @@ public class Job implements IJob {
 			throw new ETLException("The job is already beeing executed.");
 		}
 		executing = true;
+		lastStarted = new Date();
+		state = State.RUNNING;
 		try {
 			if (processChain == null) {
 				if (chainScriptName == null) {
@@ -68,7 +72,7 @@ public class Job implements IJob {
 			throw new ETLException("Error executing job: " + t, t);
 		} finally {
 			executing = false;
-			lastRun = new Date();
+			lastFinished = new Date();
 			processChain = null;
 		}
 	}
@@ -149,8 +153,8 @@ public class Job implements IJob {
 	/**
 	 * @return the lastRun
 	 */
-	public Date getLastRun() {
-		return lastRun;
+	public Date getLastFinished() {
+		return lastFinished;
 	}
 
 	/**
@@ -193,6 +197,31 @@ public class Job implements IJob {
 	 */
 	public void setLastException(Throwable lastException) {
 		this.lastException = lastException;
+	}
+
+	/**
+	 * @return the lastStarted
+	 */
+	public Date getLastStarted() {
+		return lastStarted;
+	}
+
+	/**
+	 * A disabled job is not scheduled, even if the trigger is due. A manual execution
+	 * is still possible.
+	 * @return the disabled
+	 */
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	/**
+	 * A disabled job is not scheduled, even if the trigger is due. A manual execution
+	 * is still possible.
+	 * @param disabled the disabled to set
+	 */
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
 	}
 	
 }

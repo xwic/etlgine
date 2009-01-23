@@ -14,6 +14,8 @@ import de.jwic.ecolib.tableviewer.TableColumn;
 import de.jwic.ecolib.tableviewer.TableModel;
 import de.jwic.ecolib.tableviewer.TableViewer;
 import de.jwic.ecolib.tableviewer.defaults.ListContentProvider;
+import de.jwic.events.ElementSelectedEvent;
+import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.IJob;
@@ -29,6 +31,7 @@ public class JobAdminControl extends BaseContentContainer {
 
 	private TableViewer table;
 	private ButtonControl btRun;
+	private ButtonControl btViewJob;
 	private List<IJob> jobList;
 	private ErrorWarningControl errInfo;
 	
@@ -60,10 +63,25 @@ public class JobAdminControl extends BaseContentContainer {
 		
 		TableModel model = table.getModel();
 		model.setSelectionMode(TableModel.SELECTION_SINGLE);
-		model.addColumn(new TableColumn("Job Name", 300, "name"));
-		model.addColumn(new TableColumn("Last Run", 120, "lastRun"));
-		model.addColumn(new TableColumn("State", 100, "state"));
+		model.addColumn(new TableColumn("Job Name", 500, "name"));
+		model.addColumn(new TableColumn("Finished", 120, "lastFinish"));
+		model.addColumn(new TableColumn("State", 150, "state"));
 		
+		model.addElementSelectedListener(new ElementSelectedListener() {
+			public void elementSelected(ElementSelectedEvent event) {
+				updateButtons();
+			}
+		});
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void updateButtons() {
+		boolean selected = table.getModel().getFirstSelectedKey() != null && table.getModel().getFirstSelectedKey().length() != 0;
+		btRun.setEnabled(selected);
+		btViewJob.setEnabled(selected);
 	}
 
 	/**
@@ -81,7 +99,7 @@ public class JobAdminControl extends BaseContentContainer {
 		});
 
 		btRun = new ButtonControl(abar, "btRun");
-		btRun.setIconEnabled(ImageLibrary.IMAGE_APP_GO);
+		btRun.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_GO);
 		btRun.setTitle("Run Job");
 		btRun.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {
@@ -98,6 +116,24 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 
+		btViewJob = new ButtonControl(abar);
+		btViewJob.setIconEnabled(ImageLibrary.IMAGE_ZOOM);
+		btViewJob.setTitle("View Job");
+		btViewJob.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onViewJob();
+			}
+		});
+
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onViewJob() {
+		
+			
 		
 	}
 
@@ -122,7 +158,8 @@ public class JobAdminControl extends BaseContentContainer {
 				errInfo.showError("The selected job is currently executing.");
 			} else {
 				ETLgineServer.getInstance().enqueueJob(job);
-				errInfo.showWarning("The job has been enqueued");
+				//errInfo.showWarning("The job has been enqueued");
+				table.setRequireRedraw(true);
 			}
 		}
 	}

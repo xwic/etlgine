@@ -4,8 +4,8 @@
 
 	<name>ETLgineAdmin</name>
 	<class>de.xwic.etlgine.server.admin.AdminApplication</class>
+	<serializable>false</serializable>
 	<singlesession>true</singlesession>
 	<requireauth>false</requireauth>
-	<serializable>false</serializable>
 	
 </application>

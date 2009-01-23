@@ -647,6 +647,7 @@ de.xwic.etlgine/server/jetty/start.jar -text
 de.xwic.etlgine/server/jobs/Testjob.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcess.groovy -text
 de.xwic.etlgine/server/jobs/Testjob/DummyProcessChain.groovy -text
+de.xwic.etlgine/server/jobs/Testjob_error.groovy -text
 de.xwic.etlgine/server/run.bat -text
 de.xwic.etlgine/server/setcp.bat -text
 de.xwic.etlgine/server/web/WEB-INF/jwic-setup.xml -text
@@ -881,6 +882,7 @@ de.xwic.etlgine/server/web/img/application_go.png -text
 de.xwic.etlgine/server/web/img/arrow_refresh.png -text
 de.xwic.etlgine/server/web/img/backfade.png -text
 de.xwic.etlgine/server/web/img/bricks.png -text
+de.xwic.etlgine/server/web/img/control_pause.png -text
 de.xwic.etlgine/server/web/img/database.png -text
 de.xwic.etlgine/server/web/img/database_lightning.png -text
 de.xwic.etlgine/server/web/img/database_save.png -text
@@ -889,6 +891,14 @@ de.xwic.etlgine/server/web/img/headerfade4.png -text
 de.xwic.etlgine/server/web/img/pencil.png -text
 de.xwic.etlgine/server/web/img/report.png -text
 de.xwic.etlgine/server/web/img/script.png -text
+de.xwic.etlgine/server/web/img/script_add.png -text
+de.xwic.etlgine/server/web/img/script_code_red.png -text
+de.xwic.etlgine/server/web/img/script_delete.png -text
+de.xwic.etlgine/server/web/img/script_edit.png -text
+de.xwic.etlgine/server/web/img/script_error.png -text
+de.xwic.etlgine/server/web/img/script_gear.png -text
+de.xwic.etlgine/server/web/img/script_go.png -text
+de.xwic.etlgine/server/web/img/script_lightning.png -text
 de.xwic.etlgine/server/web/img/table.png -text
 de.xwic.etlgine/server/web/img/table_add.png -text
 de.xwic.etlgine/server/web/img/table_delete.png -text
@@ -896,6 +906,7 @@ de.xwic.etlgine/server/web/img/table_edit.png -text
 de.xwic.etlgine/server/web/img/table_relationship.png -text
 de.xwic.etlgine/server/web/img/table_save.png -text
 de.xwic.etlgine/server/web/img/timeline_marker.png -text
+de.xwic.etlgine/server/web/img/zoom.png -text
 de.xwic.etlgine/server/web/index.html -text
 de.xwic.etlgine/server/web/jwic.page -text
 de.xwic.etlgine/server/web/jwic/blank.html -text
@@ -998,6 +1009,7 @@ de.xwic.etlgine/server/web/xwiccube/json2.js -text
 de.xwic.etlgine/server/web/xwiccube/xwiccube.css -text
 de.xwic.etlgine/server/web/xwiccube/xwiccube.js -text
 de.xwic.etlgine/server/xcube/ETLpoolInit.groovy -text
+de.xwic.etlgine/server/xcube/etl.datapool -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractTransformer.java -text

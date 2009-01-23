@@ -36,7 +36,7 @@ public interface IJob {
 	 * Returns the date when the job was executed the last time.
 	 * @return
 	 */
-	public abstract Date getLastRun();
+	public abstract Date getLastFinished();
 
 	/**
 	 * Returns the name of the job.
@@ -87,5 +87,24 @@ public interface IJob {
 	 * @return the lastException
 	 */
 	public Throwable getLastException();
+
+	/**
+	 * @return the lastStarted
+	 */
+	public Date getLastStarted();
+
+	/**
+	 * A disabled job is not scheduled, even if the trigger is due. A manual execution
+	 * is still possible.
+	 * @return the disabled
+	 */
+	public boolean isDisabled();
+
+	/**
+	 * A disabled job is not scheduled, even if the trigger is due. A manual execution
+	 * is still possible.
+	 * @param disabled the disabled to set
+	 */
+	public void setDisabled(boolean disabled);
 
 }

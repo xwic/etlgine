@@ -10,6 +10,7 @@ import de.jwic.ecolib.tableviewer.ITableLabelProvider;
 import de.jwic.ecolib.tableviewer.RowContext;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.server.admin.ImageLibrary;
 
 /**
  * @author Developer
@@ -25,15 +26,53 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 		IJob job = (IJob)row;
 		if ("name".equals(column.getUserObject())) {
 			cell.text = job.getName();
-		} else if ("lastRun".equals(column.getUserObject())) {
-			if (job.getLastRun() != null) {
+			if (job.isDisabled() && !job.isExecuting()) {
+				cell.image = ImageLibrary.IMAGE_CONTROL_PAUSE;
+			} else {
+				switch (job.getState()) {
+				case ENQUEUED:
+					cell.image = ImageLibrary.IMAGE_SCRIPT_GEAR;
+					break;
+				case RUNNING:
+					cell.image = ImageLibrary.IMAGE_SCRIPT_LIGHTNING;
+					break;
+				case FINISHED_WITH_ERROR:
+					cell.image = ImageLibrary.IMAGE_SCRIPT_ERROR;
+					break;
+				case ERROR:
+					cell.image = ImageLibrary.IMAGE_SCRIPT_RED;
+					break;
+				default:
+					cell.image = ImageLibrary.IMAGE_SCRIPT;
+					break;
+				}
+			}
+		} else if ("lastFinish".equals(column.getUserObject())) {
+			if (job.getLastFinished() != null) {
 				DateFormat df = DateFormat.getDateTimeInstance();
-				cell.text = df.format(job.getLastRun());
+				cell.text = df.format(job.getLastFinished());
 			} else {
 				cell.text = "never";
 			}
 		} else if ("state".equals(column.getUserObject())) {
-			cell.text = job.getState().name();
+			IJob.State state = job.getState();
+			cell.text = state.name();
+			if (state == IJob.State.RUNNING) {
+				long duration = System.currentTimeMillis() - job.getLastStarted().getTime();
+				int ms = (int)(duration % 1000);
+				int sec = (int)((duration / 1000) % 60);
+				int min = (int)(duration / 60000);
+				cell.text = cell.text + " (" + min + "m " + sec + "s " + ms + "ms)";
+			} else if (state == IJob.State.FINISHED || state == IJob.State.FINISHED_WITH_ERROR) {
+				long duration = job.getLastFinished().getTime() - job.getLastStarted().getTime();
+				int ms = (int)(duration % 1000);
+				int sec = (int)((duration / 1000) % 60);
+				int min = (int)(duration / 60000);
+				cell.text = cell.text + " (" + min + "m " + sec + "s " + ms + "ms)";
+				
+			}
+			
+			
 		}
 		return cell;
 	}

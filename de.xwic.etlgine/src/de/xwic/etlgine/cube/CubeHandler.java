@@ -170,7 +170,7 @@ public class CubeHandler {
 				
 				return dataPool;
 			} catch (StorageException e) {
-				throw new ETLException("Error opening DataPool " + dataPoolManagerKey + " / " + key);
+				throw new ETLException("Error opening DataPool " + dataPoolManagerKey + " / " + key, e);
 			}
 		}
 		throw new ETLException("A DataPool for this manager is not available.");

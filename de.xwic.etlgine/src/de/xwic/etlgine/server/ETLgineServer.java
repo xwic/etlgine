@@ -188,10 +188,8 @@ public class ETLgineServer implements Runnable {
 			try {
 				log.info("Loading Job " + jobName + " from file " + scriptName);
 				serverContext.loadJob(jobName, scriptName);
-			} catch (Exception e) {
-				log.error("An log.error occured during loading of the job " + scriptName + ": " + e);
-				e.printStackTrace();
-				return false;
+			} catch (Throwable e) {
+				log.error("An error occured during loading of the job " + scriptName + ": " + e, e);
 			}
 		}
 

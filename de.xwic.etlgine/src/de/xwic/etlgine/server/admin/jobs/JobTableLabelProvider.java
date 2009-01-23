@@ -32,6 +32,8 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 			} else {
 				cell.text = "never";
 			}
+		} else if ("state".equals(column.getUserObject())) {
+			cell.text = job.getState().name();
 		}
 		return cell;
 	}

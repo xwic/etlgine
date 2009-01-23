@@ -877,6 +877,8 @@ de.xwic.etlgine/server/web/ecolib/treeviewer/treeviewer.js -text
 de.xwic.etlgine/server/web/etladmin.css -text
 de.xwic.etlgine/server/web/img/Thumbs.db -text
 de.xwic.etlgine/server/web/img/add.png -text
+de.xwic.etlgine/server/web/img/application_go.png -text
+de.xwic.etlgine/server/web/img/arrow_refresh.png -text
 de.xwic.etlgine/server/web/img/backfade.png -text
 de.xwic.etlgine/server/web/img/bricks.png -text
 de.xwic.etlgine/server/web/img/database.png -text
@@ -996,7 +998,6 @@ de.xwic.etlgine/server/web/xwiccube/json2.js -text
 de.xwic.etlgine/server/web/xwiccube/xwiccube.css -text
 de.xwic.etlgine/server/web/xwiccube/xwiccube.js -text
 de.xwic.etlgine/server/xcube/ETLpoolInit.groovy -text
-de.xwic.etlgine/server/xcube/etl.datapool -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractTransformer.java -text

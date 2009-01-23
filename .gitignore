@@ -2,3 +2,4 @@ de.xwic.cube.webui.samples/web_root/WEB-INF/*.log.?
 de.xwic.cube.webui.samples/web_root/WEB-INF/sessions
 de.xwic.cube/data
 de.xwic.etlgine/doc
+de.xwic.etlgine/server/web/WEB-INF/*.log.?

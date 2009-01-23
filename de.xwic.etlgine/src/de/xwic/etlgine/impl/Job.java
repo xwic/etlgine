@@ -29,6 +29,9 @@ public class Job implements IJob {
 	private boolean executing = false;
 	private String chainScriptName = null; 
 	
+	private State state = State.NEW;
+	private Throwable lastException = null;
+	
 	/**
 	 * @param name
 	 */
@@ -54,6 +57,15 @@ public class Job implements IJob {
 				loadChainFromScript(context);
 			}
 			processChain.start();
+			state = State.FINISHED;
+		} catch (ETLException ee) {
+			state = State.ERROR;
+			lastException = ee;
+			throw ee;
+		} catch (Throwable t) {
+			state = State.ERROR;
+			lastException = t;
+			throw new ETLException("Error executing job: " + t, t);
 		} finally {
 			executing = false;
 			lastRun = new Date();
@@ -153,6 +165,34 @@ public class Job implements IJob {
 	 */
 	public void setChainScriptName(String chainScriptName) {
 		this.chainScriptName = chainScriptName;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public State getState() {
+		return state;
+	}
+
+	/**
+	 * @param state the state to set
+	 */
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	/**
+	 * @return the lastException
+	 */
+	public Throwable getLastException() {
+		return lastException;
+	}
+
+	/**
+	 * @param lastException the lastException to set
+	 */
+	public void setLastException(Throwable lastException) {
+		this.lastException = lastException;
 	}
 	
 }

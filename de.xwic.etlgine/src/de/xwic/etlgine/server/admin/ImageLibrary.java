@@ -11,10 +11,12 @@ import de.jwic.base.ImageRef;
  */
 public class ImageLibrary {
 
+	public static final ImageRef IMAGE_APP_GO = new ImageRef("img/application_go.png");
 	public static final ImageRef IMAGE_DATABASE = new ImageRef("img/database.png");
 	public static final ImageRef IMAGE_DATABASE_SAVE = new ImageRef("img/database_save.png");
 	public static final ImageRef IMAGE_DATABASE_INIT = new ImageRef("img/database_lightning.png");
 	public static final ImageRef IMAGE_REPORT = new ImageRef("img/report.png");
+	public static final ImageRef IMAGE_REFRESH = new ImageRef("img/arrow_refresh.png");
 	public static final ImageRef IMAGE_SCRIPT = new ImageRef("img/script.png");
 	public static final ImageRef IMAGE_RETURN = new ImageRef("img/door_out.png");
 	public static final ImageRef IMAGE_COLUMN = new ImageRef("img/timeline_marker.png");

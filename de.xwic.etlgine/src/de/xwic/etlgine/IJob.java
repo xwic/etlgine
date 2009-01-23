@@ -11,6 +11,15 @@ import java.util.Date;
  */
 public interface IJob {
 
+	public enum State {
+		NEW,
+		ENQUEUED,
+		RUNNING,
+		FINISHED,
+		FINISHED_WITH_ERROR,
+		ERROR		
+	}
+	
 	/**
 	 * Returns true if the job is currently executed.
 	 * @return
@@ -68,5 +77,15 @@ public interface IJob {
 	 * @param chainScriptName the chainScriptName to set
 	 */
 	public void setChainScriptName(String chainScriptName);
+
+	/**
+	 * @return the state
+	 */
+	public State getState();
+
+	/**
+	 * @return the lastException
+	 */
+	public Throwable getLastException();
 
 }

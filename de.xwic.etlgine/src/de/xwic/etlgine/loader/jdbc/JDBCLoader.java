@@ -4,6 +4,7 @@
 package de.xwic.etlgine.loader.jdbc;
 
 import java.sql.Connection;
+import java.sql.DataTruncation;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -45,6 +46,7 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean autoCreateColumns = false;
 	private boolean ignoreMissingTargetColumns = false;
 	private boolean truncateTable = false;
+	private boolean autoDataTruncate = false;
 	
 	private Connection connection = null;
 	private PreparedStatement psInsert = null;
@@ -304,9 +306,15 @@ public class JDBCLoader extends AbstractLoader {
 						case Types.VARCHAR:
 						case Types.CHAR:
 						case Types.LONGVARCHAR:
-						case -9: //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
-							psInsert.setString(idx, value.toString());
+						case -9: { //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
+							String s = value.toString();
+							if (autoDataTruncate && s.length() > colDef.getSize()) {
+								monitor.logWarn("Truncate value for column '" + colDef.getName() + "' from " + s.length() + " to " + colDef.getSize() + " character");
+								s = s.substring(0, colDef.getSize());
+							}
+							psInsert.setString(idx, s);
 							break;
+						}
 						case Types.INTEGER:
 						case Types.BIGINT:
 							if (value instanceof Integer) {
@@ -362,9 +370,22 @@ public class JDBCLoader extends AbstractLoader {
 			if (count != 1) {
 				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
 			}
+		} catch (DataTruncation dt) {
+			monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, dt);
+			// log field value lengths
+			for (DbColumnDef colDef : columns.values()) {
+				if (colDef.getColumn() != null) {
+					Object value = record.getData(colDef.getColumn());
+					if (value == null) {
+						continue;
+					}
+					monitor.logInfo(colDef.getName() + ":(" + value.toString().length() + ")=" + value);
+				}
+			}
+			throw new ETLException("A Data Truncation occured during INSERT.", dt);
 		} catch (SQLException se) {
 			monitor.logError("Error during INSERT record: " + record, se);
-			throw new ETLException("An SQLException occured during INSERT: " + se, se);
+			throw new ETLException("A SQLException occured during INSERT: " + se, se);
 		}
 		
 	}
@@ -501,7 +522,7 @@ public class JDBCLoader extends AbstractLoader {
 	public void setConnectionName(String connectionName) {
 		this.connectionName = connectionName;
 	}
-
+	
 	/**
 	 * @return the truncateTable
 	 */
@@ -514,5 +535,19 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setTruncateTable(boolean truncateTable) {
 		this.truncateTable = truncateTable;
+	}
+	
+	/**
+	 * @return the autoDataTruncate
+	 */
+	public boolean isAutoDataTruncate() {
+		return autoDataTruncate;
+	}
+	
+	/**
+	 * @param autoDataTruncate the autoDataTruncate to set
+	 */
+	public void setAutoDataTruncate(boolean autoDataTruncate) {
+		this.autoDataTruncate = autoDataTruncate;
 	}
 }

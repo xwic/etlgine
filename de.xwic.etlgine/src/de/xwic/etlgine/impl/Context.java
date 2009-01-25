@@ -118,14 +118,10 @@ public abstract class Context implements IContext {
 		return value;
 	}
 
-	/**
-	 * Returns the parentContext if instance of Context. 
-	 * @return
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IContext#getParentContext()
 	 */
-	public Context getParentContext() {
-		if (parentContext instanceof Context) {
-			return (Context)parentContext;
-		}
-		return null;
+	public IContext getParentContext() {
+		return parentContext;
 	}
 }

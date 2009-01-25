@@ -66,4 +66,9 @@ public interface IContext {
 	 */
 	public Object getData(String name, Object defaultObject);
 
+	/**
+	 * Returns the parentContext if instance of Context. 
+	 * @return
+	 */
+	public IContext getParentContext();
 }

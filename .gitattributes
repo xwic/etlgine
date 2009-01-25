@@ -1034,6 +1034,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/ISource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeHandler.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/cube/DefaultCubeHandler.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDefDAO.java -text
@@ -1054,6 +1055,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/impl/Job.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Process.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ProcessChain.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ProcessContext.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/impl/PropertyFileContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Record.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/jdbc/DbColumnDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/jdbc/JDBCUtil.java -text

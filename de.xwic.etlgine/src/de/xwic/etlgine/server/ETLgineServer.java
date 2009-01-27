@@ -86,6 +86,9 @@ public class ETLgineServer implements Runnable {
 				}
 			}
 			
+			// check triggers
+			checkTriggers();
+			
 			try {
 				Thread.sleep(SLEEP_TIME);
 			} catch (InterruptedException e) {
@@ -108,6 +111,21 @@ public class ETLgineServer implements Runnable {
 		
 	}
 	
+	/**
+	 * 
+	 */
+	private void checkTriggers() {
+
+		for (IJob job : serverContext.getJobs()) {
+			if (!job.isDisabled() && !job.isExecuting() && !(job.getState() == IJob.State.ENQUEUED)) {
+				if (job.getTrigger() != null && job.getTrigger().isDue()) {
+					enqueueJob(job);
+				}
+			}
+		}
+		
+	}
+
 	/**
 	 * Add the job to the default execution queue.
 	 * @param job

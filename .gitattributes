@@ -889,6 +889,7 @@ de.xwic.etlgine/server/web/img/database_lightning.png -text
 de.xwic.etlgine/server/web/img/database_save.png -text
 de.xwic.etlgine/server/web/img/door_out.png -text
 de.xwic.etlgine/server/web/img/headerfade4.png -text
+de.xwic.etlgine/server/web/img/page_excel.png -text
 de.xwic.etlgine/server/web/img/pencil.png -text
 de.xwic.etlgine/server/web/img/report.png -text
 de.xwic.etlgine/server/web/img/script.png -text
@@ -1010,7 +1011,6 @@ de.xwic.etlgine/server/web/xwiccube/json2.js -text
 de.xwic.etlgine/server/web/xwiccube/xwiccube.css -text
 de.xwic.etlgine/server/web/xwiccube/xwiccube.js -text
 de.xwic.etlgine/server/xcube/ETLpoolInit.groovy -text
-de.xwic.etlgine/server/xcube/etl.datapool -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/AbstractTransformer.java -text
@@ -1109,10 +1109,17 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/MappingEditorControl.v
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/MappingElementEditorControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/MappingElementEditorControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/MappingElementTableLabelProvider.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/XlsDownloadControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/XlsDownloadControl.vtl -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/XlsTemplateTestControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/XlsTemplateTestControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobAdminControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobAdminControl.vtl -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/util/Validate.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/CubeLoaderTest.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/JDBCTest.java -text

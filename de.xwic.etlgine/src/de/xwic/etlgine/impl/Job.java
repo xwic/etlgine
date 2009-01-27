@@ -53,6 +53,9 @@ public class Job implements IJob {
 		executing = true;
 		lastStarted = new Date();
 		state = State.RUNNING;
+		if (trigger != null) {
+			trigger.notifyJobStarted();
+		}
 		try {
 			if (processChain == null) {
 				if (chainScriptName == null) {
@@ -74,6 +77,9 @@ public class Job implements IJob {
 			executing = false;
 			lastFinished = new Date();
 			processChain = null;
+			if (trigger != null) {
+				trigger.notifyJobFinished(state == State.ERROR);
+			}
 		}
 	}
 
@@ -222,6 +228,14 @@ public class Job implements IJob {
 	 */
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IJob#notifyEnqueued()
+	 */
+	public void notifyEnqueued() {
+		state = State.ENQUEUED;
+		
 	}
 	
 }

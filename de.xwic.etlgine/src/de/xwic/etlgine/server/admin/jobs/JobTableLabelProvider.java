@@ -11,6 +11,7 @@ import de.jwic.ecolib.tableviewer.RowContext;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.server.admin.ImageLibrary;
+import de.xwic.etlgine.trigger.ScheduledTrigger;
 
 /**
  * @author Developer
@@ -71,7 +72,17 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 				cell.text = cell.text + " (" + min + "m " + sec + "s " + ms + "ms)";
 				
 			}
-			
+		
+		} else if ("nextRun".equals(column.getUserObject())) {
+			cell.text = "-";
+			if (job.getTrigger() != null) {
+				if (job.getTrigger() instanceof ScheduledTrigger) {
+					ScheduledTrigger st = (ScheduledTrigger)job.getTrigger();
+					if (st.getNextStart() != null) {
+						cell.text = DateFormat.getDateTimeInstance().format(st.getNextStart());
+					}
+				}
+			}
 			
 		}
 		return cell;

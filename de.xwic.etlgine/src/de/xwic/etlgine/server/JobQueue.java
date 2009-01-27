@@ -47,6 +47,7 @@ public class JobQueue implements Runnable {
 	 */
 	public void addJob(IJob job) {
 		if (!queue.contains(job)) {
+			job.notifyEnqueued();
 			log.debug("Adding job " + job.getName() + " to queue " + name);
 			queue.add(job);
 			myThread.interrupt();

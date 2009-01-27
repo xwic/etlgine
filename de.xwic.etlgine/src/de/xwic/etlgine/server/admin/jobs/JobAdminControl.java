@@ -22,6 +22,7 @@ import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.admin.BaseContentContainer;
 import de.xwic.etlgine.server.admin.ImageLibrary;
+import de.xwic.etlgine.server.admin.StackedContentContainer;
 
 /**
  * @author Developer
@@ -63,9 +64,10 @@ public class JobAdminControl extends BaseContentContainer {
 		
 		TableModel model = table.getModel();
 		model.setSelectionMode(TableModel.SELECTION_SINGLE);
-		model.addColumn(new TableColumn("Job Name", 500, "name"));
-		model.addColumn(new TableColumn("Finished", 120, "lastFinish"));
+		model.addColumn(new TableColumn("Job Name", 450, "name"));
 		model.addColumn(new TableColumn("State", 150, "state"));
+		model.addColumn(new TableColumn("Finished", 130, "lastFinish"));
+		model.addColumn(new TableColumn("Next Run", 130, "nextRun"));
 		
 		model.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
@@ -133,7 +135,15 @@ public class JobAdminControl extends BaseContentContainer {
 	 */
 	protected void onViewJob() {
 		
-			
+		String selection = table.getModel().getFirstSelectedKey();
+		if (selection != null) {
+			int idx = Integer.parseInt(selection);
+			IJob job = jobList.get(idx);
+			StackedContentContainer sc = (StackedContentContainer)getContainer();
+			JobDetailsControl jobDetails = new JobDetailsControl (sc, "jd", job);
+			sc.setCurrentControlName(jobDetails.getName());
+		}
+
 		
 	}
 

@@ -1,0 +1,36 @@
+$insert.control("actionBar")
+#set($job = $control.job)
+<div class="detailView">
+<h3>$job.name</h3>
+
+<table width="100%">
+	<tr>
+		<td width="120">State</td>
+		<td>$job.state</td>
+	</tr>
+	<tr>
+		<td>Last Started</td>
+		<td>$jwic.formatDateTime($job.lastStarted)</td>
+	</tr>
+	<tr>
+		<td>Last Finished</td>
+		<td>$jwic.formatDateTime($job.lastFinished)</td>
+	</tr>
+	<tr>
+		<td>Disabled</td>
+		<td>$job.disabled</td>
+	</tr>
+	<tr>
+		<td>Executing</td>
+		<td>$job.executing</td>
+	</tr>
+	<tr>
+		<td>Chain Script Name</td>
+		<td>$job.chainScriptName</td>
+	</tr>
+	<tr>
+		<td>Last Exception</td>
+		<td><textarea style="width: 100%; height: 80px">$!jwic.formatInp($!job.lastException.toString())</textarea></td>
+	</tr>
+</table>
+</div>

@@ -26,6 +26,8 @@ public class ImageLibrary {
 	public static final ImageRef IMAGE_SCRIPT_GEAR = new ImageRef("img/script_gear.png");
 	public static final ImageRef IMAGE_SCRIPT_LIGHTNING = new ImageRef("img/script_lightning.png");
 	
+	public static final ImageRef IMAGE_PAGE_EXCEL = new ImageRef("img/page_excel.png");
+	
 	public static final ImageRef IMAGE_RETURN = new ImageRef("img/door_out.png");
 	public static final ImageRef IMAGE_COLUMN = new ImageRef("img/timeline_marker.png");
 	public static final ImageRef IMAGE_BRICKS = new ImageRef("img/bricks.png");

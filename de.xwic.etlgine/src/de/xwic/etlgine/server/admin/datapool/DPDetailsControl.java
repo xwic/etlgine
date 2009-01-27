@@ -99,11 +99,36 @@ public class DPDetailsControl extends BaseContentContainer {
 				onSavePool();
 			}
 		});
+
+		ButtonControl btXlsTest = new ButtonControl(abar);
+		btXlsTest.setTitle("Test XLS Template");
+		btXlsTest.setIconEnabled(ImageLibrary.IMAGE_PAGE_EXCEL);
+		btXlsTest.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onXlsTest();
+			}
+		});
+
 		
 		loadDataPoolInfo();
 		
 	}
 	
+	/**
+	 * 
+	 */
+	protected void onXlsTest() {
+
+		StackedContentContainer sc = (StackedContentContainer)getContainer();
+		XlsTemplateTestControl xlsTest = new XlsTemplateTestControl(sc, null, dataPool);
+		sc.setCurrentControlName(xlsTest.getName());		
+		
+		
+	}
+
 	/**
 	 * 
 	 */

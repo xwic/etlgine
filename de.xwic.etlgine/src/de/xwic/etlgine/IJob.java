@@ -107,4 +107,9 @@ public interface IJob {
 	 */
 	public void setDisabled(boolean disabled);
 
+	/**
+	 * Invoked when the job was enqueued.
+	 */
+	public abstract void notifyEnqueued();
+
 }

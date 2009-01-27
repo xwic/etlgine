@@ -1,0 +1,21 @@
+$insert.control("actionBar")
+$insert.control("errInfo")
+<div class="detailView">
+<p>Upload an Excel 97-2003 .xls file to be filled with data from the current datapool. You may set global
+filters for the specified template.<br><br></p>
+<h4>Filter</h4>
+<p>
+<table>
+	#foreach($dim in $control.dimensions)
+		<tr>
+			<td>$dim.key</td>
+			<td>$insert.control($control.getDimCtrlId($dim.key))</td>
+		</tr>
+	#end
+</table>
+<br>
+</p>
+<p>Select Template $insert.control("fileUpload")<br>$insert.control("btTest")</p>
+<p>&nbsp;</p>
+<p>$insert.control("download")</p>
+</div>

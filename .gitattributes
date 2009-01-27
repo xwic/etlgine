@@ -369,6 +369,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserConfigXmlReader.java
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserListConverter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/IPicklistEntryControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryByIndexComparator.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryCheckboxControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryComparator.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryRadioGroupControl.java -text

@@ -577,6 +577,15 @@ de.xwic.cube.webui/web/xwiccube/images/right_i.gif -text
 de.xwic.cube.webui/web/xwiccube/json2.js -text
 de.xwic.cube.webui/web/xwiccube/xwiccube.css -text
 de.xwic.cube.webui/web/xwiccube/xwiccube.js -text
+de.xwic.cube.xlsbridge/.classpath -text
+de.xwic.cube.xlsbridge/.project -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/AbstractFunction.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/CubeToExcel.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/FilterInfoFunction.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/ISimpleLog.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/Match.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/SetConfigFunction.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/XCValueFunction.java -text
 de.xwic.cube/.classpath -text
 de.xwic.cube/.cvsignore -text
 de.xwic.cube/.project -text

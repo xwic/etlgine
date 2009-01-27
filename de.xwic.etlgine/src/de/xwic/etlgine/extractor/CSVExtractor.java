@@ -21,7 +21,7 @@ import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.sources.FileSource;
 
 /**
- * Extract data from a CSV file.
+ * Extract data from a CSV file using OpenCSV Reader.
  * @author lippisch
  */
 public class CSVExtractor extends AbstractExtractor implements IExtractor {

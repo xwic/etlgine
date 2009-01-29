@@ -6,6 +6,7 @@ package de.xwic.etlgine.impl;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IMonitor;
+import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;

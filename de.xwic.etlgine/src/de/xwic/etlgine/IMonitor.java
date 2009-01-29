@@ -41,5 +41,5 @@ public interface IMonitor {
 	 * @param e
 	 */
 	public void logError(String string, Throwable t);
-	
+
 }

@@ -33,6 +33,13 @@ public interface IColumn {
 	public abstract int getSourceIndex();
 
 	/**
+	 * Set the source index.
+	 * @param sourceIndex
+	 * @return
+	 */
+	public abstract void setSourceIndex(int sourceIndex);
+	
+	/**
 	 * @return the exclude
 	 */
 	public boolean isExclude();

@@ -5,8 +5,10 @@ package de.xwic.etlgine.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
@@ -23,6 +25,7 @@ public class Record implements IRecord, Cloneable {
 	protected boolean skip = false;
 	protected String invalidReason = null;
 	protected Map<IColumn, Object> data = new HashMap<IColumn, Object>();
+	protected Set<IColumn> changedColumns = new HashSet<IColumn>();
 	protected List<IRecord> duplicates = new ArrayList<IRecord>();
 	
 	/**
@@ -38,6 +41,16 @@ public class Record implements IRecord, Cloneable {
 	 * @param value
 	 */
 	public void setData(IColumn column, Object value) {
+		if (data.containsKey(column) && !changedColumns.contains(column)) {
+			Object oldValue = data.get(column);
+			if (!(oldValue == null && value == null)) {
+				if (oldValue == null || value == null) {
+					changedColumns.add(column);
+				} else if (!oldValue.equals(value)) {
+					changedColumns.add(column);
+				}
+			}
+		}
 		data.put(column, value);
 	}
 	
@@ -50,6 +63,26 @@ public class Record implements IRecord, Cloneable {
 	public void setData(String columnName, Object value) throws ETLException {
 		IColumn column = dataSet.getColumn(columnName);
 		setData(column, value);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#isChanged(de.xwic.etlgine.IColumn)
+	 */
+	public boolean isChanged(IColumn column) throws ETLException {
+		return changedColumns.contains(column);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#isChanged(java.lang.String)
+	 */
+	public boolean isChanged(String columnName) throws ETLException {
+		return changedColumns.contains(dataSet.getColumn(columnName));
+	}
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#resetChangeFlag()
+	 */
+	public void resetChangeFlag() {
+		changedColumns.clear();		
 	}
 	
 	/**

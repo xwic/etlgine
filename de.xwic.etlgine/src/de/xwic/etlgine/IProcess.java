@@ -1,47 +1,27 @@
-/*
- * de.xwic.etlgine.IETLProcess 
+/**
+ * 
  */
 package de.xwic.etlgine;
 
 import java.util.List;
 
-
 /**
- * Defines the whole process of extracting, transformation and loading.
- * An ETL process has one IExtractor, none to many ITransformer and one
- * to many ILoader.
- * 
- * 
+ * A process is sequentially executed within a IProcessChain. 
  * @author lippisch
  */
 public interface IProcess {
 
 	/**
-	 * @return the extractor
-	 */
-	public IExtractor getExtractor();
-
-	/**
-	 * @param extractor the IExtractor to set
-	 */
-	public void setExtractor(IExtractor extractor);
-
-	/**
 	 * Start the process. Usualy this method is invoked from the IProcessChain.
 	 */
-	public void start() throws ETLException;
-
+	public Result start() throws ETLException;
+	
 	/**
-	 * Add a source.
-	 * @param source
-	 */
-	public void addSource(ISource source);
-
-	/**
-	 * Returns the list of specified sources.
+	 * After the process has been finished, the result is returned. If the process.start()
+	 * method was never called, the result is NULL.
 	 * @return
 	 */
-	public List<ISource> getSources();
+	public Result getResult();
 
 	/**
 	 * @return the monitor
@@ -52,30 +32,6 @@ public interface IProcess {
 	 * @param monitor the monitor to set
 	 */
 	public void setMonitor(IMonitor monitor);
-
-	/**
-	 * Add a loader.
-	 * @param loader
-	 */
-	public void addLoader(ILoader loader);
-
-	/**
-	 * Returns the list of loaders.
-	 * @return
-	 */
-	public List<ILoader> getLoaders();
-
-	/**
-	 * Add a transformer.
-	 * @param transformer
-	 */
-	public void addTransformer(ITransformer transformer);
-
-	/**
-	 * Returns the list of transformers.
-	 * @return
-	 */
-	public List<ITransformer> getTransformers();
 
 	/**
 	 * @return the name
@@ -98,14 +54,6 @@ public interface IProcess {
 	 */
 	public List<IProcessFinalizer> getProcessFinalizers();
 
-	/**
-	 * @return the stopAfterRecords
-	 */
-	public int getStopAfterRecords();
 
-	/**
-	 * @param stopAfterRecords the stopAfterRecords to set
-	 */
-	public void setStopAfterRecords(int stopAfterRecords);
 	
 }

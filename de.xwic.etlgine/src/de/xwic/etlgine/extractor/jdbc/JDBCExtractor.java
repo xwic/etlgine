@@ -103,6 +103,9 @@ public class JDBCExtractor extends AbstractExtractor {
 						value = rs.getObject(i);
 						break;
 					}
+					if (rs.wasNull()) {
+						value = null;
+					}
 					record.setData(col, value);
 				}
 				
@@ -196,6 +199,9 @@ public class JDBCExtractor extends AbstractExtractor {
 						break;
 					}
 					column.setTypeHint(dt);
+				} else {
+					IColumn column = dataSet.getColumn(name);
+					column.setSourceIndex(i);
 				}
 			}
 			

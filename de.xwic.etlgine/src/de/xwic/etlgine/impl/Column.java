@@ -154,4 +154,11 @@ public class Column implements IColumn {
 	public String toString() {
 		return name;
 	}
+
+	/**
+	 * @param sourceIndex the sourceIndex to set
+	 */
+	public void setSourceIndex(int sourceIndex) {
+		this.sourceIndex = sourceIndex;
+	}
 }

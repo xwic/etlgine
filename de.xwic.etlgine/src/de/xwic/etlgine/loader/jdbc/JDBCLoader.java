@@ -29,6 +29,7 @@ import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.jdbc.DbColumnDef;
 import de.xwic.etlgine.jdbc.JDBCUtil;
+import de.xwic.etlgine.util.Validate;
 
 /**
  * @author lippisch
@@ -36,6 +37,12 @@ import de.xwic.etlgine.jdbc.JDBCUtil;
  */
 public class JDBCLoader extends AbstractLoader {
 
+	public enum Mode {
+		INSERT,
+		UPDATE,
+		INSERT_OR_UPDATE
+	}
+	
 	private String connectionName = null;
 	// by default use the JTDS driver...
 	private String driverName = "net.sourceforge.jtds.jdbc.Driver";
@@ -48,8 +55,21 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean truncateTable = false;
 	private boolean autoDataTruncate = false;
 	
+	private boolean ignoreUnchangedRecords = false;
+	
+	private Mode mode = Mode.INSERT;
+	private String pkColumn = null;
+	private String newIdentifierColumn = null;
+	private String newIdentifierValue = null;
+	
+
+	private long insertCount = 0;
+	private long updateCount = 0;
+		
+	
 	private Connection connection = null;
 	private PreparedStatement psInsert = null;
+	private PreparedStatement psUpdate = null;
 	private Map<String, DbColumnDef> columns;
 	private Set<String> ignoredColumns = new HashSet<String>();
 	
@@ -59,6 +79,13 @@ public class JDBCLoader extends AbstractLoader {
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
+		
+		if (mode == Mode.UPDATE || mode == Mode.INSERT_OR_UPDATE) {
+			Validate.notNull(pkColumn, "PkColumn must be specified for UPDATE mode.");
+		}
+		if (mode == Mode.INSERT_OR_UPDATE) {
+			Validate.notNull(newIdentifierColumn, "NewIdentifierColumn must be specified for INSERT_OR_UPDATE mode.");
+		}
 		
 		if (connectionName == null) {
 			if (connectionUrl == null) {
@@ -109,6 +136,9 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
+		
+		monitor.logInfo("JDBCLoader " + insertCount + " records inserted, " + updateCount + " records updated.");
+		
 		if (connection != null) {
 			try {
 				connection.close();
@@ -176,10 +206,12 @@ public class JDBCLoader extends AbstractLoader {
 				}
 			}
 			
-			// build prepared statement..
+			// build prepared statement.. and Update statement.
 			StringBuilder sql = new StringBuilder();
 			StringBuilder sqlValues = new StringBuilder();
+			StringBuilder sqlUpd = new StringBuilder();
 			sql.append("INSERT INTO [").append(tablename).append("] (");
+			sqlUpd.append("UPDATE [").append(tablename).append("] SET ");
 			sqlValues.append("(");
 			
 			boolean first = true;
@@ -190,11 +222,16 @@ public class JDBCLoader extends AbstractLoader {
 					} else {
 						sql.append(", ");
 						sqlValues.append(", ");
+						sqlUpd.append(", ");
 					}
 					sql.append("[");
 					sql.append(colDef.getName());
 					sql.append("]");
 					sqlValues.append("?");
+
+					sqlUpd.append("[");
+					sqlUpd.append(colDef.getName());
+					sqlUpd.append("] = ?");
 				} else {
 					if (!ignoredColumns.contains(colDef.getName())) {
 						monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
@@ -204,9 +241,16 @@ public class JDBCLoader extends AbstractLoader {
 			sqlValues.append(")");
 			sql.append(") VALUES").append(sqlValues);
 			
-			monitor.logInfo("INSERT Statement: " + sql);
+			sqlUpd.append(" WHERE [" + pkColumn + "] = ?");
 			
+			monitor.logInfo("INSERT Statement: " + sql);
 			psInsert = connection.prepareStatement(sql.toString());
+
+			if (mode == Mode.UPDATE || mode == Mode.INSERT_OR_UPDATE) {
+				monitor.logInfo("UPDATE Statement: " + sqlUpd);
+				psUpdate = connection.prepareStatement(sqlUpd.toString());
+			}
+			
 			
 		} catch (SQLException se) {
 			throw new ETLException("Error initializing target database/tables: " + se, se);
@@ -291,85 +335,64 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 
+		
+		switch (mode) {
+		case INSERT:
+			doInsert(processContext, record);
+			break;
+		case UPDATE:
+			doUpdate(processContext, record);
+			break;
+		case INSERT_OR_UPDATE:
+			if (Validate.equals(newIdentifierValue, record.getData(newIdentifierColumn))) {
+				doInsert(processContext, record);
+			} else {
+				doUpdate(processContext, record);
+			}
+		}
+		
+		
+	}
+
+	private void doUpdate(IProcessContext processContext, IRecord record) throws ETLException {
+		
+		
 		try {
-			psInsert.clearParameters();
+			psUpdate.clearParameters();
 			
 			int idx = 1;
+			boolean modified = false;
+			DbColumnDef pkColDef = null;
 			for (DbColumnDef colDef : columns.values()) {
 				if (colDef.getColumn() != null) {
 					
 					Object value = record.getData(colDef.getColumn());
-					if (value == null) {
-						psInsert.setNull(idx, colDef.getType());
-					} else {
-						switch (colDef.getType()) {
-						case Types.VARCHAR:
-						case Types.CHAR:
-						case Types.LONGVARCHAR:
-						case -9: { //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
-							String s = value.toString();
-							if (autoDataTruncate && s.length() > colDef.getSize()) {
-								monitor.logWarn("Truncate value for column '" + colDef.getName() + "' from " + s.length() + " to " + colDef.getSize() + " character");
-								s = s.substring(0, colDef.getSize());
-							}
-							psInsert.setString(idx, s);
-							break;
-						}
-						case Types.INTEGER:
-						case Types.BIGINT:
-							if (value instanceof Integer) {
-								psInsert.setInt(idx, (Integer)value);
-							} else if (value instanceof String) {
-								psInsert.setInt(idx, Integer.parseInt((String)value));
-							}
-							break;
-						case Types.DOUBLE:
-						case Types.FLOAT:
-							if (value instanceof Integer) {
-								psInsert.setInt(idx, (Integer)value);
-							} else if (value instanceof String) {
-								String s = (String)value;
-								if (s.length() == 0) {
-									psInsert.setNull(idx, colDef.getType());
-								} else {
-									psInsert.setDouble(idx, Double.parseDouble(s));
-								}
-							} else if (value instanceof Double) {
-								psInsert.setDouble(idx, (Double)value);
-							}
-							break;							
-						case Types.TIMESTAMP:
-						case Types.DATE:
-							if (value instanceof Date) {
-								psInsert.setDate(idx, new java.sql.Date(((Date)value).getTime()));
-							} else if (value instanceof String) {
-								// let database worry about the format for now
-								// TODO parse String to Date
-								psInsert.setString(idx, (String)value);
-							}
-							break;
-						case Types.TINYINT:
-							if (value instanceof Integer) {
-								Integer valInt = (Integer) value;
-								psInsert.setBoolean(idx, valInt == 1 ? true : false);
-							} else if (value instanceof String) {
-								Integer valInt = Integer.parseInt((String) value);
-								psInsert.setBoolean(idx, valInt == 1 ? true : false);
-							}
-							break;
-						default:
-							throw new ETLException("Unknown datatype: "+ colDef.getType());
-						}
-						
+					setPSValue(psUpdate, idx++, value, colDef);
+					
+					modified = modified | record.isChanged(colDef.getColumn());
+					
+					if (colDef.getName().equals(pkColumn)) {
+						pkColDef = colDef;
 					}
-					idx++;
+					
 				}
 			}
-			
-			int count = psInsert.executeUpdate();
-			if (count != 1) {
-				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+
+			if (pkColDef == null) {
+				throw new ETLException("The specified PK Column does not exist.");
 			}
+			setPSValue(psUpdate, idx, record.getData(pkColumn), pkColDef);
+			
+			if (!ignoreUnchangedRecords || modified) {
+
+				int count = psUpdate.executeUpdate();
+				if (count != 1) {
+					monitor.logWarn("Update resulted in count " + count + " but expected 1");
+				}	
+				updateCount += count;
+			}
+
+			
 		} catch (DataTruncation dt) {
 			monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, dt);
 			// log field value lengths
@@ -390,6 +413,127 @@ public class JDBCLoader extends AbstractLoader {
 		
 	}
 
+	
+	/**
+	 * @param psUpdate2 
+	 * @param i
+	 * @param value
+	 * @param colDef 
+	 * @throws SQLException 
+	 * @throws ETLException 
+	 */
+	private void setPSValue(PreparedStatement ps, int idx, Object value, DbColumnDef colDef) throws SQLException, ETLException {
+
+		if (value == null) {
+			ps.setNull(idx, colDef.getType());
+		} else {
+			switch (colDef.getType()) {
+			case Types.VARCHAR:
+			case Types.CHAR:
+			case Types.LONGVARCHAR:
+			case -9: { //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
+				String s = value.toString();
+				if (autoDataTruncate && s.length() > colDef.getSize()) {
+					monitor.logWarn("Truncate value for column '" + colDef.getName() + "' from " + s.length() + " to " + colDef.getSize() + " character");
+					s = s.substring(0, colDef.getSize());
+				}
+				ps.setString(idx, s);
+				break;
+			}
+			case Types.INTEGER:
+			case Types.BIGINT:
+				if (value instanceof Integer) {
+					ps.setInt(idx, (Integer)value);
+				} else if (value instanceof String) {
+					ps.setInt(idx, Integer.parseInt((String)value));
+				}
+				break;
+			case Types.DOUBLE:
+			case Types.FLOAT:
+				if (value instanceof Integer) {
+					ps.setInt(idx, (Integer)value);
+				} else if (value instanceof String) {
+					String s = (String)value;
+					if (s.length() == 0) {
+						ps.setNull(idx, colDef.getType());
+					} else {
+						ps.setDouble(idx, Double.parseDouble(s));
+					}
+				} else if (value instanceof Double) {
+					ps.setDouble(idx, (Double)value);
+				}
+				break;							
+			case Types.TIMESTAMP:
+			case Types.DATE:
+				if (value instanceof Date) {
+					ps.setDate(idx, new java.sql.Date(((Date)value).getTime()));
+				} else if (value instanceof String) {
+					// let database worry about the format for now
+					// TODO parse String to Date
+					ps.setString(idx, (String)value);
+				}
+				break;
+			case Types.TINYINT:
+				if (value instanceof Integer) {
+					Integer valInt = (Integer) value;
+					ps.setBoolean(idx, valInt == 1 ? true : false);
+				} else if (value instanceof String) {
+					Integer valInt = Integer.parseInt((String) value);
+					ps.setBoolean(idx, valInt == 1 ? true : false);
+				}
+				break;
+			default:
+				throw new ETLException("Unknown datatype: "+ colDef.getType());
+			}
+			
+		}
+		
+	}
+
+	private void doInsert(IProcessContext processContext, IRecord record) throws ETLException {
+		
+		try {
+			psInsert.clearParameters();
+			
+			int idx = 1;
+			for (DbColumnDef colDef : columns.values()) {
+				if (colDef.getColumn() != null) {
+					
+					Object value = record.getData(colDef.getColumn());
+					setPSValue(psInsert, idx++, value, colDef);
+					
+					
+				}
+			}
+			
+			int count = psInsert.executeUpdate();
+			if (count != 1) {
+				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+			}
+			
+			insertCount += count;
+			
+		} catch (DataTruncation dt) {
+			monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, dt);
+			// log field value lengths
+			for (DbColumnDef colDef : columns.values()) {
+				if (colDef.getColumn() != null) {
+					Object value = record.getData(colDef.getColumn());
+					if (value == null) {
+						continue;
+					}
+					monitor.logInfo(colDef.getName() + ":(" + value.toString().length() + ")=" + value);
+				}
+			}
+			throw new ETLException("A Data Truncation occured during INSERT.", dt);
+		} catch (SQLException se) {
+			monitor.logError("Error during INSERT record: " + record, se);
+			throw new ETLException("A SQLException occured during INSERT: " + se, se);
+		}
+		
+	}
+	
+	
 	/**
 	 * @return the driverName
 	 */
@@ -549,5 +693,75 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setAutoDataTruncate(boolean autoDataTruncate) {
 		this.autoDataTruncate = autoDataTruncate;
+	}
+
+	/**
+	 * @return the mode
+	 */
+	public Mode getMode() {
+		return mode;
+	}
+
+	/**
+	 * @param mode the mode to set
+	 */
+	public void setMode(Mode mode) {
+		this.mode = mode;
+	}
+
+	/**
+	 * @return the pkColumn
+	 */
+	public String getPkColumn() {
+		return pkColumn;
+	}
+
+	/**
+	 * @param pkColumn the pkColumn to set
+	 */
+	public void setPkColumn(String pkColumn) {
+		this.pkColumn = pkColumn;
+	}
+
+	/**
+	 * @return the newIdentifierColumn
+	 */
+	public String getNewIdentifierColumn() {
+		return newIdentifierColumn;
+	}
+
+	/**
+	 * @param newIdentifierColumn the newIdentifierColumn to set
+	 */
+	public void setNewIdentifierColumn(String newIdentifierColumn) {
+		this.newIdentifierColumn = newIdentifierColumn;
+	}
+
+	/**
+	 * @return the newIdentifierValue
+	 */
+	public String getNewIdentifierValue() {
+		return newIdentifierValue;
+	}
+
+	/**
+	 * @param newIdentifierValue the newIdentifierValue to set
+	 */
+	public void setNewIdentifierValue(String newIdentifierValue) {
+		this.newIdentifierValue = newIdentifierValue;
+	}
+
+	/**
+	 * @return the ignoreUnchangedRecords
+	 */
+	public boolean isIgnoreUnchangedRecords() {
+		return ignoreUnchangedRecords;
+	}
+
+	/**
+	 * @param ignoreUnchangedRecords the ignoreUnchangedRecords to set
+	 */
+	public void setIgnoreUnchangedRecords(boolean ignoreUnchangedRecords) {
+		this.ignoreUnchangedRecords = ignoreUnchangedRecords;
 	}
 }

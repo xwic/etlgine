@@ -26,10 +26,16 @@ public interface IProcessChain {
 	public String getName();
 	
 	/**
+	 * Add a custom process.
+	 * @param process
+	 */
+	public void addCustomProcess(IProcess process);
+	
+	/**
 	 * Add a process. 
 	 * @param process
 	 */
-	public IProcess createProcess(String name);
+	public IETLProcess createProcess(String name);
 	
 	/**
 	 * Start the process chain.
@@ -53,7 +59,7 @@ public interface IProcessChain {
 	 * @throws FileNotFoundException 
 	 * @throws ETLException 
 	 */
-	public IProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException;
+	public IETLProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException;
 
 
 }

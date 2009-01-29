@@ -28,7 +28,7 @@ public class ProcessTest extends TestCase {
 	public void testStartChecks() {
 		
 		IProcessChain pc = ETLgine.createProcessChain("Test");
-		IProcess process = pc.createProcess("testStartChecks");
+		IETLProcess process = pc.createProcess("testStartChecks");
 		assertNotNull(process);
 		try {
 			pc.start();
@@ -51,7 +51,7 @@ public class ProcessTest extends TestCase {
 	public void testProcess() throws ETLException {
 		
 		IProcessChain pc = ETLgine.createProcessChain("Test");
-		IProcess process = pc.createProcess("testStartChecks");
+		IETLProcess process = pc.createProcess("testStartChecks");
 		
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
@@ -99,7 +99,7 @@ public class ProcessTest extends TestCase {
 	public void testTransformerAddColumn() throws Exception {
 		
 		IProcessChain pc = ETLgine.createProcessChain("Test");
-		IProcess process = pc.createProcess("testStartChecks");
+		IETLProcess process = pc.createProcess("testStartChecks");
 		
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
@@ -157,7 +157,7 @@ public class ProcessTest extends TestCase {
 	public void testTransformerHideColumn() throws Exception {
 		
 		IProcessChain pc = ETLgine.createProcessChain("Test");
-		IProcess process = pc.createProcess("testStartChecks");
+		IETLProcess process = pc.createProcess("testStartChecks");
 			
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);

@@ -43,6 +43,31 @@ public interface IRecord {
 	public void setData(String columnName, Object value) throws ETLException;
 
 	/**
+	 * Returns true if the specified column has been changed since the last
+	 * resetChangeFlag() method. The resetChangeFlag is usualy reset by the
+	 * extractor after reading the record.
+	 * @param columnName
+	 * @return
+	 * @throws ETLException
+	 */
+	public boolean isChanged(String columnName) throws ETLException;
+
+	/**
+	 * Returns true if the specified column has been changed since the last
+	 * resetChangeFlag() method. The resetChangeFlag is usualy reset by the
+	 * extractor after reading the record.
+	 * @param column
+	 * @return
+	 * @throws ETLException
+	 */
+	public boolean isChanged(IColumn column) throws ETLException;
+	
+	/**
+	 * Reset the change flag of all columns.
+	 */
+	public void resetChangeFlag();
+	
+	/**
 	 * Returns the data with the specified column name.
 	 * @param columnName
 	 * @return

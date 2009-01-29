@@ -33,7 +33,7 @@ public class TestRndExtractor2JDBCTest extends TestCase {
 	public void testJDBCLoader() throws ETLException {
 		
 		IProcessChain pc = ETLgine.createProcessChain("testChain");
-		IProcess process = pc.createProcess("jdbcLoad");
+		IETLProcess process = pc.createProcess("jdbcLoad");
 
 		process.addSource(new TestRndSource(10000));
 		
@@ -63,7 +63,7 @@ public class TestRndExtractor2JDBCTest extends TestCase {
 	 */
 	public void testJDBCExtractor() throws Exception {
 		IProcessChain pc = ETLgine.createProcessChain("testChain");
-		IProcess process = pc.createProcess("jdbcExtract");
+		IETLProcess process = pc.createProcess("jdbcExtract");
 		
 		JDBCSource source = new JDBCSource();
 		source.setConnectionUrl("jdbc:jtds:sqlserver://localhost/etlgine_test");

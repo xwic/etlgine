@@ -15,8 +15,10 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IGlobalContext;
 import de.xwic.etlgine.IMonitor;
+import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessChain;
+import de.xwic.etlgine.Result;
 
 /**
  * A chain of processes.
@@ -50,10 +52,17 @@ public class ProcessChain implements IProcessChain {
 	}
 
 	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#addCustomProcess(de.xwic.etlgine.IProcess)
+	 */
+	public void addCustomProcess(IProcess process) {
+		processList.add(process);
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#addProcess(de.xwic.etlgine.IProcess)
 	 */
-	public IProcess createProcess(String name) {
-		IProcess process = new Process(globalContext, name);
+	public IETLProcess createProcess(String name) {
+		IETLProcess process = new ETLProcess(globalContext, name);
 		processList.add(process);
 		return process;
 	}
@@ -61,7 +70,7 @@ public class ProcessChain implements IProcessChain {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#createProcessFromScript(java.lang.String)
 	 */
-	public IProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException {
+	public IETLProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException {
 		
 		File jobPath = new File(globalContext.getProperty("scriptpath", "."));
 		if (!jobPath.exists()) {
@@ -73,7 +82,7 @@ public class ProcessChain implements IProcessChain {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		
-		IProcess process = new Process(globalContext, name);
+		IETLProcess process = new ETLProcess(globalContext, name);
 		
 		Binding binding = new Binding();
 		binding.setVariable("process", process);
@@ -124,7 +133,11 @@ public class ProcessChain implements IProcessChain {
 	public void start() throws ETLException {
 		
 		for (IProcess process : processList) {
-			process.start();
+			Result result = process.start();
+			if (result == Result.FAILED || result == Result.FINISHED_WITH_ERRORS) {
+				monitor.logError("Exiting ProcessChain execution because process " + process.getName() + " finished with result: " + result);
+				break;
+			}
 		}
 
 	}

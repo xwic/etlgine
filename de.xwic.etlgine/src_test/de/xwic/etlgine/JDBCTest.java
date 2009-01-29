@@ -26,7 +26,7 @@ public class JDBCTest extends TestCase {
 	public void testJDBCLoader() throws ETLException {
 		
 		IProcessChain pc = ETLgine.createProcessChain("testChain");
-		IProcess process = pc.createProcess("jdbcLoad");
+		IETLProcess process = pc.createProcess("jdbcLoad");
 		
 		/**
 		 * Define Source

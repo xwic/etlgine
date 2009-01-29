@@ -30,6 +30,7 @@ public class ETLProcess extends Process implements IETLProcess {
 	protected List<ILoader> loaders = new ArrayList<ILoader>();
 	protected IExtractor extractor = null;
 	protected int stopAfterRecords = 0;
+	protected boolean skipInvalidRecords = true;
 
 	/**
 	 * @param context
@@ -186,14 +187,18 @@ public class ETLProcess extends Process implements IETLProcess {
 					IRecord record;
 					while ((record = extractor.getNextRecord()) != null) {
 						
-						for (ITransformer transformer : transformers) {
-							List<IRecord> duplicates = record.getDuplicates();
-							int duplicatesSize = duplicates.size();
-							transformer.processRecord(processContext, record);
-							// process duplicates
-							for (int i = 0; i < duplicatesSize; i++) {
-								IRecord duplicate = duplicates.get(i);
-								transformer.processRecord(processContext, duplicate);
+						if (!record.isInvalid() || !skipInvalidRecords) {
+							for (ITransformer transformer : transformers) {
+								List<IRecord> duplicates = record.getDuplicates();
+								int duplicatesSize = duplicates.size();
+								transformer.processRecord(processContext, record);
+								// process duplicates
+								for (int i = 0; i < duplicatesSize; i++) {
+									IRecord duplicate = duplicates.get(i);
+									if (!duplicate.isInvalid() || !skipInvalidRecords) {
+										transformer.processRecord(processContext, duplicate);
+									}
+								}
 							}
 						}
 						if (record.isInvalid()) {
@@ -214,6 +219,9 @@ public class ETLProcess extends Process implements IETLProcess {
 									}
 								}
 							}
+						}
+						if (record.isInvalid() && skipInvalidRecords) {
+							record.setSkip(true);
 						}
 						
 						processContext.recordProcessed(record);
@@ -289,5 +297,19 @@ public class ETLProcess extends Process implements IETLProcess {
 	public void setStopAfterRecords(int stopAfterRecords) {
 		this.stopAfterRecords = stopAfterRecords;
 	}
-	
+
+	/**
+	 * @return the skipInvalidRecords
+	 */
+	public boolean isSkipInvalidRecords() {
+		return skipInvalidRecords;
+	}
+
+	/**
+	 * @param skipInvalidRecords the skipInvalidRecords to set
+	 */
+	public void setSkipInvalidRecords(boolean skipInvalidRecords) {
+		this.skipInvalidRecords = skipInvalidRecords;
+	}
+
 }

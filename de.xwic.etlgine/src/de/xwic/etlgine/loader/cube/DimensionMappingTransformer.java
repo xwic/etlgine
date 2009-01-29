@@ -42,7 +42,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	private String mappingName = null;
 	private String nullValue = "";
 	
-	private IDataPool dataPool = null;
+	protected IDataPool dataPool = null;
 	private DimMappingDef mappingDef = null;
 	private IColumn[] sourceColumns = null;
 	private IColumn targetColumn = null;

@@ -522,7 +522,7 @@ public class JDBCLoader extends AbstractLoader {
 					if (value == null) {
 						continue;
 					}
-					monitor.logInfo(colDef.getName() + ":(" + value.toString().length() + ")=" + value);
+					monitor.logInfo(colDef.getName() + "{" + colDef.getSize() + "}=" + value + "{" + value.toString().length() + "}");
 				}
 			}
 			throw new ETLException("A Data Truncation occured during INSERT.", dt);

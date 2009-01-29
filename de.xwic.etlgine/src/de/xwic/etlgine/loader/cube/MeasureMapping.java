@@ -13,8 +13,8 @@ import de.xwic.etlgine.IRecord;
  */
 public class MeasureMapping {
 
-	private String columnName = null;
-	private Double fixedValue = null; 
+	protected String columnName = null;
+	protected Double fixedValue = null; 
 	
 	/**
 	 * @return the columnName

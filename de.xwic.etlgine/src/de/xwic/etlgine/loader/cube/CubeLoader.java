@@ -24,10 +24,10 @@ public class CubeLoader extends AbstractLoader {
 	private IDataPoolProvider dataPoolProvider;
 	private DataPoolInitializer dataPoolInitializer = null;
 	private IDataPool dataPool;
-	private ICube cube;
+	protected ICube cube;
 	
 	private String targetCubeKey = null;
-	private ICubeDataMapper dataMapper = null;
+	protected ICubeDataMapper dataMapper = null;
 	
 	private boolean saveDataPoolOnFinish = false;
 	private boolean clearCubeBeforeStart = false;

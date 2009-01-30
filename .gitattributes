@@ -1076,6 +1076,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/csv/CSVLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/BaseCubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/CubeLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DataPoolInitializer.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DataPoolInitializerUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DimensionMapping.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/DimensionMappingTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ElementMapping.java -text

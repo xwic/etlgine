@@ -1,0 +1,285 @@
+
+ form	{ margin-top: 0; margin-bottom: 0 }
+
+ p { margin: 0px 0px; }
+
+ .clickBlocker {
+ 	background-color: #E0E0E0; 
+ 	color: #000000; 
+ 	font-size: 12pt; 
+ 	font-weight: bold; 
+ 	border: 1px solid #000000;
+ }
+
+/* WindowControl */ 
+table.e_dsk_win { 
+	border-right: 1px solid #000000; 
+	border-bottom: 1px solid #000000; 
+}
+td.e_dsk_ttl { 
+	background-color: #A0C8F0; color: #FFFFFF; 
+	font-size: 10pt; 
+	font-weight: bold; 
+	background-image: url("window/win_bar.gif"); 
+	background-repeat: repeat-y; 
+	background-position: left top; 
+	border-bottom: 1px solid #000000; 
+	border-top: 1px solid #000000  
+}
+td.e_dsk_ttl_in { 
+	color: #FFFFFF; 
+	font-size: 10pt; 
+	font-weight: bold; 
+}
+td.e_dsk_body { 
+	background-color: #E0DFE3; 
+	border-left: 1px solid #000000 
+}
+td.e_dsk_body2 { 
+	background-color: #E0DFE3; 
+}
+td.e_dsk_top { 
+	background-color: transparent; 
+	background-image: url("window/win_ecke.gif"); 
+	background-repeat: no-repeat; 
+	background-position: left top; 
+	border-bottom: 0px solid #000000; 
+}
+/* ActionBar */
+td.e_dsk_eaction { 
+	background-color: #D0D0D0; 
+	background-image: url("gfx/barline_h.gif");
+}
+td.e_dsk_action { 
+	background-color: #D0D0D0; 
+	border-left: 1px solid #000000; 
+	background-image: url("gfx/barline_h.gif") ;
+}
+
+/* TabStrip/Tabs */ 
+td.e_pan_sla { 
+	background-color: #E0DFE3; 
+	font-size: 10pt; 
+	border-top: 1px solid #000000; 
+	border-right: 1px solid #000000; 
+}
+
+td.e_pan_sla_bottom { 
+	background-color: #E0DFE3; 
+	font-size: 10pt; 
+	border-bottom: 1px solid #000000; 
+	border-right: 1px solid #000000;
+	border-left: 1px solid #000000; 
+}
+
+td.e_pan_sli { 
+	background-color: #A0A0A0; 
+	font-size: 10pt; 
+	border-top: 1px solid #404040; 
+	border-right: 1px solid #404040;
+	border-bottom: 1px solid #808080;
+}
+
+td.e_pan_sli_bottom { 
+	background-color: #A0A0A0; 
+	font-size: 10pt; 
+	border-right: 1px solid #404040;
+	border-bottom: 1px solid #404040; 
+	border-left: 1px solid #000000; 
+}
+
+td.e_tab_sla { 
+	background-color: #E0DFE3; 
+	font-size: 10pt; 
+	border-bottom: 0px solid #404040; 
+	background-image: url("tabstrip/ecke.gif"); 
+	background-repeat: no-repeat; 
+	background-position: left top;
+}
+
+td.e_tab_sla_bottom { 
+	background-color: #E0DFE3; 
+	font-size: 10pt; 
+	border-bottom: 0px solid #404040; 
+	/*background-image: url("tabstrip/ecke.gif"); */
+	background-repeat: no-repeat; 
+	background-position: left top;
+}
+
+td.e_tab_sli { 
+	background-color: #A0A0A0; 
+	font-size: 10pt; 
+	border-bottom: 0px solid #404040; 
+	background-image: url("tabstrip/ecke_i.gif"); 
+	background-repeat: no-repeat; 
+	background-position: left top;
+}
+
+td.e_tab_sli_bottom { 
+	background-color: #A0A0A0; 
+	font-size: 10pt; 
+	border-bottom: 0px solid #404040; 
+/*	background-image: url("tabstrip/ecke_i.gif"); */
+	background-repeat: no-repeat; 
+	background-position: left top;
+}
+
+td.e_pan_fre { 
+	border-bottom: 1px solid #808080 
+}
+a.e_pan_sli { 
+	color: #000000; 
+	text-decoration: none;
+}
+a.e_pan_sli:visited { 
+	color: #000000; 
+	text-decoration: none;
+}
+a.e_pan_sli:hover { 
+	color: #000080; 
+	text-decoration: underline;
+} 
+td.e_pan_title { 
+	background-color: #A0A0A0; 
+	color: #000000; 
+	font-size: 8pt; 
+	font-weight: bold; 
+	font-family:Verdana, Arial ;
+}
+  /* ActionBar */
+ table.action td.action_left {
+ 	border-left: 1px solid #D0D0D0;
+ 	border-top: 1px solid #D0D0D0;
+ 	border-bottom: 1px solid #D0D0D0;
+ }
+ table.action td.action_right {
+ 	border-right: 1px solid #D0D0D0;
+ 	border-top: 1px solid #D0D0D0;
+ 	border-bottom: 1px solid #D0D0D0;
+ }
+ table.action td.action_middle {
+ 	border-top: 1px solid #D0D0D0;
+ 	border-bottom: 1px solid #D0D0D0;
+ 	font-size: 8pt;
+ 	font-family: Arial, Sans-Serif;
+ }
+ table.actionDis td.action_left {
+ 	border-left: 1px solid #D0D0D0;
+ 	border-top: 1px solid #D0D0D0;
+ 	border-bottom: 1px solid #D0D0D0;
+ }
+ table.actionDis td.action_right {
+ 	border-right: 1px solid #D0D0D0;
+ 	border-top: 1px solid #D0D0D0;
+ 	border-bottom: 1px solid #D0D0D0;
+ }
+ table.actionDis td.action_middle {
+ 	border-top: 1px solid #D0D0D0;
+ 	border-bottom: 1px solid #D0D0D0;
+ 	font-size: 8pt;
+ 	font-family: Arial, Sans-Serif;
+ 	color: #606060;
+ }
+ table.actionSel td.action_left {
+ 	border-left: 1px solid #ffffff;
+ 	border-top: 1px solid #ffffff;
+ 	border-bottom: 1px solid #888888;
+ }
+ table.actionSel td.action_right {
+ 	border-right: 1px solid #888888;
+ 	border-top: 1px solid #ffffff;
+ 	border-bottom: 1px solid #888888;
+ }
+ table.actionSel td.action_middle {
+ 	border-top: 1px solid #ffffff;
+ 	border-bottom: 1px solid #888888;
+ 	font-size: 8pt;
+ 	font-family: Arial, Sans-Serif;
+ }
+ 
+ a.actionCaption {
+ 	text-decoration: none;
+ 	color: #000000;
+ } 
+ a.actionCaption:visited {
+ 	color: #000000;
+ } 
+  
+ /**
+  * ProgressBar styles
+  */
+ div.progressBar {
+   border: 1px solid #404040;
+   background-color: #ffffff;
+   padding: 1px;
+ }
+ div.progressBar div.progressBarSmooth {
+   background-color: #0000ff;
+ }
+ div.progressBar td.done {
+   /*border: 1px solid #E0E0E0;*/
+   background-color: #0000ff;
+ }
+ div.progressBar td.notdone {
+   /*border: 1px solid #E0E0E0;*/
+   background-color: transparent;
+ }
+
+ /**
+  * ListBoxControl styles (for drop-down multiselect mode)
+  */
+  option.selected {
+   color: highlighttext;
+   background-color: highlight;
+  }
+  option.unselected {
+   color: windowtext;
+   background-color: window;
+  } 
+  
+  /*GroupControl styles*/
+  table.grpDefault td.grpTitle {
+  	font-size: 8pt;
+  	padding-left: 2px;
+  	padding-right: 8px;
+  }
+  table.grpDefault td.grpTL {
+ 	background-image: url("gfx/grp_tl.png") ;
+	background-repeat: no-repeat; 
+	background-position: left top;
+	width: 8px; 
+  }
+  table.grpDefault td.grpTR {
+ 	background-image: url("gfx/grp_tr.png") ;
+	background-repeat: no-repeat; 
+	background-position: left top;
+	width: 8px; 
+  }
+  table.grpDefault td.grpML {
+ 	background-image: url("gfx/grp_vl.png") ;
+	background-repeat: repeat-y; 
+	width: 8px; 
+  }
+  table.grpDefault td.grpMR {
+ 	background-image: url("gfx/grp_vr.png") ;
+	background-repeat: repeat-y; 
+	width: 8px; 
+  }
+  
+  table.grpDefault td.grpTH {
+ 	background-image: url("gfx/grp_hor.png") ;
+	background-repeat: repeat-x; 
+  }
+  table.grpDefault td.grpBH {
+ 	background-image: url("gfx/grp_hor.png") ;
+	background-repeat: repeat-x; 
+  }
+  table.grpDefault td.grpBL {
+ 	background-image: url("gfx/grp_bl.png") ;
+	background-repeat: no-repeat; 
+  }
+  table.grpDefault td.grpBR {
+ 	background-image: url("gfx/grp_br.png") ;
+	background-repeat: no-repeat; 
+  }
+  

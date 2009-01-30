@@ -1,0 +1,81 @@
+$insert.control("actionBar")
+$insert.control("errInfo")
+#set($pool = $control.dataPool)
+<div class="detailView">
+#if (!$pool)
+	<h3>The pool is not initialized</h3>
+#else
+	<h3>DataPool $pool.key</h3>
+	<h4>Measures</h4>
+	<p>
+		<table width="100%" class="tbl" cellspacing="0">
+			<tr>
+				<th width=150>Key</th>
+				<th>Title</th>
+				<th width="80">Functional</th>
+			</tr>
+		#foreach($measure in $pool.measures)
+			<tr>
+				<td class="data">$measure.key</td>
+				<td class="data">$!measure.title</td>
+				<td class="data">#if($measure.isFunction()) Yes #else No #end</td>
+			</tr>
+		#end
+		</table>
+	</p>
+	<h4>Dimensions</h4>
+	<p>
+		<table width="100%" class="tbl" cellspacing="0">
+			<tr>
+				<th width=150>Key</th>
+				<th>Title</th>
+				<th width="250">Elements</th>
+				<th width="80">Size</th>
+			</tr>
+		#foreach($dim in $pool.dimensions)
+			<tr>
+				<td class="data"><a href="$control.createActionURL("dimEdit", $dim.key)"><img src="img/pencil.png" border="0"> $dim.key</a></td>
+				<td class="data">$!dim.title</td>
+				<td class="data">$insert.control($control.getSelectorName($dim))</td>
+				<td class="data">$dim.totalSize()</td>
+			</tr>
+		#end
+		</table>
+	</p>
+	<h4>Cubes</h4>
+	<p>
+			<table width="100%" class="tbl" cellspacing="0">
+			<tr>
+				<th width=150>Key</th>
+				<th>Title</th>
+				<th width="170">Dimensions</th>
+				<th width="170">Measures</th>
+				<th width="120">Size*</th>
+			</tr>
+		#foreach($cube in $pool.cubes)
+			<tr>
+				<td class="data" valign="top">$cube.key</td>
+				<td class="data" valign="top">$!cube.title</td>
+				<td class="data" width="170" valign="top"><ul>
+					#foreach($dim in $cube.dimensions)
+						<li>$dim.key</li>
+					#end</ul>
+				</td>
+				<td class="data" width="170" valign="top"><ul>
+					#foreach($me in $cube.measures)
+						<li>$me.key</li>
+					#end</ul>
+				</td>
+				<td class="data" valign="top">
+					$cube.getSize() Cells<br>
+#set($totalSize = ($cube.getSize() * (($cube.measures.size() * 8) + ($cube.dimensions.size() * 4) + 32)) / 1024)
+					$totalSize kB					
+					</td>
+			</tr>
+		#end
+		</table>
+		* KB Size is estimated for 32-bit OS and may vary. 
+	</p>
+	
+#end
+</div>

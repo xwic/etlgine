@@ -1,0 +1,17 @@
+ body.pwait {
+ 	margin: 0px;
+ 	background-color: #FFFFFF;
+ 	text-align: center;
+ }
+ p.pwait {
+ 	color: #000000; 
+ 	font-size: 12pt; 
+ 	font-weight: bold; 
+ 	border: 1px solid #000000;
+ 	text-align: center;
+ 	font-family: Sans-Serif, Arial;
+ 	width: 198px; 
+ 	height: 58px;
+ 	padding-top: 5px;
+ 	margin: 0px;
+ }

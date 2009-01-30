@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src_test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/opencsv-1.8.jar" sourcepath="C:/DATA_lippisch/development/tools/Open CSV/opencsv-1.8/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/groovy-all-1.5.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-3.1-FINAL-20080629.jar"/>
+	<classpathentry kind="lib" path="lib/jtds-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/jscreen-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/swt.jar"/>
+	<classpathentry kind="lib" path="server/jetty/servlet-api-2.5-6.1.9.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.commons.logging"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.log4j"/>
+	<classpathentry kind="lib" path="server/jetty/jetty-6.1.9.jar"/>
+	<classpathentry kind="lib" path="server/jetty/jetty-util-6.1.9.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.libs.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.dom4j"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.webui"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.xlsbridge"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,66 @@
+/**
+ * ReallySimpleMenu CSS
+ **/
+table.rsmenu_nav {
+	/* background: white;
+	border: solid 1px silver; */
+	position: absolute;
+	background: menu;
+	color: menutext;
+	border: outset 2px captiontext;
+	display: block;
+}
+
+table.rsmenu_nav_menu {
+	position: absolute;
+	display: none;
+}
+
+table.rsmenu_nav_menu_select {
+	background: menu;
+	color: menutext;
+	border: outset 2px captiontext;
+	position: absolute;
+	display: block;
+}
+
+td.rsmenu_nav_menu {
+	cursor: default;
+	font: 8pt arial, helvetica, serif;
+	padding-left: 10px;
+	padding-right: 10px;
+	align: left;
+}
+
+td.rsmenu_nav_menu_select {
+	cursor: default;
+	font: 8pt arial, helvetica, serif;
+	padding-left: 10px;
+	padding-right: 10px;
+	background: background;
+	/*color: captiontext;*/
+	color: #FFFFFF;
+	align: left;
+}
+
+td.rsmenu_nav_menu_select td.rsmenu_nav_menu {
+	color: #ffffff;
+}
+
+td.disabled {
+	cursor: default;
+	font: 8pt arial, helvetica, serif;
+	padding-left: 10px;
+	padding-right: 10px;
+	color: #CCCCCC;
+}
+
+.line{
+	margin:0px 0;
+	border: #808080 groove;	
+	border-width: 0px 0px 1px 1px;	
+	LINE-HEIGHT: 0;
+	HEIGHT: 0px";
+	/*color: #C0C0C0;*/
+}
+

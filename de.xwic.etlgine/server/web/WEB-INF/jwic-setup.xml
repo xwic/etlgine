@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jwic PUBLIC '-//jWic//DTD jwic-setup 3.2//EN' 'http://jwic.sourceforge.net/jwic-setup-3.2.dtd'>
+
+<jwic>
+    
+ 	<!-- The time after jWic will serialize a session if it allows serialization in minutes. -->
+	<session-swap-time>2</session-swap-time>	
+
+    <!-- The path where jWic should store the applications. -->
+	<session-storage-path>${rootPath}WEB-INF/sessions</session-storage-path>
+ 
+    <!-- Setup the default velocity engine. The engine is used by the velocity-type renderer 
+       - implementations.
+      -->
+    <velocity-engine id="default">
+		<properties>
+			<prop key="runtime.log">${rootPath}WEB-INF/velocity.log</prop>
+			<prop key="resource.loader">file, class</prop>
+			<prop key="file.resource.loader.description">Velocity File Resource Loader</prop>
+			<prop key="file.resource.loader.class">org.apache.velocity.runtime.resource.loader.FileResourceLoader</prop>
+			<prop key="file.resource.loader.path">${rootPath}WEB-INF/jwic/ctrl_vtls</prop>
+			<prop key="file.resource.loader.cache">true</prop>
+			<prop key="file.resource.loader.modificationCheckInterval">2</prop>
+			<prop key="class.resource.loader.description">Velocity Classpath Resource Loader</prop>
+			<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
+		</properties>
+    </velocity-engine>
+    
+    <!-- Setup the default renderer.
+      -->
+    <renderer type="velocity" id="jwic.renderer.Default" classname="de.jwic.renderer.velocity.BasicControlRenderer">
+        <!-- link to the default velocity engine -->
+        <engine>default</engine>
+    </renderer>
+
+    <!-- Setup the OuterContainerRenderer. This renderer uses two templates, one for the
+       - outer area (wich is usualy fixed) and one for the content.
+      -->    
+    <renderer type="velocity" id="jwic.renderer.OuterContainer" classname="de.jwic.renderer.velocity.OuterContainerRenderer">
+        <!-- link to the default velocity engine -->
+        <engine>default</engine>
+    </renderer>
+
+	<!-- 
+	   - Setup the selfRenderer that enables controls to render themself.
+	 -->
+   	<renderer type="custom" id="jwic.selfRenderer" classname="de.jwic.renderer.self.SelfRenderer" />
+
+	<!--
+	   - Uncomment the following tag if you want to use the JSP based rendering engine. 
+	   - See the de.jwic.renderer.jsp.JspRenderer javaDoc for details.
+	  -->
+	<!-- 
+   	<renderer type="custom" id="jwic.renderer.JSPRenderer" classname="de.jwic.renderer.jsp.JspRenderer" />
+   	 -->
+
+    <!-- Setup the SkeletonRenderer. This renderer is used by controls that render themself using
+       - the SkeletonParser.
+       - Uncomment if you are using the jWic grid library.
+      -->    
+    <!-- 
+    <renderer type="custom" id="jwic.renderer.SkeletonRenderer" classname="de.jwic.renderer.skeleton.SkeletonControlRenderer" />
+   	-->
+    
+</jwic>

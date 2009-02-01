@@ -66,4 +66,14 @@ public interface IProcessContext extends IContext {
 	 */
 	public void setMonitor(IMonitor monitor);
 
+	/**
+	 * @return the result
+	 */
+	public Result getResult();
+
+	/**
+	 * @param result the result to set
+	 */
+	public void setResult(Result result);
+
 }

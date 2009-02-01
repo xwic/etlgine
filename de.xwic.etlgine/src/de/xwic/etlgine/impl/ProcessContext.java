@@ -6,11 +6,11 @@ package de.xwic.etlgine.impl;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IMonitor;
-import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
+import de.xwic.etlgine.Result;
 
 /**
  * @author lippisch
@@ -25,6 +25,7 @@ public class ProcessContext extends Context implements IProcessContext {
 	protected int skippedCount = 0;
 	protected int invalidCount = 0;
 	protected IProcess process = null;
+	protected Result result = null;
 	
 	/**
 	 * 
@@ -134,6 +135,20 @@ public class ProcessContext extends Context implements IProcessContext {
 	 */
 	public IProcess getProcess() {
 		return process;
+	}
+
+	/**
+	 * @return the result
+	 */
+	public Result getResult() {
+		return result;
+	}
+
+	/**
+	 * @param result the result to set
+	 */
+	public void setResult(Result result) {
+		this.result = result;
 	}
 
 }

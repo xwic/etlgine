@@ -267,6 +267,7 @@ public class ETLProcess extends Process implements IETLProcess {
 			result = Result.FAILED;
 			throw e;
 		} finally {
+			processContext.setResult(result);
 			// close everything
 			if (extractor != null) {
 				extractor.close();

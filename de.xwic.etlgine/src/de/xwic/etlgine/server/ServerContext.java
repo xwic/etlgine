@@ -52,6 +52,7 @@ public class ServerContext extends Context {
 		IJob job = new Job(name);
 		
 		Binding binding = new Binding();
+		binding.setVariable("context", this);
 		binding.setVariable("job", job);
 
 		GroovyShell shell = new GroovyShell(binding);

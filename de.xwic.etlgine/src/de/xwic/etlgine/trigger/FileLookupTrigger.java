@@ -16,6 +16,7 @@ import de.xwic.etlgine.ITrigger;
 public class FileLookupTrigger implements ITrigger {
 
 	private File file;
+	private long lastSize = -1;
 	
 	/**
 	 * @param file
@@ -37,14 +38,23 @@ public class FileLookupTrigger implements ITrigger {
 			try {
 				FileOutputStream fos = new FileOutputStream(file, true);
 				fos.close();
-				return true;
+				
+				long size = file.length();
+				// if the file size has not increased since the last check, we can be
+				// sure that the file is no longer "downloaded".
+				// This fixes a problem with the NEO downloader who is not locking
+				// the file.
+				if (size == lastSize) {		
+					return true;
+				}
+				lastSize = size;
 			} catch (Throwable t) {
 				// the file is not yet ready to be opened -> most probably still being
 				// written 
+				lastSize = -1;
 				return false;
 			}
 		}
-			
 		return false;
 	}
 

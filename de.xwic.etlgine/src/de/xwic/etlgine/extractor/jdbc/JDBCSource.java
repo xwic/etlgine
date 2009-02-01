@@ -11,6 +11,7 @@ import de.xwic.etlgine.ISource;
  */
 public class JDBCSource implements ISource {
 
+	private String sharedConnectionName = null; 
 	private String connectionName = null;
 	// by default use the JTDS driver...
 	private String driverName = "net.sourceforge.jtds.jdbc.Driver";
@@ -181,6 +182,20 @@ public class JDBCSource implements ISource {
 	 */
 	public void setSqlSelectString(String sqlSelectString) {
 		this.sqlSelectString = sqlSelectString;
+	}
+
+	/**
+	 * @return the sharedConnectionName
+	 */
+	public String getSharedConnectionName() {
+		return sharedConnectionName;
+	}
+
+	/**
+	 * @param sharedConnectionName the sharedConnectionName to set
+	 */
+	public void setSharedConnectionName(String sharedConnectionName) {
+		this.sharedConnectionName = sharedConnectionName;
 	}
 
 }

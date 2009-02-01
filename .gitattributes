@@ -1134,6 +1134,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/DateTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/TrimTransformer.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/trigger/FileLookupTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/util/Validate.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/CubeLoaderTest.java -text

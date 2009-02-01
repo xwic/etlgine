@@ -21,6 +21,7 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 
 	private File targetPath;
 	
+	private boolean deleteTargetIfExists = true;
 	
 	/**
 	 * @param targetPath
@@ -65,9 +66,15 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 					File file = fs.getFile();
 					if (file != null) {
 						File destFile = new File(targetPath, file.getName());
-						if (destFile.exists()) {
-							monitor.logWarn("Can not move file " + file.getName() + " as it already exists in the target location.");
+						if (destFile.exists() && !deleteTargetIfExists) {
+							monitor.logWarn("Cannot move file " + file.getName() + " as it already exists in the target location.");
 						} else {
+							if (destFile.exists()) {
+								if (!destFile.delete()) {
+									monitor.logError("Error deleting target file - file cannot be moved!");
+									continue;
+								}
+							}
 							if (!file.renameTo(destFile)) {
 								monitor.logWarn("File was not moved to " + destFile.getAbsolutePath());
 							} else {
@@ -76,11 +83,25 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 						}
 					}
 				} else {
-					monitor.logWarn("Can not move source " + source.getName() + " as it is no FileSource.");
+					monitor.logWarn("Cannot move source " + source.getName() + " as it is no FileSource.");
 				}
 			}
 		}
 
+	}
+
+	/**
+	 * @return the deleteTargetIfExists
+	 */
+	public boolean isDeleteTargetIfExists() {
+		return deleteTargetIfExists;
+	}
+
+	/**
+	 * @param deleteTargetIfExists the deleteTargetIfExists to set
+	 */
+	public void setDeleteTargetIfExists(boolean deleteTargetIfExists) {
+		this.deleteTargetIfExists = deleteTargetIfExists;
 	}
 
 }

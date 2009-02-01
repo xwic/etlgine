@@ -85,6 +85,7 @@ public class ProcessChain implements IProcessChain {
 		IETLProcess process = new ETLProcess(globalContext, name);
 		
 		Binding binding = new Binding();
+		binding.setVariable("context", globalContext);
 		binding.setVariable("process", process);
 		binding.setVariable("processChain", this);
 

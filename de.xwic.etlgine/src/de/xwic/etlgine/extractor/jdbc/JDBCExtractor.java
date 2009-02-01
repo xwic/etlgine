@@ -160,7 +160,11 @@ public class JDBCExtractor extends AbstractExtractor {
 		} else {
 			Log.info("Using named connection: " + currSource.getConnectionName());
 			try {
-				connection = JDBCUtil.openConnection(context, currSource.getConnectionName());
+				if (currSource.getSharedConnectionName() != null) {
+					connection = JDBCUtil.getSharedConnection(context, currSource.getSharedConnectionName(), currSource.getConnectionName());
+				} else {
+					connection = JDBCUtil.openConnection(context, currSource.getConnectionName());
+				}
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}

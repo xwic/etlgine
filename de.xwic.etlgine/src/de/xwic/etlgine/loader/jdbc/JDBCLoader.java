@@ -43,6 +43,7 @@ public class JDBCLoader extends AbstractLoader {
 		INSERT_OR_UPDATE
 	}
 	
+	private String sharedConnectionName = null;
 	private String connectionName = null;
 	// by default use the JTDS driver...
 	private String driverName = "net.sourceforge.jtds.jdbc.Driver";
@@ -113,7 +114,11 @@ public class JDBCLoader extends AbstractLoader {
 		} else {
 			Log.info("Using named connection: " + connectionName);
 			try {
-				connection = JDBCUtil.openConnection(processContext, connectionName);
+				if (sharedConnectionName != null) {
+					connection = JDBCUtil.getSharedConnection(processContext, sharedConnectionName, connectionName);
+				} else {
+					connection = JDBCUtil.openConnection(processContext, connectionName);
+				}
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -129,6 +134,13 @@ public class JDBCLoader extends AbstractLoader {
 			}
 		}
 		
+//		try {
+////			connection.setAutoCommit(false);
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 	}
 	
 	/* (non-Javadoc)
@@ -141,7 +153,12 @@ public class JDBCLoader extends AbstractLoader {
 		
 		if (connection != null) {
 			try {
-				connection.close();
+//				connection.commit();
+				if (sharedConnectionName == null) {
+					// only close the connection if it is not shared!
+					connection.close();
+				}
+				
 			} catch (SQLException e) {
 				throw new ETLException("Error closing connection: " + e, e);
 			}
@@ -444,6 +461,8 @@ public class JDBCLoader extends AbstractLoader {
 			case Types.BIGINT:
 				if (value instanceof Integer) {
 					ps.setInt(idx, (Integer)value);
+				} else if (value instanceof Long) {
+					ps.setLong(idx, (Long)value);
 				} else if (value instanceof String) {
 					ps.setInt(idx, Integer.parseInt((String)value));
 				}
@@ -763,5 +782,19 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setIgnoreUnchangedRecords(boolean ignoreUnchangedRecords) {
 		this.ignoreUnchangedRecords = ignoreUnchangedRecords;
+	}
+
+	/**
+	 * @return the sharedConnectionName
+	 */
+	public String getSharedConnectionName() {
+		return sharedConnectionName;
+	}
+
+	/**
+	 * @param sharedConnectionName the sharedConnectionName to set
+	 */
+	public void setSharedConnectionName(String sharedConnectionName) {
+		this.sharedConnectionName = sharedConnectionName;
 	}
 }

@@ -53,6 +53,14 @@ public interface ICubeDataMapper {
 	public Double getValue(IMeasure measure, IRecord record) throws ETLException;
 	
 	
-	
+	/**
+	 * Returns true if the record may be loaded into the cube. The default
+	 * implementation returns true, but it may be overriden to implement
+	 * a customized filter.
+	 * @param record
+	 * @return
+	 * @throws ETLException
+	 */
+	public boolean accept(IRecord record) throws ETLException;
 
 }

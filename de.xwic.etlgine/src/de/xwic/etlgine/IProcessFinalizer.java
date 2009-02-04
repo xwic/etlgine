@@ -14,6 +14,6 @@ public interface IProcessFinalizer {
 	 * Invoked when the process is done.
 	 * @param context
 	 */
-	public void onFinish(IProcessContext context);
+	public void onFinish(IProcessContext context) throws ETLException;
 	
 }

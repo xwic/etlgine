@@ -121,4 +121,11 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		return mm.getValue(cube, record);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#accept(de.xwic.etlgine.IRecord)
+	 */
+	public boolean accept(IRecord record) throws ETLException {
+		return true;
+	}
+	
 }

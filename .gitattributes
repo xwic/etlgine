@@ -1134,6 +1134,8 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.java -te
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipEntrySource.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipSources.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/DateTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/TrimTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/FileLookupTrigger.java -text

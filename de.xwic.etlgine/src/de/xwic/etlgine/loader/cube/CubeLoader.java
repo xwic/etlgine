@@ -78,23 +78,26 @@ public class CubeLoader extends AbstractLoader {
 	 */
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 
-		Key key = cube.createKey("");
-		int idx = 0;
-		for (IDimension dim : cube.getDimensions()) {
-			
-			IDimensionElement element = dataMapper.getElement(dim, record);
-			if (element == null) {
-				// invalid data
-				return;
-			}
-			key.setDimensionElement(idx++, element);
-			
-		}
+		if (dataMapper.accept(record)) {
 		
-		for (IMeasure measure : dataMapper.getMeasures()) {
-			Double value = dataMapper.getValue(measure, record);
-			if (value != null) {
-				cube.addCellValue(key, measure, value);
+			Key key = cube.createKey("");
+			int idx = 0;
+			for (IDimension dim : cube.getDimensions()) {
+				
+				IDimensionElement element = dataMapper.getElement(dim, record);
+				if (element == null) {
+					// invalid data
+					return;
+				}
+				key.setDimensionElement(idx++, element);
+				
+			}
+			
+			for (IMeasure measure : dataMapper.getMeasures()) {
+				Double value = dataMapper.getValue(measure, record);
+				if (value != null) {
+					cube.addCellValue(key, measure, value);
+				}
 			}
 		}
 		

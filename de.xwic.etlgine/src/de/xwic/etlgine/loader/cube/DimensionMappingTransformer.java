@@ -50,6 +50,8 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	private List<DimMapper> mappers = null;
 	private IDimensionElement parentElm;
 	
+	private boolean forceRemap = false;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
 	 */
@@ -133,72 +135,73 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 		super.processRecord(processContext, record);
 		
+		if(forceRemap || record.getData(targetColumn) == null) {
 		
-		
-		// build the source key
-		StringBuilder sbSource = new StringBuilder();
-		boolean first = true;
-		for (IColumn sourceCol : sourceColumns) {
-			if (first) {
-				first = false;
-			} else {
-				sbSource.append("/");
-			}
-			String val = record.getDataAsString(sourceCol);
-			if (val != null) {
-				// escape '/'
-				val = val.replace('/', '&');
-				sbSource.append(val);
-			} else {
-				sbSource.append(nullValue);
-			}
-		}
-		
-		String value = sbSource.toString();
-		
-		// lookup MappingDef
-		DimMappingElementDef elmDef = null;
-		for (DimMapper mapper : mappers) {
-			if (mapper.match(value)) {
-				elmDef = mapper.getDimMappingElementDef();
-				break;
-			}
-		}
-
-		// do the mapping...
-		if (elmDef != null) {
-			if (elmDef.isSkipRecord()) {
-				record.setSkip(true);
-			} else {
-				record.setData(targetColumn, elmDef.getElementPath());
-			}
-		} else {
-			// no mapping found
-			switch (mappingDef.getOnUnmapped()) {
-			case ASSIGN:
-				//processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
-				record.setData(targetColumn, mappingDef.getUnmappedPath());
-				break;
-			case CREATE: {
-				String[] path = value.split("/");
-				IDimensionElement elm = parentElm;
-				for (String key : path) {
-					if (elm.containsDimensionElement(key)) {
-						elm = elm.getDimensionElement(key);
-					} else {
-						elm = elm.createDimensionElement(key);
-					}
+			// build the source key
+			StringBuilder sbSource = new StringBuilder();
+			boolean first = true;
+			for (IColumn sourceCol : sourceColumns) {
+				if (first) {
+					first = false;
+				} else {
+					sbSource.append("/");
 				}
-				record.setData(targetColumn, elm.getPath());
-			}
-			break;
-			case FAIL:
-				throw new ETLException("Unable to map value '" + value + "' - Aborting process!");
-			case SKIP:
-				record.setSkip(true);
-				break;
+				String val = record.getDataAsString(sourceCol);
+				if (val != null) {
+					// escape '/'
+					val = val.replace('/', '&');
+					sbSource.append(val);
+				} else {
+					sbSource.append(nullValue);
+				}
 			}
 			
+			String value = sbSource.toString();
+			
+			// lookup MappingDef
+			DimMappingElementDef elmDef = null;
+			for (DimMapper mapper : mappers) {
+				if (mapper.match(value)) {
+					elmDef = mapper.getDimMappingElementDef();
+					break;
+				}
+			}
+	
+			// do the mapping...
+			if (elmDef != null) {
+				if (elmDef.isSkipRecord()) {
+					record.setSkip(true);
+				} else {
+					record.setData(targetColumn, elmDef.getElementPath());
+				}
+			} else {
+				// no mapping found
+				switch (mappingDef.getOnUnmapped()) {
+				case ASSIGN:
+					//processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
+					record.setData(targetColumn, mappingDef.getUnmappedPath());
+					break;
+				case CREATE: {
+					String[] path = value.split("/");
+					IDimensionElement elm = parentElm;
+					for (String key : path) {
+						if (elm.containsDimensionElement(key)) {
+							elm = elm.getDimensionElement(key);
+						} else {
+							elm = elm.createDimensionElement(key);
+						}
+					}
+					record.setData(targetColumn, elm.getPath());
+				}
+				break;
+				case FAIL:
+					throw new ETLException("Unable to map value '" + value + "' - Aborting process!");
+				case SKIP:
+					record.setSkip(true);
+					break;
+				}
+				
+			}
 		}
 		
 	}
@@ -290,6 +293,20 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	public void setNullValue(String nullValue) {
 		this.nullValue = nullValue;
+	}
+
+	/**
+	 * @return the forceRemap
+	 */
+	public boolean isForceRemap() {
+		return forceRemap;
+	}
+
+	/**
+	 * @param forceRemap the forceRemap to set
+	 */
+	public void setForceRemap(boolean forceRemap) {
+		this.forceRemap = forceRemap;
 	}
 	
 }

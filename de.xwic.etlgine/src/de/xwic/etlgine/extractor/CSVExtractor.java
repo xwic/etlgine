@@ -4,7 +4,6 @@
 package de.xwic.etlgine.extractor;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,7 +99,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 			recordNumber = 0;
 			reachedEnd = false;
 			
-			InputStream in = new FileInputStream(fsrc.getFile());
+			InputStream in = fsrc.getInputStream();
 			
 			// determine encoding
 			if (fsrc.getEncoding() == null) {
@@ -112,11 +111,11 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 					encoding = "UTF-16LE";
 				} else {
 					in.close();
-					in = new FileInputStream(fsrc.getFile());
+					in = fsrc.getInputStream();
 				}
 				fsrc.setEncoding(encoding);
 			}
-			reader  = new CSVReader(new BufferedReader(StreamDecoder.forInputStreamReader(in, fsrc.getFile(), fsrc.getEncoding())), separator, quoteChar, skipLines);
+			reader  = new CSVReader(new BufferedReader(StreamDecoder.forInputStreamReader(in, fsrc, fsrc.getEncoding())), separator, quoteChar, skipLines);
 			if (containsHeader) {
 				String[] header = reader.readNext();
 				if (header == null) {

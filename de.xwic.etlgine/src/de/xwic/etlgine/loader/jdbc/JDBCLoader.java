@@ -53,6 +53,7 @@ public class JDBCLoader extends AbstractLoader {
 	private String tablename = null;
 	private boolean autoCreateColumns = false;
 	private boolean ignoreMissingTargetColumns = false;
+	private boolean treatEmptyAsNull = false;
 	private boolean truncateTable = false;
 	private boolean autoDataTruncate = false;
 	
@@ -441,7 +442,7 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	private void setPSValue(PreparedStatement ps, int idx, Object value, DbColumnDef colDef) throws SQLException, ETLException {
 
-		if (value == null) {
+		if (value == null || (treatEmptyAsNull && value instanceof String && ((String)value).length() == 0)) {
 			ps.setNull(idx, colDef.getType());
 		} else {
 			switch (colDef.getType()) {
@@ -796,5 +797,19 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setSharedConnectionName(String sharedConnectionName) {
 		this.sharedConnectionName = sharedConnectionName;
+	}
+	
+	/**
+	 * @return the treatEmptyAsNull
+	 */
+	public boolean isTreatEmptyAsNull() {
+		return treatEmptyAsNull;
+	}
+	
+	/**
+	 * @param treatEmptyAsNull the treatEmptyAsNull to set
+	 */
+	public void setTreatEmptyAsNull(boolean treatEmptyAsNull) {
+		this.treatEmptyAsNull = treatEmptyAsNull;
 	}
 }

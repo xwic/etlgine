@@ -148,7 +148,7 @@ public class XLSExtractor extends AbstractExtractor {
 		}
 		currSource = (XLSFileSource)source;
 		try {
-			inputStream = new FileInputStream(currSource.getFile());
+			inputStream = currSource.getInputStream();
 			workbook = new HSSFWorkbook(new POIFSFileSystem(inputStream));
 			
 			if (currSource.isContainsHeader()) {

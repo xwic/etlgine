@@ -4,6 +4,9 @@
 package de.xwic.etlgine.sources;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import de.xwic.etlgine.ISource;
 
@@ -116,5 +119,13 @@ public class FileSource implements ISource {
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+	
+	/**
+	 * @return new InputStream for file.
+	 * @throws IOException
+	 */
+	public InputStream getInputStream() throws IOException {
+		return new FileInputStream(file);
 	}
 }

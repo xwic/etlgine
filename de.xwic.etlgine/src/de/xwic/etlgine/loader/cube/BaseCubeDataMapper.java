@@ -127,5 +127,12 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	public boolean accept(IRecord record) throws ETLException {
 		return true;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#clearCube(de.xwic.cube.ICube)
+	 */
+	public void clearCube(ICube cube) {
+		cube.clear();
+	}
 	
 }

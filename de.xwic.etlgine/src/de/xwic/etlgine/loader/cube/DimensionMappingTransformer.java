@@ -35,22 +35,22 @@ import de.xwic.etlgine.util.Validate;
  */
 public class DimensionMappingTransformer extends AbstractTransformer {
 
-	private String dataPoolName = null;
-	private String[] sourceColumnNames = null;
-	private String separator = "/";
-	private String targetColumnName = null;
-	private String mappingName = null;
-	private String nullValue = "";
+	protected String dataPoolName = null;
+	protected String[] sourceColumnNames = null;
+	protected String separator = "/";
+	protected String targetColumnName = null;
+	protected String mappingName = null;
+	protected String nullValue = "";
 	
 	protected IDataPool dataPool = null;
-	private DimMappingDef mappingDef = null;
-	private IColumn[] sourceColumns = null;
-	private IColumn targetColumn = null;
-	private List<DimMappingElementDef> mappingElements = null;
-	private List<DimMapper> mappers = null;
-	private IDimensionElement parentElm;
+	protected DimMappingDef mappingDef = null;
+	protected IColumn[] sourceColumns = null;
+	protected IColumn targetColumn = null;
+	protected List<DimMappingElementDef> mappingElements = null;
+	protected List<DimMapper> mappers = null;
+	protected IDimensionElement parentElm;
 	
-	private boolean forceRemap = false;
+	protected boolean forceRemap = false;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
@@ -307,6 +307,13 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	public void setForceRemap(boolean forceRemap) {
 		this.forceRemap = forceRemap;
+	}
+
+	/**
+	 * @param sourceColumns the sourceColumns to set
+	 */
+	protected void setSourceColumns(IColumn[] sourceColumns) {
+		this.sourceColumns = sourceColumns;
 	}
 	
 }

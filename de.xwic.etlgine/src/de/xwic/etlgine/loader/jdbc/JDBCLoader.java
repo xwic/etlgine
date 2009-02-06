@@ -488,9 +488,12 @@ public class JDBCLoader extends AbstractLoader {
 				if (value instanceof Date) {
 					ps.setDate(idx, new java.sql.Date(((Date)value).getTime()));
 				} else if (value instanceof String) {
-					// let database worry about the format for now
-					// TODO parse String to Date
-					ps.setString(idx, (String)value);
+					String s = (String)value;
+					if (s.length() == 0) {
+						ps.setNull(idx, colDef.getType());
+					} else {
+						ps.setString(idx, s);
+					}
 				}
 				break;
 			case Types.TINYINT:

@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.mortbay.log.Log;
@@ -75,6 +76,9 @@ public class JDBCLoader extends AbstractLoader {
 	private Map<String, DbColumnDef> columns;
 	private Set<String> ignoredColumns = new HashSet<String>();
 	
+	/** custom jdbc properties */
+	private Properties properties = new Properties();
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
@@ -108,7 +112,11 @@ public class JDBCLoader extends AbstractLoader {
 					throw new ETLException("The specified driver (" + driverName + ") can not be found.", e);
 				}
 				
-				connection = DriverManager.getConnection(connectionUrl, username, password);
+				
+				properties.setProperty("user", username);
+				properties.setProperty("password", password);
+				
+				connection = DriverManager.getConnection(connectionUrl, properties);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -814,5 +822,28 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setTreatEmptyAsNull(boolean treatEmptyAsNull) {
 		this.treatEmptyAsNull = treatEmptyAsNull;
+	}
+	
+	/**
+	 * @return the properties
+	 */
+	public Properties getProperties() {
+		return properties;
+	}
+	
+	/**
+	 * @param properties the properties to set
+	 */
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+	
+	/**
+	 * Set jdbc property for connection.
+	 * @param key
+	 * @param value
+	 */
+	public void setProperty(String key, String value) {
+		properties.put(key, value);
 	}
 }

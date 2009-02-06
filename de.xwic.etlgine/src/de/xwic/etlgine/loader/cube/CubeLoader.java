@@ -68,7 +68,7 @@ public class CubeLoader extends AbstractLoader {
 		dataMapper.initialize(processContext, cube);
 		
 		if (isClearCubeBeforeStart()) {
-			cube.clear();
+			dataMapper.clearCube(cube);
 		}
 		
 	}

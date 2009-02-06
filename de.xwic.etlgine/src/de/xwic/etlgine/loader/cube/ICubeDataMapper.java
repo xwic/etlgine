@@ -63,4 +63,10 @@ public interface ICubeDataMapper {
 	 */
 	public boolean accept(IRecord record) throws ETLException;
 
+	/**
+	 * Clear the cube.
+	 * @param cube
+	 */
+	public void clearCube(ICube cube);
+
 }

@@ -5,7 +5,7 @@
 import de.xwic.etlgine.*
 import de.xwic.etlgine.loader.jdbc.JDBCLoader
 
-def source = new TestRndSource(10000);
+def source = new TestRndSource(60000);
 
 process.addSource(source);
 

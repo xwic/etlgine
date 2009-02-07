@@ -8,6 +8,42 @@
  	font-weight: bold;
  }
  
+ #serverName {
+ 	color: #ffffff;
+ 	float: right;
+ }
+ 
+ #statusBar {
+ 	width: 200px;
+ 	height: 800px;
+ 	float: left;
+ 	background-color: #F0F0F0;
+ 	background: url(img/sbfade2.png);
+ }
+ 
+ div.srvStatus {
+ 	border: 1px solid #A0A0A0;
+ 	margin: 4px 15px 2px 4px;
+ 	background-color: #ffffff;
+ }
+ div.srcStatusHeader {
+ 	background-color: #000030;
+ 	color: #ffffff;
+ 	text-align: center;
+ 	font-weight: bold;
+ }
+ div.srvStatusContent {
+ 	padding: 2px;
+ }
+ 
+ div.srvStatus td {
+ 	font-size: 8pt;
+ }
+ div.srvStatus td.caption {
+ 	font-size: 8pt;
+ 	color: #000000;
+ }
+
  div.breadCrump {
  	margin-top: 4px;
  	margin-left: 5px;
@@ -164,4 +200,7 @@
  	font-family: Arial;
  	font-size: 10pt;
  }
+ 
+ 
+ 
  

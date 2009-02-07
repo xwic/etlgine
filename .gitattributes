@@ -887,6 +887,7 @@ de.xwic.etlgine/server/web/ecolib/treeviewer/expand.png -text
 de.xwic.etlgine/server/web/ecolib/treeviewer/treeviewer.css -text
 de.xwic.etlgine/server/web/ecolib/treeviewer/treeviewer.js -text
 de.xwic.etlgine/server/web/etladmin.css -text
+de.xwic.etlgine/server/web/etladmin.js -text
 de.xwic.etlgine/server/web/img/Thumbs.db -text
 de.xwic.etlgine/server/web/img/add.png -text
 de.xwic.etlgine/server/web/img/application_go.png -text
@@ -1107,6 +1108,8 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/MainMenuControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/MainMenuControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StackedContentContainer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StackedContentContainer.vtl -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StatusControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StatusControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPAdminControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPAdminControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPDetailsControl.java -text

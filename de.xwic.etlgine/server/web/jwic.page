@@ -8,6 +8,8 @@
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/json2.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
 
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/etladmin.js"></SCRIPT>
+
 #parse("jwic/jwic.page.body")
 
 ## Uncomment the following line to enable debug informations

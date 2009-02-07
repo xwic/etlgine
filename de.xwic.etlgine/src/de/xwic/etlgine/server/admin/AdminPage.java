@@ -5,6 +5,7 @@ package de.xwic.etlgine.server.admin;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
+import de.xwic.etlgine.server.ETLgineServer;
 
 /**
  * @author Developer
@@ -33,6 +34,16 @@ public class AdminPage extends Page {
 		
 		new BreadCrumpControl(this, "breadcrump", content);
 		new MainMenuControl(content, "mm");
+		new StatusControl(this, "status");
+		
+	}
+	
+	/**
+	 * Returns the server name.
+	 * @return
+	 */
+	public String getServerName() {
+		return ETLgineServer.getInstance().getServerContext().getProperty("name", "unnamed");
 		
 	}
 

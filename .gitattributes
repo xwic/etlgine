@@ -1190,6 +1190,16 @@ de.xwic.webkit.admin.user/src/de/pol/netapp/amis/admin/users/editor/UserEditorVi
 de.xwic.webkit.admin.user/src/de/pol/netapp/amis/admin/users/editor/UserEditorView.vtl -text
 de.xwic.webkit.admin.user/src/de/pol/netapp/amis/admin/users/editor/security/SecurityEditor.java -text
 de.xwic.webkit.admin.user/src/de/pol/netapp/amis/admin/users/editor/security/SecurityEditorView.vtl -text
+external/OpenCSV/.classpath -text
+external/OpenCSV/.project -text
+external/OpenCSV/src/au/com/bytecode/opencsv/CSVReader.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/CSVWriter.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/bean/ColumnPositionMappingStrategy.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/bean/CsvToBean.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/bean/HeaderColumnNameMappingStrategy.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/bean/HeaderColumnNameTranslateMappingStrategy.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/bean/MappingStrategy.java -text
+external/OpenCSV/src/au/com/bytecode/opencsv/bean/package.html -text
 external/libs.common.jwic/.classpath -text
 external/libs.common.jwic/.project -text
 external/libs.common.jwic/lib/commons-collections-2.1.jar -text

@@ -112,4 +112,9 @@ public interface IJob {
 	 */
 	public abstract void notifyEnqueued();
 
+	/**
+	 * @return
+	 */
+	public abstract String getDurationInfo();
+
 }

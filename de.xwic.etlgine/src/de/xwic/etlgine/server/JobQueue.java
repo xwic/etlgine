@@ -110,5 +110,20 @@ public class JobQueue implements Runnable {
 	public IJob getActiveJob() {
 		return activeJob;
 	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * Returns the size of the queue.
+	 * @return
+	 */
+	public int getSize() {
+		return queue.size();
+	}
 	
 }

@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="$contextPath/xwiccube/xwiccube.css">
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/json2.js"></SCRIPT>
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/etladmin.js"></SCRIPT>
 
 #parse("jwic/jwic.page.body")
 

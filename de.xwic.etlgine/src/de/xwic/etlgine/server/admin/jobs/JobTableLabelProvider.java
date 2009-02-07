@@ -59,18 +59,9 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 			IJob.State state = job.getState();
 			cell.text = state.name();
 			if (state == IJob.State.RUNNING) {
-				long duration = System.currentTimeMillis() - job.getLastStarted().getTime();
-				int ms = (int)(duration % 1000);
-				int sec = (int)((duration / 1000) % 60);
-				int min = (int)(duration / 60000);
-				cell.text = cell.text + " (" + min + "m " + sec + "s " + ms + "ms)";
+				cell.text = cell.text + " (" + job.getDurationInfo() + ")";
 			} else if (state == IJob.State.FINISHED || state == IJob.State.FINISHED_WITH_ERROR) {
-				long duration = job.getLastFinished().getTime() - job.getLastStarted().getTime();
-				int ms = (int)(duration % 1000);
-				int sec = (int)((duration / 1000) % 60);
-				int min = (int)(duration / 60000);
-				cell.text = cell.text + " (" + min + "m " + sec + "s " + ms + "ms)";
-				
+				cell.text = cell.text + " (" + job.getDurationInfo() + ")";
 			}
 		
 		} else if ("nextRun".equals(column.getUserObject())) {

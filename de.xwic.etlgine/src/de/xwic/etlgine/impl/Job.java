@@ -7,6 +7,7 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Date;
 
 import de.xwic.etlgine.ETLException;
@@ -235,6 +236,35 @@ public class Job implements IJob {
 	 */
 	public void notifyEnqueued() {
 		state = State.ENQUEUED;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IJob#getDurationInfo()
+	 */
+	public String getDurationInfo() {
+		
+		NumberFormat nf = NumberFormat.getNumberInstance();
+		nf.setMinimumIntegerDigits(2);
+		nf.setMaximumFractionDigits(0);
+		String sDuration = "";
+		if (state == IJob.State.RUNNING) {
+			long duration = System.currentTimeMillis() - getLastStarted().getTime();
+			int ms = (int)(duration % 1000);
+			int sec = (int)((duration / 1000) % 60);
+			int min = (int)(duration / 60000);
+			sDuration = nf.format(min) + ":" + nf.format(sec) + ":" + nf.format(ms); 
+			
+		} else if (state == IJob.State.FINISHED || state == IJob.State.FINISHED_WITH_ERROR) {
+			long duration = getLastFinished().getTime() - getLastStarted().getTime();
+			int ms = (int)(duration % 1000);
+			int sec = (int)((duration / 1000) % 60);
+			int min = (int)(duration / 60000);
+			sDuration = nf.format(min) + ":" + nf.format(sec) + ":" + nf.format(ms);
+			
+		}
+		return sDuration;
+		
 		
 	}
 	

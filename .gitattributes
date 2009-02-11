@@ -603,6 +603,7 @@ de.xwic.cube/src/de/xwic/cube/IDimensionElement.java -text
 de.xwic.cube/src/de/xwic/cube/IIdentifyable.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasure.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasureFunction.java -text
+de.xwic.cube/src/de/xwic/cube/IQuery.java -text
 de.xwic.cube/src/de/xwic/cube/IValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/IValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/Key.java -text
@@ -622,6 +623,7 @@ de.xwic.cube/src/de/xwic/cube/impl/Dimension.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DimensionElement.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Identifyable.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Measure.java -text
+de.xwic.cube/src/de/xwic/cube/impl/Query.java -text
 de.xwic.cube/src/de/xwic/cube/storage/impl/FileDataPoolStorageProvider.java -text
 de.xwic.cube/src/de/xwic/cube/storage/impl/JDBCDataPoolStorageProvider.java -text
 de.xwic.cube/src/de/xwic/cube/util/DataDump.java -text

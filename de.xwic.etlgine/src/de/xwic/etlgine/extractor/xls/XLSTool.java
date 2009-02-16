@@ -44,6 +44,14 @@ public class XLSTool {
 					return cell.getNumericCellValue();
 				case HSSFCell.CELL_TYPE_STRING:
 					return cell.getRichStringCellValue().getString();
+				case HSSFCell.CELL_TYPE_FORMULA:
+					// try string first
+					String s = cell.getRichStringCellValue().getString();
+					if (s == null || s.length() == 0) {
+						return cell.getNumericCellValue();
+					} else {
+						return s;
+					}
 				}
 			}
 		}

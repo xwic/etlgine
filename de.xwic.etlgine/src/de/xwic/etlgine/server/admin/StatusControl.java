@@ -16,6 +16,8 @@ import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IProcess;
+import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.JobQueue;
 import de.xwic.etlgine.server.ServerContext;
@@ -54,7 +56,7 @@ public class StatusControl extends Control implements IResourceControl {
 		NumberFormat nf = NumberFormat.getIntegerInstance();
 
 		pw.println("<tr><td class=\"caption\">");
-		pw.println("Max Memory:</td><td>");
+		pw.println("Max:</td><td>");
 		pw.println(nf.format(rt.maxMemory() / 1024) + "k");
 		pw.println("</td></tr>");
 
@@ -62,17 +64,17 @@ public class StatusControl extends Control implements IResourceControl {
 		long free = rt.freeMemory() / 1024;
 		
 		pw.println("<tr><td class=\"caption\">");
-		pw.println("Total Memory:</td><td>");
+		pw.println("Total:</td><td>");
 		pw.println(nf.format(total) + "k");
 		pw.println("</td></tr>");
 
 		pw.println("<tr><td class=\"caption\">");
-		pw.println("Free Memory:</td><td>");
+		pw.println("Free:</td><td>");
 		pw.println(nf.format(free) + "k");
 		pw.println("</td></tr>");
 
 		pw.println("<tr><td class=\"caption\">");
-		pw.println("Used Memory:</td><td>");
+		pw.println("Used:</td><td>");
 		pw.println(nf.format(total - free) + "k");
 		pw.println("</td></tr>");
 
@@ -117,6 +119,45 @@ public class StatusControl extends Control implements IResourceControl {
 				pw.println("Duration:</td><td>");
 				pw.println(job.getDurationInfo());
 				pw.println("</td></tr>");
+
+				IProcess p = job.getProcessChain().getActiveProcess();
+				if (p != null) {
+					pw.println("<tr><td class=\"caption\">");
+					pw.println("Process:</td><td>");
+					pw.println(p.getName());
+					pw.println("</td></tr>");
+
+					ISource source = p.getContext().getCurrentSource();
+					if (source != null) {
+						String name = source.getName();
+						if (name != null) {
+							if (name.lastIndexOf('\\') != -1) {
+								name = name.substring(name.lastIndexOf('\\') + 1);
+							}
+							if (name.length() > 30) {
+								name = name.substring(name.length() - 30);
+							}
+							pw.println("<tr><td class=\"caption\">");
+							pw.println("Source:</td><td>");
+							pw.println(name);
+							pw.println("</td></tr>");
+						}
+					}
+					
+					pw.println("<tr><td class=\"caption\">");
+					pw.println("Record:</td><td>");
+					
+					long count = p.getContext().getRecordsCount();
+					
+					pw.println(nf.format(count));
+					
+					long duration = (System.currentTimeMillis() - job.getLastStarted().getTime()) / 1000;
+					if (duration > 0) {
+						pw.println("(" + nf.format(count / duration) + "/sec)");
+					}
+					
+					pw.println("</td></tr>");
+				}
 				
 			}
 		}

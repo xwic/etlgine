@@ -5,6 +5,7 @@ package de.xwic.etlgine.trigger;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.channels.FileLock;
 
 import de.xwic.etlgine.ITrigger;
 
@@ -37,7 +38,19 @@ public class FileLookupTrigger implements ITrigger {
 		if (file.exists()) {
 			try {
 				FileOutputStream fos = new FileOutputStream(file, true);
-				fos.close();
+				
+				// try to lock the file. If it fails, the file is still "in use"
+				// and can not be processed.
+				
+				FileLock lock = fos.getChannel().tryLock();
+				try {
+					if (lock == null) {
+						return false;
+					}
+					lock.release();
+				} finally {
+					fos.close();
+				}
 				
 				long size = file.length();
 				// if the file size has not increased since the last check, we can be

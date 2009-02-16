@@ -61,5 +61,10 @@ public interface IProcessChain {
 	 */
 	public IETLProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException;
 
+	/**
+	 * Returns the currently active process or null.
+	 * @return
+	 */
+	public IProcess getActiveProcess();
 
 }

@@ -48,7 +48,7 @@ public class ZipEntrySource extends FileSource {
 	 */
 	@Override
 	public String getName() {
-		return super.getName();
+		return zipEntry.getName();
 	}
 
 	/* (non-Javadoc)

@@ -173,6 +173,8 @@ public class Record implements IRecord, Cloneable {
 		Object val = getData(column);
 		if (val instanceof Double) {
 			return (Double)val;
+		} else if (val instanceof Number) {
+			return ((Number)val).doubleValue();
 		} else if (val instanceof String) {
 			String s = (String)val;
 			if (s.length() == 0) {

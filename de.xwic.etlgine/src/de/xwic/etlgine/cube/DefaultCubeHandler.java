@@ -14,6 +14,7 @@ package de.xwic.etlgine.cube;
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.StorageException;
+import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 
 /**
@@ -67,7 +68,15 @@ public class DefaultCubeHandler extends CubeHandler {
 	 * @throws StorageException
 	 */
 	public IDataPool getDefaultDataPool() throws StorageException {
-		return getDataPoolManager(defaultDataPoolKey).getDataPool(defaultDataPoolKey);
+		//return getDataPoolManager(defaultDataPoolKey).getDataPool(defaultDataPoolKey);
+		try {
+			return openDataPool(defaultDataPoolKey);
+		} catch (ETLException e) {
+			if (e.getCause() instanceof StorageException) {
+				throw (StorageException)e.getCause();
+			}
+			throw new StorageException(e);
+		}
 	}
 	
 	/**

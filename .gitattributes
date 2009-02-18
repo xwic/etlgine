@@ -341,6 +341,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/BaseLabelPr
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/BaseView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/BaseView.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/DeleteFailedException.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/EmployeeSelectionCombo.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/IEntityListBoxControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/ListModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/components/SiteWizardContainer.java -text

@@ -158,50 +158,62 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			
 			String value = sbSource.toString();
 			
-			// lookup MappingDef
-			DimMappingElementDef elmDef = null;
-			for (DimMapper mapper : mappers) {
-				if (mapper.match(value)) {
-					elmDef = mapper.getDimMappingElementDef();
-					break;
-				}
-			}
-	
-			// do the mapping...
-			if (elmDef != null) {
-				if (elmDef.isSkipRecord()) {
-					record.setSkip(true);
-				} else {
-					record.setData(targetColumn, elmDef.getElementPath());
-				}
-			} else {
-				// no mapping found
-				switch (mappingDef.getOnUnmapped()) {
-				case ASSIGN:
-					//processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
-					record.setData(targetColumn, mappingDef.getUnmappedPath());
-					break;
-				case CREATE: {
-					String[] path = value.split("/");
-					IDimensionElement elm = parentElm;
-					for (String key : path) {
-						if (elm.containsDimensionElement(key)) {
-							elm = elm.getDimensionElement(key);
-						} else {
-							elm = elm.createDimensionElement(key);
-						}
-					}
-					record.setData(targetColumn, elm.getPath());
-				}
+			doMapping(processContext, record, value);
+		}
+		
+	}
+
+	/**
+	 * @param processContext
+	 * @param record
+	 * @param value
+	 * @throws ETLException 
+	 */
+	protected void doMapping(IProcessContext processContext, IRecord record, String value) throws ETLException {
+		
+		// lookup MappingDef
+		DimMappingElementDef elmDef = null;
+		for (DimMapper mapper : mappers) {
+			if (mapper.match(value)) {
+				elmDef = mapper.getDimMappingElementDef();
 				break;
-				case FAIL:
-					throw new ETLException("Unable to map value '" + value + "' - Aborting process!");
-				case SKIP:
-					record.setSkip(true);
-					break;
-				}
-				
 			}
+		}
+
+		// do the mapping...
+		if (elmDef != null) {
+			if (elmDef.isSkipRecord()) {
+				record.setSkip(true);
+			} else {
+				record.setData(targetColumn, elmDef.getElementPath());
+			}
+		} else {
+			// no mapping found
+			switch (mappingDef.getOnUnmapped()) {
+			case ASSIGN:
+				//processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
+				record.setData(targetColumn, mappingDef.getUnmappedPath());
+				break;
+			case CREATE: {
+				String[] path = value.split("/");
+				IDimensionElement elm = parentElm;
+				for (String key : path) {
+					if (elm.containsDimensionElement(key)) {
+						elm = elm.getDimensionElement(key);
+					} else {
+						elm = elm.createDimensionElement(key);
+					}
+				}
+				record.setData(targetColumn, elm.getPath());
+			}
+			break;
+			case FAIL:
+				throw new ETLException("Unable to map value '" + value + "' - Aborting process!");
+			case SKIP:
+				record.setSkip(true);
+				break;
+			}
+			
 		}
 		
 	}

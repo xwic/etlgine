@@ -7,8 +7,10 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -25,6 +27,11 @@ import de.xwic.etlgine.impl.Job;
  */
 public class ServerContext extends Context {
 
+	enum EventType {
+		JOB_EXECUTION_START,
+		JOB_EXECUTION_END
+	}
+	
 	public final static String DEFAULT_QUEUE = "default";
 	
 	protected final Log log = LogFactory.getLog(getClass());
@@ -32,11 +39,51 @@ public class ServerContext extends Context {
 	private Map<String, IJob> jobs = new HashMap<String, IJob>();
 	private Map<String, JobQueue> queues = new HashMap<String, JobQueue>();
 
+	private List<IServerContextListener> listeners = new ArrayList<IServerContextListener>();
+	
 	/**
 	 * 
 	 */
 	public ServerContext() {
 		queues.put(DEFAULT_QUEUE, new JobQueue(this, DEFAULT_QUEUE));
+	}
+	
+	/**
+	 * Add a IServerContextListener.
+	 * @param listener
+	 */
+	public synchronized void addServerContextListener(IServerContextListener listener) {
+		listeners.add(listener);
+	}
+	
+	/**
+	 * Remove a listener.
+	 * @param listener
+	 */
+	public synchronized void removeServerContextListener(IServerContextListener listener) {
+		listeners.remove(listener);
+	}
+	
+	/**
+	 * Notify listeners of a new event.
+	 * @param et
+	 * @param event
+	 */
+	void fireEvent(EventType et, ServerContextEvent event) {
+		
+		IServerContextListener[] ls = new IServerContextListener[listeners.size()];
+		ls = listeners.toArray(ls);
+		for (IServerContextListener listener : ls) {
+			switch (et) {
+			case JOB_EXECUTION_END:
+				listener.jobExecutionEnd(event);
+				break;
+			case JOB_EXECUTION_START:
+				listener.jobExecutionStart(event);
+				break;
+			}
+		}
+		
 	}
 	
 	/**

@@ -117,4 +117,14 @@ public interface IJob {
 	 */
 	public abstract String getDurationInfo();
 
+	/**
+	 * @return the jobId
+	 */
+	public String getJobId();
+
+	/**
+	 * @param jobId the jobId to set
+	 */
+	public void setJobId(String jobId);
+
 }

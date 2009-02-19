@@ -4,6 +4,8 @@
 package de.xwic.etlgine.server.admin.jobs;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import de.jwic.base.IControlContainer;
@@ -53,6 +55,13 @@ public class JobAdminControl extends BaseContentContainer {
 		
 		jobList = new ArrayList<IJob>();
 		jobList.addAll(ETLgineServer.getInstance().getServerContext().getJobs());
+		
+		Collections.sort(jobList, new Comparator<IJob>() {
+			public int compare(IJob o1, IJob o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		
 		
 		table.setContentProvider(new ListContentProvider(jobList));
 		table.setTableLabelProvider(new JobTableLabelProvider());

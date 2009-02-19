@@ -35,6 +35,8 @@ public class Job implements IJob {
 	private State state = State.NEW;
 	private Throwable lastException = null;
 	
+	private String jobId = null;
+	
 	/**
 	 * @param name
 	 */
@@ -266,6 +268,20 @@ public class Job implements IJob {
 		return sDuration;
 		
 		
+	}
+
+	/**
+	 * @return the jobId
+	 */
+	public String getJobId() {
+		return jobId;
+	}
+
+	/**
+	 * @param jobId the jobId to set
+	 */
+	public void setJobId(String jobId) {
+		this.jobId = jobId;
 	}
 	
 }

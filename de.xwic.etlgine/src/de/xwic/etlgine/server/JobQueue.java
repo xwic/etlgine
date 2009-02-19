@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.server.ServerContext.EventType;
 
 /**
  * 
@@ -86,8 +87,10 @@ public class JobQueue implements Runnable {
 			if (activeJob != null) {
 				try {
 					log.info("[Queue " + name +"]: Executing Job " + activeJob.getName());
+					context.fireEvent(EventType.JOB_EXECUTION_START, new ServerContextEvent(this, activeJob));
 					activeJob.execute(context);
 					log.info("[Queue " + name +"]: Job " + activeJob.getName() + " finished execution.");
+					context.fireEvent(EventType.JOB_EXECUTION_END, new ServerContextEvent(this, activeJob, activeJob.getState()));
 				} catch (Throwable t) {
 					log.error("Error executing job " + activeJob.getName() + " in queue " + name + ": " + t, t);
 				}

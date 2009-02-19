@@ -1097,11 +1097,14 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ScriptedCubeDataMapper.java -tex
 de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/JDBCLoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineConsole.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineServer.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/IServerContextListener.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/JobQueue.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/Launch.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenOutputStream.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenPrintStream.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ServerContext.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/ServerContextAdapter.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/ServerContextEvent.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/AdminApplication.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/AdminPage.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/AdminPage.vtl -text
@@ -1148,6 +1151,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipSources.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/DateTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/TrimTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/FileLookupTrigger.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/trigger/JobExecutedTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/util/Validate.java -text
 de.xwic.etlgine/src_test/de/xwic/etlgine/CubeLoaderTest.java -text

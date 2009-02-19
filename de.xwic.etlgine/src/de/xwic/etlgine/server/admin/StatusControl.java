@@ -120,7 +120,7 @@ public class StatusControl extends Control implements IResourceControl {
 				pw.println(job.getDurationInfo());
 				pw.println("</td></tr>");
 
-				IProcess p = job.getProcessChain().getActiveProcess();
+				IProcess p = job.getProcessChain() != null ? job.getProcessChain().getActiveProcess() : null;
 				if (p != null) {
 					pw.println("<tr><td class=\"caption\">");
 					pw.println("Process:</td><td>");

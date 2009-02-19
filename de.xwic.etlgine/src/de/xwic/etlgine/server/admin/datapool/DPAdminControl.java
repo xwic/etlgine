@@ -20,6 +20,7 @@ import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDataPoolManager;
+import de.xwic.cube.StorageException;
 import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.loader.cube.DataPoolInitializer;
 import de.xwic.etlgine.server.ETLgineServer;
@@ -37,6 +38,7 @@ public class DPAdminControl extends BaseContentContainer {
 	private TableViewer table;
 	private ButtonControl btInitialize;
 	private ButtonControl btOpen;
+	private ButtonControl btRelease;
 	private TableModel tableModel;
 	private CubeHandler cubeHandler;
 	
@@ -123,6 +125,42 @@ public class DPAdminControl extends BaseContentContainer {
 				doDbInitialize();
 			}
 		});
+		
+		btRelease = new ButtonControl(abar, "release");
+		btRelease.setTitle("Release");
+		btRelease.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				doRelease();
+			}
+		});
+	}
+
+	/**
+	 * 
+	 */
+	protected void doRelease() {
+		
+		ServerContext context = ETLgineServer.getInstance().getServerContext();
+		String dpmKey = tableModel.getFirstSelectedKey();
+		String key = context.getProperty(dpmKey + ".datapool.key", null);
+		
+		if (key != null) {
+			try {
+				IDataPoolManager dpm = cubeHandler.getDataPoolManager(dpmKey);
+				IDataPool pool;
+				if (dpm.isDataPoolLoaded(key)) {
+					pool = dpm.getDataPool(key);
+					dpm.releaseDataPool(pool);
+				}
+				table.setRequireRedraw(true);
+			} catch (StorageException se) {
+				log.error("Error releasing dataPool", se);
+				throw new RuntimeException("Error releasing DP" + se, se);
+			}
+		}
 	}
 
 	/**

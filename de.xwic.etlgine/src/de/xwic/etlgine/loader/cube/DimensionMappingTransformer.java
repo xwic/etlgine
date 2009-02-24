@@ -137,30 +137,37 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		
 		if(forceRemap || record.getData(targetColumn) == null) {
 		
-			// build the source key
-			StringBuilder sbSource = new StringBuilder();
-			boolean first = true;
-			for (IColumn sourceCol : sourceColumns) {
-				if (first) {
-					first = false;
-				} else {
-					sbSource.append("/");
-				}
-				String val = record.getDataAsString(sourceCol);
-				if (val != null) {
-					// escape '/'
-					val = val.replace('/', '&');
-					sbSource.append(val);
-				} else {
-					sbSource.append(nullValue);
-				}
-			}
-			
-			String value = sbSource.toString();
-			
-			doMapping(processContext, record, value);
+			doMapping(processContext, record, sourceColumns);
 		}
 		
+	}
+
+	/**
+	 * @param processContext
+	 * @param record
+	 * @param sourceColumns
+	 * @throws ETLException 
+	 */
+	protected void doMapping(IProcessContext processContext, IRecord record, IColumn[] sourceColumns) throws ETLException {
+		// build the source key
+		StringBuilder sbSource = new StringBuilder();
+		for (IColumn sourceCol : sourceColumns) {
+			if (sbSource.length() > 0) {
+				sbSource.append("/");
+			}
+			String val = record.getDataAsString(sourceCol);
+			if (val != null) {
+				// escape '/'
+				val = val.replace('/', '&');
+				sbSource.append(val);
+			} else {
+				sbSource.append(nullValue);
+			}
+		}
+		
+		String value = sbSource.toString();
+		
+		doMapping(processContext, record, value);
 	}
 
 	/**

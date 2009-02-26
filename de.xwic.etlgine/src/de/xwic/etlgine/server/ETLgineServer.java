@@ -12,12 +12,14 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.xml.XmlConfiguration;
 
+import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.cube.CubeHandler;
@@ -156,16 +158,23 @@ public class ETLgineServer implements Runnable {
 		//log.info("Redirecting System.out");
 		//System.setOut(new PrintStream(new ScreenOutputStream(screen)));
 
-		File configFile = new File(pathConfig, "log4j.properties");
-		if (!configFile.exists()) {
-			System.out.println("Log4J config file log4j.properties does not exist.");
-			return false;
+		File configFile = new File(pathConfig, "log4j.xml");
+		boolean isXml = configFile.exists(); 
+		if (!isXml) {
+			configFile = new File(pathConfig, "log4j.properties");
+			if (!configFile.exists()) {
+				System.out.println("Log4J config file log4j.xml or log4j.properties does not exist.");
+				return false;
+			}
 		}
-		
+
 		// Initialize logging
 		System.out.println("Initializing Log4J");
-		PropertyConfigurator.configure(configFile.getAbsolutePath());
-		
+		if (isXml) {
+			DOMConfigurator.configureAndWatch(configFile.getAbsolutePath(), DefaultMonitor.STATUS_INTERVALL / 2);
+		} else {
+			PropertyConfigurator.configureAndWatch(configFile.getAbsolutePath(), DefaultMonitor.STATUS_INTERVALL / 2);
+		}
 	
 		File fileServerConf = new File(pathConfig, "server.properties");
 		if (!fileServerConf.exists()) {

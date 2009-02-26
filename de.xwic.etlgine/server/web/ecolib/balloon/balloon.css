@@ -1,0 +1,243 @@
+/*
+ * By default the balloon is hidden
+ */
+table.balloon_hide {
+	position: absolute;
+	display: none;
+}
+
+/*
+ * Default balloon content
+ */
+ 
+tbody.balloon td.balloon_left {
+	width: 6px;
+	background: white url("../../ecolib/balloon/default_dott.gif") repeat-y;
+}
+tbody.balloon td.balloon_right {
+	width: 7px;
+	background: transparent url("../../ecolib/balloon/default_cr.gif") repeat-y;
+}
+
+tbody.balloon td.balloon_content {
+	background-color: white;
+}
+
+/*
+ * Default head and foot
+ */
+table.balloon_head {
+	width: 100%;
+}
+table.balloon_foot {
+	width: 100%;
+}
+
+/*
+ * Default balloon pointing bottom left
+ */
+/* table */
+table.balloon_default_bl {
+	position: absolute;
+	border-collapse: collapse;
+}
+/* head left */
+table.balloon_default_bl table.balloon_head td.left {
+	width: 6px;
+	height: 6px;
+	min-width: 7px;
+	background: transparent url("../../ecolib/balloon/default_b_tl.gif") no-repeat;
+}
+/* head center */
+table.balloon_default_bl table.balloon_head td.center {
+	height: 6px;
+	background: white url("../../ecolib/balloon/default_dott.gif") repeat-x;
+}
+table.balloon_default_bl table.balloon_head td.center div {
+	width: 100%;
+	background-color: white;
+	font-size: 1px;
+}
+/* head right */
+table.balloon_default_bl table.balloon_head td.right {
+	width: 7px;
+	height: 6px;
+	background: transparent url("../../ecolib/balloon/default_b_tr.gif") no-repeat;
+}
+/* foot left */
+table.balloon_default_bl table.balloon_foot td.left {
+	width: 19px;
+	height: 15px;
+	background: transparent url("../../ecolib/balloon/default_bl_bl.gif") no-repeat;
+}
+/* foot center */
+table.balloon_default_bl table.balloon_foot td.center {
+	height: 15px;
+	background: transparent url("../../ecolib/balloon/default_b_c.gif") repeat-x;
+}
+table.balloon_default_bl table.balloon_foot td.center div {
+	width: 100%;
+	font-size: 1px;
+}
+/* foot right */
+table.balloon_default_bl table.balloon_foot td.right {
+	width: 7px;
+	height: 15px;
+	background: transparent url("../../ecolib/balloon/default_bl_br.gif") no-repeat;
+}
+
+/*
+ * Default balloon pointing bottom right
+ */
+/* table */
+table.balloon_default_br {
+	position: absolute;
+	border-collapse: collapse;
+}
+/* head left */
+table.balloon_default_br table.balloon_head td.left {
+	width: 6px;
+	height: 6px;
+	min-width: 7px;
+	background: transparent url("../../ecolib/balloon/default_b_tl.gif") no-repeat;
+}
+/* head center */
+table.balloon_default_br table.balloon_head td.center {
+	height: 6px;
+	background: white url("../../ecolib/balloon/default_dott.gif") repeat-x;
+}
+table.balloon_default_br table.balloon_head td.center div {
+	width: 100%;
+	background-color: white;
+	font-size: 1px;
+}
+/* head right */
+table.balloon_default_br table.balloon_head td.right {
+	width: 7px;
+	height: 6px;
+	background: transparent url("../../ecolib/balloon/default_b_tr.gif") no-repeat;
+}
+/* foot left */
+table.balloon_default_br table.balloon_foot td.left {
+	width: 6px;
+	height: 15px;
+	background: transparent url("../../ecolib/balloon/default_t_bl.gif") no-repeat;
+}
+/* foot center */
+table.balloon_default_br table.balloon_foot td.center {
+	height: 15px;
+	background: transparent url("../../ecolib/balloon/default_b_c.gif") repeat-x;
+}
+table.balloon_default_br table.balloon_foot td.center div {
+	width: 100%;
+	font-size: 1px;
+}
+/* foot right */
+table.balloon_default_br table.balloon_foot td.right {
+	width: 19px;
+	height: 15px;
+	background: transparent url("../../ecolib/balloon/default_br_br.gif") no-repeat;
+}
+
+/*
+ * Default balloon pointing top left
+ */
+/* table */
+table.balloon_default_tl {
+	position: absolute;
+	border-collapse: collapse;
+}
+/* head left */
+table.balloon_default_tl table.balloon_head td.left {
+	width: 19px;
+	height: 14px;
+	min-width: 7px;
+	background: transparent url("../../ecolib/balloon/default_tl_tl.gif") no-repeat;
+}
+/* head center */
+table.balloon_default_tl table.balloon_head td.center {
+	height: 14px;
+	background: transparent url("../../ecolib/balloon/default_t_c.gif") repeat-x;
+}
+table.balloon_default_tl table.balloon_head td.center div {
+	width: 100%;
+	font-size: 1px;
+}
+/* head right */
+table.balloon_default_tl table.balloon_head td.right {
+	width: 7px;
+	height: 14px;
+	background: transparent url("../../ecolib/balloon/default_b_tr.gif") no-repeat 0px 8px;
+}
+/* foot left */
+table.balloon_default_tl table.balloon_foot td.left {
+	width: 6px;
+	height: 7px;
+	background: transparent url("../../ecolib/balloon/default_t_bl.gif") no-repeat;
+}
+/* foot center */
+table.balloon_default_tl table.balloon_foot td.center {
+	height: 8px;
+	background: transparent url("../../ecolib/balloon/default_b_c.gif") repeat-x;
+}
+table.balloon_default_tl table.balloon_foot td.center div {
+	width: 100%;
+	font-size: 1px;
+}
+/* foot right */
+table.balloon_default_tl table.balloon_foot td.right {
+	width: 7px;
+	height: 7px;
+	background: transparent url("../../ecolib/balloon/default_bl_br.gif") no-repeat;
+}
+
+/*
+ * Default balloon pointing top right
+ */
+/* table */
+table.balloon_default_tr {
+	position: absolute;
+	border-collapse: collapse;
+}
+/* head left */
+table.balloon_default_tr table.balloon_head td.left {
+	width: 6px;
+	height: 14px;
+	background: transparent url("../../ecolib/balloon/default_b_tl.gif") no-repeat 0px 8px;
+}
+/* head center */
+table.balloon_default_tr table.balloon_head td.center {
+	height: 14px;
+	background: transparent url("../../ecolib/balloon/default_t_c.gif") repeat-x;
+}
+table.balloon_default_tr table.balloon_head td.center div {
+	width: 100%;
+	font-size: 1px;
+}
+/* head right */
+table.balloon_default_tr table.balloon_head td.right {
+	width: 19px;
+	height: 14px;
+	background: transparent url("../../ecolib/balloon/default_tr_tr.gif") no-repeat 0px 0px;
+}
+/* foot left */
+table.balloon_default_tr table.balloon_foot td.left {
+	width: 6px;
+	height: 7px;
+	background: transparent url("../../ecolib/balloon/default_t_bl.gif") no-repeat;
+}
+/* foot center */
+table.balloon_default_tr table.balloon_foot td.center {
+	height: 8px;
+	background: transparent url("../../ecolib/balloon/default_b_c.gif") repeat-x;
+}
+table.balloon_default_tr table.balloon_foot td.center div {
+	width: 100%;
+	font-size: 1px;
+}
+/* foot right */
+table.balloon_default_tr table.balloon_foot td.right {
+	width: 7px;
+	height: 7px;
+	background: transparent url("../../ecolib/balloon/default_bl_br.gif") no-repeat;
+}

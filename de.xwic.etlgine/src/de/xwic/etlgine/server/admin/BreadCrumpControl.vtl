@@ -1,0 +1,5 @@
+<div class="breadCrump">
+#foreach ($name in $control.nameList)
+	&gt;&gt; <a href="$control.createActionURL("goto", $name)">$control.getTitle($name)</a>
+#end
+</div>

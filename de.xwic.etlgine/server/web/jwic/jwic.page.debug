@@ -1,0 +1,16 @@
+<table width="100%" style="border-bottom: 1px solid #000000;">
+	<tr>
+		<td width="33%">Log:</td>
+		<td width="33%">Send:</td>
+		<td width="34%">Recieved:</td>
+	</tr>
+	<tr>
+		<td width="33%"><textarea name="_debugLog" rows="10" cols="80" style="font-size: 8pt; font-family: sans-serif"></textarea></td>
+		<td width="33%"><textarea name="_sendContent" rows="10" style="width:100%; font-size: 8pt; font-family: sans-serif"></textarea></td>
+		<td width="34%"><textarea name="_ajaxMessage" rows="10" style="width:100%; font-size: 8pt; font-family: sans-serif"></textarea></td>
+	</tr>
+</table>
+<script language="JavaScript">
+	debugMode = true;
+	log("Debug mode enabled");
+</script>

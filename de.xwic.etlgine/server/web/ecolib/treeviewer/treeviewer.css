@@ -1,0 +1,66 @@
+ /*
+  * Default Design
+  */
+
+ table.treeSimple {
+ 	background-color: window;
+ 	font-size: 8pt;
+ }
+
+ table.treeSimple select {
+ 	font-size: 8pt;
+ }
+
+ table.treeSimple div.tblContent {
+ 	border: 1px solid threedshadow;
+ }
+ table.treeSimple table.tblData {
+ 	/*background-color: window;*/
+ 	font-size: 8pt;
+ 	border-collapse: seperate;
+ 	table-layout: fixed;
+ }
+
+ table.treeSimple table.tblData th {
+ 	text-align: left;
+ 	background-color: threedface;
+ 	color: buttontext;
+ 	border: 0px;
+ 	height: 18px;
+ }
+
+ table.treeSimple table.tblData th.pushed {
+ 	background-color: highlight;
+ 	color: highlighttext;
+  }
+
+ table.treeSimple table.tblData td {
+ 	background-color: window;
+ 	color: windowtext;
+ 	font-size: 8pt;
+ 	border: 0px solid window;
+ 	white-space: nowrap;
+ 	cursor: default;
+ 	overflow: hidden;
+ 	padding: 1px 0px;
+ } 
+ 
+ table.treeSimple table.tblData table.inner td {
+ 	background-color: transparent;
+ 	border: 0px;
+ 	padding: 0px;
+ 	margin: 0px;
+ }  
+ table.treeSimple table.tblData tr.lastRow td {
+	border-bottom: 0px solid threedlightshadow;
+ } 
+
+ table.treeSimple table.tblData tr.selected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ } 
+ table.treeSimple table.tblData tr.lastRowselected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ 	border-bottom: 0px solid threedlightshadow;
+ } 

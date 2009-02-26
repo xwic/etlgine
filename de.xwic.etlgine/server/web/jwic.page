@@ -1,0 +1,22 @@
+#parse("jwic/jwic.page.header")
+#parse("ecolib/ecolib.page.header")
+
+	## add your custom META, SCRIPT or LINK tags here
+	<link rel="stylesheet" type="text/css" href="etladmin.css">
+	
+	<link rel="stylesheet" type="text/css" href="$contextPath/xwiccube/xwiccube.css">
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/json2.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
+
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/etladmin.js"></SCRIPT>
+
+#parse("jwic/jwic.page.body")
+
+## Uncomment the following line to enable debug informations
+## #parse("jwic/jwic.page.debug")
+
+<!-- content -->
+$content.render()
+<!-- /content -->
+
+#parse("jwic/jwic.page.footer")

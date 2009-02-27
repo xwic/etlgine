@@ -51,7 +51,9 @@ public class JobQueue implements Runnable {
 			job.notifyEnqueued();
 			log.debug("Adding job " + job.getName() + " to queue " + name);
 			queue.add(job);
-			myThread.interrupt();
+			//FLI: Do not interrupt the thread - some operations might stop immediately if the
+			//thread is interrupted. (i.e. FileChannel operations)
+			//myThread.interrupt();
 		} else {
 			throw new IllegalStateException("The specified job (" + job.getName() + ") is already queued for processing.");
 		}

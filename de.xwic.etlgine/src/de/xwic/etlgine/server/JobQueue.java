@@ -18,7 +18,7 @@ import de.xwic.etlgine.server.ServerContext.EventType;
  */
 public class JobQueue implements Runnable {
 
-	private static final int SLEEP_TIME = 30 * 1000;
+	private static final int SLEEP_TIME = 5 * 1000;
 	
 	private static final Log log = LogFactory.getLog(JobQueue.class);
 	
@@ -74,7 +74,9 @@ public class JobQueue implements Runnable {
 	public void stopQueue() {
 		log.info("Stopping queue " + name);
 		exitFlag = true;
-		myThread.interrupt();
+		if (activeJob == null) {
+			myThread.interrupt();
+		}
 	}
 	
 

@@ -670,6 +670,7 @@ de.xwic.etlgine/lib/jscreen-1.0.jar -text
 de.xwic.etlgine/lib/jtds-1.2.2.jar -text
 de.xwic.etlgine/lib/opencsv-1.8.jar -text
 de.xwic.etlgine/lib/poi-3.1-FINAL-20080629.jar -text
+de.xwic.etlgine/lib/spring-1.2-api.jar -text
 de.xwic.etlgine/lib/swt.jar -text
 de.xwic.etlgine/scripts/TestRnd2JDBC.groovy -text
 de.xwic.etlgine/scripts/test.groovy -text
@@ -1172,6 +1173,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobAdminControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/spring/ETLgineServerFactoryBean.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipEntrySource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipSources.java -text

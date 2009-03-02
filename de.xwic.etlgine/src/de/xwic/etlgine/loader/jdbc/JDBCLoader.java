@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.mortbay.log.Log;
+import org.apache.log4j.Logger;
 
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
@@ -38,6 +38,8 @@ import de.xwic.etlgine.util.Validate;
  */
 public class JDBCLoader extends AbstractLoader {
 
+	private static Logger log = Logger.getLogger(JDBCLoader.class.getName());
+	
 	public enum Mode {
 		INSERT,
 		UPDATE,
@@ -104,7 +106,7 @@ public class JDBCLoader extends AbstractLoader {
 				throw new ETLException("No password specified");
 			}
 			try {
-				Log.info("Using direct connection - URL: " + connectionUrl);
+				log.info("Using direct connection - URL: " + connectionUrl);
 				// initialize the driver
 				try {
 					Class.forName(driverName);
@@ -121,7 +123,7 @@ public class JDBCLoader extends AbstractLoader {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		} else {
-			Log.info("Using named connection: " + connectionName);
+			log.info("Using named connection: " + connectionName);
 			try {
 				if (sharedConnectionName != null) {
 					connection = JDBCUtil.getSharedConnection(processContext, sharedConnectionName, connectionName);

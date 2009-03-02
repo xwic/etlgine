@@ -33,6 +33,7 @@ public class ServerContext extends Context {
 	}
 	
 	public final static String DEFAULT_QUEUE = "default";
+	public final static String PROPERTY_WEBSERVER_START = "webserver.start";
 	
 	protected final Log log = LogFactory.getLog(getClass());
 	

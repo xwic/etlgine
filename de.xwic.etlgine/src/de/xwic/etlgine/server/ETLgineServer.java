@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.mortbay.jetty.Handler;
@@ -41,6 +42,8 @@ public class ETLgineServer implements Runnable {
 	
 	private ServerContext serverContext = new ServerContext();
 	
+	private boolean initialized = false;
+	private boolean initializing = false;
 	private boolean doExit = false;
 	private boolean exitAfterFinish = false;
 
@@ -56,6 +59,9 @@ public class ETLgineServer implements Runnable {
 	 * @return
 	 */
 	public static ETLgineServer getInstance() {
+		if (instance == null) {
+			instance = new ETLgineServer();
+		}
 		return instance;
 	}
 
@@ -141,6 +147,24 @@ public class ETLgineServer implements Runnable {
 	 * @throws ETLException 
 	 */
 	public boolean initialize() {
+		if (initialized) {
+			System.out.println("Server is already initialized.");
+			return true;
+		}
+		try {
+			initializing = true;
+			initialized = initializeServer();
+			return initialized;
+		} finally {
+			initializing = false;
+		}
+	}
+	
+	/**
+	 * Initialize the server.
+	 * @return
+	 */
+	private boolean initializeServer() {
 		
 		File path = new File(rootPath);
 		if (!path.exists()) {
@@ -158,30 +182,33 @@ public class ETLgineServer implements Runnable {
 		//log.info("Redirecting System.out");
 		//System.setOut(new PrintStream(new ScreenOutputStream(screen)));
 
-		File configFile = new File(pathConfig, "log4j.xml");
-		boolean isXml = configFile.exists(); 
-		if (!isXml) {
-			configFile = new File(pathConfig, "log4j.properties");
-			if (!configFile.exists()) {
-				System.out.println("Log4J config file log4j.xml or log4j.properties does not exist.");
-				return false;
+		// Initialize logging (only if it had not yet been initialized)
+		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
+
+			File configFile = new File(pathConfig, "log4j.xml");
+			boolean isXml = configFile.exists(); 
+			if (!isXml) {
+				configFile = new File(pathConfig, "log4j.properties");
+				if (!configFile.exists()) {
+					System.out.println("Log4J config file log4j.xml or log4j.properties does not exist.");
+					return false;
+				}
+			}
+
+			System.out.println("Initializing Log4J");
+			if (isXml) {
+				DOMConfigurator.configureAndWatch(configFile.getAbsolutePath(), DefaultMonitor.STATUS_INTERVALL / 2);
+			} else {
+				PropertyConfigurator.configureAndWatch(configFile.getAbsolutePath(), DefaultMonitor.STATUS_INTERVALL / 2);
 			}
 		}
-
-		// Initialize logging
-		System.out.println("Initializing Log4J");
-		if (isXml) {
-			DOMConfigurator.configureAndWatch(configFile.getAbsolutePath(), DefaultMonitor.STATUS_INTERVALL / 2);
-		} else {
-			PropertyConfigurator.configureAndWatch(configFile.getAbsolutePath(), DefaultMonitor.STATUS_INTERVALL / 2);
-		}
-	
+		
 		File fileServerConf = new File(pathConfig, "server.properties");
 		if (!fileServerConf.exists()) {
 			log.error("server.properties not found.");
 			return false;
 		}
-		
+
 		Properties props = new Properties();
 		try {
 			props.load(new FileInputStream(fileServerConf));
@@ -194,7 +221,10 @@ public class ETLgineServer implements Runnable {
 		// copy properties to server context
 		for (Object key : props.keySet()) {
 			String sKey = (String)key;
-			serverContext.setProperty(sKey, props.getProperty(sKey));
+			if (serverContext.getProperty(sKey) == null) {
+				// set only new properties
+				serverContext.setProperty(sKey, props.getProperty(sKey));
+			}
 		}
 
 		// load jobs
@@ -225,7 +255,7 @@ public class ETLgineServer implements Runnable {
 		log.info("Loaded " + cubeHandler.getDataPoolManagerKeys().size() + " DataPool(s).");
 		
 		// load webserver
-		if (serverContext.getPropertyBoolean("webserver.start", false)) {
+		if (serverContext.getPropertyBoolean(ServerContext.PROPERTY_WEBSERVER_START, false)) {
 			log.info("Initializing Webserver (Jetty)");
 			try {
 				jetty = new Server();
@@ -294,5 +324,17 @@ public class ETLgineServer implements Runnable {
 		this.exitAfterFinish = exitAfterFinish;
 	}
 
+	/**
+	 * @return the initialized
+	 */
+	public boolean isInitialized() {
+		return initialized;
+	}
 	
+	/**
+	 * @return the initializing
+	 */
+	public boolean isInitializing() {
+		return initializing;
+	}
 }

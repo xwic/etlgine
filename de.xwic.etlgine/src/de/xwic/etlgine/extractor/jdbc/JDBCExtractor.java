@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import org.mortbay.log.Log;
+import org.apache.log4j.Logger;
 
 import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
@@ -28,6 +28,8 @@ import de.xwic.etlgine.jdbc.JDBCUtil;
  */
 public class JDBCExtractor extends AbstractExtractor {
 
+	private static Logger log = Logger.getLogger(JDBCExtractor.class.getName());
+	
 	private Statement stmt = null;
 	private ResultSet rs = null;
 	private Connection connection = null;
@@ -145,7 +147,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				throw new ETLException("No password specified");
 			}
 			try {
-				Log.info("Using direct connection - URL: " + currSource.getConnectionUrl());
+				log.info("Using direct connection - URL: " + currSource.getConnectionUrl());
 				// initialize the driver
 				try {
 					Class.forName(currSource.getDriverName());
@@ -158,7 +160,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		} else {
-			Log.info("Using named connection: " + currSource.getConnectionName());
+			log.info("Using named connection: " + currSource.getConnectionName());
 			try {
 				if (currSource.getSharedConnectionName() != null) {
 					connection = JDBCUtil.getSharedConnection(context, currSource.getSharedConnectionName(), currSource.getConnectionName());

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import de.xwic.etlgine.IJob;
-
 import eu.lippisch.jscreen.runner.SwingRunner;
 import eu.lippisch.jscreen.runner.SwtRunner;
 
@@ -63,7 +62,7 @@ public class Launch {
 		
 		System.setProperty("root", new File(path).getAbsolutePath());
 		
-		ETLgineServer server = new ETLgineServer();
+		ETLgineServer server = ETLgineServer.getInstance();
 		server.setRootPath(path);
 		if (!server.initialize()) {
 			System.out.println("Server start failed.");
@@ -87,11 +86,13 @@ public class Launch {
 		}
 		
 		if (runJob != null) {
-			IJob job = server.getServerContext().getJob(runJob);
-			if (job == null) {
-				System.out.println("The specified job does not exist: " + runJob);
-			} else {
-				server.enqueueJob(job);
+			for (String rJob : runJob.split(";")) {
+				IJob job = server.getServerContext().getJob(rJob);
+				if (job == null) {
+					System.out.println("The specified job does not exist: " + runJob);
+				} else {
+					server.enqueueJob(job);
+				}
 			}
 			server.setExitAfterFinish(true);
 		}

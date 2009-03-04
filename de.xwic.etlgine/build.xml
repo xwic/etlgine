@@ -45,7 +45,7 @@
 		</jar>
 	</target>
 
-	<target name="etlgine" depends="xwic-cube-webui">
+	<target name="etlgine" depends="xwic-cube-webui,xwic-xlsbridge">
 		<antcall target="make-jar">
 			<param name="jar-file" value="xwic-etlgine.jar" />
 			<param name="jar-sources" value="${basedir}/src" />
@@ -65,6 +65,14 @@
 			<param name="jar-sources" value="../de.xwic.cube.webui/src" />
 		</antcall>
 	</target>
+	
+	<target name="xwic-xlsbridge" depends="xwic-cube">
+		<antcall target="make-jar">
+			<param name="jar-file" value="xwic-xlsbridge.jar" />
+			<param name="jar-sources" value="../de.xwic.cube.xlsbridge/src" />
+		</antcall>
+	</target>
+
 	
 	<target name="json">
 		<antcall target="make-jar">

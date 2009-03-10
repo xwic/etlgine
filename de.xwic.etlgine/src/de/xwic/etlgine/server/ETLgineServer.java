@@ -3,6 +3,9 @@
  */
 package de.xwic.etlgine.server;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -280,12 +283,51 @@ public class ETLgineServer implements Runnable {
 				jetty.start();
 				
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error starting webserver: " + e, e);
 			}
 		}
 		
+		// execute run scripts, if specified
+		
+		stk = new StringTokenizer(serverContext.getProperty("run", ""), ",; ");
+		while (stk.hasMoreTokens()) {
+			String scriptName = stk.nextToken();
+			try {
+				executeStartScript(scriptName);
+			} catch (Exception e) {
+				log.error("Error running startscript: " + e, e);
+				return false;
+			}
+		}
 		//System.setOut(oldPS);
 		return true;
+		
+	}
+
+	/**
+	 * @param scriptName
+	 * @throws Exception 
+	 */
+	private void executeStartScript(String scriptName) throws Exception {
+		
+		log.info("Executing Startscript " + scriptName);
+		
+		Binding binding = new Binding();
+		binding.setVariable("context", serverContext);
+
+		GroovyShell shell = new GroovyShell(binding);
+		
+		File file = new File(new File(rootPath), scriptName);
+		if (!file.exists()) {
+			throw new ETLException("The script file " + file.getAbsolutePath() + " does not exist.");
+		}
+		
+		try {
+			shell.evaluate(file);
+		} catch (Exception e) {
+			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
+		}
+
 		
 	}
 

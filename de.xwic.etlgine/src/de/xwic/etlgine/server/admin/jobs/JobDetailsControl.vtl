@@ -32,5 +32,9 @@ $insert.control("actionBar")
 		<td>Last Exception</td>
 		<td><textarea style="width: 100%; height: 80px">$!jwic.formatInp($!job.lastException.toString())</textarea></td>
 	</tr>
+	<tr>
+		<td>Log</td>
+		<td><textarea style="width: 100%; height: 250px">$!jwic.formatInp($!job.monitor.logBuffer)</textarea></td>
+	</tr>
 </table>
 </div>

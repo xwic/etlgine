@@ -677,6 +677,7 @@ de.xwic.etlgine/scripts/TestRnd2JDBC.groovy -text
 de.xwic.etlgine/scripts/test.groovy -text
 de.xwic.etlgine/scripts/testcube.init.groovy -text
 de.xwic.etlgine/scripts/testcube.mapping.groovy -text
+de.xwic.etlgine/server/autostart.groovy -text
 de.xwic.etlgine/server/config/jetty.xml -text
 de.xwic.etlgine/server/config/log4j.properties -text
 de.xwic.etlgine/server/config/realm.properties -text
@@ -1082,6 +1083,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/ISource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/Result.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeExportUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeHandler.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/DefaultCubeHandler.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMapper.java -text
@@ -1148,6 +1150,8 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StackedContentContainer.java -t
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StackedContentContainer.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StatusControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StatusControl.vtl -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeDownloadControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeDownloadControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPAdminControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPAdminControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPDetailsControl.java -text

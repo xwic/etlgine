@@ -42,4 +42,16 @@ public interface IMonitor {
 	 */
 	public void logError(String string, Throwable t);
 
+	/**
+	 * Returns the content of the log buffer. The log buffer contains up to 256k of the
+	 * last log entries.
+	 * @return
+	 */
+	public String getLogBuffer();
+
+	/**
+	 * Reset the monitor prior to a new job execution.
+	 */
+	public void reset();
+
 }

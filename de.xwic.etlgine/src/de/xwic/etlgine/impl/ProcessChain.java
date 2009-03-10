@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IGlobalContext;
@@ -27,7 +28,7 @@ import de.xwic.etlgine.Result;
 public class ProcessChain implements IProcessChain {
 
 	private final String name;
-	private IMonitor monitor;
+	private IMonitor monitor = new DefaultMonitor();
 	private IGlobalContext globalContext;
 
 	private List<IProcess> processList = new ArrayList<IProcess>();
@@ -58,6 +59,7 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public void addCustomProcess(IProcess process) {
 		processList.add(process);
+		process.setMonitor(monitor);
 	}
 	
 	/* (non-Javadoc)
@@ -65,6 +67,7 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public IETLProcess createProcess(String name) {
 		IETLProcess process = new ETLProcess(globalContext, name);
+		process.setMonitor(monitor);
 		processList.add(process);
 		return process;
 	}
@@ -85,6 +88,7 @@ public class ProcessChain implements IProcessChain {
 		}
 		
 		IETLProcess process = new ETLProcess(globalContext, name);
+		process.setMonitor(monitor);
 		
 		Binding binding = new Binding();
 		binding.setVariable("context", globalContext);

@@ -1,0 +1,8 @@
+<iframe id="iframe_$control.controlID" src="blank.html" style="visibility: hidden; position:absolute; left: 0px; top: 0px;"></iframe>
+#if($control.showDownload) 
+	$control.setShowDownload(false)
+	<script language="JavaScript">
+		var IF = document.getElementById("iframe_$control.controlID");
+		IF.src = "$control.downloadURL";
+	</script>
+#end

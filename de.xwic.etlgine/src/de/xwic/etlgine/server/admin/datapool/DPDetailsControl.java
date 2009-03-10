@@ -13,6 +13,7 @@ import de.jwic.controls.ButtonControl;
 import de.jwic.ecolib.controls.ErrorWarningControl;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.cube.ICube;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.StorageException;
@@ -43,6 +44,8 @@ public class DPDetailsControl extends BaseContentContainer {
 	
 	private ErrorWarningControl errInfo;
 	private CubeHandler cubeHandler;
+	
+	private CubeDownloadControl cubeDownload;
 	
 	/**
 	 * @param container
@@ -113,6 +116,8 @@ public class DPDetailsControl extends BaseContentContainer {
 		});
 
 		
+		cubeDownload = new CubeDownloadControl(this, "cubeDownload");
+		
 		loadDataPoolInfo();
 		
 	}
@@ -128,7 +133,7 @@ public class DPDetailsControl extends BaseContentContainer {
 		
 		
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -185,6 +190,28 @@ public class DPDetailsControl extends BaseContentContainer {
 		StackedContentContainer sc = (StackedContentContainer)getContainer();
 		DimensionEditorControl dimEditor = new DimensionEditorControl(sc, null, dataPool.getDimension(dimKey));
 		sc.setCurrentControlName(dimEditor.getName());		
+		
+	}
+	
+	/**
+	 * Export the Cube with leafs only.
+	 * @param cubeKey
+	 */
+	public void actionExportCube(String cubeKey) {
+		
+		ICube cube = dataPool.getCube(cubeKey);
+		cubeDownload.startDownload(cube, true);
+		
+	}
+
+	/**
+	 * Export the cube including all cells.
+	 * @param cubeKey
+	 */
+	public void actionExportFullCube(String cubeKey) {
+		
+		ICube cube = dataPool.getCube(cubeKey);
+		cubeDownload.startDownload(cube, false);
 		
 	}
 

@@ -54,7 +54,8 @@ $insert.control("errInfo")
 			</tr>
 		#foreach($cube in $pool.cubes)
 			<tr>
-				<td class="data" valign="top">$cube.key</td>
+				<td class="data" valign="top">$cube.key<br>
+				<a class="small" href="$control.createActionURL("exportCube", $cube.key)">Download as CSV</a></td>
 				<td class="data" valign="top">$!cube.title</td>
 				<td class="data" width="170" valign="top"><ul>
 					#foreach($dim in $cube.dimensions)
@@ -79,3 +80,4 @@ $insert.control("errInfo")
 	
 #end
 </div>
+$insert.control("cubeDownload")

@@ -5,7 +5,7 @@
 import de.xwic.etlgine.*
 import de.xwic.etlgine.loader.jdbc.JDBCLoader
 
-def source = new TestRndSource(60000);
+def source = new TestRndSource(6000);
 
 process.addSource(source);
 
@@ -26,12 +26,12 @@ process.addLoader(jdbcLoader);
 
 // add a test transformer
 class MyTransformer extends AbstractTransformer {
-	public void processRecord(IContext context, IRecord record) throws ETLException {
+	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 		def obj = record.getDataAsDouble("Bookings");
 		if (obj != null) {
 			record.setData("Bookings", -obj);
 		}
 	}
 }
-process.addTransformer(new MyTransformer());
+//process.addTransformer(new MyTransformer());
 

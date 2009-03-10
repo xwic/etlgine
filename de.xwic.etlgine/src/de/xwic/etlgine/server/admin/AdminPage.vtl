@@ -2,13 +2,19 @@
   <div id="serverName">$control.serverName</div>
   ETLgine Administrator
 </div>
-<div id="statusBar">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr>
+ <td valign="top" width="210"><div id="statusBar">
 	<br>
 	$insert.control("status")
 	<br>
 	$insert.control("btGC")
-</div>
+</div></td>
+<td valign="top">
 $insert.control("breadcrump")
 <div id="content">
 $insert.control("content")
 </div>
+</td>
+</tr>
+</table>

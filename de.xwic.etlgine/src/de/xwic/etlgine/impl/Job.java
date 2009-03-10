@@ -10,10 +10,12 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.Date;
 
+import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.ETLgine;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.ITrigger;
 
@@ -34,6 +36,7 @@ public class Job implements IJob {
 	
 	private State state = State.NEW;
 	private Throwable lastException = null;
+	private IMonitor monitor = new DefaultMonitor();
 	
 	private String jobId = null;
 	
@@ -55,6 +58,7 @@ public class Job implements IJob {
 		}
 		executing = true;
 		lastStarted = new Date();
+		monitor.reset();
 		state = State.RUNNING;
 		if (trigger != null) {
 			trigger.notifyJobStarted();
@@ -93,6 +97,7 @@ public class Job implements IJob {
 	private void loadChainFromScript(IContext context) throws ETLException {
 		
 		processChain = ETLgine.createProcessChain(context, chainScriptName);
+		processChain.setMonitor(monitor);
 		
 		Binding binding = new Binding();
 		binding.setVariable("job", this);
@@ -282,6 +287,20 @@ public class Job implements IJob {
 	 */
 	public void setJobId(String jobId) {
 		this.jobId = jobId;
+	}
+
+	/**
+	 * @return the monitor
+	 */
+	public IMonitor getMonitor() {
+		return monitor;
+	}
+
+	/**
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(IMonitor monitor) {
+		this.monitor = monitor;
 	}
 	
 }

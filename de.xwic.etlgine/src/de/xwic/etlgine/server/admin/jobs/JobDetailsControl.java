@@ -31,6 +31,7 @@ public class JobDetailsControl extends BaseContentContainer {
 
 		setTitle("Job Details (" + job.getName() + ")");
 		
+		
 		createActionBar();
 		
 	}

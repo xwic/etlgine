@@ -20,7 +20,7 @@ import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.ITrigger;
 
 /**
- * @author Developer
+ * @author Florian Lippisch
  *
  */
 public class Job implements IJob {

@@ -1085,6 +1085,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/ITrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/Result.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeExportUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeHandler.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeImportUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/DefaultCubeHandler.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDef.java -text

@@ -51,6 +51,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	protected IDimensionElement parentElm;
 	
 	protected boolean forceRemap = false;
+	protected boolean autoCreateTargetColumn = false;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
@@ -123,7 +124,11 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		}
 		
 		if (!dataSet.containsColumn(targetColumnName)) {
-			throw new ETLException("The DataSet does not contain the target column " + targetColumnName);
+			if (autoCreateTargetColumn) {
+				targetColumn = dataSet.addColumn(targetColumnName);
+			} else {
+				throw new ETLException("The DataSet does not contain the target column " + targetColumnName);
+			}
 		}
 		targetColumn = dataSet.getColumn(targetColumnName);
 	}
@@ -137,7 +142,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		
 		if(forceRemap || record.getData(targetColumn) == null) {
 		
-			doMapping(processContext, record, sourceColumns);
+			doMappingByColumns(processContext, record, sourceColumns);
 		}
 		
 	}
@@ -148,7 +153,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 * @param sourceColumns
 	 * @throws ETLException 
 	 */
-	protected void doMapping(IProcessContext processContext, IRecord record, IColumn[] sourceColumns) throws ETLException {
+	protected void doMappingByColumns(IProcessContext processContext, IRecord record, IColumn[] sourceColumns) throws ETLException {
 		// build the source key
 		StringBuilder sbSource = new StringBuilder();
 		for (IColumn sourceCol : sourceColumns) {
@@ -333,6 +338,20 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	protected void setSourceColumns(IColumn[] sourceColumns) {
 		this.sourceColumns = sourceColumns;
+	}
+
+	/**
+	 * @return the autocreateTargetColumn
+	 */
+	public boolean isAutoCreateTargetColumn() {
+		return autoCreateTargetColumn;
+	}
+
+	/**
+	 * @param autocreateTargetColumn the autocreateTargetColumn to set
+	 */
+	public void setAutoCreateTargetColumn(boolean autocreateTargetColumn) {
+		this.autoCreateTargetColumn = autocreateTargetColumn;
 	}
 	
 }

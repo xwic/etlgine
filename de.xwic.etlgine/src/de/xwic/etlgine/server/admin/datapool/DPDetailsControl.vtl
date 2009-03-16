@@ -54,8 +54,9 @@ $insert.control("errInfo")
 			</tr>
 		#foreach($cube in $pool.cubes)
 			<tr>
-				<td class="data" valign="top">$cube.key<br>
-				<a class="small" href="$control.createActionURL("exportCube", $cube.key)">Download as CSV</a></td>
+				<td class="data" valign="top"><a href="$control.createActionURL("viewCube", $cube.key)">$cube.key</a><br>
+				<a class="small" href="$control.createActionURL("exportCube", $cube.key)">Download as CSV</a> <a class="small" href="$control.createActionURL("exportFullCube", $cube.key)">(Full)</a><br>
+				</td>
 				<td class="data" valign="top">$!cube.title</td>
 				<td class="data" width="170" valign="top"><ul>
 					#foreach($dim in $cube.dimensions)

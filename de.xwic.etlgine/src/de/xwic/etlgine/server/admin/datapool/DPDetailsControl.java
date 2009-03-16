@@ -203,6 +203,19 @@ public class DPDetailsControl extends BaseContentContainer {
 		cubeDownload.startDownload(cube, true);
 		
 	}
+	
+	/**
+	 * View the cube details.
+	 * @param cubeKey
+	 */
+	public void actionViewCube(String cubeKey) {
+		
+		ICube cube = dataPool.getCube(cubeKey);
+		StackedContentContainer sc = (StackedContentContainer)getContainer();
+		CubeDetailsControl control = new CubeDetailsControl(sc, null, cube);
+		sc.setCurrentControlName(control.getName());		
+
+	}
 
 	/**
 	 * Export the cube including all cells.

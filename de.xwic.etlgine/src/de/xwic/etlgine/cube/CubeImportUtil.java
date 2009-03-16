@@ -17,7 +17,10 @@ import au.com.bytecode.opencsv.CSVReader;
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
+import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.Key;
+import de.xwic.etlgine.ETLException;
 
 /**
  * Import data from a CSV file into an ICube. There must be one column for each dimension
@@ -41,8 +44,9 @@ public class CubeImportUtil {
 	 * @param in
 	 * @param cube
 	 * @throws IOException
+	 * @throws ETLException 
 	 */
-	public static void importCSV(InputStream in, ICube cube) throws IOException {
+	public static void importCSV(InputStream in, ICube cube) throws IOException, ETLException {
 	
 		new CubeImportUtil()._importCSV(in, cube);
 		
@@ -53,8 +57,9 @@ public class CubeImportUtil {
 	 * @param in
 	 * @param cube
 	 * @throws IOException
+	 * @throws ETLException 
 	 */
-	private void _importCSV(InputStream in, ICube cube) throws IOException {
+	private void _importCSV(InputStream in, ICube cube) throws IOException, ETLException {
 		
 		CSVReader csvIn = new CSVReader(new BufferedReader(new InputStreamReader(in)));
 		
@@ -87,6 +92,49 @@ public class CubeImportUtil {
 				log.warn("Unknown column: [" + key + "] - the column will be ignored.");
 			}
 			idx++;
+		}
+		
+		// check if all dimensions in the cube are represented in the file
+		
+		for (IDimension dim : cube.getDimensions()) {
+			if (!dimRef.containsKey(dim)) {
+				throw new ETLException("The file does not contain the dimension '" + dim.getKey() + "', which is defined in the cube.");
+			}
+		}
+		
+		if (meRef.size() == 0) {
+			throw new ETLException("The file does not contain any measure data that is defined by the cube.");
+		}
+		
+		// start reading
+		String[] data;
+		Key key = cube.createKey("");
+		
+		while ((data = csvIn.readNext()) != null) {
+			
+			int keyIdx = 0;
+			for (IDimension dim : cube.getDimensions()) {
+				idx = dimRef.get(dim);
+				String path = data[idx];
+				
+				IDimensionElement elm = dim.parsePath(path);
+				key.setDimensionElement(keyIdx, elm);
+				keyIdx++;
+			}
+			
+			// read measures
+			for (IMeasure measure : meRef.keySet()) {
+				idx = meRef.get(measure);
+				String value = data[idx];
+				if (value.length() == 0) {
+					// do nothing
+				} else {
+					double dblValue = Double.parseDouble(value);
+					cube.addCellValue(key, measure, dblValue);
+				}
+			}
+			
+			
 		}
 		
 	}

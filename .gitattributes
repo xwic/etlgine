@@ -645,6 +645,7 @@ de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/functions/DifferenceFunction.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cell.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
+de.xwic.cube/src/de/xwic/cube/impl/CubeFlexCalc.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPool.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPoolManager.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Dimension.java -text
@@ -657,11 +658,13 @@ de.xwic.cube/src/de/xwic/cube/storage/impl/JDBCDataPoolStorageProvider.java -tex
 de.xwic.cube/src/de/xwic/cube/util/CubeUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/DataDump.java -text
 de.xwic.cube/src/de/xwic/cube/util/JDBCSerializerUtil.java -text
+de.xwic.cube/src_test/de/xwic/cube/CubeFlexCalcTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeSpeedTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/DataPoolManagerTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/Demo.java -text
 de.xwic.cube/src_test/de/xwic/cube/SizeOptimizationTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/SpeedTest.java -text
 de.xwic.etlgine/.classpath -text
 de.xwic.etlgine/.project -text
 de.xwic.etlgine/.settings/org.eclipse.jdt.ui.prefs -text
@@ -1151,8 +1154,12 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StackedContentContainer.java -t
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StackedContentContainer.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StatusControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/StatusControl.vtl -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeDetailsControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeDetailsControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeDownloadControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeDownloadControl.vtl -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeImportControl.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/CubeImportControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPAdminControl.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPAdminControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/datapool/DPDetailsControl.java -text

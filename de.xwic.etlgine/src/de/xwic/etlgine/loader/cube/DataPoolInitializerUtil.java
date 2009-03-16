@@ -150,13 +150,26 @@ public class DataPoolInitializerUtil {
 	}
 
 	/**
-	 * Ensure that the specified cube exists. If it does not exist, it is created.
+	 * Ensure that the specified cube exists. If it does not exist, a cube of type DEFAULT is created.
 	 * @param key
 	 * @param dimKeys
 	 * @param measureKeys
 	 * @return
 	 */
 	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys) {
+		return ensureCube(key, dimKeys, measureKeys, IDataPool.CubeType.DEFAULT);
+	}
+	
+	/**
+	 * Ensure that the specified cube exists. If it does not exists, it is created with the 
+	 * specified cubeType setting.
+	 * @param key
+	 * @param dimKeys
+	 * @param measureKeys
+	 * @param cubeType
+	 * @return
+	 */
+	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType) {
 		if (!pool.containsCube(key)) {
 			IDimension[] dimensions = new IDimension[dimKeys.size()];
 			for (int i = 0; i < dimKeys.size(); i++) {
@@ -166,7 +179,7 @@ public class DataPoolInitializerUtil {
 			for (int i = 0; i < measureKeys.size(); i++) {
 				measures[i] = pool.getMeasure(measureKeys.get(i));
 			}
-			pool.createCube(key, dimensions, measures);
+			pool.createCube(key, dimensions, measures, cubeType);
 		}
 		return pool.getCube(key);
 	}

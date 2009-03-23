@@ -30,7 +30,7 @@ public class CubeExportUtil {
 	
 	private class Exporter implements ICellListener {
 		public boolean onCell(Key key, ICell cell) {
-			if (!leafsOnly || key.containsLeafsOnly()) {
+			if (!leafsOnly || key.isLeaf()) {
 				int i = 0;
 				for (IDimensionElement dim : key.getDimensionElements()) {
 					data[i++] = dim.getPath();

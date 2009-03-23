@@ -327,11 +327,13 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistorySelWizPa
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistorySelectionWizard.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/EditorToolkit.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/ExtendedApplication.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/ExtendedApplicationLoginPage.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/INavigationEventListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/IPageControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/IStackChangedListener.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/IToolkitControlHelper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/InnerPage.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/InnerPage.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/LogoutControl.java -text
@@ -342,6 +344,10 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/Site.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/SplashControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/StackedContainerWithEvent.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/SubModule.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitDateInputControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitEmployeeControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitInputBoxControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitPicklistSelectionControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/attachment/AddAttachmentDialog.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/attachment/AddAttachmentDialog.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/attachment/MultiAttachmentControl.java -text

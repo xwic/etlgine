@@ -348,6 +348,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitChec
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitDateInputControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitEmployeeControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitInputBoxControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitMultiAttachmentControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitPicklistSelectionControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitSingleAttachmentControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/attachment/AddAttachmentDialog.java -text

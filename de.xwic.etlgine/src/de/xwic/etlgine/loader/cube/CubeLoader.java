@@ -3,7 +3,11 @@
  */
 package de.xwic.etlgine.loader.cube;
 
+import java.io.InputStream;
+import java.net.URL;
+
 import de.xwic.cube.ICube;
+import de.xwic.cube.ICubeCacheControl;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
@@ -27,6 +31,7 @@ public class CubeLoader extends AbstractLoader {
 	protected ICube cube;
 	
 	private String targetCubeKey = null;
+	private String cacheStatsUrl = null;
 	protected ICubeDataMapper dataMapper = null;
 	
 	private boolean saveDataPoolOnFinish = false;
@@ -109,6 +114,26 @@ public class CubeLoader extends AbstractLoader {
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		super.onProcessFinished(processContext);
+		
+		if (getCacheStatsUrl() != null) {
+			try {
+				URL url = new URL(getCacheStatsUrl());
+				if (cube instanceof ICubeCacheControl) {
+					ICubeCacheControl ccc = (ICubeCacheControl)cube;
+					InputStream in = url.openStream();
+					ccc.buildCacheFromStats(in);
+					in.close();
+					
+					ccc.refreshCache();
+					processContext.getMonitor().logInfo("Rebuild cube cache done. (" + ccc.getCacheSize() + " cached elements)");
+				} else {
+					processContext.getMonitor().logWarn("Cube type does not support any cache control.");
+				}
+			} catch (Exception e) {
+				processContext.getMonitor().logWarn("Can not rebuild cache: " + e);
+			}
+		}
+		
 		if (isSaveDataPoolOnFinish()) {
 			try {
 				processContext.getMonitor().logInfo("Storing DataPool...");
@@ -188,6 +213,20 @@ public class CubeLoader extends AbstractLoader {
 	 */
 	public void setClearCubeBeforeStart(boolean clearCubeBeforeStart) {
 		this.clearCubeBeforeStart = clearCubeBeforeStart;
+	}
+
+	/**
+	 * @return the cacheStatsUrl
+	 */
+	public String getCacheStatsUrl() {
+		return cacheStatsUrl;
+	}
+
+	/**
+	 * @param cacheStatsUrl the cacheStatsUrl to set
+	 */
+	public void setCacheStatsUrl(String cacheStatsUrl) {
+		this.cacheStatsUrl = cacheStatsUrl;
 	}
 	
 }

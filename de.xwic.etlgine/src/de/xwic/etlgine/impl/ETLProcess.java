@@ -130,13 +130,16 @@ public class ETLProcess extends Process implements IETLProcess {
 		
 		try {
 			// initialize the extractor
+			monitor.logInfo("Initializing extractor " + extractor);
 			extractor.initialize(processContext);
 			// initialize transformer
 			for (ITransformer transformer : transformers) {
+				monitor.logInfo("Initializing transformer " + transformer);
 				transformer.initialize(processContext);
 			}
 			// initialize loaders 
 			for (ILoader loader : loaders) {
+				monitor.logInfo("Initializing loader " + loader);
 				loader.initialize(processContext);
 			}
 			

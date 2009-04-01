@@ -644,6 +644,7 @@ de.xwic.cube/src/de/xwic/cube/DataPoolManagerFactory.java -text
 de.xwic.cube/src/de/xwic/cube/ICell.java -text
 de.xwic.cube/src/de/xwic/cube/ICellListener.java -text
 de.xwic.cube/src/de/xwic/cube/ICube.java -text
+de.xwic.cube/src/de/xwic/cube/ICubeCacheControl.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPool.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPoolManager.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPoolStorageProvider.java -text

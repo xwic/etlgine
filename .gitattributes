@@ -591,6 +591,7 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeWriter.vtl -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CustomNavigationProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DefaultDimensionDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionNavigationProvider.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionNavigationSort.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/DimensionSelectorControl.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ICubeDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ICubeViewerModelListener.java -text

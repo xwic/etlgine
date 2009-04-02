@@ -18,7 +18,7 @@ import de.xwic.etlgine.server.ServerContext.EventType;
  */
 public class JobQueue implements Runnable {
 
-	private static final int SLEEP_TIME = 5 * 1000;
+	private static final int SLEEP_TIME = 2 * 1000;
 	
 	private static final Log log = LogFactory.getLog(JobQueue.class);
 	

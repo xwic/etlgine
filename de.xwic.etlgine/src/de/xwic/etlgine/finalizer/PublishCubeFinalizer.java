@@ -102,6 +102,7 @@ public class PublishCubeFinalizer implements IProcessFinalizer {
 			if (refreshUrl != null) {
 				try {
 					URL url = new URL(refreshUrl);
+					context.getMonitor().logInfo("Sending DataPool refresh signal to "  + url.toExternalForm());
 					URLConnection connection = url.openConnection();
 					if (connection instanceof HttpURLConnection) {
 						HttpURLConnection httpCon = (HttpURLConnection)connection;

@@ -72,10 +72,18 @@ public class CubeLoader extends AbstractLoader {
 		cube = dataPool.getCube(targetCubeKey);
 		dataMapper.initialize(processContext, cube);
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IProcessContext)
+	 */
+	@Override
+	public void preSourceProcessing(IProcessContext processContext)
+			throws ETLException {
+		super.preSourceProcessing(processContext);
 		if (isClearCubeBeforeStart()) {
 			dataMapper.clearCube(cube);
 		}
-		
 	}
 	
 	/* (non-Javadoc)

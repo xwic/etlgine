@@ -156,7 +156,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		currElement = null;
 		inpExpression.setText("");
 		inpExpression.forceFocus();
-		chkOptions.setSelectedKey("");
+		chkOptions.setSelectedKey("ignoreCase");
 		if (selElement != null) {
 			selElement.actionFirst();
 		}

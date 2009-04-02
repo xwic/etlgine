@@ -53,6 +53,8 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	protected boolean forceRemap = false;
 	protected boolean autoCreateTargetColumn = false;
 	
+	private DimensionMappingTransformer onFailTransformer = null;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
 	 */
@@ -102,6 +104,10 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			IDimension dim = dataPool.getDimension(mappingDef.getDimensionKey());
 			parentElm = dim.parsePath(mappingDef.getUnmappedPath());
 		}
+		
+		if (getOnFailTransformer() != null) {
+			getOnFailTransformer().initialize(processContext);
+		}
 
 	}
 	
@@ -131,6 +137,11 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			}
 		}
 		targetColumn = dataSet.getColumn(targetColumnName);
+		
+		if (getOnFailTransformer() != null) {
+			getOnFailTransformer().preSourceProcessing(processContext);
+		}
+		
 	}
 	
 	/* (non-Javadoc)
@@ -220,7 +231,12 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			}
 			break;
 			case FAIL:
-				throw new ETLException("Unable to map value '" + value + "' - Aborting process!");
+				if (getOnFailTransformer() != null) {
+					getOnFailTransformer().processRecord(processContext, record);
+				} else {
+					throw new ETLException("Unable to map value '" + value + "' - Aborting process!");
+				}
+				break;
 			case SKIP:
 				record.setSkip(true);
 				break;
@@ -352,6 +368,20 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	public void setAutoCreateTargetColumn(boolean autocreateTargetColumn) {
 		this.autoCreateTargetColumn = autocreateTargetColumn;
+	}
+
+	/**
+	 * @param onFailTransformer the onFailTransformer to set
+	 */
+	public void setOnFailTransformer(DimensionMappingTransformer onFailTransformer) {
+		this.onFailTransformer = onFailTransformer;
+	}
+
+	/**
+	 * @return the onFailTransformer
+	 */
+	public DimensionMappingTransformer getOnFailTransformer() {
+		return onFailTransformer;
 	}
 	
 }

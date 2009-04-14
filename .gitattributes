@@ -1239,6 +1239,10 @@ de.xwic.libs.common/lib/commons-dbcp-1.2.1.jar -text
 de.xwic.libs.common/lib/commons-lang-2.1.jar -text
 de.xwic.libs.common/lib/commons-pool-1.2.jar -text
 de.xwic.libs.common/lib/jaxen-1.1.1.jar -text
+de.xwic.libs.common/lib/jcommon-1.0.15.jar -text
+de.xwic.libs.common/lib/jcommon-1.0.9.jar -text
+de.xwic.libs.common/lib/jfreechart-1.0.12.jar -text
+de.xwic.libs.common/lib/jfreechart-1.0.5.jar -text
 de.xwic.libs.common/lib/jta.jar -text
 de.xwic.libs.common/lib/jtds-1.1.jar -text
 de.xwic.libs.common/lib/jwic-ecolib.jar -text
@@ -1249,6 +1253,7 @@ de.xwic.libs.common/lib/lucene-demos-1.4-final.jar -text
 de.xwic.libs.common/lib/mail.jar -text
 de.xwic.libs.common/lib/opencsv-1.8.jar -text
 de.xwic.libs.common/lib/poi-3.1-FINAL-20080629.jar -text
+de.xwic.libs.common/lib/poi-3.2-FINAL-20081019.jar -text
 de.xwic.libs.common/lib/servlet-api-2.5.jar -text
 de.xwic.libs.common/lib/velocity-1.4.jar -text
 de.xwic.webkit.admin.user/.classpath -text

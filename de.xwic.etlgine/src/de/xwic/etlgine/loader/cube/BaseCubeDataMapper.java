@@ -12,6 +12,8 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.Key;
+import de.xwic.cube.util.CountLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
@@ -29,6 +31,8 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	protected Map<IMeasure, MeasureMapping> measureMap = new HashMap<IMeasure, MeasureMapping>();
 	protected IProcessContext processContext;
 	
+	protected Map<CountLoader, String> countLoaderMap = new HashMap<CountLoader, String>();
+	
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#initialize(de.xwic.etlgine.IETLContext, de.xwic.cube.ICube)
@@ -38,6 +42,18 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		this.cube = cube;
 		configure(processContext);
 		
+		// register cell value changed listener (replace existing one)
+		for (CountLoader loader: countLoaderMap.keySet()) {
+			// remove existing one
+			int idx_old = cube.getCellValueChangedListeners().indexOf(loader);
+			if (idx_old != -1) {
+				CountLoader loader_old = (CountLoader)cube.getCellValueChangedListeners().get(idx_old);
+				cube.getCellValueChangedListeners().remove(idx_old);
+				loader.configure(loader_old);
+			}
+			cube.getCellValueChangedListeners().add(loader);
+		}
+
 		// notify mappings
 		for (DimensionMapping dm : dimMap.values()) {
 			dm.afterConfiguration(processContext, cube);
@@ -95,6 +111,17 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		return mm;
 	}
 	
+	/**
+	 * Add a countLoader for a measure counting column values.
+	 * @param measureKey
+	 * @param countLoader
+	 */
+	public void addCountLoader(String measureKey, String columnName, CountLoader countLoader) {
+		int measureIndex = cube.getMeasureIndex(cube.getDataPool().getMeasure(measureKey));
+		countLoader.setMeasureIndex(measureIndex);
+		countLoaderMap.put(countLoader, columnName);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#getElement(de.xwic.cube.IDimension, de.xwic.etlgine.IRecord)
 	 */
@@ -135,4 +162,16 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		cube.clear();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#onAddCellValue(de.xwic.cube.Key, de.xwic.cube.IMeasure, java.lang.Double, de.xwic.etlgine.IRecord)
+	 */
+	public void onAddCellValue(Key key, IMeasure measure, Double value, IRecord record) throws ETLException {
+		// TODO check if using only one measure makes sense and improves performance
+		for (Map.Entry<CountLoader, String> entry : countLoaderMap.entrySet()) {
+			CountLoader countLoader = entry.getKey();
+			String columnName = entry.getValue();
+			Object count = record.getData(columnName);
+			countLoader.setCountOn(count);
+		}
+	}
 }

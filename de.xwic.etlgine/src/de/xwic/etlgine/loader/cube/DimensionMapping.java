@@ -4,7 +4,9 @@
 package de.xwic.etlgine.loader.cube;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
@@ -27,6 +29,8 @@ public class DimensionMapping {
 	private IDimensionElement unmappedElement = null;
 	
 	private List<ElementMapping> emList = null;
+	
+	private Map<String, IDimensionElement> cachedDimensionElements = new HashMap<String, IDimensionElement>();
 	
 	/**
 	 * Constructor.
@@ -131,18 +135,28 @@ public class DimensionMapping {
 				throw new ETLException("Specified context property '" + contextPropertyName + "' contains null.");
 			}
 		} else {
-			StringBuilder sb = new StringBuilder();
-			for (String col : columnNames) {
-				String val = record.getDataAsString(col);
-				if (sb.length() != 0) {
-					sb.append("/");
+			if (columnNames.length == 1) {
+				value = record.getDataAsString(columnNames[0]);
+				if (value == null) {
+					value = "null"; // sb.append(null) compatible
 				}
-				sb.append(val);
+			} else {
+				StringBuilder sb = new StringBuilder();
+				for (String col : columnNames) {
+					String val = record.getDataAsString(col);
+					if (sb.length() != 0) {
+						sb.append("/");
+					}
+					sb.append(val);
+				}
+				value = sb.toString();
 			}
-			value = sb.toString();
 		}
 		
-		
+		IDimensionElement dimElement = cachedDimensionElements.get(value);
+		if (dimElement != null) {
+			return dimElement;
+		}
 		if (emList == null) {	// values are the keys.
 			String[] path = value.split("/");
 			IDimensionElement elm = dimension;
@@ -154,25 +168,29 @@ public class DimensionMapping {
 						elm = elm.createDimensionElement(key);
 					} else {
 						if (unmappedElement != null) {
+							cachedDimensionElements.put(value, unmappedElement);
 							return unmappedElement;
 						} else {
-							record.markInvalid("Element " + value + " not found in dimension " + dimension.getKey() + " - cant map data.");
+							record.markInvalid("Element " + value + " not found in dimension " + dimension.getKey() + " - cannot map data.");
 							return null;
 						}
 					}
 				}
 			}
+			cachedDimensionElements.put(value, elm);
 			return elm;
 		} else {
 			for (ElementMapping em : emList) {
 				if (em.match(value)) {
+					cachedDimensionElements.put(value, em.getElement());
 					return em.getElement();
 				}
 			}
 			if (unmappedElement != null) {
+				cachedDimensionElements.put(value, unmappedElement);
 				return unmappedElement;
 			}
-			record.markInvalid("No mapping found for element " + value + " in dimension " + dimension.getKey() + " - cant map data.");
+			record.markInvalid("No mapping found for element " + value + " in dimension " + dimension.getKey() + " - cannot map data.");
 			return null;
 		}
 	}

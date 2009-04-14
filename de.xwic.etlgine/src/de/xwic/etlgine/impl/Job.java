@@ -100,6 +100,7 @@ public class Job implements IJob {
 		processChain.setMonitor(monitor);
 		
 		Binding binding = new Binding();
+		binding.setVariable("context", context);
 		binding.setVariable("job", this);
 		binding.setVariable("processChain", processChain);
 		

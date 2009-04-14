@@ -262,6 +262,19 @@ public class ETLgineServer implements Runnable {
 			log.info("Initializing Webserver (Jetty)");
 			try {
 				jetty = new Server();
+				/*
+				 * If ETLgine is launched from a different "current directory",
+				 * this is the the only way to set jetty home directoy.
+				 * Might have side effects on the "hosting" application.
+				 */
+				String userDir = System.getProperty("user.dir");
+				String newUserDir = new File(rootPath, "..").getCanonicalPath();
+				if (!newUserDir.startsWith(userDir)) {
+					// etl server is located in different path
+					// workaround for now is to set user.dir to newUserDir
+					// FIXME do it better ;-)
+					System.setProperty("user.dir", newUserDir);
+				}
 				XmlConfiguration conf = new XmlConfiguration(new FileInputStream(new File(pathConfig, "jetty.xml")));
 				conf.configure(jetty);
 	

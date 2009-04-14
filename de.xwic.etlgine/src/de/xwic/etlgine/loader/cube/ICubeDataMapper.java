@@ -9,6 +9,7 @@ import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.Key;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
@@ -68,5 +69,14 @@ public interface ICubeDataMapper {
 	 * @param cube
 	 */
 	public void clearCube(ICube cube);
+
+	/**
+	 * Invoked right before ICube.addCellValue is called.
+	 * @param key
+	 * @param measure
+	 * @param value
+	 * @param record
+	 */
+	public void onAddCellValue(Key key, IMeasure measure, Double value, IRecord record) throws ETLException;
 
 }

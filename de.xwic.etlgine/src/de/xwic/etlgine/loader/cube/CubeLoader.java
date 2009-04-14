@@ -105,10 +105,16 @@ public class CubeLoader extends AbstractLoader {
 				key.setDimensionElement(idx++, element);
 				
 			}
-			
+			IMeasure countOnMeasure = dataMapper.getMeasures().get(0);
 			for (IMeasure measure : dataMapper.getMeasures()) {
 				Double value = dataMapper.getValue(measure, record);
 				if (value != null) {
+					
+					if (measure == countOnMeasure) {
+						// set count loader count on value
+						dataMapper.onAddCellValue(key, measure, value, record);
+					}					
+					// add value to cube
 					cube.addCellValue(key, measure, value);
 				}
 			}
@@ -142,13 +148,16 @@ public class CubeLoader extends AbstractLoader {
 			}
 		}
 		
+		// remove cell value changed listener
+		//cube.getCellValueChangedListeners().clear();
+		
 		if (isSaveDataPoolOnFinish()) {
 			try {
 				processContext.getMonitor().logInfo("Storing DataPool...");
 				dataPool.save();
 				processContext.getMonitor().logInfo("Storing DataPool finished...");
 			} catch (StorageException e) {
-				throw new ETLException("Error saving dataPool");
+				throw new ETLException("Error saving dataPool", e);
 			}
 		}
 	}

@@ -6,7 +6,9 @@ package de.xwic.etlgine.loader.cube;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
@@ -54,6 +56,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	protected boolean autoCreateTargetColumn = false;
 	
 	private DimensionMappingTransformer onFailTransformer = null;
+	protected Map<String, DimMappingElementDef> cachedDimMappingElementDef = new HashMap<String, DimMappingElementDef>();
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
@@ -151,7 +154,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 		super.processRecord(processContext, record);
 		
-		if(forceRemap || record.getData(targetColumn) == null) {
+		if (forceRemap || record.getData(targetColumn) == null) {
 		
 			doMappingByColumns(processContext, record, sourceColumns);
 		}
@@ -195,14 +198,16 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	protected void doMapping(IProcessContext processContext, IRecord record, String value) throws ETLException {
 		
 		// lookup MappingDef
-		DimMappingElementDef elmDef = null;
-		for (DimMapper mapper : mappers) {
-			if (mapper.match(value)) {
-				elmDef = mapper.getDimMappingElementDef();
-				break;
+		DimMappingElementDef elmDef = cachedDimMappingElementDef.get(value);
+		if (elmDef == null) {
+			for (DimMapper mapper : mappers) {
+				if (mapper.match(value)) {
+					elmDef = mapper.getDimMappingElementDef();
+					cachedDimMappingElementDef.put(value, elmDef);
+					break;
+				}
 			}
 		}
-
 		// do the mapping...
 		if (elmDef != null) {
 			if (elmDef.isSkipRecord()) {

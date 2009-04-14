@@ -646,6 +646,7 @@ de.xwic.cube/src/de/xwic/cube/ICell.java -text
 de.xwic.cube/src/de/xwic/cube/ICellListener.java -text
 de.xwic.cube/src/de/xwic/cube/ICube.java -text
 de.xwic.cube/src/de/xwic/cube/ICubeCacheControl.java -text
+de.xwic.cube/src/de/xwic/cube/ICubeListener.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPool.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPoolManager.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPoolStorageProvider.java -text
@@ -663,6 +664,8 @@ de.xwic.cube/src/de/xwic/cube/formatter/DefaultValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/DefaultValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/KValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/KValueFormatProvider.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/MValueFormat.java -text
+de.xwic.cube/src/de/xwic/cube/formatter/MValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/functions/DifferenceFunction.java -text
@@ -678,6 +681,7 @@ de.xwic.cube/src/de/xwic/cube/impl/Measure.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Query.java -text
 de.xwic.cube/src/de/xwic/cube/storage/impl/FileDataPoolStorageProvider.java -text
 de.xwic.cube/src/de/xwic/cube/storage/impl/JDBCDataPoolStorageProvider.java -text
+de.xwic.cube/src/de/xwic/cube/util/CountLoader.java -text
 de.xwic.cube/src/de/xwic/cube/util/CubeUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/DataDump.java -text
 de.xwic.cube/src/de/xwic/cube/util/JDBCSerializerUtil.java -text

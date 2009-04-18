@@ -69,18 +69,10 @@ public class CubeLoader extends AbstractLoader {
 		if (!dataPool.containsCube(targetCubeKey)) {
 			throw new ETLException("The DataPool does not contain a cube with the key " + targetCubeKey + ".");
 		}
+
 		cube = dataPool.getCube(targetCubeKey);
 		dataMapper.initialize(processContext, cube);
-		
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IProcessContext)
-	 */
-	@Override
-	public void preSourceProcessing(IProcessContext processContext)
-			throws ETLException {
-		super.preSourceProcessing(processContext);
+
 		if (isClearCubeBeforeStart()) {
 			dataMapper.clearCube(cube);
 		}
@@ -147,9 +139,6 @@ public class CubeLoader extends AbstractLoader {
 				processContext.getMonitor().logWarn("Can not rebuild cache: " + e);
 			}
 		}
-		
-		// remove cell value changed listener
-		//cube.getCellValueChangedListeners().clear();
 		
 		if (isSaveDataPoolOnFinish()) {
 			try {

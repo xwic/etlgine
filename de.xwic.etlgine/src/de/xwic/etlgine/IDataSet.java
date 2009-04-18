@@ -71,5 +71,12 @@ public interface IDataSet {
 	 * @throws ETLException
 	 */
 	public IColumn getColumnByIndex(int idx) throws ETLException;
+	
+	/**
+	 * Update the DataSet with changed column (e.g. sourceIndex).
+	 * @param column
+	 * @throws ETLException
+	 */
+	public void updateColumn(IColumn column) throws ETLException;
 
 }

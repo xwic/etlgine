@@ -46,6 +46,15 @@ public interface IContext {
 	public boolean getPropertyBoolean(String name, boolean defaultValue);
 	
 	/**
+	 * Returns the property value as int value.
+	 * 
+	 * @param name
+	 * @param defaultValue
+	 * @return
+	 */
+	public int getPropertyInt(String name, int defaultValue);
+	
+	/**
 	 * Set a global object.
 	 * @param name
 	 * @param object

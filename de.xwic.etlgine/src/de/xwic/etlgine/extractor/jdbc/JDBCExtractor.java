@@ -180,35 +180,38 @@ public class JDBCExtractor extends AbstractExtractor {
 			colCount = metaData.getColumnCount();
 			for (int i = 1; i <= colCount; i++) {
 				String name = metaData.getColumnLabel(i);
+				IColumn column = null;
 				if (!dataSet.containsColumn(name)) {
-					IColumn column = dataSet.addColumn(name, i);
-					IColumn.DataType dt = column.getTypeHint();
-					switch (metaData.getColumnType(i)) {
-					case Types.CHAR:
-					case Types.VARCHAR:
-						dt = DataType.STRING;
-						break;
-					case Types.INTEGER:
-						dt = DataType.INT;
-						break;
-					case Types.BIGINT:
-						dt = DataType.LONG;
-						break;
-					case Types.FLOAT:
-						dt = DataType.DOUBLE;
-						break;
-					case Types.TIMESTAMP:
-						dt = DataType.DATETIME;
-						break;
-					case Types.DATE:
-						dt = DataType.DATE;
-						break;
-					}
-					column.setTypeHint(dt);
+					column = dataSet.addColumn(name, i);
 				} else {
-					IColumn column = dataSet.getColumn(name);
+					column = dataSet.getColumn(name);
 					column.setSourceIndex(i);
+					// changed source index update
+					dataSet.updateColumn(column);
 				}
+				IColumn.DataType dt = column.getTypeHint();
+				switch (metaData.getColumnType(i)) {
+				case Types.CHAR:
+				case Types.VARCHAR:
+					dt = DataType.STRING;
+					break;
+				case Types.INTEGER:
+					dt = DataType.INT;
+					break;
+				case Types.BIGINT:
+					dt = DataType.LONG;
+					break;
+				case Types.FLOAT:
+					dt = DataType.DOUBLE;
+					break;
+				case Types.TIMESTAMP:
+					dt = DataType.DATETIME;
+					break;
+				case Types.DATE:
+					dt = DataType.DATE;
+					break;
+				}
+				column.setTypeHint(dt);
 			}
 			
 			endReached = false;

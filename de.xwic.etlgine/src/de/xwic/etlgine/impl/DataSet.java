@@ -66,13 +66,8 @@ public class DataSet implements IDataSet {
 		if (columnMap.containsKey(column.getName())) {
 			throw new ETLException("A column with name '" + column + "' already exists in this dataset.");
 		}
-		
-		if (column.getSourceIndex() != -1) {
-			if (columnIndexMap.containsKey(column.getSourceIndex())) {
-				throw new ETLException("A column with source index '" + column.getSourceIndex() + "' already exists in this dataset.");
-			}
-			columnIndexMap.put(column.getSourceIndex(), column);
-		}
+
+		updateColumn(column);
 		
 		columns.add(column);
 		columnMap.put(column.getName(), column);
@@ -141,5 +136,16 @@ public class DataSet implements IDataSet {
 	public boolean containsColumn(String name) {
 		return columnMap.containsKey(name) || aliasMap.containsKey(name);
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IDataSet#updateColumn(de.xwic.etlgine.IColumn)
+	 */
+	public void updateColumn(IColumn column) throws ETLException {
+		if (column.getSourceIndex() != -1) {
+			if (columnIndexMap.containsKey(column.getSourceIndex())) {
+				throw new ETLException("A column with source index '" + column.getSourceIndex() + "' already exists in this dataset.");
+			}
+			columnIndexMap.put(column.getSourceIndex(), column);
+		}
+	}
 }

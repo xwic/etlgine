@@ -669,6 +669,7 @@ de.xwic.cube/src/de/xwic/cube/formatter/MValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/formatter/PercentageValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/functions/DifferenceFunction.java -text
+de.xwic.cube/src/de/xwic/cube/impl/AbstractCubeListener.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cell.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubeFlexCalc.java -text

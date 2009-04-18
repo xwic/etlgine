@@ -45,13 +45,13 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		// register cell value changed listener (replace existing one)
 		for (CountLoader loader: countLoaderMap.keySet()) {
 			// remove existing one
-			int idx_old = cube.getCellValueChangedListeners().indexOf(loader);
+			int idx_old = cube.getCubeListeners().indexOf(loader);
 			if (idx_old != -1) {
-				CountLoader loader_old = (CountLoader)cube.getCellValueChangedListeners().get(idx_old);
-				cube.getCellValueChangedListeners().remove(idx_old);
+				CountLoader loader_old = (CountLoader)cube.getCubeListeners().get(idx_old);
+				cube.getCubeListeners().remove(idx_old);
 				loader.configure(loader_old);
 			}
-			cube.getCellValueChangedListeners().add(loader);
+			cube.getCubeListeners().add(loader);
 		}
 
 		// notify mappings
@@ -160,6 +160,9 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	 */
 	public void clearCube(ICube cube) {
 		cube.clear();
+		for (CountLoader loader: countLoaderMap.keySet()) {
+			loader.clear();
+		}
 	}
 	
 	/* (non-Javadoc)

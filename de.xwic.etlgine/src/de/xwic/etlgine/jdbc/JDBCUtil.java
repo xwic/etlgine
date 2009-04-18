@@ -74,9 +74,22 @@ public class JDBCUtil {
 			throw new ETLException("Driver " + driver + " can not be found.");
 		}
 		
-		return DriverManager.getConnection(url, username, password);
+		Connection connection = DriverManager.getConnection(url, username, password);
+		return connection;
 		
 	}
+	
+	/**
+	 * Returns the batch size used for this jdbc statements.
+	 * @param context
+	 * @param name
+	 * @return
+	 */
+	public static int getBatchSize(IContext context, String name) {
+		int batch_size = context.getPropertyInt(name + ".connection.batch_size", 0);
+		return batch_size;
+	}
+	
 	/**
 	 * @param rs
 	 * @throws SQLException 

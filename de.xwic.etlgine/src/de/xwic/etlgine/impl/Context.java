@@ -83,6 +83,17 @@ public abstract class Context implements IContext {
 		return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") || value.equals("1");
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IContext#getPropertyInt(java.lang.String, int)
+	 */
+	public int getPropertyInt(String name, int defaultValue) {
+		String value = getProperty(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		return Integer.parseInt(value);
+	}
+	
 	/**
 	 * Set a global object.
 	 * @param name

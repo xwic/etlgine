@@ -167,7 +167,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 * @param sourceColumns
 	 * @throws ETLException 
 	 */
-	protected void doMappingByColumns(IProcessContext processContext, IRecord record, IColumn[] sourceColumns) throws ETLException {
+	protected void doMappingByColumns(IProcessContext processContext, IRecord record, IColumn... sourceColumns) throws ETLException {
 		// build the source key
 		StringBuilder sbSource = new StringBuilder();
 		for (IColumn sourceCol : sourceColumns) {
@@ -176,8 +176,8 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			}
 			String val = record.getDataAsString(sourceCol);
 			if (val != null) {
-				// escape '/'
-				val = val.replace('/', '&');
+				// escape '/', '[' and ']'
+				val = val.replace('/', '&').replace('[', '(').replace(']', ')');
 				sbSource.append(val);
 			} else {
 				sbSource.append(nullValue);

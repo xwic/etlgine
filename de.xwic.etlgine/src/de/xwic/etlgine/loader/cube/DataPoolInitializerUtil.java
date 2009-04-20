@@ -195,4 +195,8 @@ public class DataPoolInitializerUtil {
 		
 	}
 	
+	public IDataPool getDataPool() {
+		return pool;
+	}
+	
 }

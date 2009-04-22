@@ -59,6 +59,8 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean treatEmptyAsNull = false;
 	private boolean truncateTable = false;
 	private boolean autoDataTruncate = false;
+	private int batchSize = -1;
+	private int batchCount = 0;
 	
 	private boolean ignoreUnchangedRecords = false;
 	
@@ -124,6 +126,7 @@ public class JDBCLoader extends AbstractLoader {
 			}
 		} else {
 			log.info("Using named connection: " + connectionName);
+			batchSize = JDBCUtil.getBatchSize(processContext, connectionName);
 			try {
 				if (sharedConnectionName != null) {
 					connection = JDBCUtil.getSharedConnection(processContext, sharedConnectionName, connectionName);
@@ -138,7 +141,15 @@ public class JDBCLoader extends AbstractLoader {
 		if (truncateTable) {
 			try {
 				Statement stmt = connection.createStatement();
-				int rows = stmt.executeUpdate("DELETE FROM " + tablename);
+				int rows;
+				try {
+					ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + tablename);
+					rs.next();
+					rows = rs.getInt(1);
+					stmt.executeUpdate("TRUNCATE TABLE " + tablename);
+				} catch (SQLException e) {
+					rows = stmt.executeUpdate("DELETE FROM " + tablename);
+				}
 				processContext.getMonitor().logInfo("TRUNCATED TABLE " + tablename + " - " + rows + " rows have been deleted.");
 			} catch (SQLException e) {
 				throw new ETLException("Error truncating table: " + e, e);
@@ -164,6 +175,10 @@ public class JDBCLoader extends AbstractLoader {
 		
 		if (connection != null) {
 			try {
+				// check open batch statements
+				if (batchCount > batchSize) {
+					executeBatch();
+				}
 //				connection.commit();
 				if (sharedConnectionName == null) {
 					// only close the connection if it is not shared!
@@ -539,12 +554,23 @@ public class JDBCLoader extends AbstractLoader {
 				}
 			}
 			
-			int count = psInsert.executeUpdate();
-			if (count != 1) {
-				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+			if (batchSize < 1) {
+				// non-batched mode
+				int count = psInsert.executeUpdate();
+				if (count != 1) {
+					monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+				}
+				insertCount += count;
+			} else {
+				// batched mode
+				if (batchCount < batchSize) {
+					psInsert.addBatch();
+					batchCount++;
+				} else {
+					// execute
+					executeBatch();
+				}
 			}
-			
-			insertCount += count;
 			
 		} catch (DataTruncation dt) {
 			monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, dt);
@@ -567,6 +593,22 @@ public class JDBCLoader extends AbstractLoader {
 	}
 	
 	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void executeBatch() throws SQLException {
+		batchCount = 0;
+		for (int count : psInsert.executeBatch()) {
+			if (count != 1) {
+				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+			}
+			if (count > 0) {
+				insertCount += count;
+			}
+		}
+	}
+
 	/**
 	 * @return the driverName
 	 */
@@ -847,5 +889,19 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setProperty(String key, String value) {
 		properties.put(key, value);
+	}
+
+	/**
+	 * @return the batchSize
+	 */
+	public int getBatchSize() {
+		return batchSize;
+	}
+
+	/**
+	 * @param batchSize the batchSize to set
+	 */
+	public void setBatchSize(int batchSize) {
+		this.batchSize = batchSize;
 	}
 }

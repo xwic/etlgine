@@ -86,7 +86,7 @@ public class Launch {
 		}
 		
 		if (runJob != null) {
-			for (String rJob : runJob.split(";")) {
+			for (String rJob : runJob.split("[;,]")) {
 				IJob job = server.getServerContext().getJob(rJob);
 				if (job == null) {
 					System.out.println("The specified job does not exist: " + runJob);

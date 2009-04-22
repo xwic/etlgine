@@ -14,7 +14,8 @@ import de.xwic.etlgine.IRecord;
 public class MeasureMapping {
 
 	protected String columnName = null;
-	protected Double fixedValue = null; 
+	protected Double fixedValue = null;
+	protected int measureIndex;
 	
 	/**
 	 * @return the columnName
@@ -65,5 +66,19 @@ public class MeasureMapping {
 		
 		
 	}
-	
+
+	/**
+	 * @return the measureIndex
+	 */
+	public int getMeasureIndex() {
+		return measureIndex;
+	}
+
+	/**
+	 * @param measureIndex the measureIndex to set
+	 */
+	public void setMeasureIndex(int measureIndex) {
+		this.measureIndex = measureIndex;
+	}
+
 }

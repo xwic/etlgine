@@ -50,13 +50,15 @@ public interface ICubeDataMapper {
 	 * @param record
 	 * @return
 	 * @throws ETLException 
-	 */
+	 * /
 	public Double getValue(IMeasure measure, IRecord record) throws ETLException;
+	*/
 	
+	public MeasureMapping getMeasureMapping(IMeasure measure);
 	
 	/**
 	 * Returns true if the record may be loaded into the cube. The default
-	 * implementation returns true, but it may be overriden to implement
+	 * implementation returns true, but it may be overwritten to implement
 	 * a customized filter.
 	 * @param record
 	 * @return
@@ -73,10 +75,10 @@ public interface ICubeDataMapper {
 	/**
 	 * Invoked right before ICube.addCellValue is called.
 	 * @param key
-	 * @param measure
+	 * @param measureIndex
 	 * @param value
 	 * @param record
 	 */
-	public void onAddCellValue(Key key, IMeasure measure, Double value, IRecord record) throws ETLException;
+	public void onAddCellValue(Key key, int measureIndex, Double value, IRecord record) throws ETLException;
 
 }

@@ -85,7 +85,7 @@ public class CubeLoader extends AbstractLoader {
 
 		if (dataMapper.accept(record)) {
 		
-			Key key = cube.createKey("");
+			Key key = cube.createKey();
 			int idx = 0;
 			for (IDimension dim : cube.getDimensions()) {
 				
@@ -97,15 +97,14 @@ public class CubeLoader extends AbstractLoader {
 				key.setDimensionElement(idx++, element);
 				
 			}
-			IMeasure countOnMeasure = dataMapper.getMeasures().get(0);
 			for (IMeasure measure : dataMapper.getMeasures()) {
-				Double value = dataMapper.getValue(measure, record);
+				MeasureMapping mm = dataMapper.getMeasureMapping(measure);
+				Double value = mm.getValue(cube, record);
 				if (value != null) {
 					
-					if (measure == countOnMeasure) {
-						// set count loader count on value
-						dataMapper.onAddCellValue(key, measure, value, record);
-					}					
+					// set loader focus object
+					dataMapper.onAddCellValue(key, cube.getMeasureIndex(measure), value, record);
+
 					// add value to cube
 					cube.addCellValue(key, measure, value);
 				}

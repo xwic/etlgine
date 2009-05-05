@@ -19,6 +19,7 @@ public class DefaultMonitor implements IMonitor {
 	
 	protected long startTime = 0;
 	protected long nextStatus = 0;
+	protected int lastRecordsCount = 0;
 	protected Log log = LogFactory.getLog(DefaultMonitor.class);
 	protected StringBuilder logBuffer = new StringBuilder();
 	
@@ -46,13 +47,16 @@ public class DefaultMonitor implements IMonitor {
 				logInfo("Processing: " 
 						+ processContext.getRecordsCount() 
 						+ " records from " + sourceName 
-						+ " (" + processContext.getSkippedCount() + " skipped, " 
+						+ " (" +  (processContext.getRecordsCount() - lastRecordsCount) + " processed now, "
+						+ processContext.getSkippedCount() + " skipped, " 
 						+ processContext.getInvalidCount() + " invalid)");
+				lastRecordsCount = processContext.getRecordsCount();
 			}
 		}
 		
 		switch (eventType) {
 		case PROCESS_START:
+			lastRecordsCount = 0;
 			startTime = System.currentTimeMillis();
 			nextStatus = startTime + STATUS_INTERVALL;
 			break;

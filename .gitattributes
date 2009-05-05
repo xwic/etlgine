@@ -1260,6 +1260,7 @@ de.xwic.libs.common/lib/jfreechart-1.0.12.jar -text
 de.xwic.libs.common/lib/jfreechart-1.0.5.jar -text
 de.xwic.libs.common/lib/jta.jar -text
 de.xwic.libs.common/lib/jtds-1.1.jar -text
+de.xwic.libs.common/lib/jtds-1.2.2.jar -text
 de.xwic.libs.common/lib/jwic-ecolib.jar -text
 de.xwic.libs.common/lib/jwic3_2_1.jar -text
 de.xwic.libs.common/lib/log4j-1.2.9.jar -text

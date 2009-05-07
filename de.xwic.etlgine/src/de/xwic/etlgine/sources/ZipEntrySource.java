@@ -74,4 +74,5 @@ public class ZipEntrySource extends FileSource {
 	public boolean isAvailable() {
 		return zipFile != null && zipEntry != null && !zipEntry.isDirectory();
 	}
+	
 }

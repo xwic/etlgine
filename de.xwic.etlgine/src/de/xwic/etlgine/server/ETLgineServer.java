@@ -26,6 +26,7 @@ import org.mortbay.xml.XmlConfiguration;
 import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.cube.CubeHandler;
 
 /**
@@ -129,8 +130,10 @@ public class ETLgineServer implements Runnable {
 
 		for (IJob job : serverContext.getJobs()) {
 			if (!job.isDisabled() && !job.isExecuting() && !(job.getState() == IJob.State.ENQUEUED)) {
-				if (job.getTrigger() != null && job.getTrigger().isDue()) {
-					enqueueJob(job);
+				if (job.getState() != State.FINISHED_WITH_ERROR && job.getState() != State.ERROR) {
+					if (job.getTrigger() != null && job.getTrigger().isDue()) {
+						enqueueJob(job);
+					}
 				}
 			}
 		}

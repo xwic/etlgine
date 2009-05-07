@@ -283,6 +283,10 @@ public class ETLProcess extends Process implements IETLProcess {
 					monitor.logError("Error executing finalizer!", t);
 				}
 			}
+			
+			// copy back the result, as it might have changed
+			// bye a finalizer that failed.
+			result = processContext.getResult();
 		}
 		
 		return result;

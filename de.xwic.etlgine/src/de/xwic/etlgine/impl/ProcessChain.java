@@ -34,6 +34,7 @@ public class ProcessChain implements IProcessChain {
 	private List<IProcess> processList = new ArrayList<IProcess>();
 	
 	private IProcess activeProcess = null;
+	private Result result = null;
 	
 	/**
 	 * Constructor.
@@ -140,10 +141,12 @@ public class ProcessChain implements IProcessChain {
 	public void start() throws ETLException {
 		
 		try {
+			result = Result.SUCCESSFULL;
 			for (IProcess process : processList) {
 				activeProcess = process;
-				Result result = process.start();
-				if (result == Result.FAILED || result == Result.FINISHED_WITH_ERRORS) {
+				Result pResult = process.start();
+				if (pResult == Result.FAILED || pResult == Result.FINISHED_WITH_ERRORS) {
+					result = pResult;
 					monitor.logError("Exiting ProcessChain execution because process " + process.getName() + " finished with result: " + result);
 					break;
 				}
@@ -159,6 +162,20 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public IProcess getActiveProcess() {
 		return activeProcess;
+	}
+
+	/**
+	 * @return the result
+	 */
+	public Result getResult() {
+		return result;
+	}
+
+	/**
+	 * @param result the result to set
+	 */
+	public void setResult(Result result) {
+		this.result = result;
 	}
 
 }

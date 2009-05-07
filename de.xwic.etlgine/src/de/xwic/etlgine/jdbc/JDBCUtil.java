@@ -59,13 +59,13 @@ public class JDBCUtil {
 		String password = context.getProperty(name + ".connection.password");
 		
 		if (url == null) {
-			throw new ETLException("The URL is not specified for this connection name.");
+			throw new ETLException("The URL is not specified for this connection name. ('" + name + "')");
 		}
 		if (username == null) {
-			throw new ETLException("The username is not specified for this connection name.");
+			throw new ETLException("The username is not specified for this connection name. ('" + name + "')");
 		}
 		if (password == null) {
-			throw new ETLException("The password is not specified for this connection name.");
+			throw new ETLException("The password is not specified for this connection name. ('" + name + "')");
 		}
 		
 		try {
@@ -74,8 +74,7 @@ public class JDBCUtil {
 			throw new ETLException("Driver " + driver + " can not be found.");
 		}
 		
-		Connection connection = DriverManager.getConnection(url, username, password);
-		return connection;
+		return DriverManager.getConnection(url, username, password);
 		
 	}
 	

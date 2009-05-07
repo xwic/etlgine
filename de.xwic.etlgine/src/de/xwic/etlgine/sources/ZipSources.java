@@ -28,6 +28,7 @@ import de.xwic.etlgine.impl.ETLProcess;
 public class ZipSources {
 
 	protected File file;
+	private ZipFile zipFile = null;
 	
 	public ZipSources() {
 		
@@ -64,11 +65,11 @@ public class ZipSources {
 	 */
 	public void addSources(ETLProcess process) throws ETLException {
 		try {
-			ZipFile zipFile = new ZipFile(file);
-			for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
+			zipFile  = new ZipFile(file);
+			for (Enumeration<? extends ZipEntry> entries = zipFile .entries(); entries.hasMoreElements(); ) {
 				ZipEntry entry = entries.nextElement();
 				if (!entry.isDirectory()) {
-					ZipEntrySource source = new ZipEntrySource(zipFile, entry);
+					ZipEntrySource source = new ZipEntrySource(zipFile , entry);
 					process.addSource(source);
 				}
 			}
@@ -77,4 +78,14 @@ public class ZipSources {
 		}
 		
 	}
+	
+	/**
+	 * Close file.
+	 * @throws IOException 
+	 */
+	public void close() throws IOException {
+		zipFile.close();
+	}
+	
+
 }

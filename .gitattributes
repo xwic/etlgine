@@ -1134,6 +1134,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/CSVExtractor.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/extractor/ICSVExtractorListener.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSExtractor.java -text

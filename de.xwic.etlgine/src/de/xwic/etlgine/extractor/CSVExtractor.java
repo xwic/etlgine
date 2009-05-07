@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import sun.nio.cs.StreamDecoder;
 import au.com.bytecode.opencsv.CSVReader;
@@ -37,6 +39,26 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	private int expectedColumns = -1;
 	
 	private IDataSet dataSet;
+
+	private InputStream input = null;
+	
+	public List<ICSVExtractorListener> listeners = new ArrayList<ICSVExtractorListener>();
+	
+	/**
+	 * Add a listener.
+	 * @param listener
+	 */
+	public void addCSVExtractorListener(ICSVExtractorListener listener) {
+		listeners.add(listener);
+	}
+	
+	/**
+	 * Remove listener.
+	 * @param listener
+	 */
+	public void removeCSVExtractorListener(ICSVExtractorListener listener) {
+		listeners.remove(listener);
+	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#close()
@@ -48,6 +70,14 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 			} catch (IOException e) {
 				throw new ETLException("Error closing loader: " + e, e);
 			}
+		}
+		if (input != null) {
+			try {
+				input.close();
+			} catch (IOException e) {
+				throw new ETLException("Error closing loader: " + e, e);
+			}
+			
 		}
 	}
 	
@@ -99,23 +129,31 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 			recordNumber = 0;
 			reachedEnd = false;
 			
-			InputStream in = fsrc.getInputStream();
+			input = fsrc.getInputStream();
 			
 			// determine encoding
 			if (fsrc.getEncoding() == null) {
 				String encoding = null; // java default
 				byte[] encoding_tag = new byte[2];
 				// find source encoding
-				if (in.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == -1 && encoding_tag[1] == -2) {
+				if (input.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == -1 && encoding_tag[1] == -2) {
 					// used by Cognos CSV reports
 					encoding = "UTF-16LE";
 				} else {
-					in.close();
-					in = fsrc.getInputStream();
+					input.close();
+					input = fsrc.getInputStream();
 				}
 				fsrc.setEncoding(encoding);
 			}
-			reader  = new CSVReader(new BufferedReader(StreamDecoder.forInputStreamReader(in, fsrc, fsrc.getEncoding())), separator, quoteChar, skipLines);
+			
+			BufferedReader rawReader = new BufferedReader(StreamDecoder.forInputStreamReader(input, fsrc, fsrc.getEncoding()));
+			for (int i = 0; i < skipLines; i++) {
+				String skipLine = rawReader.readLine();
+				for (ICSVExtractorListener listener : listeners) {
+					listener.onLineSkipped(skipLine, i);
+				}
+			}
+			reader  = new CSVReader(rawReader, separator, quoteChar, 0);
 			if (containsHeader) {
 				String[] header = reader.readNext();
 				if (header == null) {

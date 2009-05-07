@@ -58,7 +58,7 @@ public class JobAdminControl extends BaseContentContainer {
 		
 		Collections.sort(jobList, new Comparator<IJob>() {
 			public int compare(IJob o1, IJob o2) {
-				return o1.getName().compareTo(o2.getName());
+				return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
 			}
 		});
 		
@@ -66,7 +66,7 @@ public class JobAdminControl extends BaseContentContainer {
 		table.setContentProvider(new ListContentProvider(jobList));
 		table.setTableLabelProvider(new JobTableLabelProvider());
 		table.setWidth(799);
-		table.setHeight(300);
+		table.setHeight(500);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);
 		table.setShowStatusBar(false);

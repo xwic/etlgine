@@ -67,4 +67,9 @@ public interface IProcessChain {
 	 */
 	public IProcess getActiveProcess();
 
+	/**
+	 * @return the result
+	 */
+	public Result getResult();
+
 }

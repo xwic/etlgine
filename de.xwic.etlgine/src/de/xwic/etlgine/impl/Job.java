@@ -18,6 +18,7 @@ import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.ITrigger;
+import de.xwic.etlgine.Result;
 
 /**
  * @author Florian Lippisch
@@ -71,7 +72,7 @@ public class Job implements IJob {
 				loadChainFromScript(context);
 			}
 			processChain.start();
-			state = State.FINISHED;
+			state = processChain.getResult() != Result.SUCCESSFULL ? State.FINISHED_WITH_ERROR : State.FINISHED;
 		} catch (ETLException ee) {
 			state = State.ERROR;
 			lastException = ee;

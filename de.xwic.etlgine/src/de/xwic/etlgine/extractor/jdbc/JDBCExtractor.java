@@ -58,7 +58,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				// continue -> try to close the connection..
 			}
 		}
-		if (connection != null) {
+		if (connection != null && currSource.getSharedConnectionName() == null) {
 			try {
 				connection.close();
 			} catch (SQLException e) {

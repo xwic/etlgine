@@ -33,6 +33,8 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	
 	protected Map<IMeasureLoader, String> measureLoaderMap = new HashMap<IMeasureLoader, String>();
 	
+	protected boolean enforceDimensionMapping = true;
+	
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#initialize(de.xwic.etlgine.IETLContext, de.xwic.cube.ICube)
@@ -133,6 +135,9 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	public IDimensionElement getElement(IDimension dim, IRecord record) throws ETLException {
 		DimensionMapping dm = dimMap.get(dim);
 		if (dm == null) {
+			if (!enforceDimensionMapping) {
+				return null;
+			}
 			throw new ETLException("No mapping for dimension " + dim.getKey());
 		}
 		return dm.mapElement(processContext, cube, record);
@@ -180,13 +185,13 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#onAddCellValue(de.xwic.cube.Key, int, java.lang.Double, de.xwic.etlgine.IRecord)
+	 * @see de.xwic.etlgine.loader.cube.ICubeDataMapper#onAddCellValue(de.xwic.cube.Key, IMeasure, java.lang.Double, de.xwic.etlgine.IRecord)
 	 */
-	public void onAddCellValue(Key key, int measureIndex, Double value, IRecord record) throws ETLException {
+	public void onAddCellValue(Key key, IMeasure measure, Double value, IRecord record) throws ETLException {
 		// TODO check if using only one measure makes sense and improves performance
 		for (Map.Entry<IMeasureLoader, String> entry : measureLoaderMap.entrySet()) {
 			IMeasureLoader loader = entry.getKey();
-			if (loader.getMeasureIndex() != measureIndex) {
+			if (!loader.accept(cube, key, measure, value)) {
 				continue;
 			}
 			String columnName = entry.getValue();
@@ -194,4 +199,19 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 			loader.setObjectFocus(count);
 		}
 	}
+
+	/**
+	 * @return the enforceDimensionMapping
+	 */
+	public boolean isEnforceDimensionMapping() {
+		return enforceDimensionMapping;
+	}
+
+	/**
+	 * @param enforceDimensionMapping the enforceDimensionMapping to set
+	 */
+	public void setEnforceDimensionMapping(boolean enforceDimensionMapping) {
+		this.enforceDimensionMapping = enforceDimensionMapping;
+	}
+	
 }

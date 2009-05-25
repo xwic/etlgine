@@ -75,10 +75,15 @@ public interface ICubeDataMapper {
 	/**
 	 * Invoked right before ICube.addCellValue is called.
 	 * @param key
-	 * @param measureIndex
+	 * @param measure
 	 * @param value
 	 * @param record
 	 */
-	public void onAddCellValue(Key key, int measureIndex, Double value, IRecord record) throws ETLException;
+	public void onAddCellValue(Key key, IMeasure measure, Double value, IRecord record) throws ETLException;
+
+	/**
+	 * @return the enforceDimensionMapping
+	 */
+	public boolean isEnforceDimensionMapping();
 
 }

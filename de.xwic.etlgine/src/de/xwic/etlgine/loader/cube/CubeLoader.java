@@ -27,7 +27,7 @@ public class CubeLoader extends AbstractLoader {
 
 	private IDataPoolProvider dataPoolProvider;
 	private DataPoolInitializer dataPoolInitializer = null;
-	private IDataPool dataPool;
+	protected IDataPool dataPool;
 	protected ICube cube;
 	
 	private String targetCubeKey = null;
@@ -91,10 +91,13 @@ public class CubeLoader extends AbstractLoader {
 				
 				IDimensionElement element = dataMapper.getElement(dim, record);
 				if (element == null) {
-					// invalid data
-					return;
+					if (dataMapper.isEnforceDimensionMapping()) {
+						// invalid data
+						return;
+					}
+				} else {
+					key.setDimensionElement(idx++, element);
 				}
-				key.setDimensionElement(idx++, element);
 				
 			}
 			for (IMeasure measure : dataMapper.getMeasures()) {
@@ -103,7 +106,7 @@ public class CubeLoader extends AbstractLoader {
 				if (value != null) {
 					
 					// set loader focus object
-					dataMapper.onAddCellValue(key, cube.getMeasureIndex(measure), value, record);
+					dataMapper.onAddCellValue(key, measure, value, record);
 
 					// add value to cube
 					cube.addCellValue(key, measure, value);

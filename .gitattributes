@@ -1251,6 +1251,7 @@ de.xwic.etlgine/test/source.csv -text
 de.xwic.etlgine/test/source_cube.csv -text
 de.xwic.libs.common/.classpath -text
 de.xwic.libs.common/.project -text
+de.xwic.libs.common/.settings/org.hibernate.eclipse.console.prefs -text
 de.xwic.libs.common/lib/commons-collections-2.1.jar -text
 de.xwic.libs.common/lib/commons-dbcp-1.2.1.jar -text
 de.xwic.libs.common/lib/commons-lang-2.1.jar -text
@@ -1273,6 +1274,7 @@ de.xwic.libs.common/lib/opencsv-1.8.jar -text
 de.xwic.libs.common/lib/poi-3.1-FINAL-20080629.jar -text
 de.xwic.libs.common/lib/poi-3.2-FINAL-20081019.jar -text
 de.xwic.libs.common/lib/servlet-api-2.5.jar -text
+de.xwic.libs.common/lib/velocity-1.4-log4j-patch.jar -text
 de.xwic.libs.common/lib/velocity-1.4.jar -text
 de.xwic.webkit.admin.user/.classpath -text
 de.xwic.webkit.admin.user/.project -text

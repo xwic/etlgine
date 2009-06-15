@@ -585,6 +585,7 @@ de.xwic.cube.webui/src/de/xwic/cube/webui/controls/DimensionElementSelector.java
 de.xwic.cube.webui/src/de/xwic/cube/webui/controls/DimensionElementSelector.vtl -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableCell.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/util/TableRenderer.java -text
+de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/AbstractCubeDataProvider.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/ContentInfo.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeFilter.java -text
 de.xwic.cube.webui/src/de/xwic/cube/webui/viewer/CubeFilter.vtl -text

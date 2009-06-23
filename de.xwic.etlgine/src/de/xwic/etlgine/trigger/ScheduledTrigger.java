@@ -15,8 +15,8 @@ import de.xwic.etlgine.ITrigger;
 public class ScheduledTrigger implements ITrigger {
 
 	public enum Type {
-		DAILY,
-		INTERVALL,
+		DAILY, // fixed time daily execution at a  
+		INTERVALL, // starts the job again every x seconds after the last execution
 		WEEKLY,
 		MONTLY,
 		ONCE
@@ -28,6 +28,8 @@ public class ScheduledTrigger implements ITrigger {
 	
 	private int hourOfDay = 0;
 	private int minuteOfDay = 0;
+	
+	private int intervallInSeconds;
 	
 	private Date nextStart = null;
 	private Date lastRun = null;
@@ -51,7 +53,15 @@ public class ScheduledTrigger implements ITrigger {
 		calculateNextStart();
 	}
 
-
+	/**
+	 * @param intervallInSeconds
+	 */
+	public ScheduledTrigger(int intervallInSeconds) {
+		super();
+		this.intervallInSeconds = intervallInSeconds;
+		type = Type.INTERVALL;
+		calculateNextStart();
+	}
 
 
 	/* (non-Javadoc)
@@ -96,7 +106,15 @@ public class ScheduledTrigger implements ITrigger {
 			}
 			nextStart = cal.getTime();
 			
-		}
+		}; break;
+		case INTERVALL : {
+			
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.SECOND, this.intervallInSeconds);
+			
+			nextStart = cal.getTime();
+			
+		}; break;
 			
 		}
 		
@@ -198,4 +216,18 @@ public class ScheduledTrigger implements ITrigger {
 		return nextStart;
 	}
 
+	/**
+	 * @return the intervallInSeconds
+	 */
+	public int getIntervallInSeconds() {
+		return intervallInSeconds;
+	}
+
+	/**
+	 * @param intervallInSeconds the intervallInSeconds to set
+	 */
+	public void setIntervallInSeconds(int intervallInSeconds) {
+		this.intervallInSeconds = intervallInSeconds;
+	}
+	
 }

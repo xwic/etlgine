@@ -32,6 +32,7 @@ import de.xwic.etlgine.server.ETLgineServer;
 public class ETLgineServerFactoryBean implements ApplicationContextAware, FactoryBean, InitializingBean {
 
 	private String rootPath = null;
+	private boolean startServer = false;
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
@@ -74,6 +75,13 @@ public class ETLgineServerFactoryBean implements ApplicationContextAware, Factor
 			}
 			server.initialize();
 		}
+		
+		if (startServer && !server.isRunning()) {
+			// startup the server.
+			Thread serverThread = new Thread(server, "ETLgineServer");
+			serverThread.setDaemon(false);
+			serverThread.start();		
+		}
 	}
 
 	/**
@@ -89,4 +97,19 @@ public class ETLgineServerFactoryBean implements ApplicationContextAware, Factor
 	public void setRootPath(String rootPath) {
 		this.rootPath = rootPath;
 	}
+
+	/**
+	 * @return the startServer
+	 */
+	public boolean isStartServer() {
+		return startServer;
+	}
+
+	/**
+	 * @param startServer the startServer to set
+	 */
+	public void setStartServer(boolean startServer) {
+		this.startServer = startServer;
+	}
+	
 }

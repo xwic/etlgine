@@ -1,0 +1,5 @@
+2009-06-18 kstein
+	- new type "Intervall" in ScheduledTrigger
+	- new Trigger: ScheduledFileChangedTrigger
+	- Method for ETLgineServer start in spring bean
+	- ETLgineServer knows if its is running

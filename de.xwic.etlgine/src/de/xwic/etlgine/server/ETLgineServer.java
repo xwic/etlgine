@@ -49,6 +49,7 @@ public class ETLgineServer implements Runnable {
 	private boolean initialized = false;
 	private boolean initializing = false;
 	private boolean doExit = false;
+	private boolean running = false;
 	private boolean exitAfterFinish = false;
 
 	/**
@@ -82,6 +83,8 @@ public class ETLgineServer implements Runnable {
 	public void run() {
 
 		log.info("Server started.");
+		
+		running = true;
 		
 		while (!doExit) {
 			
@@ -120,6 +123,8 @@ public class ETLgineServer implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		running = false;
 		
 	}
 	
@@ -394,5 +399,9 @@ public class ETLgineServer implements Runnable {
 	 */
 	public boolean isInitializing() {
 		return initializing;
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 }

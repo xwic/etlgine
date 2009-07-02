@@ -697,6 +697,7 @@ de.xwic.cube/src/de/xwic/cube/util/CountLoader.java -text
 de.xwic.cube/src/de/xwic/cube/util/CubeUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/DataDump.java -text
 de.xwic.cube/src/de/xwic/cube/util/DimensionLeafLoader.java -text
+de.xwic.cube/src/de/xwic/cube/util/FindUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/JDBCSerializerUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/TimeUtil.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeFlexCalcTest.java -text

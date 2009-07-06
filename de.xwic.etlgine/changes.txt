@@ -1,3 +1,12 @@
+Change Notes
+=============
+
+2009-07-06 jbornema
+	- Added Java Heap statistics in DefaultMonitor when logging record status every 30 sec.
+	- DataPoolInitializer: added "context" variable to verify(IDataPool) method
+	- DimensionMappingTransformer caches unmatched by adding a temp definition to the cache
+	- Fixed JDBCLoader primary key usage when it is not exported
+
 2009-06-18 kstein
 	- new type "Intervall" in ScheduledTrigger
 	- new Trigger: ScheduledFileChangedTrigger

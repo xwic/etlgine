@@ -217,10 +217,13 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			}
 		} else {
 			// no mapping found
+			elmDef = new DimMappingElementDef();
+			
 			switch (mappingDef.getOnUnmapped()) {
 			case ASSIGN:
 				//processContext.getMonitor().logInfo("Assigning unmapped value '" + value + "' to " + mappingDef.getUnmappedPath());
 				record.setData(targetColumn, mappingDef.getUnmappedPath());
+				elmDef.setElementPath(mappingDef.getUnmappedPath());
 				break;
 			case CREATE: {
 				String[] path = value.split("/");
@@ -233,9 +236,11 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 					}
 				}
 				record.setData(targetColumn, elm.getPath());
+				elmDef.setElementPath(elm.getPath());
 			}
 			break;
 			case FAIL:
+				elmDef = null;
 				if (getOnFailTransformer() != null) {
 					getOnFailTransformer().processRecord(processContext, record);
 				} else {
@@ -244,9 +249,14 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 				break;
 			case SKIP:
 				record.setSkip(true);
+				elmDef.setSkipRecord(true);
 				break;
 			}
 			
+			// cache unknown mapping
+			if (elmDef != null) {
+				cachedDimMappingElementDef.put(value, elmDef);
+			}
 		}
 		
 	}

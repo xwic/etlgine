@@ -414,10 +414,11 @@ public class JDBCLoader extends AbstractLoader {
 					
 					modified = modified | record.isChanged(colDef.getColumn());
 					
-					if (colDef.getName().equals(pkColumn)) {
-						pkColDef = colDef;
-					}
-					
+				}
+
+				// PK might be excluded
+				if (colDef.getName().equals(pkColumn)) {
+					pkColDef = colDef;
 				}
 			}
 
@@ -521,13 +522,18 @@ public class JDBCLoader extends AbstractLoader {
 					}
 				}
 				break;
+			case Types.BIT:
+			case Types.BOOLEAN:
 			case Types.TINYINT:
-				if (value instanceof Integer) {
-					Integer valInt = (Integer) value;
-					ps.setBoolean(idx, valInt == 1 ? true : false);
+				if (value instanceof Boolean) {
+					Boolean b = (Boolean)value;
+					ps.setBoolean(idx, b.booleanValue());
+				} else if (value instanceof Number) {
+					Number valNum = (Number) value;
+					ps.setBoolean(idx, valNum.intValue() == 0 ? false : true);
 				} else if (value instanceof String) {
 					Integer valInt = Integer.parseInt((String) value);
-					ps.setBoolean(idx, valInt == 1 ? true : false);
+					ps.setBoolean(idx, valInt == 0 ? false : true);
 				}
 				break;
 			default:

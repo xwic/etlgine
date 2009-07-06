@@ -44,6 +44,7 @@ public class DataPoolInitializer {
 		Binding binding = new Binding();
 		binding.setVariable("pool", pool);
 		binding.setVariable("util", new DataPoolInitializerUtil(pool, context));
+		binding.setVariable("context", context);
 
 		GroovyShell shell = new GroovyShell(binding);
 		shell.evaluate(scriptFile);

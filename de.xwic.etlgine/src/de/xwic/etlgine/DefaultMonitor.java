@@ -44,13 +44,18 @@ public class DefaultMonitor implements IMonitor {
 			if (System.currentTimeMillis() > nextStatus) {
 				nextStatus = System.currentTimeMillis() + STATUS_INTERVALL;
 				String sourceName = processContext.getCurrentSource() != null ? processContext.getCurrentSource().getName() : "NO-SOURCE";
+				Runtime rt = Runtime.getRuntime();
 				logInfo("Processing: " 
 						+ processContext.getRecordsCount() 
 						+ " records from " + sourceName 
 						+ " (" +  (processContext.getRecordsCount() - lastRecordsCount) + " processed now, "
 						+ processContext.getSkippedCount() + " skipped, " 
-						+ processContext.getInvalidCount() + " invalid)");
+						+ processContext.getInvalidCount() + " invalid, "
+						+ "Java Heap: " + rt.totalMemory() / 1024 / 1024 + "MB total, " + rt.freeMemory() / 1024 / 1024 + "MB free)");
 				lastRecordsCount = processContext.getRecordsCount();
+				if (rt.freeMemory() < 16 * 1024 * 1024) {
+					//logInfo("Low free memory < 16MB");
+				}
 			}
 		}
 		

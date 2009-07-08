@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
@@ -42,6 +43,51 @@ public class JDBCUtil {
 		
 		return con;
 		
+	}
+	
+	/**
+	 * Executes the given SQL statement and returns the value from the first column in the first row
+	 * of the ResultSet or NULL if no result is given.
+	 * A new connection is opened for the query and closed after processing.
+	 * @param con
+	 * @param select
+	 * @return
+	 * @throws SQLException
+	 * @throws ETLException 
+	 */
+	public static Object executeSingleValueQuery(IContext context, String connectionName, String select) throws SQLException, ETLException {
+		Connection con = openConnection(context, connectionName);
+		try {
+			return executeSingleValueQuery(con, select);
+		} finally {
+			con.close();
+		}
+	}
+	
+	/**
+	 * Executes the given SQL statement and returns the value from the first column in the first row
+	 * of the ResultSet or NULL if no result is given.
+	 * @param con
+	 * @param select
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Object executeSingleValueQuery(Connection con, String select) throws SQLException {
+		
+		Statement stmt = con.createStatement();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(select);
+			if (rs.next()) {
+				return rs.getObject(1);
+			}
+			return null;
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			stmt.close();
+		}
 	}
 	
 	/**

@@ -137,23 +137,9 @@ public class JDBCLoader extends AbstractLoader {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		}
-		
+
 		if (truncateTable) {
-			try {
-				Statement stmt = connection.createStatement();
-				int rows;
-				try {
-					ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + tablename);
-					rs.next();
-					rows = rs.getInt(1);
-					stmt.executeUpdate("TRUNCATE TABLE " + tablename);
-				} catch (SQLException e) {
-					rows = stmt.executeUpdate("DELETE FROM " + tablename);
-				}
-				processContext.getMonitor().logInfo("TRUNCATED TABLE " + tablename + " - " + rows + " rows have been deleted.");
-			} catch (SQLException e) {
-				throw new ETLException("Error truncating table: " + e, e);
-			}
+			truncateTable();
 		}
 		
 //		try {
@@ -206,100 +192,145 @@ public class JDBCLoader extends AbstractLoader {
 		
 		// does the table exist?
 		try {
-			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs = metaData.getTables(connection.getCatalog(), null, tablename, null);
-			if (!rs.next()) {
-				throw new ETLException("The target table '" + tablename + "' does not exist.");
-			}
 			
-			rs = metaData.getColumns(connection.getCatalog(), null, tablename, null);
-			//dumpResultSet(rs);
-			
-			columns = new LinkedHashMap<String, DbColumnDef>();
-			while (rs.next()) {
-				String name = rs.getString("COLUMN_NAME");
-				int type = rs.getInt("DATA_TYPE");
-				int size = rs.getInt("COLUMN_SIZE");
-				String allowNull = rs.getString("NULLABLE");
-				DbColumnDef colDef = new DbColumnDef(name, type, size, allowNull.equals("YES") || allowNull.equals("1") || allowNull.equals("TRUE"));
-				columns.put(name, colDef);
-			}
-			
-			List<IColumn> missingCols = new ArrayList<IColumn>();
-			
-			// Check if the columns apply.
-			for (IColumn column : processContext.getDataSet().getColumns()) {
-				if (!column.isExclude()) {
-					DbColumnDef dbc = columns.get(column.computeTargetName());
-					if (dbc != null) {
-						dbc.setColumn(column);
-					} else {
-						processContext.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
-						missingCols.add(column);
-					}
-				}
-			}
-			if (missingCols.size() > 0) {
-				if (autoCreateColumns) {
-					createColumns(missingCols, columns);
-				} else {
-					if (!ignoreMissingTargetColumns) {
-						throw new ETLException("The source contains columns that do not exist in the target table.");
-					}
-				}
-			}
+			// check table structure, adds missing columns
+			checkTableStructure();
 			
 			// build prepared statement.. and Update statement.
-			StringBuilder sql = new StringBuilder();
-			StringBuilder sqlValues = new StringBuilder();
-			StringBuilder sqlUpd = new StringBuilder();
-			sql.append("INSERT INTO [").append(tablename).append("] (");
-			sqlUpd.append("UPDATE [").append(tablename).append("] SET ");
-			sqlValues.append("(");
-			
-			boolean first = true;
-			for (DbColumnDef colDef : columns.values()) {
-				if (colDef.getColumn() != null) {
-					if (first) {
-						first = false;
-					} else {
-						sql.append(", ");
-						sqlValues.append(", ");
-						sqlUpd.append(", ");
-					}
-					sql.append("[");
-					sql.append(colDef.getName());
-					sql.append("]");
-					sqlValues.append("?");
-
-					sqlUpd.append("[");
-					sqlUpd.append(colDef.getName());
-					sqlUpd.append("] = ?");
-				} else {
-					if (!ignoredColumns.contains(colDef.getName())) {
-						monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
-					}
-				}
-			}
-			sqlValues.append(")");
-			sql.append(") VALUES").append(sqlValues);
-			
-			sqlUpd.append(" WHERE [" + pkColumn + "] = ?");
-			
-			monitor.logInfo("INSERT Statement: " + sql);
-			psInsert = connection.prepareStatement(sql.toString());
-
-			if (mode == Mode.UPDATE || mode == Mode.INSERT_OR_UPDATE) {
-				monitor.logInfo("UPDATE Statement: " + sqlUpd);
-				psUpdate = connection.prepareStatement(sqlUpd.toString());
-			}
-			
+			buildPreparedStatements();
 			
 		} catch (SQLException se) {
 			throw new ETLException("Error initializing target database/tables: " + se, se);
 		}
 	}
 	
+	/**
+	 * Build prepared SQL statements
+	 * @throws SQLException 
+	 */
+	protected void buildPreparedStatements() throws SQLException {
+		StringBuilder sql = new StringBuilder();
+		StringBuilder sqlValues = new StringBuilder();
+		StringBuilder sqlUpd = new StringBuilder();
+		sql.append("INSERT INTO [").append(tablename).append("] (");
+		sqlUpd.append("UPDATE [").append(tablename).append("] SET ");
+		sqlValues.append("(");
+		
+		boolean first = true;
+		for (DbColumnDef colDef : columns.values()) {
+			if (colDef.getColumn() != null) {
+				if (first) {
+					first = false;
+				} else {
+					sql.append(", ");
+					sqlValues.append(", ");
+					sqlUpd.append(", ");
+				}
+				sql.append("[");
+				sql.append(colDef.getName());
+				sql.append("]");
+				sqlValues.append("?");
+
+				sqlUpd.append("[");
+				sqlUpd.append(colDef.getName());
+				sqlUpd.append("] = ?");
+			} else {
+				if (!ignoredColumns.contains(colDef.getName())) {
+					monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
+				}
+			}
+		}
+		sqlValues.append(")");
+		sql.append(") VALUES").append(sqlValues);
+		
+		sqlUpd.append(" WHERE [" + pkColumn + "] = ?");
+		
+		monitor.logInfo("INSERT Statement: " + sql);
+		psInsert = connection.prepareStatement(sql.toString());
+
+		if (mode == Mode.UPDATE || mode == Mode.INSERT_OR_UPDATE) {
+			monitor.logInfo("UPDATE Statement: " + sqlUpd);
+			psUpdate = connection.prepareStatement(sqlUpd.toString());
+		}
+	}
+
+	/**
+	 * Checks table structure and creates missing columns if autoCreateColumns is enabled
+	 * @throws ETLException 
+	 * @throws SQLException 
+	 * 
+	 */
+	protected void checkTableStructure() throws ETLException, SQLException {
+		
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = metaData.getTables(connection.getCatalog(), null, tablename, null);
+		if (!rs.next()) {
+			throw new ETLException("The target table '" + tablename + "' does not exist.");
+		}
+		
+		rs = metaData.getColumns(connection.getCatalog(), null, tablename, null);
+		//dumpResultSet(rs);
+		
+		columns = new LinkedHashMap<String, DbColumnDef>();
+		while (rs.next()) {
+			String name = rs.getString("COLUMN_NAME");
+			int type = rs.getInt("DATA_TYPE");
+			int size = rs.getInt("COLUMN_SIZE");
+			String allowNull = rs.getString("NULLABLE");
+			DbColumnDef colDef = new DbColumnDef(name, type, size, allowNull.equals("YES") || allowNull.equals("1") || allowNull.equals("TRUE"));
+			columns.put(name, colDef);
+		}
+		rs.close();
+		
+		List<IColumn> missingCols = new ArrayList<IColumn>();
+		
+		// Check if the columns apply.
+		for (IColumn column : processContext.getDataSet().getColumns()) {
+			if (!column.isExclude()) {
+				DbColumnDef dbc = columns.get(column.computeTargetName());
+				if (dbc != null) {
+					dbc.setColumn(column);
+				} else {
+					processContext.getMonitor().logWarn("Column does not exist: " + column.computeTargetName());
+					missingCols.add(column);
+				}
+			}
+		}
+		if (missingCols.size() > 0) {
+			if (autoCreateColumns) {
+				createColumns(missingCols, columns);
+			} else {
+				if (!ignoreMissingTargetColumns) {
+					throw new ETLException("The source contains columns that do not exist in the target table.");
+				}
+			}
+		}
+	}
+
+	/**
+	 * Truncate table
+	 * @throws ETLException 
+	 */
+	protected void truncateTable() throws ETLException {
+		try {
+			Statement stmt = connection.createStatement();
+			int rows;
+			try {
+				// try TRUNCATE TABLE
+				ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + tablename);
+				rs.next();
+				rows = rs.getInt(1);
+				stmt.executeUpdate("TRUNCATE TABLE " + tablename);
+			} catch (SQLException e) {
+				// try DELETE FROM
+				rows = stmt.executeUpdate("DELETE FROM " + tablename);
+			}
+			processContext.getMonitor().logInfo("TRUNCATED TABLE " + tablename + " - " + rows + " rows have been deleted.");
+		} catch (SQLException e) {
+			throw new ETLException("Error truncating table: " + e, e);
+		}
+	}
+
 	/**
 	 * @param missingCols
 	 * @param columns 

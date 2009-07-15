@@ -245,9 +245,11 @@ public class JDBCLoader extends AbstractLoader {
 		
 		sqlUpd.append(" WHERE [" + pkColumn + "] = ?");
 		
-		monitor.logInfo("INSERT Statement: " + sql);
-		psInsert = connection.prepareStatement(sql.toString());
-
+		if (mode == Mode.INSERT || mode == Mode.INSERT_OR_UPDATE) {
+			monitor.logInfo("INSERT Statement: " + sql);
+			psInsert = connection.prepareStatement(sql.toString());
+		}
+		
 		if (mode == Mode.UPDATE || mode == Mode.INSERT_OR_UPDATE) {
 			monitor.logInfo("UPDATE Statement: " + sqlUpd);
 			psUpdate = connection.prepareStatement(sqlUpd.toString());

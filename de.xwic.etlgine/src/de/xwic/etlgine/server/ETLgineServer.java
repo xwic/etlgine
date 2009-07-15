@@ -276,7 +276,7 @@ public class ETLgineServer implements Runnable {
 				 * Might have side effects on the "hosting" application.
 				 */
 				String userDir = System.getProperty("user.dir");
-				String newUserDir = new File(rootPath, "..").getCanonicalPath();
+				String newUserDir = new File(rootPath).getCanonicalPath();
 				if (!newUserDir.startsWith(userDir)) {
 					// etl server is located in different path
 					// workaround for now is to set user.dir to newUserDir

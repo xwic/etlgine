@@ -2,7 +2,7 @@ Change Notes
 =============
 
 2009-07-15 jbornema
-	- Little restructure in LDBCLoader
+	- Little restructure in JDBCLoader
 	- DefaultMonitor logging adjusted
 
 2009-07-06 jbornema

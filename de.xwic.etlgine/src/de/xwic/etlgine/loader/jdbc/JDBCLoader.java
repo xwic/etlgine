@@ -60,7 +60,8 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean truncateTable = false;
 	private boolean autoDataTruncate = false;
 	private int batchSize = -1;
-	private int batchCount = 0;
+	private int batchCountInsert = 0;
+	private int batchCountUpdate = 0;
 	
 	private boolean ignoreUnchangedRecords = false;
 	
@@ -126,7 +127,9 @@ public class JDBCLoader extends AbstractLoader {
 			}
 		} else {
 			log.info("Using named connection: " + connectionName);
-			batchSize = JDBCUtil.getBatchSize(processContext, connectionName);
+			if (batchSize == -1) {
+				batchSize = JDBCUtil.getBatchSize(processContext, connectionName);
+			}
 			try {
 				if (sharedConnectionName != null) {
 					connection = JDBCUtil.getSharedConnection(processContext, sharedConnectionName, connectionName);
@@ -157,14 +160,11 @@ public class JDBCLoader extends AbstractLoader {
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		
-		monitor.logInfo("JDBCLoader " + insertCount + " records inserted, " + updateCount + " records updated.");
-		
 		if (connection != null) {
 			try {
 				// check open batch statements
-				if (batchCount > batchSize) {
-					executeBatch();
-				}
+				executeBatch();
+				
 //				connection.commit();
 				if (sharedConnectionName == null) {
 					// only close the connection if it is not shared!
@@ -176,6 +176,8 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			connection = null;
 		}
+
+		monitor.logInfo("JDBCLoader " + insertCount + " records inserted, " + updateCount + " records updated.");
 	}
 	
 	/* (non-Javadoc)
@@ -462,11 +464,23 @@ public class JDBCLoader extends AbstractLoader {
 			
 			if (!ignoreUnchangedRecords || modified) {
 
-				int count = psUpdate.executeUpdate();
-				if (count != 1) {
-					monitor.logWarn("Update resulted in count " + count + " but expected 1");
-				}	
-				updateCount += count;
+				if (batchSize < 1) {
+					// non-batched mode
+					int count = psUpdate.executeUpdate();
+					if (count != 1) {
+						monitor.logWarn("Update resulted in count " + count + " but expected 1");
+					}	
+					updateCount += count;
+				} else {
+					// batched mode
+					if (batchCountUpdate < batchSize) {
+						psUpdate.addBatch();
+						batchCountUpdate++;
+					} else {
+						// execute
+						executeBatch();
+					}
+				}
 			}
 
 			
@@ -578,7 +592,6 @@ public class JDBCLoader extends AbstractLoader {
 	}
 
 	private void doInsert(IProcessContext processContext, IRecord record) throws ETLException {
-		
 		try {
 			psInsert.clearParameters();
 			
@@ -602,9 +615,9 @@ public class JDBCLoader extends AbstractLoader {
 				insertCount += count;
 			} else {
 				// batched mode
-				if (batchCount < batchSize) {
+				if (batchCountInsert < batchSize) {
 					psInsert.addBatch();
-					batchCount++;
+					batchCountInsert++;
 				} else {
 					// execute
 					executeBatch();
@@ -637,14 +650,28 @@ public class JDBCLoader extends AbstractLoader {
 	 * 
 	 */
 	private void executeBatch() throws SQLException {
-		batchCount = 0;
-		for (int count : psInsert.executeBatch()) {
-			if (count != 1) {
-				monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+		// batch insert
+		if (batchCountInsert > 0) {
+			for (int count : psInsert.executeBatch()) {
+				if (count != 1) {
+					monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+				}
+				if (count > 0) {
+					insertCount += count;
+				}
 			}
-			if (count > 0) {
-				insertCount += count;
-			}
+			batchCountInsert = 0;
+		}
+		
+		// batch update
+		if (batchCountUpdate > 0) {
+			for (int count : psUpdate.executeBatch()) {
+				if (count != 1) {
+					monitor.logWarn("Update resulted in count " + count + " but expected 1");
+				}	
+				updateCount += count;
+			}			
+			batchCountUpdate = 0;
 		}
 	}
 

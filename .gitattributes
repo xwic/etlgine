@@ -232,6 +232,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/security/IRight.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/IRole.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/IScope.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/IUser.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/security/IUserSession.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/ScopeActionKey.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/SingleUserSecurityManager.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/UserCredential.java -text
@@ -241,12 +242,14 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/IRightDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/IRoleDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/IScopeDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/IUserDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/IUserSessionDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/ActionDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/ActionSetDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/RightDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/RoleDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/ScopeDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/UserDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/UserSessionDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/local/LocalActionDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/local/LocalActionSetDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/daos/impl/local/LocalRightDAO.java -text
@@ -259,6 +262,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/security/impl/Right.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/impl/Role.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/impl/Scope.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/impl/User.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/security/impl/UserSession.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/queries/RightQuery.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/queries/UniqueActionQuery.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/security/queries/UniqueActionSetQuery.java -text

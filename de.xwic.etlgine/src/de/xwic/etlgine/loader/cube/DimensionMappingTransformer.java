@@ -55,8 +55,12 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	protected boolean forceRemap = false;
 	protected boolean autoCreateTargetColumn = false;
 	
+	protected int newOrderIndex = 0;
+	
 	private DimensionMappingTransformer onFailTransformer = null;
 	protected Map<String, DimMappingElementDef> cachedDimMappingElementDef = new HashMap<String, DimMappingElementDef>();
+	private Connection connection = null;
+	private DimMappingElementDefDAO dmeDAO;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
@@ -77,25 +81,22 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		// load the mapping
 	
 		try {
-			Connection connection = null;
-			try {
-				connection = JDBCUtil.openConnection(processContext, conName);
-				DimMappingDefDAO dmdDAO = new DimMappingDefDAO(connection);
-				mappingDef = dmdDAO.findMapping(mappingName);
-				Validate.notNull(mappingDef, "A mapping with the name '" + mappingName + "' does not exist.");
-				
-				DimMappingElementDefDAO dmeDAO = new DimMappingElementDefDAO(connection);
-				mappingElements = dmeDAO.listMappings(mappingName);
-				
-				// create mappers.
-				mappers = new ArrayList<DimMapper>();
-				for (DimMappingElementDef dme : mappingElements) {
-					mappers.add(new DimMapper(dme));
-				}
-				
-			} finally {
-				connection.close();
+			connection = JDBCUtil.openConnection(processContext, conName);
+			DimMappingDefDAO dmdDAO = new DimMappingDefDAO(connection);
+			mappingDef = dmdDAO.findMapping(mappingName);
+			Validate.notNull(mappingDef, "A mapping with the name '" + mappingName + "' does not exist.");
+			
+			dmeDAO = new DimMappingElementDefDAO(connection);
+			mappingElements = dmeDAO.listMappings(mappingName);
+			
+			// create mappers.
+			mappers = new ArrayList<DimMapper>();
+			for (DimMappingElementDef dme : mappingElements) {
+				mappers.add(new DimMapper(dme));
 			}
+			
+			newOrderIndex = mappingElements.size() + 1;
+				
 		} catch (SQLException se) {
 			throw new ETLException("Error loading mapping data: " + se, se);
 		}
@@ -112,6 +113,21 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			getOnFailTransformer().initialize(processContext);
 		}
 
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.AbstractTransformer#onProcessFinished(de.xwic.etlgine.IProcessContext)
+	 */
+	@Override
+	public void onProcessFinished(IProcessContext processContext) throws ETLException {
+		super.onProcessFinished(processContext);
+		if (connection != null) {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				throw new ETLException("Error closing connection: " + e, e);
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -218,6 +234,8 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		} else {
 			// no mapping found
 			elmDef = new DimMappingElementDef();
+			elmDef.setDimMapKey(mappingDef.getKey());
+			elmDef.setExpression(value);
 			
 			switch (mappingDef.getOnUnmapped()) {
 			case ASSIGN:
@@ -256,6 +274,16 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			// cache unknown mapping
 			if (elmDef != null) {
 				cachedDimMappingElementDef.put(value, elmDef);
+				
+				// insert element into table if autocreate is true
+				if (mappingDef.isAutoCreateMapping()) {
+					try {
+						dmeDAO.insert(elmDef, newOrderIndex++);
+					} catch (SQLException e) {
+						throw new ETLException("Error autocreating mapping: " + e, e);
+					}
+				}
+				
 			}
 		}
 		

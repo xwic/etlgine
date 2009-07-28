@@ -4,6 +4,7 @@
 package de.xwic.etlgine.jdbc;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -158,5 +159,27 @@ public class JDBCUtil {
 		
 	}
 
+	/**
+	 * Checks if the specified column exists.
+	 * @param con
+	 * @param tableName
+	 * @param columnName
+	 * @return
+	 * @throws SQLException
+	 */
+	public static boolean columnExists(Connection con, String tableName, String columnName) throws SQLException {
+		
+		DatabaseMetaData metaData = con.getMetaData();
+		ResultSet columns = metaData.getColumns(con.getCatalog(), null, tableName, columnName);
+		try {
+			if (columns.next()) {
+				return true;
+			}
+			return false;
+		} finally {
+			columns.close();
+		}
+		
+	}
 
 }

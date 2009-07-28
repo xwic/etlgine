@@ -128,6 +128,16 @@ public class DimMappingElementDefDAO {
 	 * @throws SQLException 
 	 */
 	public void insert(DimMappingElementDef dimMapElm) throws SQLException {
+		insert(dimMapElm, orderIndex++);
+	}
+	
+	/**
+	 * Insert at the specified order index position.
+	 * @param dimMapElm
+	 * @param order_index
+	 * @throws SQLException
+	 */
+	public void insert(DimMappingElementDef dimMapElm, int order_index) throws SQLException {
 
 		//DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord
 		int idx = 1;
@@ -138,7 +148,7 @@ public class DimMappingElementDefDAO {
 		psInsert.setBoolean(idx++, dimMapElm.isIgnoreCase());
 		psInsert.setString(idx++, dimMapElm.getElementPath());
 		psInsert.setBoolean(idx++, dimMapElm.isSkipRecord());
-		psInsert.setInt(idx++, orderIndex++);
+		psInsert.setInt(idx++, order_index);
 		int count = psInsert.executeUpdate(); 
 		if (count != 1) {
 			throw new SQLException("Error inserting DimMappingElementDef " + dimMapElm.getId() + ": Updated " + count + " but expected 1");

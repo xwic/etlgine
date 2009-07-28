@@ -15,6 +15,7 @@ public class DimMappingDef {
 	private String dimensionKey = null;
 	private String unmappedPath = null;
 	private Action onUnmapped = Action.CREATE;
+	private boolean autoCreateMapping = false;
 	
 	/**
 	 * @return the key
@@ -75,6 +76,18 @@ public class DimMappingDef {
 	 */
 	public void setOnUnmapped(Action onUnmapped) {
 		this.onUnmapped = onUnmapped;
+	}
+	/**
+	 * @return the autoCreateMapping
+	 */
+	public boolean isAutoCreateMapping() {
+		return autoCreateMapping;
+	}
+	/**
+	 * @param autoCreateMapping the autoCreateMapping to set
+	 */
+	public void setAutoCreateMapping(boolean autoCreateMapping) {
+		this.autoCreateMapping = autoCreateMapping;
 	}
 	
 }

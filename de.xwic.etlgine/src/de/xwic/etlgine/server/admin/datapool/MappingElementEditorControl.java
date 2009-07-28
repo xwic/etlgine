@@ -39,7 +39,7 @@ public class MappingElementEditorControl extends ControlContainer {
 	private InputBoxControl inpExpression;
 	private DimensionElementSelector selElement;
 	private CheckboxControl chkOptions;
-	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown;
+	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown, btMoveTop, btMoveBtm;
 	
 	private DimMappingElementDef currElement = null;
 	private MappingElementTableLabelProvider labelProvider;
@@ -112,7 +112,50 @@ public class MappingElementEditorControl extends ControlContainer {
 				onMoveDown();				
 			}
 		});
-		
+
+		btMoveTop = new ButtonControl(this, "btMoveTop");
+		btMoveTop.setTitle("Move Top");
+		btMoveTop.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onMoveTop();				
+			}
+		});
+
+		btMoveBtm = new ButtonControl(this, "btMoveBtm");
+		btMoveBtm.setTitle("Move Bottom");
+		btMoveBtm.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				onMoveBtm();				
+			}
+		});
+
+	}
+
+	/**
+	 * 
+	 */
+	protected void onMoveBtm() {
+		int idx = mappingList.size() - 1;
+		reindex(currElement, idx);
+		tableModel.selection(String.valueOf(idx)); // set new index selected
+		table.setRequireRedraw(true);
+		refreshMoveButtons(); // refresh buttons
+	}
+
+	/**
+	 * 
+	 */
+	protected void onMoveTop() {
+		reindex(currElement, 0);
+		tableModel.selection(String.valueOf(0)); // set new index selected
+		table.setRequireRedraw(true);
+		refreshMoveButtons(); // refresh buttons
 	}
 
 	/**
@@ -296,7 +339,9 @@ public class MappingElementEditorControl extends ControlContainer {
 	protected void refreshMoveButtons() {
 		int idx = currElement == null ? -1 : mappingList.indexOf(currElement);
 		btMoveUp.setEnabled(currElement != null && idx > 0);
+		btMoveTop.setEnabled(currElement != null && idx > 0);
 		btMoveDown.setEnabled(currElement != null && idx + 1 < mappingList.size());
+		btMoveBtm.setEnabled(currElement != null && idx + 1 < mappingList.size());
 	}
 	
 	/**

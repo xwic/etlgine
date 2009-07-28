@@ -1,6 +1,11 @@
 Change Notes
 =============
 
+2009-07-28 FLI
+	- Added auto-create unmapped elements feature
+	- Moved cube-clear back into preSourceProcessing event. The movement caused imports to fail as these determine the
+	  dimensions to be cleared from the source.
+
 2009-07-17 jbornema
 	- JdbcLoader completely implements batchSize for insert and update statements (can improve sql performance up to >100%!)
 	  If no batchSize is set, [connection name].connection.batch_size is used from server.properties, batchSize between 20 and 50 seems to work good

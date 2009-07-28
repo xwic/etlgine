@@ -73,9 +73,6 @@ public class CubeLoader extends AbstractLoader {
 		cube = dataPool.getCube(targetCubeKey);
 		dataMapper.initialize(processContext, cube);
 
-		if (isClearCubeBeforeStart()) {
-			dataMapper.clearCube(cube);
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -114,6 +111,24 @@ public class CubeLoader extends AbstractLoader {
 			}
 		}
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IProcessContext)
+	 */
+	@Override
+	public void preSourceProcessing(IProcessContext processContext)
+			throws ETLException {
+		super.preSourceProcessing(processContext);
+
+		// FLI: This must remain here, as custom data mappers need to initialize/pre process before
+		// they can clear the data. 
+		// Another note: NEVER EVER MOVE THINGS LIKE THIS INTO OTHER PROCESS STAGES. IT CAUSES EXISTING
+		// IMPORTS TO FAIL!
+		if (isClearCubeBeforeStart()) {
+			dataMapper.clearCube(cube);
+		}
+
 	}
 	
 	/* (non-Javadoc)

@@ -7,9 +7,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
  * Simple, direct JDBC usage DAO.
@@ -20,9 +26,13 @@ import java.util.List;
  */
 public class DimMappingDefDAO {
 
+	private final static String TABLE_NAME = "XCUBE_DIMMAP";
+	
 	private Connection connection;
 	private PreparedStatement psInsert;
 	private PreparedStatement psUpdate;
+
+	protected final Log log = LogFactory.getLog(getClass());
 	
 	/**
 	 * @param connection
@@ -32,8 +42,20 @@ public class DimMappingDefDAO {
 		super();
 		this.connection = connection;
 		
-		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP] (DimMapKey, Description, DimensionKey, UnmappedPath, OnUnmapped) VALUES (?, ?, ?, ?, ?)");
-		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP] SET Description=?, DimensionKey=?, UnmappedPath=?, OnUnmapped=? WHERE DimMapKey = ?");
+		psInsert = connection.prepareStatement("INSERT INTO [" + TABLE_NAME + "] (DimMapKey, Description, DimensionKey, UnmappedPath, OnUnmapped, AutoCreate) VALUES (?, ?, ?, ?, ?, ?)");
+		psUpdate = connection.prepareStatement("UPDATE [" + TABLE_NAME + "] SET Description=?, DimensionKey=?, UnmappedPath=?, OnUnmapped=?, AutoCreate=? WHERE DimMapKey = ?");
+		
+		// check for missing columns
+		if (!JDBCUtil.columnExists(connection, TABLE_NAME, "AutoCreate")) {
+			// create column
+			log.warn("Column 'AutoCreate' not found, trying to create column.");
+			Statement stmt = connection.createStatement();
+			stmt.execute("ALTER TABLE [" + TABLE_NAME + "] ADD [AutoCreate] Bit NOT NULL Default 0");
+			SQLWarning sw = stmt.getWarnings();
+			if (sw != null) {
+				log.warn("SQL Result: " + sw);
+			}
+		}
 		
 	}
 
@@ -47,7 +69,7 @@ public class DimMappingDefDAO {
 		List<DimMappingDef> list = new ArrayList<DimMappingDef>(); 
 		
 		Statement stmt = connection.createStatement();
-		String sql = "SELECT [DimMapKey], [Description], [DimensionKey], [UnmappedPath], [OnUnmapped] FROM XCUBE_DIMMAP";
+		String sql = "SELECT [DimMapKey], [Description], [DimensionKey], [UnmappedPath], [OnUnmapped], [AutoCreate] FROM " + TABLE_NAME;
 		ResultSet rs = stmt.executeQuery(sql);
 		while (rs.next()) {
 			DimMappingDef dmd = new DimMappingDef();
@@ -56,6 +78,7 @@ public class DimMappingDefDAO {
 			dmd.setDimensionKey(rs.getString("DimensionKey"));
 			dmd.setUnmappedPath(rs.getString("UnmappedPath"));
 			dmd.setOnUnmapped(DimMappingDef.Action.valueOf(rs.getString("OnUnmapped")));
+			dmd.setAutoCreateMapping(rs.getBoolean("AutoCreate"));
 			list.add(dmd);
 		}
 		rs.close();
@@ -72,7 +95,7 @@ public class DimMappingDefDAO {
 	 */
 	public DimMappingDef findMapping(String dimMapKey) throws SQLException {
 		DimMappingDef dmd = null;
-		String sql = "SELECT [DimMapKey], [Description], [DimensionKey], [UnmappedPath], [OnUnmapped] FROM XCUBE_DIMMAP WHERE [DimMapKey] = ?";
+		String sql = "SELECT [DimMapKey], [Description], [DimensionKey], [UnmappedPath], [OnUnmapped], [AutoCreate] FROM " + TABLE_NAME + " WHERE [DimMapKey] = ?";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		stmt.setString(1, dimMapKey);
 		ResultSet rs = stmt.executeQuery();
@@ -83,6 +106,7 @@ public class DimMappingDefDAO {
 			dmd.setDimensionKey(rs.getString("DimensionKey"));
 			dmd.setUnmappedPath(rs.getString("UnmappedPath"));
 			dmd.setOnUnmapped(DimMappingDef.Action.valueOf(rs.getString("OnUnmapped")));
+			dmd.setAutoCreateMapping(rs.getBoolean("AutoCreate"));
 		}
 		rs.close();
 		stmt.close();
@@ -102,6 +126,7 @@ public class DimMappingDefDAO {
 		psUpdate.setString(idx++, dimMapping.getDimensionKey());
 		psUpdate.setString(idx++, dimMapping.getUnmappedPath());
 		psUpdate.setString(idx++, dimMapping.getOnUnmapped().name());
+		psUpdate.setBoolean(idx++, dimMapping.isAutoCreateMapping());
 		psUpdate.setString(idx++, dimMapping.getKey());
 		int count = psUpdate.executeUpdate(); 
 		if (count != 1) {
@@ -123,6 +148,7 @@ public class DimMappingDefDAO {
 		psInsert.setString(idx++, dimMapping.getDimensionKey());
 		psInsert.setString(idx++, dimMapping.getUnmappedPath());
 		psInsert.setString(idx++, dimMapping.getOnUnmapped().name());
+		psInsert.setBoolean(idx++, dimMapping.isAutoCreateMapping());
 		int count = psInsert.executeUpdate(); 
 		if (count != 1) {
 			throw new SQLException("Error inserting DimMappingDef " + dimMapping.getKey() + ": Updated " + count + " but expected 1");

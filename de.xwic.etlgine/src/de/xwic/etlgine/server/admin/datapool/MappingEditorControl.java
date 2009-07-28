@@ -9,6 +9,7 @@ import java.util.List;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
+import de.jwic.controls.CheckboxControl;
 import de.jwic.controls.InputBoxControl;
 import de.jwic.controls.LabelControl;
 import de.jwic.controls.ListBoxControl;
@@ -45,7 +46,8 @@ public class MappingEditorControl extends BaseContentContainer {
 	private InputBoxControl inpKey;
 	private InputBoxControl inpDescription;
 	private ListBoxControl lbcDimension;
-	private RadioGroupControl chkOptions;
+	private RadioGroupControl chkOnUnmapped;
+	private CheckboxControl chkOptions;
 	private DimensionElementSelector elmSelector;
 	private ErrorWarningControl errInfo;
 
@@ -169,7 +171,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			errInfo.showError("You must select a dimension.");
 			return;
 		}
-		DimMappingDef.Action onUnmapped = DimMappingDef.Action.valueOf(chkOptions.getSelectedKey());
+		DimMappingDef.Action onUnmapped = DimMappingDef.Action.valueOf(chkOnUnmapped.getSelectedKey());
 		
 		String unmappedElement = elmSelector.getDimensionElement() != null ? elmSelector.getDimensionElement().getPath() : null;
 		if (onUnmapped == DimMappingDef.Action.ASSIGN) {
@@ -197,6 +199,7 @@ public class MappingEditorControl extends BaseContentContainer {
 		dimMapping.setDescription(inpDescription.getText());
 		dimMapping.setOnUnmapped(onUnmapped);
 		dimMapping.setUnmappedPath(unmappedElement);
+		dimMapping.setAutoCreateMapping(chkOptions.isKeySelected("autocreate"));
 		
 		ServerContext context = ETLgineServer.getInstance().getServerContext();
 		String syncTableConnectionName = context.getProperty(dpManagerKey + ".datapool.syncTables.connection");
@@ -267,12 +270,15 @@ public class MappingEditorControl extends BaseContentContainer {
 			lbcDimension.addElement(title, dim.getKey());
 		}
 		
-		chkOptions = new RadioGroupControl(this, "chkOptions");
-		chkOptions.setChangeNotification(true);
-		chkOptions.addElement("Create", "CREATE");
-		chkOptions.addElement("Skip", "SKIP");
-		chkOptions.addElement("Assign To", "ASSIGN");
-		chkOptions.addElement("Fail", "FAIL");
+		chkOnUnmapped = new RadioGroupControl(this, "chkOnUnmapped");
+		chkOnUnmapped.setChangeNotification(true);
+		chkOnUnmapped.addElement("Create", "CREATE");
+		chkOnUnmapped.addElement("Skip", "SKIP");
+		chkOnUnmapped.addElement("Assign To", "ASSIGN");
+		chkOnUnmapped.addElement("Fail", "FAIL");
+		
+		chkOptions = new CheckboxControl(this, "chkOptions");
+		chkOptions.addElement("Autocreate Mapping", "autocreate");
 		
 		new LabelControl(this, "elmSelector").setText("");
 		elmSelector = null;
@@ -287,7 +293,11 @@ public class MappingEditorControl extends BaseContentContainer {
 		inpDescription.setText(dimMapping.getDescription() != null ? dimMapping.getDescription() : "");
 		lbcDimension.setSelectedKey(dimMapping.getDimensionKey() != null ? dimMapping.getDimensionKey() : "");
 		
-		chkOptions.setSelectedKey(dimMapping.getOnUnmapped().name());
+		chkOnUnmapped.setSelectedKey(dimMapping.getOnUnmapped().name());
+		
+		if (dimMapping.isAutoCreateMapping()) {
+			chkOptions.setSelectedKey("autocreate");
+		}
 		
 		if (elmSelector != null && dimMapping.getUnmappedPath() != null && dimMapping.getUnmappedPath().length() != 0) {
 			IDimension dimension = elmSelector.getDimension();

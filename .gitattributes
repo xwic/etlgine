@@ -672,6 +672,7 @@ de.xwic.cube/src/de/xwic/cube/IValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/IValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/Key.java -text
 de.xwic.cube/src/de/xwic/cube/StorageException.java -text
+de.xwic.cube/src/de/xwic/cube/TempMeasure.java -text
 de.xwic.cube/src/de/xwic/cube/event/CellAggregatedEvent.java -text
 de.xwic.cube/src/de/xwic/cube/event/CellValueChangedEvent.java -text
 de.xwic.cube/src/de/xwic/cube/event/CubeEvent.java -text

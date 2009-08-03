@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-08-03 FLI
+	- Added "Delete Cube" action in cube details viewer.
+	
 2009-07-28 FLI
 	- Added auto-create unmapped elements feature
 	- Moved cube-clear back into preSourceProcessing event. The movement caused imports to fail as these determine the

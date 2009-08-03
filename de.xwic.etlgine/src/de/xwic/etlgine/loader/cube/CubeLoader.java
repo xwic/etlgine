@@ -36,6 +36,8 @@ public class CubeLoader extends AbstractLoader {
 	
 	private boolean saveDataPoolOnFinish = false;
 	private boolean clearCubeBeforeStart = false;
+
+	private boolean warningWriteToLeaf = false;
 	
 	/**
 	 * Constructor.
@@ -97,6 +99,12 @@ public class CubeLoader extends AbstractLoader {
 				}
 				
 			}
+			
+			if (!warningWriteToLeaf && !key.isLeaf()) {
+				processContext.getMonitor().logWarn("Writing data to non-leafs (splash) with key: " + key.toString());
+				warningWriteToLeaf = true; // warn just once.
+			}
+			
 			for (IMeasure measure : dataMapper.getMeasures()) {
 				MeasureMapping mm = dataMapper.getMeasureMapping(measure);
 				Double value = mm.getValue(cube, record);

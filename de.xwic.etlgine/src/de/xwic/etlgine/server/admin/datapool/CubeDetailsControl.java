@@ -60,6 +60,25 @@ public class CubeDetailsControl extends BaseContentContainer {
 			}
 		});
 
+		ButtonControl delete = new ButtonControl(abar);
+		delete.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);
+		delete.setTitle("Delete Cube");
+		delete.setConfirmMsg("Do you really want to delete this cube from the datapool.");
+		delete.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onDeleteCube();
+			}
+		});
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onDeleteCube() {
+		
+		cube.remove();
+		close();
 		
 	}
 

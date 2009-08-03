@@ -70,6 +70,26 @@ public class CubeDetailsControl extends BaseContentContainer {
 			}
 		});
 		
+		ButtonControl btClear = new ButtonControl(abar);
+		btClear.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);
+		btClear.setTitle("Clear Cube");
+		btClear.setConfirmMsg("Do you really want to delete ALL DATA (cells) from this cube.");
+		btClear.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onClearCube();
+			}
+		});
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onClearCube() {
+		
+		cube.clear();
+		close();
+		
 	}
 
 	/**

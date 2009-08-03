@@ -97,6 +97,23 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	}
 	
 	/**
+	 * Add a measure to the mapping that just counts.
+	 * @param measureKey
+	 * @param columnName
+	 * @return
+	 */
+	public MeasureMapping addMeasure(String measureKey) {
+		IMeasure measure = cube.getDataPool().getMeasure(measureKey);
+		MeasureMapping mm = new MeasureMapping();
+		mm.setFixedValue(1.0d);
+		mm.setMeasureIndex(cube.getMeasureIndex(measure));
+		
+		measureMap.put(measure, mm);
+		measures.add(measure);
+		return mm;
+	}
+	
+	/**
 	 * Add a measure to the mapping.
 	 * @param measureKey
 	 * @param columnName
@@ -112,6 +129,7 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		measures.add(measure);
 		return mm;
 	}
+
 	
 	/**
 	 * Add a IMNeasureLoader for customer measure setting other than default sum aggregation.

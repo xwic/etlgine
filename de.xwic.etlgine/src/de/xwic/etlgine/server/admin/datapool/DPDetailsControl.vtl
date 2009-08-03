@@ -6,23 +6,6 @@ $insert.control("errInfo")
 	<h3>The pool is not initialized</h3>
 #else
 	<h3>DataPool $pool.key</h3>
-	<h4>Measures</h4>
-	<p>
-		<table width="100%" class="tbl" cellspacing="0">
-			<tr>
-				<th width=150>Key</th>
-				<th>Title</th>
-				<th width="80">Functional</th>
-			</tr>
-		#foreach($measure in $pool.measures)
-			<tr>
-				<td class="data">$measure.key</td>
-				<td class="data">$!measure.title</td>
-				<td class="data">#if($measure.isFunction()) Yes #else No #end</td>
-			</tr>
-		#end
-		</table>
-	</p>
 	<h4>Dimensions</h4>
 	<p>
 		<table width="100%" class="tbl" cellspacing="0">
@@ -77,6 +60,23 @@ $insert.control("errInfo")
 		#end
 		</table>
 		* KB Size is estimated for 32-bit OS and may vary. 
+	</p>
+	<h4>Measures</h4>
+	<p>
+		<table width="100%" class="tbl" cellspacing="0">
+			<tr>
+				<th width=150>Key</th>
+				<th>Title</th>
+				<th width="80">Functional</th>
+			</tr>
+		#foreach($measure in $pool.measures)
+			<tr>
+				<td class="data">$measure.key</td>
+				<td class="data">$!measure.title</td>
+				<td class="data">#if($measure.isFunction()) Yes #else No #end</td>
+			</tr>
+		#end
+		</table>
 	</p>
 	
 #end

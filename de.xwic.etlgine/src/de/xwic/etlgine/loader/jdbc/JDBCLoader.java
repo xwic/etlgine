@@ -218,24 +218,34 @@ public class JDBCLoader extends AbstractLoader {
 		sqlUpd.append("UPDATE [").append(tablename).append("] SET ");
 		sqlValues.append("(");
 		
-		boolean first = true;
+		boolean firstI = true;
+		boolean firstU = true;
 		for (DbColumnDef colDef : columns.values()) {
 			if (colDef.getColumn() != null) {
-				if (first) {
-					first = false;
+				
+				// INSERT Statement
+				if (firstI) {
+					firstI = false;
 				} else {
 					sql.append(", ");
 					sqlValues.append(", ");
-					sqlUpd.append(", ");
 				}
 				sql.append("[");
 				sql.append(colDef.getName());
 				sql.append("]");
 				sqlValues.append("?");
 
-				sqlUpd.append("[");
-				sqlUpd.append(colDef.getName());
-				sqlUpd.append("] = ?");
+				// UPDATE Statement (might skip pk)
+				if (!colDef.getName().equalsIgnoreCase(pkColumn)) {
+					if (firstU) {
+						firstU = false;
+					} else {
+						sqlUpd.append(", ");
+					}
+					sqlUpd.append("[");
+					sqlUpd.append(colDef.getName());
+					sqlUpd.append("] = ?");
+				}
 			} else {
 				if (!ignoredColumns.contains(colDef.getName())) {
 					monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
@@ -442,7 +452,7 @@ public class JDBCLoader extends AbstractLoader {
 			boolean modified = false;
 			DbColumnDef pkColDef = null;
 			for (DbColumnDef colDef : columns.values()) {
-				if (colDef.getColumn() != null) {
+				if (colDef.getColumn() != null && !colDef.getName().equalsIgnoreCase(pkColumn)) {
 					
 					Object value = record.getData(colDef.getColumn());
 					setPSValue(psUpdate, idx++, value, colDef);

@@ -2,6 +2,8 @@ Change Notes
 =============
 
 2009-08-03 FLI
+	- CubeLoader prints a warning if data is written into a non-leaf element (splash)
+	- ETLgine Mapping-Admin: non-leaf elements are now printed in blue in the mapping table. 
 	- Added "Delete Cube" action in cube details viewer.
 	
 2009-07-28 FLI

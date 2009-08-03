@@ -8,6 +8,7 @@ import de.jwic.ecolib.tableviewer.ITableLabelProvider;
 import de.jwic.ecolib.tableviewer.RowContext;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.xwic.cube.IDimension;
+import de.xwic.cube.IDimensionElement;
 import de.xwic.etlgine.cube.mapping.DimMappingElementDef;
 
 /**
@@ -31,7 +32,10 @@ public class MappingElementTableLabelProvider implements ITableLabelProvider {
 			cell.text = path;
 			if (dimension != null) {
 				try {
-					dimension.parsePath(path);
+					IDimensionElement elm = dimension.parsePath(path);
+					if (!elm.isLeaf()) {
+						cell.text = "<span style=\"color: blue\">" + path + "</span>";
+					}
 				} catch (Throwable t) {
 					// the path does not work
 					cell.text = "<span style=\"color: red\">" + path + "</span>";

@@ -90,7 +90,7 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 					if (source instanceof FileSource) {
 						FileSource fs = (FileSource)source;
 						File file = fs.getFile();
-						if (file != null) {
+						if (file != null && file.exists()) {
 							if (!moveFile(file))  {
 								context.setResult(Result.FINISHED_WITH_ERRORS);
 							}

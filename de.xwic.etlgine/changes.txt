@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-08-07 FLI
+	- MoveFileFinalizer no longer sets status to FINISHED_WITH_ERRORS if a file that should get moved does not exist.
+	
 2009-08-03 FLI
 	- CubeLoader prints a warning if data is written into a non-leaf element (splash)
 	- ETLgine Mapping-Admin: non-leaf elements are now printed in blue in the mapping table. 

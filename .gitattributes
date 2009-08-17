@@ -348,6 +348,8 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/Module.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/Site.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/SplashControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/StackedContainerWithEvent.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/StackedContainerWithEvent.js -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/StackedContainerWithEvent.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/SubModule.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitCheckBoxControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/helper/ToolkitDateInputControl.java -text

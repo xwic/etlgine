@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-08-23 FLI
+	- Added CallURLFinalizer
+	
 2009-08-07 FLI
 	- MoveFileFinalizer no longer sets status to FINISHED_WITH_ERRORS if a file that should get moved does not exist.
 	

@@ -1155,6 +1155,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSFileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSTool.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/finalizer/CallURLFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/finalizer/MoveFileFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/finalizer/PublishCubeFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Column.java -text

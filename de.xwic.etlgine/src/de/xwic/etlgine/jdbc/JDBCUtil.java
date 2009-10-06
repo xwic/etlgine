@@ -137,6 +137,17 @@ public class JDBCUtil {
 	}
 	
 	/**
+	 * Returns the fetch size used for this jdbc statements.
+	 * @param context
+	 * @param name
+	 * @return
+	 */
+	public static int getFetchSize(IContext context, String name) {
+		int fetch_size = context.getPropertyInt(name + ".connection.fetch_size", 0);
+		return fetch_size;
+	}
+
+	/**
 	 * @param rs
 	 * @throws SQLException 
 	 */

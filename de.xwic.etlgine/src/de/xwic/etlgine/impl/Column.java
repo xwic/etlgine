@@ -15,7 +15,9 @@ public class Column implements IColumn {
 
 	private int sourceIndex = -1;
 	private boolean exclude = false;
-	private DataType typeHint = DataType.UNKNOWN; 
+	
+	private DataType typeHint = DataType.UNKNOWN;
+	private int lengthHint = -1;
 
 	public Column() {
 		
@@ -161,4 +163,19 @@ public class Column implements IColumn {
 	public void setSourceIndex(int sourceIndex) {
 		this.sourceIndex = sourceIndex;
 	}
+
+	/**
+	 * @return the lengthHint
+	 */
+	public int getLengthHint() {
+		return lengthHint;
+	}
+
+	/**
+	 * @param lengthHint the lengthHint to set
+	 */
+	public void setLengthHint(int lengthHint) {
+		this.lengthHint = lengthHint;
+	}
+
 }

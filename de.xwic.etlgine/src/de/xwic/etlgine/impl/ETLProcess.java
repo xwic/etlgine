@@ -228,7 +228,7 @@ public class ETLProcess extends Process implements IETLProcess {
 						}
 						
 						processContext.recordProcessed(record);
-						// TODO track duplcates as well and inform
+						// TODO track duplicates as well and inform
 						monitor.onEvent(processContext, EventType.RECORD_PROCESSED);
 						
 						if (stopAfterRecords > 0 && processContext.getRecordsCount() >= stopAfterRecords) {

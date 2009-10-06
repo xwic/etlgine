@@ -10,7 +10,7 @@ package de.xwic.etlgine;
  */
 public abstract class AbstractTransformer implements ITransformer {
 
-	protected IProcessContext processContext = null;
+	protected transient IProcessContext processContext = null;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ITransformer#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
@@ -29,8 +29,7 @@ public abstract class AbstractTransformer implements ITransformer {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessParticipant#preSourceOpening(de.xwic.etlgine.IProcessContext)
 	 */
-	public void preSourceOpening(IProcessContext processContext)
-			throws ETLException {
+	public void preSourceOpening(IProcessContext processContext) throws ETLException {
 		
 	}
 	

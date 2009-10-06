@@ -63,7 +63,7 @@ public class DateTransformer extends AbstractTransformer {
 			
 				record.setData(name, d);
 			} catch (ParseException e) {
-				throw new ETLException("Error parsing date string '" + s + "' in filed " + name, e);
+				throw new ETLException("Error parsing date string '" + s + "' in field " + name, e);
 			}
 		}
 	}

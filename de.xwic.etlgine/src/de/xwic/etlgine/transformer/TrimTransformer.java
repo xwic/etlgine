@@ -40,8 +40,28 @@ public class TrimTransformer extends AbstractTransformer {
 			if (!(value instanceof String)) {
 				continue;
 			}
-			value = ((String)value).trim();
+			value = trim((String)value);
 			record.setData(column, value);
 		}
+	}
+
+	/**
+	 * @param value
+	 * @return
+	 */
+	private String trim(String s) {
+		int count = s.length();
+    	int len = count;
+    	int st = 0;
+    	int off = 0;      /* avoid getfield opcode */
+    	char[] val = s.toCharArray();    /* avoid getfield opcode */
+
+    	while ((st < len) && (val[off + st] <= ' ' || val[off + st] == 0xa0)) {
+    	    st++;
+    	}
+    	while ((st < len) && (val[off + len - 1] <= ' ' || val[off + st] == 0xa0)) {
+    	    len--;
+    	}
+    	return ((st > 0) || (len < count)) ? s.substring(st, len) : s;
 	}
 }

@@ -38,6 +38,10 @@ public class JDBCExtractor extends AbstractExtractor {
 	private boolean endReached = false;
 	private int colCount = 0;
 	
+	private int fetchSize = -1;
+	private int returnedCount = 0;
+	private int getNextRecordInvoked = 0;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractExtractor#initialize(de.xwic.etlgine.IProcessContext)
 	 */
@@ -73,6 +77,8 @@ public class JDBCExtractor extends AbstractExtractor {
 	 * @see de.xwic.etlgine.IExtractor#getNextRecord()
 	 */
 	public IRecord getNextRecord() throws ETLException {
+
+		getNextRecordInvoked++;
 		
 		if (endReached) {
 			return null;
@@ -110,7 +116,8 @@ public class JDBCExtractor extends AbstractExtractor {
 					}
 					record.setData(col, value);
 				}
-				
+		
+				returnedCount++;
 				return record;
 			} else {
 				endReached = true;
@@ -173,7 +180,16 @@ public class JDBCExtractor extends AbstractExtractor {
 		}
 
 		try {
-			stmt = connection.createStatement();
+			stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+			// set fetch size
+			if (fetchSize == -1) {
+				fetchSize = JDBCUtil.getFetchSize(context, currSource.getConnectionName());
+			}
+			
+			if (fetchSize > 0) {
+				stmt.setFetchSize(fetchSize);
+			}
 			rs = stmt.executeQuery(currSource.getSqlSelectString());
 			
 			ResultSetMetaData metaData = rs.getMetaData();
@@ -193,6 +209,8 @@ public class JDBCExtractor extends AbstractExtractor {
 				switch (metaData.getColumnType(i)) {
 				case Types.CHAR:
 				case Types.VARCHAR:
+				case Types.NVARCHAR:
+				case Types.CLOB:
 					dt = DataType.STRING;
 					break;
 				case Types.INTEGER:
@@ -210,6 +228,8 @@ public class JDBCExtractor extends AbstractExtractor {
 				case Types.DATE:
 					dt = DataType.DATE;
 					break;
+				case Types.BIT:
+					dt = DataType.BOOLEAN;
 				}
 				column.setTypeHint(dt);
 			}
@@ -220,6 +240,20 @@ public class JDBCExtractor extends AbstractExtractor {
 		}
 		
 
+	}
+
+	/**
+	 * @return the fetchSize
+	 */
+	public int getFetchSize() {
+		return fetchSize;
+	}
+
+	/**
+	 * @param fetchSize the fetchSize to set
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
 	}
 
 }

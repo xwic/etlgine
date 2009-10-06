@@ -1128,6 +1128,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/IETLProcess.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IGlobalContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IJob.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/IJobFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ILoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IMonitor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IProcess.java -text
@@ -1150,6 +1151,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDef.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/mapping/DimMappingElementDefDAO.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/CSVExtractor.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/extractor/EmptyExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/ICSVExtractorListener.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/extractor/jdbc/JDBCSource.java -text
@@ -1159,6 +1161,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/extractor/xls/XLSTool.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/finalizer/CallURLFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/finalizer/MoveFileFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/finalizer/PublishCubeFinalizer.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/finalizer/SaveDataPoolFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Column.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Context.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/DataSet.java -text
@@ -1244,9 +1247,12 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.vtl -tex
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/spring/ETLgineServerFactoryBean.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/sources/URLFileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipEntrySource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipSources.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/transformer/BooleanTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/DateTransformer.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/transformer/NumberTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/TrimTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/FileLookupTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/JobExecutedTrigger.java -text

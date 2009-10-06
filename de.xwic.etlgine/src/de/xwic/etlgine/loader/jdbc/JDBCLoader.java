@@ -12,8 +12,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,14 +28,24 @@ import org.apache.log4j.Logger;
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
+import de.xwic.etlgine.IETLProcess;
+import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
+import de.xwic.etlgine.ISource;
+import de.xwic.etlgine.ITransformer;
+import de.xwic.etlgine.IColumn.DataType;
+import de.xwic.etlgine.impl.DataSet;
 import de.xwic.etlgine.jdbc.DbColumnDef;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.util.Validate;
 
 /**
  * @author lippisch
+ *
+ */
+/**
+ * @author JBORNEMA
  *
  */
 public class JDBCLoader extends AbstractLoader {
@@ -54,11 +66,16 @@ public class JDBCLoader extends AbstractLoader {
 	private String username = null;
 	private String password = null;
 	private String tablename = null;
+
+	private boolean autoCreateTable = false;
 	private boolean autoCreateColumns = false;
+	private boolean autoDetectColumnTypes = false;
+	private boolean autoDataTruncate = false;
+	
 	private boolean ignoreMissingTargetColumns = false;
 	private boolean treatEmptyAsNull = false;
 	private boolean truncateTable = false;
-	private boolean autoDataTruncate = false;
+	private boolean skipError = false;
 	private int batchSize = -1;
 	private int batchCountInsert = 0;
 	private int batchCountUpdate = 0;
@@ -142,6 +159,11 @@ public class JDBCLoader extends AbstractLoader {
 		}
 
 		if (truncateTable) {
+			try {
+				checkTableExists();
+			} catch (SQLException se) {
+				throw new ETLException("Error initializing target database/tables: " + se, se);
+			}
 			truncateTable();
 		}
 		
@@ -152,6 +174,20 @@ public class JDBCLoader extends AbstractLoader {
 //			e.printStackTrace();
 //		}
 		
+	}
+	
+	@Override
+	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
+		super.postSourceProcessing(processContext);
+		
+		if (connection != null) {
+			try {
+				// check open batch statements
+				executeBatch();
+			} catch (SQLException e) {
+				throw new ETLException(e);
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -269,6 +305,25 @@ public class JDBCLoader extends AbstractLoader {
 	}
 
 	/**
+	 * Checks if table exists and auto creates it if autoCreateTable is true.
+	 * @return DatabaseMetaData
+	 * @throws SQLException 
+	 * @throws ETLException
+	 */
+	protected DatabaseMetaData checkTableExists() throws SQLException, ETLException {
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = metaData.getTables(connection.getCatalog(), null, tablename, null);
+		if (!rs.next()) {
+			if (!autoCreateTable) {
+				throw new ETLException("The target table '" + tablename + "' does not exist.");
+			}
+			createTable();
+		}
+		rs.close();
+		return metaData;
+	}
+	
+	/**
 	 * Checks table structure and creates missing columns if autoCreateColumns is enabled
 	 * @throws ETLException 
 	 * @throws SQLException 
@@ -276,13 +331,9 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	protected void checkTableStructure() throws ETLException, SQLException {
 		
-		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = metaData.getTables(connection.getCatalog(), null, tablename, null);
-		if (!rs.next()) {
-			throw new ETLException("The target table '" + tablename + "' does not exist.");
-		}
+		DatabaseMetaData metaData = checkTableExists();
 		
-		rs = metaData.getColumns(connection.getCatalog(), null, tablename, null);
+		ResultSet rs = metaData.getColumns(connection.getCatalog(), null, tablename, null);
 		//dumpResultSet(rs);
 		
 		columns = new LinkedHashMap<String, DbColumnDef>();
@@ -292,7 +343,7 @@ public class JDBCLoader extends AbstractLoader {
 			int size = rs.getInt("COLUMN_SIZE");
 			String allowNull = rs.getString("NULLABLE");
 			DbColumnDef colDef = new DbColumnDef(name, type, size, allowNull.equals("YES") || allowNull.equals("1") || allowNull.equals("TRUE"));
-			columns.put(name, colDef);
+			columns.put(name.toUpperCase(), colDef);
 		}
 		rs.close();
 		
@@ -301,7 +352,11 @@ public class JDBCLoader extends AbstractLoader {
 		// Check if the columns apply.
 		for (IColumn column : processContext.getDataSet().getColumns()) {
 			if (!column.isExclude()) {
-				DbColumnDef dbc = columns.get(column.computeTargetName());
+				DbColumnDef dbc = columns.get(column.computeTargetName().toUpperCase());
+				if (dbc == null) {
+					// try column name
+					dbc = columns.get(column.getName().toUpperCase());
+				}
 				if (dbc != null) {
 					dbc.setColumn(column);
 				} else {
@@ -312,6 +367,10 @@ public class JDBCLoader extends AbstractLoader {
 		}
 		if (missingCols.size() > 0) {
 			if (autoCreateColumns) {
+				if (autoDetectColumnTypes) {
+					// auto-detect column types for missing columns
+					autoDetectColumnTypes(missingCols);
+				}
 				createColumns(missingCols, columns);
 			} else {
 				if (!ignoreMissingTargetColumns) {
@@ -319,6 +378,191 @@ public class JDBCLoader extends AbstractLoader {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Do an addition full source scan of value analysis.
+	 * @param missingCols
+	 * @throws ETLException 
+	 */
+	protected void autoDetectColumnTypes(List<IColumn> missingCols) throws ETLException {
+		IETLProcess process = (IETLProcess)processContext.getProcess();
+		IExtractor extractor = process.getExtractor();
+
+		class ColumnType {
+			boolean isInteger = true;
+			boolean isLong = true;
+			boolean isDouble = true;
+			boolean isDate = true;
+			int maxLength = 0;
+			int count = 0; 
+		}
+		
+		Map<IColumn, ColumnType> columnTypes = new HashMap<IColumn, ColumnType>();
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/DD/yyyy");
+		
+		// assume source is opened already, iterate all records
+		IRecord record;
+		while ((record = extractor.getNextRecord()) != null) {
+
+			// invoke transformers
+			for (ITransformer transformer : process.getTransformers()) {
+				transformer.processRecord(processContext, record);
+			}
+			
+			// iterate missing columns
+			for (IColumn column : missingCols) {
+				
+				ColumnType columnType = columnTypes.get(column);
+				if (columnType == null) {
+					columnType = new ColumnType();
+					columnTypes.put(column, columnType);
+				}
+				
+				Object value = record.getData(column);
+				if (value == null) {
+					continue;
+				}
+				
+				// identify type
+				Number n = null;
+				Date d = null;
+				String s = null;
+				if (value instanceof String) {
+					s = (String)value;
+				} else if (value instanceof Number) {
+					n = (Number)value;
+				} else if (value instanceof Date) {
+					d = (Date)value;
+				} else {
+					s = value.toString();
+				}
+				if (s != null && treatEmptyAsNull && s.length() == 0) {
+					continue;
+				}
+
+				
+				if (s != null) {
+					// check integer
+					if (columnType.isInteger) {
+						try {
+							Integer.parseInt(s);
+						} catch (Exception e) {
+							columnType.isInteger = false;
+						}
+					}
+					// check long
+					if (columnType.isLong) {
+						try {
+							Long.parseLong(s);
+						} catch (Exception e) {
+							columnType.isLong = false;
+						}
+					}
+					// check double
+					if (columnType.isDouble) {
+						try {
+							Double.parseDouble(s);
+						} catch (Exception e) {
+							columnType.isDouble = false;
+						}
+					}
+					// check date
+					if (columnType.isDate) {
+						try {
+							dateFormat.parse(s);
+						} catch (Exception e) {
+							columnType.isDate = false;
+						}
+					}
+				} else {
+					if (n != null) {
+						if (columnType.isInteger && !(n instanceof Integer)) {
+							columnType.isInteger = false;
+						}
+						if (columnType.isLong && !(n instanceof Long)) {
+							columnType.isLong = false;
+						}
+						if (columnType.isDouble && !(n instanceof Double)) {
+							columnType.isDouble = false;
+						}
+						if (columnType.isDate && !(d instanceof Date)) {
+							columnType.isDate = false;
+						}
+					}
+				}
+				
+				// set max length
+				if (s != null) {
+					int l = s.length();
+					if (l > columnType.maxLength) {
+						columnType.maxLength = l;
+					}
+				}
+				
+				// increase value count
+				columnType.count++;
+			}
+		}
+		
+		// set collected column type information
+		for (Map.Entry<IColumn, ColumnType> entry : columnTypes.entrySet()) {
+			IColumn column = entry.getKey();
+			ColumnType columnType = entry.getValue();
+			
+			if (column.getTypeHint() != DataType.UNKNOWN) {
+				continue;
+			}
+			
+			boolean forceString = columnType.count == 0; 
+			
+			if (!forceString) {
+				if (columnType.isInteger) {
+					column.setTypeHint(DataType.INT);
+				} else if (columnType.isLong) {
+					column.setTypeHint(DataType.LONG);
+				} else if (columnType.isDouble) {
+					column.setTypeHint(DataType.DOUBLE);
+				} else if (columnType.isDate) {
+					column.setTypeHint(DataType.DATE);
+				} else {
+					forceString = true;
+				}
+			} else {
+				columnType.maxLength = 256;
+			}
+			
+			if (forceString) {
+				// TODO support clob for length > 4000
+				column.setTypeHint(DataType.STRING);
+				// set length
+				int lengthHint = 1;
+				for (; lengthHint < columnType.maxLength; lengthHint *= 2);
+				column.setLengthHint(lengthHint);
+			}
+		}
+		
+		// close source
+		extractor.close();
+		
+		// open again
+		ISource source = processContext.getCurrentSource();
+		extractor.openSource(source, new DataSet());
+	}
+
+	/**
+	 * Create table with primary key column Id (bigint identidy).
+	 * @throws SQLException
+	 */
+	private void createTable() throws SQLException {
+		processContext.getMonitor().logInfo("Creating missing table: " + tablename);
+
+		Statement stmt = connection.createStatement();
+		StringBuilder sb = new StringBuilder();
+		sb.append("CREATE TABLE [").append(tablename).append("] (");
+		sb.append("[Id] [bigint] IDENTITY(1,1) NOT NULL, CONSTRAINT [PK_").append(tablename).append("] PRIMARY KEY (Id))");
+		stmt.execute(sb.toString());
 	}
 
 	/**
@@ -353,7 +597,7 @@ public class JDBCLoader extends AbstractLoader {
 	private void createColumns(List<IColumn> missingCols, Map<String, DbColumnDef> columns) throws SQLException {
 
 		StringBuilder sql = new StringBuilder();
-		sql.append("ALTER TABLE [" + tablename + "] ADD ");
+		sql.append("ALTER TABLE [").append(tablename).append("] ADD ");
 		boolean first = true;
 		
 		for (IColumn col : missingCols) {
@@ -396,9 +640,13 @@ public class JDBCLoader extends AbstractLoader {
 					dbcd.setType(Types.BIGINT);
 					break;
 				default:
-					type = "VARCHAR(255)";
+					int length = col.getLengthHint();
+					if (length < 1) {
+						length = 255;
+					}
+					type = "VARCHAR(" + length + ")";
 					dbcd.setType(Types.VARCHAR);
-					dbcd.setSize(255);
+					dbcd.setSize(length);
 					break;
 				}
 				
@@ -423,22 +671,28 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 
-		
-		switch (mode) {
-		case INSERT:
-			doInsert(processContext, record);
-			break;
-		case UPDATE:
-			doUpdate(processContext, record);
-			break;
-		case INSERT_OR_UPDATE:
-			if (Validate.equals(newIdentifierValue, record.getData(newIdentifierColumn))) {
+		try {
+			switch (mode) {
+			case INSERT:
 				doInsert(processContext, record);
-			} else {
+				break;
+			case UPDATE:
 				doUpdate(processContext, record);
+				break;
+			case INSERT_OR_UPDATE:
+				if (Validate.equals(newIdentifierValue, record.getData(newIdentifierColumn))) {
+					doInsert(processContext, record);
+				} else {
+					doUpdate(processContext, record);
+				}
+			}
+		} catch (Throwable t) {
+			record.markInvalid(t.getLocalizedMessage());
+			processContext.getMonitor().logError("Cannot process record " + processContext.getRecordsCount() , t);
+			if (!skipError) {
+				throw new ETLException(t);
 			}
 		}
-		
 		
 	}
 
@@ -483,10 +737,9 @@ public class JDBCLoader extends AbstractLoader {
 					updateCount += count;
 				} else {
 					// batched mode
-					if (batchCountUpdate < batchSize) {
-						psUpdate.addBatch();
-						batchCountUpdate++;
-					} else {
+					psUpdate.addBatch();
+					batchCountUpdate++;
+					if (batchCountUpdate >= batchSize) {
 						// execute
 						executeBatch();
 					}
@@ -532,6 +785,7 @@ public class JDBCLoader extends AbstractLoader {
 			case Types.VARCHAR:
 			case Types.CHAR:
 			case Types.LONGVARCHAR:
+			case Types.CLOB:
 			case -9: { //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
 				String s = value.toString();
 				if (autoDataTruncate && s.length() > colDef.getSize()) {
@@ -543,16 +797,26 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			case Types.INTEGER:
 			case Types.BIGINT:
-				if (value instanceof Integer) {
-					ps.setInt(idx, (Integer)value);
-				} else if (value instanceof Long) {
-					ps.setLong(idx, (Long)value);
-				} else if (value instanceof String) {
-					ps.setInt(idx, Integer.parseInt((String)value));
+			case Types.SMALLINT:
+				try {
+					if (value instanceof Integer) {
+						ps.setInt(idx, (Integer)value);
+					} else if (value instanceof Long) {
+						ps.setLong(idx, (Long)value);
+					} else if (value instanceof String) {
+						ps.setInt(idx, Integer.parseInt((String)value));
+					} else {
+						// unknown value
+						ps.setObject(idx, value);
+					}
+					break;
+				} catch (NumberFormatException nfe) {
+					// add column information
+					throw new NumberFormatException(nfe.getMessage() + ", column '" + colDef.getName() + "'");
 				}
-				break;
 			case Types.DOUBLE:
 			case Types.FLOAT:
+			case Types.REAL:
 				if (value instanceof Integer) {
 					ps.setInt(idx, (Integer)value);
 				} else if (value instanceof String) {
@@ -564,6 +828,9 @@ public class JDBCLoader extends AbstractLoader {
 					}
 				} else if (value instanceof Double) {
 					ps.setDouble(idx, (Double)value);
+				} else {
+					// unknown value
+					ps.setObject(idx, value);
 				}
 				break;							
 			case Types.TIMESTAMP:
@@ -577,6 +844,9 @@ public class JDBCLoader extends AbstractLoader {
 					} else {
 						ps.setString(idx, s);
 					}
+				} else {
+					// unknown value
+					ps.setObject(idx, value);
 				}
 				break;
 			case Types.BIT:
@@ -591,6 +861,9 @@ public class JDBCLoader extends AbstractLoader {
 				} else if (value instanceof String) {
 					Integer valInt = Integer.parseInt((String) value);
 					ps.setBoolean(idx, valInt == 0 ? false : true);
+				} else {
+					// unknown value
+					ps.setObject(idx, value);
 				}
 				break;
 			default:
@@ -625,10 +898,9 @@ public class JDBCLoader extends AbstractLoader {
 				insertCount += count;
 			} else {
 				// batched mode
-				if (batchCountInsert < batchSize) {
-					psInsert.addBatch();
-					batchCountInsert++;
-				} else {
+				psInsert.addBatch();
+				batchCountInsert++;
+				if (batchCountInsert >= batchSize) {
 					// execute
 					executeBatch();
 				}
@@ -675,7 +947,9 @@ public class JDBCLoader extends AbstractLoader {
 		
 		// batch update
 		if (batchCountUpdate > 0) {
-			for (int count : psUpdate.executeBatch()) {
+			int[] result = psUpdate.executeBatch();
+			for (int i = 0; i < result.length; i++) {
+				int count = result[i];
 				if (count != 1) {
 					monitor.logWarn("Update resulted in count " + count + " but expected 1");
 				}	
@@ -980,4 +1254,47 @@ public class JDBCLoader extends AbstractLoader {
 	public void setBatchSize(int batchSize) {
 		this.batchSize = batchSize;
 	}
+
+	/**
+	 * @return the skipError
+	 */
+	public boolean isSkipError() {
+		return skipError;
+	}
+
+	/**
+	 * @param skipError the skipError to set
+	 */
+	public void setSkipError(boolean skipError) {
+		this.skipError = skipError;
+	}
+
+	/**
+	 * @return the autoCreateTable
+	 */
+	public boolean isAutoCreateTable() {
+		return autoCreateTable;
+	}
+
+	/**
+	 * @param autoCreateTable the autoCreateTable to set
+	 */
+	public void setAutoCreateTable(boolean autoCreateTable) {
+		this.autoCreateTable = autoCreateTable;
+	}
+
+	/**
+	 * @return the autoDetectColumnTypes
+	 */
+	public boolean isAutoDetectColumnTypes() {
+		return autoDetectColumnTypes;
+	}
+
+	/**
+	 * @param autoDetectColumnTypes the autoDetectColumnTypes to set
+	 */
+	public void setAutoDetectColumnTypes(boolean autoDetectColumnTypes) {
+		this.autoDetectColumnTypes = autoDetectColumnTypes;
+	}
+
 }

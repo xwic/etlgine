@@ -4,6 +4,7 @@
 package de.xwic.etlgine;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Developer
@@ -127,4 +128,14 @@ public interface IJob {
 	 */
 	public void setJobId(String jobId);
 
+	/**
+	 * Add a job finalizer.
+	 */
+	public void addJobFinalizer(IJobFinalizer finalizer);
+	
+	/**
+	 * Returns the job finalizers.
+	 * @return
+	 */
+	public List<IJobFinalizer> getJobFinalizers();
 }

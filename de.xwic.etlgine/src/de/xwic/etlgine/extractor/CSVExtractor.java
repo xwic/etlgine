@@ -163,6 +163,14 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 					expectedColumns = header.length;
 					int idx = 0;
 					for (String colName : header) {
+						int i = 1;
+						for (String name = colName; dataSet.containsColumn(name); i++) {
+							name = colName + i;
+						}
+						if (i > 1) {
+							// correct column name
+							colName = colName + i;
+						}
 						dataSet.addColumn(colName, idx++);
 					}
 				}

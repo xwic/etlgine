@@ -77,6 +77,14 @@ public class CubeLoader extends AbstractLoader {
 
 	}
 	
+	/**
+	 * Returns new Key by calling cube.createKey() 
+	 * @return
+	 */
+	protected Key createKey() {
+		return cube.createKey();
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
@@ -84,7 +92,7 @@ public class CubeLoader extends AbstractLoader {
 
 		if (dataMapper.accept(record)) {
 		
-			Key key = cube.createKey();
+			Key key = createKey();
 			int idx = 0;
 			for (IDimension dim : cube.getDimensions()) {
 				

@@ -16,7 +16,8 @@ public interface IColumn {
 		LONG,
 		DOUBLE,
 		DATE,
-		DATETIME
+		DATETIME,
+		BOOLEAN
 	}
 	
 	
@@ -75,5 +76,15 @@ public interface IColumn {
 	 * @return
 	 */
 	public String computeTargetName();
+
+	/**
+	 * @return the lengthHint
+	 */
+	public int getLengthHint();
+
+	/**
+	 * @param lengthHint the lengthHint to set
+	 */
+	public void setLengthHint(int lengthHint);
 
 }

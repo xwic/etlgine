@@ -8,13 +8,17 @@ import groovy.lang.GroovyShell;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.ETLgine;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IJobFinalizer;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.ITrigger;
@@ -41,6 +45,8 @@ public class Job implements IJob {
 	
 	private String jobId = null;
 	
+	protected List<IJobFinalizer> finalizers = new ArrayList<IJobFinalizer>();
+
 	/**
 	 * @param name
 	 */
@@ -84,6 +90,14 @@ public class Job implements IJob {
 		} finally {
 			executing = false;
 			lastFinished = new Date();
+			// fun finalizers
+			for (IJobFinalizer finalizer : finalizers) {
+				try {
+					finalizer.onFinish(this);
+				} catch (Throwable t) {
+					monitor.logError("Error executing finalizer!", t);
+				}
+			}
 			processChain = null;
 			if (trigger != null) {
 				trigger.notifyJobFinished(state == State.ERROR);
@@ -305,4 +319,18 @@ public class Job implements IJob {
 		this.monitor = monitor;
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IJob#addJobFinalizer(de.xwic.etlgine.IJobFinalizer)
+	 */
+	public void addJobFinalizer(IJobFinalizer finalizer) {
+		finalizers.add(finalizer);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IJob#getJobFinalizers()
+	 */
+	public List<IJobFinalizer> getJobFinalizers() {
+		return Collections.unmodifiableList(finalizers);
+	}
 }

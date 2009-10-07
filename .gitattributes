@@ -668,6 +668,7 @@ de.xwic.cube/src/de/xwic/cube/IDataPoolManager.java -text
 de.xwic.cube/src/de/xwic/cube/IDataPoolStorageProvider.java -text
 de.xwic.cube/src/de/xwic/cube/IDimension.java -text
 de.xwic.cube/src/de/xwic/cube/IDimensionElement.java -text
+de.xwic.cube/src/de/xwic/cube/IDimensionResolver.java -text
 de.xwic.cube/src/de/xwic/cube/IIdentifyable.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasure.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasureFunction.java -text
@@ -676,6 +677,7 @@ de.xwic.cube/src/de/xwic/cube/IQuery.java -text
 de.xwic.cube/src/de/xwic/cube/IValueFormat.java -text
 de.xwic.cube/src/de/xwic/cube/IValueFormatProvider.java -text
 de.xwic.cube/src/de/xwic/cube/Key.java -text
+de.xwic.cube/src/de/xwic/cube/KeyExt.java -text
 de.xwic.cube/src/de/xwic/cube/StorageException.java -text
 de.xwic.cube/src/de/xwic/cube/TempMeasure.java -text
 de.xwic.cube/src/de/xwic/cube/event/CellAggregatedEvent.java -text
@@ -695,8 +697,10 @@ de.xwic.cube/src/de/xwic/cube/impl/AbstractCubeListener.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cell.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubeFlexCalc.java -text
+de.xwic.cube/src/de/xwic/cube/impl/CubePreCache.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPool.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPoolManager.java -text
+de.xwic.cube/src/de/xwic/cube/impl/DefaultDimensionResolver.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Dimension.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DimensionElement.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Identifyable.java -text

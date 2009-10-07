@@ -207,7 +207,7 @@ public class DataPoolInitializerUtil {
 				cube = new CubePreCache((CubeFlexCalc)cube);
 				log.info("Converted cube '" + key + "' to " + cube.getCubeType());
 			} else {
-				log.warn("Cannot convert cube '" + key + "' from " + cube.getTitle() + " to " + cubeType);
+				log.warn("Cannot convert cube '" + key + "' from " + cube.getCubeType() + " to " + cubeType);
 			}
 		}
 		

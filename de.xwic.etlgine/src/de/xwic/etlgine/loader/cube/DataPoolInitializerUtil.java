@@ -15,11 +15,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.IMeasure;
+import de.xwic.cube.IDataPool.CubeType;
+import de.xwic.cube.impl.CubeFlexCalc;
+import de.xwic.cube.impl.CubePreCache;
 import de.xwic.cube.util.JDBCSerializerUtil;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
@@ -37,6 +43,12 @@ public class DataPoolInitializerUtil {
 	private final IContext context;
 	private IDataPool pool;
 	
+	// Commons log
+	private transient Log log;
+	{
+		log = LogFactory.getLog(DataPoolInitializerUtil.class);
+	}
+
 	/**
 	 * Default constructor
 	 * @param pool
@@ -170,6 +182,8 @@ public class DataPoolInitializerUtil {
 	 * @return
 	 */
 	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType) {
+		ICube cube = null;
+		
 		if (!pool.containsCube(key)) {
 			IDimension[] dimensions = new IDimension[dimKeys.size()];
 			for (int i = 0; i < dimKeys.size(); i++) {
@@ -179,9 +193,25 @@ public class DataPoolInitializerUtil {
 			for (int i = 0; i < measureKeys.size(); i++) {
 				measures[i] = pool.getMeasure(measureKeys.get(i));
 			}
-			pool.createCube(key, dimensions, measures, cubeType);
+			cube = pool.createCube(key, dimensions, measures, cubeType);
+			
+		} else {
+			cube = pool.getCube(key);
 		}
-		return pool.getCube(key);
+		
+		// check for cubeType conversion
+		if (cubeType != cube.getCubeType()) {
+			log.info("Expected cube type of cube '" + key + "' is " + cubeType);
+			if (cube.getCubeType() == CubeType.FLEX_CALC && cubeType == CubeType.PRE_CACHE) {
+				// convert flex to pre-cache
+				cube = new CubePreCache((CubeFlexCalc)cube);
+				log.info("Converted cube '" + key + "' to " + cube.getCubeType());
+			} else {
+				log.warn("Cannot convert cube '" + key + "' from " + cube.getTitle() + " to " + cubeType);
+			}
+		}
+		
+		return cube;
 	}
 	
 	public void initFromDatabase(String dbProfile) throws ETLException, SQLException {

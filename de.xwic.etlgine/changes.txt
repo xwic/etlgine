@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-10-07 jbornema
+	- DataPoolInitializerUtil.ensureCube(...) converts CubeFlexCalc to CubePreCache if requested.
+
 2009-10-06 jbornema
 	- JdbcLoader SEVERE bug fixed in batch mode: each loop dropped the current record: very bad - this is fixed now.
 	- IJobFinalizer added invoked when job is finished.

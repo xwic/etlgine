@@ -89,8 +89,10 @@ public class Launch {
 			for (String rJob : runJob.split("[;,]")) {
 				IJob job = server.getServerContext().getJob(rJob);
 				if (job == null) {
-					System.out.println("The specified job does not exist: " + runJob);
-				} else {
+					job = server.loadJob(rJob + ".groovy");
+					//System.out.println("The specified job does not exist: " + runJob);
+				}
+				if (job != null) {
 					server.enqueueJob(job);
 				}
 			}

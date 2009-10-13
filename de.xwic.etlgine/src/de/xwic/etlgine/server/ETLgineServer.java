@@ -249,16 +249,7 @@ public class ETLgineServer implements Runnable {
 		StringTokenizer stk = new StringTokenizer(serverContext.getProperty("loadJobs", ""), ",; ");
 		while (stk.hasMoreTokens()) {
 			String scriptName = stk.nextToken();
-			String jobName = scriptName;
-			if (jobName.toLowerCase().endsWith(".groovy")) {
-				jobName = jobName.substring(0, jobName.length() - ".groovy".length());
-			}
-			try {
-				log.info("Loading Job " + jobName + " from file " + scriptName);
-				serverContext.loadJob(jobName, scriptName);
-			} catch (Throwable e) {
-				log.error("An error occured during loading of the job " + scriptName + ": " + e, e);
-			}
+			loadJob(scriptName);
 		}
 
 		// load DataPool(s)
@@ -403,5 +394,24 @@ public class ETLgineServer implements Runnable {
 
 	public boolean isRunning() {
 		return running;
+	}
+
+	/**
+	 * Loads a job from groovy script and returns it.
+	 * @param scriptName
+	 * @return
+	 */
+	public IJob loadJob(String scriptName) {
+		String jobName = scriptName;
+		if (jobName.toLowerCase().endsWith(".groovy")) {
+			jobName = jobName.substring(0, jobName.length() - ".groovy".length());
+		}
+		try {
+			log.info("Loading Job " + jobName + " from file " + scriptName);
+			return serverContext.loadJob(jobName, scriptName);
+		} catch (Throwable e) {
+			log.error("An error occured during loading of the job " + scriptName + ": " + e, e);
+		}
+		return null;
 	}
 }

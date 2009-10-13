@@ -3,6 +3,7 @@
  */
 package de.xwic.etlgine.loader.jdbc;
 
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.DataTruncation;
 import java.sql.DatabaseMetaData;
@@ -79,6 +80,9 @@ public class JDBCLoader extends AbstractLoader {
 	private int batchSize = -1;
 	private int batchCountInsert = 0;
 	private int batchCountUpdate = 0;
+	
+	private List<IRecord> batchInsertRecords = new ArrayList<IRecord>();
+	private List<IRecord> batchUpdateRecords = new ArrayList<IRecord>();
 	
 	private boolean ignoreUnchangedRecords = false;
 	
@@ -181,12 +185,8 @@ public class JDBCLoader extends AbstractLoader {
 		super.postSourceProcessing(processContext);
 		
 		if (connection != null) {
-			try {
-				// check open batch statements
-				executeBatch();
-			} catch (SQLException e) {
-				throw new ETLException(e);
-			}
+			// check open batch statements
+			executeBatch();
 		}
 	}
 	
@@ -875,6 +875,7 @@ public class JDBCLoader extends AbstractLoader {
 	}
 
 	private void doInsert(IProcessContext processContext, IRecord record) throws ETLException {
+		boolean handleException = true;
 		try {
 			psInsert.clearParameters();
 			
@@ -899,63 +900,124 @@ public class JDBCLoader extends AbstractLoader {
 			} else {
 				// batched mode
 				psInsert.addBatch();
+				batchInsertRecords.add(record);
 				batchCountInsert++;
 				if (batchCountInsert >= batchSize) {
 					// execute
+					handleException = false;
 					executeBatch();
 				}
 			}
 			
-		} catch (DataTruncation dt) {
-			monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, dt);
+		} catch (SQLException se) {
+			if (handleException) {
+				handleException(se, record);
+			}
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @param se
+	 * @param record
+	 * @throws ETLException 
+	 */
+	protected void handleException(SQLException se, IRecord record) throws ETLException {
+		if (se instanceof DataTruncation || se.getCause() instanceof DataTruncation || se.getMessage().toLowerCase().contains("truncation")) {
+			//monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, se);
 			// log field value lengths
+			DbColumnDef hintColDef = null;
+			int valueSize = 0;
 			for (DbColumnDef colDef : columns.values()) {
 				if (colDef.getColumn() != null) {
 					Object value = record.getData(colDef.getColumn());
 					if (value == null) {
 						continue;
 					}
-					monitor.logInfo(colDef.getName() + "{" + colDef.getSize() + "}=" + value + "{" + value.toString().length() + "}");
+					if (colDef.getSize() < value.toString().length() && hintColDef == null /*&& colDef.getColumn().getTypeHint() == DataType.STRING*/) {
+						hintColDef = colDef;
+						valueSize = value.toString().length();
+					}
+					//monitor.logInfo(colDef.getName() + "{" + colDef.getSize() + "}=" + value + "{" + value.toString().length() + "}");
 				}
 			}
-			throw new ETLException("A Data Truncation occured during INSERT.", dt);
-		} catch (SQLException se) {
-			monitor.logError("Error during INSERT record: " + record, se);
-			throw new ETLException("A SQLException occured during INSERT: " + se, se);
+			
+			if (hintColDef != null) {
+				monitor.logError("Column '" + hintColDef.getName() + "' of size " + hintColDef.getSize() + " requires " + valueSize);
+			}
+			throw new ETLException("A Data Truncation occured during INSERT or UPDATE.", se);
+		} else {
+			//monitor.logError("Error during INSERT or UPDATE record: " + record, se);
+			throw new ETLException("A SQLException occured during INSERT or UPDATE: " + se, se);
 		}
-		
 	}
-	
-	
+
 	/**
 	 * @throws SQLException 
+	 * @throws ETLException 
 	 * 
 	 */
-	private void executeBatch() throws SQLException {
+	private void executeBatch() throws ETLException {
 		// batch insert
-		if (batchCountInsert > 0) {
-			for (int count : psInsert.executeBatch()) {
-				if (count != 1) {
-					monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+		try {
+			int[] result = null;
+			List<IRecord> batchRecords = null;
+			try {
+				if (batchCountInsert > 0) {
+					batchRecords = batchInsertRecords;
+					result = psInsert.executeBatch();
+					for (int i = 0; i < result.length; i++) {
+						int count = result[i];
+						if (count != 1) {
+							monitor.logWarn("Insert resulted in count " + count + " but expected 1");
+						}
+						if (count > 0) {
+							insertCount += count;
+						}
+					}
+					batchCountInsert = 0;
 				}
-				if (count > 0) {
-					insertCount += count;
+				
+				// batch update
+				if (batchCountUpdate > 0) {
+					batchRecords = batchUpdateRecords;
+					result = psUpdate.executeBatch();
+					for (int i = 0; i < result.length; i++) {
+						int count = result[i];
+						if (count != 1) {
+							monitor.logWarn("Update resulted in count " + count + " but expected 1");
+						}	
+						updateCount += count;
+					}			
+					batchCountUpdate = 0;
 				}
+			} catch (BatchUpdateException bue) {
+				// find record
+				if (result == null) {
+					result = bue.getUpdateCounts();
+				}
+				if (result != null && batchRecords != null) {
+					int idx = result.length;
+					for (int i = 0; i < result.length; i++) {
+						if (result[i] != 1) {
+							idx = i;
+							break;
+						}
+					}
+					if (idx < batchRecords.size()) {
+						IRecord record = batchRecords.get(idx);
+						handleException(bue, record);
+						return;
+					}
+				}
+				handleException(bue, null);
+			} catch (SQLException se) {
+				handleException(se, null);
 			}
-			batchCountInsert = 0;
-		}
-		
-		// batch update
-		if (batchCountUpdate > 0) {
-			int[] result = psUpdate.executeBatch();
-			for (int i = 0; i < result.length; i++) {
-				int count = result[i];
-				if (count != 1) {
-					monitor.logWarn("Update resulted in count " + count + " but expected 1");
-				}	
-				updateCount += count;
-			}			
-			batchCountUpdate = 0;
+		} finally {
+			batchInsertRecords.clear();
+			batchUpdateRecords.clear();
 		}
 	}
 

@@ -183,6 +183,10 @@ public class ETLgineServer implements Runnable {
 			return false;
 		}
 		
+		// set root path of etlgine in system enrionment
+		System.setProperty("etlgine_rootPath", path.getAbsolutePath());
+		
+		// set root path in server context
 		serverContext.setProperty(ServerContext.PROPERTY_ROOTPATH, path.getAbsolutePath());
 		
 		File pathConfig = new File(path, "config");
@@ -266,14 +270,19 @@ public class ETLgineServer implements Runnable {
 				 * this is the the only way to set jetty home directoy.
 				 * Might have side effects on the "hosting" application.
 				 */
+				/*
 				String userDir = System.getProperty("user.dir");
 				String newUserDir = new File(rootPath).getCanonicalPath();
 				if (!newUserDir.startsWith(userDir)) {
 					// etl server is located in different path
 					// workaround for now is to set user.dir to newUserDir
-					// FIXME do it better ;-)
+					// FIX-ME do it better ;-)
 					System.setProperty("user.dir", newUserDir);
 				}
+				
+				2009-10-13 jbornema
+					- fixed in using jetty <SystemProperty name="etlgine_rootPath" default="."/> in xml files
+				*/
 				XmlConfiguration conf = new XmlConfiguration(new FileInputStream(new File(pathConfig, "jetty.xml")));
 				conf.configure(jetty);
 	

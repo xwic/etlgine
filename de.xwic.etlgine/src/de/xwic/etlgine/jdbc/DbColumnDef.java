@@ -13,6 +13,7 @@ public class DbColumnDef {
 
 	private String name = null;
 	private IColumn column = null;
+	private String typeName = null;
 	private int type = 0;
 	private int size = 0;
 	private boolean allowsNull = false;
@@ -50,6 +51,21 @@ public class DbColumnDef {
 		this.allowsNull = allowsNull;
 	}
 
+	/**
+	 * @param name
+	 * @param type
+	 * @param typeName
+	 * @param size
+	 * @param allowsNull
+	 */
+	public DbColumnDef(String name, int type, String typeName, int size, boolean allowsNull) {
+		super();
+		this.name = name;
+		this.type = type;
+		this.typeName = typeName;
+		this.size = size;
+		this.allowsNull = allowsNull;
+	}
 
 	/**
 	 * @return the name
@@ -113,6 +129,19 @@ public class DbColumnDef {
 	public void setColumn(IColumn column) {
 		this.column = column;
 	}
-	
+
+	/**
+	 * @return the typeName
+	 */
+	public String getTypeName() {
+		return typeName;
+	}
+
+	/**
+	 * @param typeName the typeName to set
+	 */
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
 	
 }

@@ -180,7 +180,7 @@
         <Item>
           <New class="org.mortbay.jetty.security.HashUserRealm">
             <Set name="name">etlgine</Set>
-            <Set name="config">server/config/realm.properties</Set>
+            <Set name="config"><SystemProperty name="etlgine_rootPath" default="."/>/config/realm.properties</Set>
           </New>
         </Item>
       </Array>

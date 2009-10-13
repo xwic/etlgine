@@ -71,6 +71,7 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean autoCreateTable = false;
 	private boolean autoCreateColumns = false;
 	private boolean autoDetectColumnTypes = false;
+	private boolean autoAlterColumns = false;	
 	private boolean autoDataTruncate = false;
 	
 	private boolean ignoreMissingTargetColumns = false;
@@ -342,7 +343,8 @@ public class JDBCLoader extends AbstractLoader {
 			int type = rs.getInt("DATA_TYPE");
 			int size = rs.getInt("COLUMN_SIZE");
 			String allowNull = rs.getString("NULLABLE");
-			DbColumnDef colDef = new DbColumnDef(name, type, size, allowNull.equals("YES") || allowNull.equals("1") || allowNull.equals("TRUE"));
+			String typeName = rs.getString("TYPE_NAME");
+			DbColumnDef colDef = new DbColumnDef(name, type, typeName, size, allowNull.equals("YES") || allowNull.equals("1") || allowNull.equals("TRUE"));
 			columns.put(name.toUpperCase(), colDef);
 		}
 		rs.close();
@@ -776,7 +778,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException 
 	 * @throws ETLException 
 	 */
-	private void setPSValue(PreparedStatement ps, int idx, Object value, DbColumnDef colDef) throws SQLException, ETLException {
+	protected void setPSValue(PreparedStatement ps, int idx, Object value, DbColumnDef colDef) throws SQLException, ETLException {
 
 		if (value == null || (treatEmptyAsNull && value instanceof String && ((String)value).length() == 0)) {
 			ps.setNull(idx, colDef.getType());
@@ -788,9 +790,16 @@ public class JDBCLoader extends AbstractLoader {
 			case Types.CLOB:
 			case -9: { //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hardcoded value here.
 				String s = value.toString();
-				if (autoDataTruncate && s.length() > colDef.getSize()) {
-					monitor.logWarn("Truncate value for column '" + colDef.getName() + "' from " + s.length() + " to " + colDef.getSize() + " character");
-					s = s.substring(0, colDef.getSize());
+				if (s.length() > colDef.getSize()) {
+					if (autoDataTruncate) {
+						monitor.logWarn("Truncate value for column '" + colDef.getName() + "' from " + s.length() + " to " + colDef.getSize() + " character");
+						s = s.substring(0, colDef.getSize());
+					} else if (autoAlterColumns) {
+						// data truncate sql exception will happen: alter pro-active the table
+						// empty batch, TODO shared or open connections might be checked that could cause a looked situation
+						executeBatch();
+						alterColumn(colDef, s.length());
+					}
 				}
 				ps.setString(idx, s);
 				break;
@@ -871,6 +880,30 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			
 		}
+		
+	}
+
+	/**
+	 * Alter column to specified size.
+	 * @param colDef
+	 * @param length
+	 * @throws SQLException 
+	 */
+	private void alterColumn(DbColumnDef colDef, int size) throws SQLException {
+		// set length
+		int newSize = 1;
+		for (; newSize < size; newSize *= 2);
+		
+		processContext.getMonitor().logInfo("Alter column '" + colDef.getName() + "' size from " + colDef.getSize() + " to " + newSize);
+
+		// alter column
+		Statement stmt = connection.createStatement();
+		StringBuilder sb = new StringBuilder();
+		sb.append("ALTER TABLE [").append(tablename).append("] ALTER COLUMN [");
+		sb.append(colDef.getName()).append("] ").append(colDef.getTypeName()).append("(").append(newSize).append(")");
+		stmt.execute(sb.toString());
+		
+		colDef.setSize(newSize);
 		
 	}
 
@@ -1357,6 +1390,20 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setAutoDetectColumnTypes(boolean autoDetectColumnTypes) {
 		this.autoDetectColumnTypes = autoDetectColumnTypes;
+	}
+
+	/**
+	 * @return the autoAlterColumns
+	 */
+	public boolean isAutoAlterColumns() {
+		return autoAlterColumns;
+	}
+
+	/**
+	 * @param autoAlterColumns the autoAlterColumns to set
+	 */
+	public void setAutoAlterColumns(boolean autoAlterColumns) {
+		this.autoAlterColumns = autoAlterColumns;
 	}
 
 }

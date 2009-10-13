@@ -3,8 +3,13 @@ Change Notes
 
 2009-10-13 jbornema
 	- JDBCLoader keeps in batch mode the records to be able to throw specific exception when
-	  SQLException occures
+	  SQLException occurs
 	- ETLgineServer.loadJob(String scriptName) added used by Launch class to dynamic load scripts
+	- ETLgineServer sets system property "etlgine_rootPath" to the root path during initialization,
+	  so this property can be used in jetty configuration xml
+	- DbColumnDef.typeName added
+	- JDBCLoader.autoAlterColumns property added that alters automatically increased column char field length
+	  when required 
 
 2009-10-07 jbornema
 	- DataPoolInitializerUtil.ensureCube(...) converts CubeFlexCalc to CubePreCache if requested.

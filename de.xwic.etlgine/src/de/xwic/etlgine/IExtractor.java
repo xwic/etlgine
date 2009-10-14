@@ -23,6 +23,7 @@ public interface IExtractor extends IProcessParticipant {
 	
 	/**
 	 * Get the next record.
+	 * Return null if eof reached.
 	 * @param context
 	 * @return
 	 */

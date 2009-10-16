@@ -1,0 +1,40 @@
+Change Notes
+=============
+
+2009-08-23 FLI
+	- Added CallURLFinalizer
+	
+2009-08-07 FLI
+	- MoveFileFinalizer no longer sets status to FINISHED_WITH_ERRORS if a file that should get moved does not exist.
+	
+2009-08-03 FLI
+	- CubeLoader prints a warning if data is written into a non-leaf element (splash)
+	- ETLgine Mapping-Admin: non-leaf elements are now printed in blue in the mapping table. 
+	- Added "Delete Cube" action in cube details viewer.
+	- added clear action to cube details view.
+	- now displays measures on the bottom of the datapool detail view
+	
+2009-07-28 FLI
+	- Added auto-create unmapped elements feature
+	- Moved cube-clear back into preSourceProcessing event. The movement caused imports to fail as these determine the
+	  dimensions to be cleared from the source.
+
+2009-07-17 jbornema
+	- JdbcLoader completely implements batchSize for insert and update statements (can improve sql performance up to >100%!)
+	  If no batchSize is set, [connection name].connection.batch_size is used from server.properties, batchSize between 20 and 50 seems to work good
+
+2009-07-15 jbornema
+	- Little restructure in JDBCLoader
+	- DefaultMonitor logging adjusted
+
+2009-07-06 jbornema
+	- Added Java Heap statistics in DefaultMonitor when logging record status every 30 sec.
+	- DataPoolInitializer: added "context" variable to verify(IDataPool) method
+	- DimensionMappingTransformer caches unmatched by adding a temp definition to the cache
+	- Fixed JDBCLoader primary key usage when it is not exported
+
+2009-06-18 kstein
+	- new type "Intervall" in ScheduledTrigger
+	- new Trigger: ScheduledFileChangedTrigger
+	- Method for ETLgineServer start in spring bean
+	- ETLgineServer knows if its is running

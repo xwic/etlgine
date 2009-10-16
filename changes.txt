@@ -1,0 +1,91 @@
+Change Notes
+============
+
+2009-09-28 FLI
+	- LastLeafFunction no longer returns 0.0 if no element is available at all.
+	- Added ICube.createKey(IDimensionElement...)
+
+2009-08-13 RPF
+	- added another "null" check on class LastLeafFunction -> findLastLeaf(), caused Nullpointer in dashboard application
+
+2009-08-11 FLI
+	- Removed cube.cleanUp() as it was not implemented.
+	- Added cube.createKey() method.
+
+2009-08-07 FLI
+	- Added LastLeafFunction
+	
+2009-08-07 RPF
+	- Added parseDimensionPath to CubeUtil.
+	
+2009-08-03 FLI
+	- Added TempMeasure helper class.
+
+2009-07-10 jbornema
+	- CubeFlexCalc.externalizeCache property added, to externalize cache data
+	- CubeFlexCalc serialize version 4 added
+	- Fixes in autoCachePaths mode
+
+2009-07-06 jbornema
+	- Fixed bug in autoCachePaths mode where the first aggregated cells had been not removed form the cache and aggregated again
+
+2009-07-02 jbornema
+	- FindUtil class for Cube browsing.
+	- Added log() method to Cube class.
+	- CubeFlexCalc support new autoCachePaths mode, using new class CachePath and CachePathDimensionDepth,
+	  to pre-cache new Key paths usage. The trigger to calculate the cache (method buildCacheForPaths) is invoked
+	  when total aggregation time of calcCellFromIndex and serialCalc calls exceeds last build cache time (1000 msec for first call).
+	  Property buildCacheForPathsTimeout can be assigned instead of last build cache time.
+	  Useful when cache statistics are not used or not applicable. 
+
+2009-06-18 kstein
+	- Added ICube.replace(ICube oldCube)
+	- Added DataPool.replaceCube(ICube oldCube, ICube newCube)
+
+2009-04-02	FLI
+	- Added ICube.clear(Key);
+	
+2009 Jan till April
+	- Added CubeFlexCalc implementation
+
+2009-01-23	FLI
+	- Implemented Externalizable interface for the cube's cell object, to speed up the serialization and
+	  deserialization process and reduce the memory requirements during the load.
+
+2009-01-21	FLI
+	- Added possibility to reorder dimension elements
+	- DifferenceFunction now can "negate" the result
+	- PercentageValueFormat is creating the result with a NOBR tag to prevent line break
+	- JDBCUtil stores the order_index of dimension elements to restore them in the same order. This requires a new database column!
+
+2009-01-14	FLI
+	- Added KValueFormatProvider
+	
+2009-01-13	FLI
+	- The cube no longer creates the internal HashMap with the theoretical maximum capacity
+	- DimensionElements with a '/' character in the key can no longer be created
+	 
+2008-12-30	FLI
+	- Added IDataPoolManager.isDataPoolLoaded() method, to check if a DataPool is already loaded into memory.
+	- Implemented JDBCSerializerUtil.restoreDimensions()
+	
+2008-12-29	FLI
+	- Added listDataPoolKeys() to DataPoolManager.
+	- Added JDBCSerializerUtil
+	
+2008-12-15	FLI
+	- IDimension.getPath() now returns an empty string (as expected) and IDimensionElement.parsePath()
+	  returns "this" if the argument is an empty string. 
+
+2008-12-01	FLI
+	- Added cube.clear(), cube.clear(IMeasure) and cube.clear(IMeasure, Key) to 
+	  remove cells by measure/key.
+	- Set cube.reset() to deprecated. Use .clear() instead. 
+	- Fixed a StackOverflowException in the equals() method of the DimensionElement
+	  that could happen when two elements are compared that are from different 
+	  dimensions.
+	  
+2008-11-25	FLI
+	- Optimized memory usage by refactoring the internal data model. This has
+	  lead to a few API changes, but also improved performance. The memory
+	  usage decreased by 24%, performance gain is at about 33%. 

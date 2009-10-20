@@ -44,6 +44,7 @@ public class MappingElementEditorControl extends ControlContainer {
 	private DimMappingElementDef currElement = null;
 	private MappingElementTableLabelProvider labelProvider;
 
+
 	/**
 	 * @param container
 	 * @param name
@@ -227,11 +228,12 @@ public class MappingElementEditorControl extends ControlContainer {
 		
 		tableModel = table.getModel();
 		tableModel.setSelectionMode(TableModel.SELECTION_SINGLE);
+		tableModel.addColumn(new TableColumn("M", 30, "match"));
 		tableModel.addColumn(new TableColumn("Expression", 250, "exp"));
 		tableModel.addColumn(new TableColumn("Path", 250, "path"));
-		tableModel.addColumn(new TableColumn("RegExp", 90, "regExp"));
+		tableModel.addColumn(new TableColumn("RegExp", 60, "regExp"));
 		tableModel.addColumn(new TableColumn("Ignore Case", 90, "ignoreCase"));
-		tableModel.addColumn(new TableColumn("Skip Record", 90, "skip"));
+		tableModel.addColumn(new TableColumn("Skip", 60, "skip"));
 		tableModel.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
 				onElementSelection((String)event.getElement());
@@ -357,5 +359,15 @@ public class MappingElementEditorControl extends ControlContainer {
 			mappingList.remove(mapping);
 			mappingList.add(newIndex, mapping);
 		}
+	}
+
+	/**
+	 * @param text
+	 */
+	public void setTestString(String text) {
+		
+		labelProvider.setTestString(text);
+		table.setRequireRedraw(true);
+		
 	}
 }

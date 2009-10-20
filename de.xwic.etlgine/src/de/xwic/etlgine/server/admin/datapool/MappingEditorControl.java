@@ -45,6 +45,7 @@ public class MappingEditorControl extends BaseContentContainer {
 	
 	private InputBoxControl inpKey;
 	private InputBoxControl inpDescription;
+	private InputBoxControl inpTestString;
 	private ListBoxControl lbcDimension;
 	private RadioGroupControl chkOnUnmapped;
 	private CheckboxControl chkOptions;
@@ -309,6 +310,30 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		}
 		
+		inpTestString = new InputBoxControl(this, "inpTestString");
+		inpTestString.setWidth(600);
+		
+		ButtonControl btTest = new ButtonControl(this, "btTest");
+		btTest.setTitle("Test");
+		btTest.addSelectionListener(new SelectionListener() { 
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			public void objectSelected(SelectionEvent event) {
+				applyTest();				
+			}
+		});
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void applyTest() {
+		
+		mapEditor.setTestString(inpTestString.getText());
+		
+		
 	}
 
 	/**
@@ -327,6 +352,20 @@ public class MappingEditorControl extends BaseContentContainer {
 			new LabelControl(this, "elmSelector").setText("");
 		}
 		
+	}
+
+	/**
+	 * @return the inpTestString
+	 */
+	public InputBoxControl getInpTestString() {
+		return inpTestString;
+	}
+
+	/**
+	 * @param inpTestString the inpTestString to set
+	 */
+	public void setInpTestString(InputBoxControl inpTestString) {
+		this.inpTestString = inpTestString;
 	}
 
 }

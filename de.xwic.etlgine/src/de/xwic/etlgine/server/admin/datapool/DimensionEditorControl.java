@@ -312,6 +312,26 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 
+		ButtonControl btDeleteAll = new ButtonControl(abar, "deleteAll");
+		btDeleteAll.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);	
+		btDeleteAll.setTitle("Delete All Elements");
+		btDeleteAll.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onDeleteAllElements();
+			}
+		});
+		btDeleteAll.setConfirmMsg("Do you really want to delete all elements in that dimension?");
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onDeleteAllElements() {
+	
+		dimension.removeDimensionElements();
+		table.setRequireRedraw(true);
+		
 	}
 
 	/**

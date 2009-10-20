@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2009-10-20 FLI
+	- Added "Test" of expressions into mapping editor.
+	
 2009-10-13 jbornema
 	- JDBCLoader keeps in batch mode the records to be able to throw specific exception when
 	  SQLException occurs

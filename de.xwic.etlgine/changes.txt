@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2009-10-21 FLI
+	- The XLSFileSource now supports the specification of a path instead of a specific file. The source will
+	  search for the first file matching the endsWith string and process this.
+	  
 2009-10-20 FLI
 	- Added "Test" of expressions into mapping editor.
 	

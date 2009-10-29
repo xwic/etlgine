@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.extractor.xls;
 
+import java.util.Date;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -53,6 +55,21 @@ public class XLSTool {
 						return s;
 					}
 				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param row
+	 * @param i
+	 * @return
+	 */
+	public static Date getDate(HSSFRow row, int i) {
+		HSSFCell cell = row.getCell(i);
+		if (cell != null) {
+			if (HSSFDateUtil.isCellDateFormatted(cell)) {
+				return HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
 			}
 		}
 		return null;

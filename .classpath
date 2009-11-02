@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-pool-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jtds-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwic-ecolib.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwic3_2_1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4-final.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-demos-1.4-final.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-3.1-FINAL-20080629.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/servlet-api-2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/velocity-1.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

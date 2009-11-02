@@ -1,0 +1,26 @@
+* text=auto !eol
+/.classpath -text
+/.project -text
+lib/commons-collections-2.1.jar -text
+lib/commons-dbcp-1.2.1.jar -text
+lib/commons-lang-2.1.jar -text
+lib/commons-pool-1.2.jar -text
+lib/jaxen-1.1.1.jar -text
+lib/jcommon-1.0.15.jar -text
+lib/jcommon-1.0.9.jar -text
+lib/jfreechart-1.0.12.jar -text
+lib/jfreechart-1.0.5.jar -text
+lib/jta.jar -text
+lib/jtds-1.1.jar -text
+lib/jtds-1.2.2.jar -text
+lib/jwic-ecolib.jar -text
+lib/jwic3_2_1.jar -text
+lib/log4j-1.2.9.jar -text
+lib/lucene-1.4-final.jar -text
+lib/lucene-demos-1.4-final.jar -text
+lib/mail.jar -text
+lib/opencsv-1.8.jar -text
+lib/poi-3.1-FINAL-20080629.jar -text
+lib/poi-3.2-FINAL-20081019.jar -text
+lib/servlet-api-2.5.jar -text
+lib/velocity-1.4.jar -text

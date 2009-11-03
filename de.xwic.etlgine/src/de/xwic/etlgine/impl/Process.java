@@ -62,7 +62,7 @@ public abstract class Process implements IProcess {
 	 * 
 	 */
 	public Process() {
-		super();
+		this("Unnamed Process");
 	}
 
 	public void addProcessFinalizer(IProcessFinalizer finalizer) {

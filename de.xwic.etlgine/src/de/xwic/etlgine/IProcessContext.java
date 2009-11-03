@@ -76,4 +76,16 @@ public interface IProcessContext extends IContext {
 	 */
 	public void setResult(Result result);
 
+
+	/**
+	 * @return the stopFlag
+	 */
+	public boolean isStopFlag();
+
+	/**
+	 * @param stopFlag the stopFlag to set
+	 */
+	public void setStopFlag(boolean stopFlag);
+
+	
 }

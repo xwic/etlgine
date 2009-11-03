@@ -27,6 +27,8 @@ public class ProcessContext extends Context implements IProcessContext {
 	protected IProcess process = null;
 	protected Result result = null;
 	
+	protected boolean stopFlag = false;
+	
 	/**
 	 * 
 	 */
@@ -149,6 +151,20 @@ public class ProcessContext extends Context implements IProcessContext {
 	 */
 	public void setResult(Result result) {
 		this.result = result;
+	}
+
+	/**
+	 * @return the stopFlag
+	 */
+	public boolean isStopFlag() {
+		return stopFlag;
+	}
+
+	/**
+	 * @param stopFlag the stopFlag to set
+	 */
+	public void setStopFlag(boolean stopFlag) {
+		this.stopFlag = stopFlag;
 	}
 
 }

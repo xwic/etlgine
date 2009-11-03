@@ -193,4 +193,22 @@ public class JDBCUtil {
 		
 	}
 
+	/**
+	 * @param con
+	 * @param string
+	 * @throws SQLException 
+	 */
+	public static int executeUpdate(Connection con, String sql) throws SQLException {
+		
+		Statement stmt = con.createStatement();
+		try {
+			int result = stmt.executeUpdate(sql);
+			return result;
+		} finally {
+			stmt.close();
+		}
+		
+		
+	}
+
 }

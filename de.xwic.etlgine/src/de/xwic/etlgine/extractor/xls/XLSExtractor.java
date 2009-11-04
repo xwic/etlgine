@@ -120,6 +120,7 @@ public class XLSExtractor extends AbstractExtractor {
 							initSheet(sheetIdx);
 						}
 					}
+					record.resetChangeFlag();
 					return record;
 				}
 				

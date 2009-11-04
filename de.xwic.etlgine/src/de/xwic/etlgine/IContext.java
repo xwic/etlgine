@@ -80,4 +80,15 @@ public interface IContext {
 	 * @return
 	 */
 	public IContext getParentContext();
+
+	/**
+	 * @return
+	 */
+	public boolean isStopFlag();
+	
+	/**
+	 * Set the stop flag.
+	 * @param stopFlag
+	 */
+	public void setStopFlag(boolean stopFlag);
 }

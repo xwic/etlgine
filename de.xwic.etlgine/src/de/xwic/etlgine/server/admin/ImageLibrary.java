@@ -41,5 +41,6 @@ public class ImageLibrary {
 	public static final ImageRef IMAGE_TABLE_DELETE = new ImageRef("img/table_delete.png");
 	public static final ImageRef IMAGE_ZOOM = new ImageRef("img/zoom.png");
 	public static final ImageRef IMAGE_CONTROL_PAUSE = new ImageRef("img/control_pause.png");
+	public static final ImageRef IMAGE_CANCEL = new ImageRef("img/cancel.png");
 		
 }

@@ -5,10 +5,8 @@ package de.xwic.etlgine.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
@@ -25,7 +23,7 @@ public class Record implements IRecord, Cloneable {
 	protected boolean skip = false;
 	protected String invalidReason = null;
 	protected Map<IColumn, Object> data = new HashMap<IColumn, Object>();
-	protected Set<IColumn> changedColumns = new HashSet<IColumn>();
+	protected Map<IColumn, Object> oldData = new HashMap<IColumn, Object>();
 	protected List<IRecord> duplicates = new ArrayList<IRecord>();
 	
 	/**
@@ -41,16 +39,6 @@ public class Record implements IRecord, Cloneable {
 	 * @param value
 	 */
 	public void setData(IColumn column, Object value) {
-		if (data.containsKey(column) && !changedColumns.contains(column)) {
-			Object oldValue = data.get(column);
-			if (!(oldValue == null && value == null)) {
-				if (oldValue == null || value == null) {
-					changedColumns.add(column);
-				} else if (!oldValue.equals(value)) {
-					changedColumns.add(column);
-				}
-			}
-		}
 		data.put(column, value);
 	}
 	
@@ -69,20 +57,34 @@ public class Record implements IRecord, Cloneable {
 	 * @see de.xwic.etlgine.IRecord#isChanged(de.xwic.etlgine.IColumn)
 	 */
 	public boolean isChanged(IColumn column) throws ETLException {
-		return changedColumns.contains(column);
+		if (!data.containsKey(column) && !oldData.containsKey(column)) {
+			return false;
+		} else if (data.containsKey(column) && oldData.containsKey(column)) {
+			Object o1 = data.get(column);
+			Object o2 = oldData.get(column);
+			if (o1 == null && o2 == null) {
+				return false;
+			} else if (o1 == null || o2 == null) {
+				return true; 
+			}
+			return !o1.equals(o2);
+		}
+		return true;	// one element exists, the other does not
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IRecord#isChanged(java.lang.String)
 	 */
 	public boolean isChanged(String columnName) throws ETLException {
-		return changedColumns.contains(dataSet.getColumn(columnName));
+		return isChanged(dataSet.getColumn(columnName));
 	}
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IRecord#resetChangeFlag()
 	 */
 	public void resetChangeFlag() {
-		changedColumns.clear();		
+		// copy data to oldData
+		oldData.clear();
+		oldData.putAll(data);
 	}
 	
 	/**

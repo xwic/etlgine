@@ -43,6 +43,8 @@ public class Job implements IJob {
 	private Throwable lastException = null;
 	private IMonitor monitor = new DefaultMonitor();
 	
+	private IContext activeContext = null;
+	
 	private String jobId = null;
 	
 	protected List<IJobFinalizer> finalizers = new ArrayList<IJobFinalizer>();
@@ -64,6 +66,7 @@ public class Job implements IJob {
 			throw new ETLException("The job is already beeing executed.");
 		}
 		executing = true;
+		activeContext = context;
 		lastStarted = new Date();
 		monitor.reset();
 		state = State.RUNNING;
@@ -89,6 +92,7 @@ public class Job implements IJob {
 			throw new ETLException("Error executing job: " + t, t);
 		} finally {
 			executing = false;
+			activeContext = null;
 			lastFinished = new Date();
 			// fun finalizers
 			for (IJobFinalizer finalizer : finalizers) {
@@ -143,6 +147,19 @@ public class Job implements IJob {
 	 */
 	public boolean isExecuting() {
 		return executing;
+	}
+
+	/**
+	 * raise stop flag.
+	 * @return
+	 */
+	public boolean stop() {
+		IContext ctx = activeContext;
+		if (ctx != null) {
+			ctx.setStopFlag(true);
+			return true;
+		}
+		return false;
 	}
 	
 	/**

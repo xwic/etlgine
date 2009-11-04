@@ -103,7 +103,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 						IColumn column = dataSet.getColumnByIndex(i);
 						record.setData(column, data[i]);
 					}
-					
+					record.resetChangeFlag();
 					return record;
 				}
 			} catch (IOException e) {

@@ -117,6 +117,7 @@ public class JDBCExtractor extends AbstractExtractor {
 					record.setData(col, value);
 				}
 		
+				record.resetChangeFlag();
 				returnedCount++;
 				return record;
 			} else {

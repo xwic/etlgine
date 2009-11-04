@@ -34,6 +34,7 @@ public class JobAdminControl extends BaseContentContainer {
 
 	private TableViewer table;
 	private ButtonControl btRun;
+	private ButtonControl btStopJob;
 	private ButtonControl btViewJob;
 	private List<IJob> jobList;
 	private ErrorWarningControl errInfo;
@@ -135,6 +136,34 @@ public class JobAdminControl extends BaseContentContainer {
 				onViewJob();
 			}
 		});
+		
+		btStopJob = new ButtonControl(abar);
+		btStopJob.setIconEnabled(ImageLibrary.IMAGE_CANCEL);
+		btStopJob.setTitle("Stop Job");
+		btStopJob.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onStopJob();
+			}
+		});
+
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onStopJob() {
+		
+		String selection = table.getModel().getFirstSelectedKey();
+		if (selection != null) {
+			int idx = Integer.parseInt(selection);
+			IJob job = jobList.get(idx);
+			if (job.isExecuting()) {
+				
+			} else {
+				errInfo.showError("The selected job is not running at the moment.");
+			}
+		}
 
 		
 	}

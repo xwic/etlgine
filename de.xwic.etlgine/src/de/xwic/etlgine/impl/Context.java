@@ -16,7 +16,9 @@ public abstract class Context implements IContext {
 	protected IContext parentContext = null; 
 	protected Map<String, String> properties = new HashMap<String, String>();
 	protected Map<String, Object> globals = new HashMap<String, Object>();
+	protected boolean stopFlag = false;
 	
+
 	/**
 	 * Default Constructor.
 	 */
@@ -134,5 +136,19 @@ public abstract class Context implements IContext {
 	 */
 	public IContext getParentContext() {
 		return parentContext;
+	}
+
+	/**
+	 * @return the stopFlag
+	 */
+	public boolean isStopFlag() {
+		return stopFlag;
+	}
+
+	/**
+	 * @param stopFlag the stopFlag to set
+	 */
+	public void setStopFlag(boolean stopFlag) {
+		this.stopFlag = stopFlag;
 	}
 }

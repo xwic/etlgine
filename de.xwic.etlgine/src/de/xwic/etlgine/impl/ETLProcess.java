@@ -236,6 +236,10 @@ public class ETLProcess extends Process implements IETLProcess {
 							break;
 						}
 						
+						if (processContext.isStopFlag()) {
+							break; 
+						}
+						
 					}
 					
 					// notify transformers that the source processing is done.
@@ -264,7 +268,7 @@ public class ETLProcess extends Process implements IETLProcess {
 			extractor.onProcessFinished(processContext);
 			
 			monitor.onEvent(processContext, EventType.PROCESS_FINISHED);
-			result = Result.SUCCESSFULL;
+			result = processContext.isStopFlag() ? Result.FAILED : Result.SUCCESSFULL;
 		} catch (ETLException e) {
 			monitor.logError("Error during ETL processing: " + e, e);
 			result = Result.FAILED;

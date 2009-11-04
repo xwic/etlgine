@@ -4,6 +4,7 @@ Change Notes
 2009-11-03 FLI
 	- Added StopFlag into process context - needs to be implemented further thought
 	- Added JDBCUtil.executeUpdate(..)
+	- Improved Record.isChanged(..) detection by comparing the current value to the original value
 	
 2009-10-21 FLI
 	- The XLSFileSource now supports the specification of a path instead of a specific file. The source will

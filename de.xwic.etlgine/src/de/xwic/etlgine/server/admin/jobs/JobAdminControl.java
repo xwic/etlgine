@@ -66,7 +66,7 @@ public class JobAdminControl extends BaseContentContainer {
 		
 		table.setContentProvider(new ListContentProvider(jobList));
 		table.setTableLabelProvider(new JobTableLabelProvider());
-		table.setWidth(799);
+		table.setWidth(949);
 		table.setHeight(500);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);

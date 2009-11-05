@@ -3,6 +3,7 @@
  */
 package de.xwic.etlgine.cube.mapping;
 
+
 /**
  * @author lippisch
  */

@@ -3,6 +3,7 @@
  */
 package de.xwic.etlgine.cube.mapping;
 
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -44,6 +45,26 @@ public class DimMapper {
 			}
 		}
 		
+	}
+	
+	/**
+	 * Tests if this mapping applies to the specified date.
+	 * @param date
+	 * @return
+	 */
+	public boolean isValid(Date date) {
+		if (date == null) {
+			// is only valid if both from/to is null
+			return elementDef.getValidFrom() == null && elementDef.getValidTo() == null;
+		}
+		if (elementDef.getValidFrom() != null && elementDef.getValidFrom().after(date)) {
+			return false;
+		}
+		if (elementDef.getValidTo() != null && elementDef.getValidTo().before(date)) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

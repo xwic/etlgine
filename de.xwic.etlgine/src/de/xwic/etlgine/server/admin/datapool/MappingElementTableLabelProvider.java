@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.server.admin.datapool;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
 import de.jwic.ecolib.tableviewer.CellLabel;
@@ -21,6 +23,7 @@ public class MappingElementTableLabelProvider implements ITableLabelProvider {
 
 	private IDimension dimension = null;
 	private String testString = null;
+	private DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 	
 	/* (non-Javadoc)
 	 * @see de.jwic.ecolib.tableviewer.ITableLabelProvider#getCellLabel(java.lang.Object, de.jwic.ecolib.tableviewer.TableColumn, de.jwic.ecolib.tableviewer.RowContext)
@@ -106,6 +109,10 @@ public class MappingElementTableLabelProvider implements ITableLabelProvider {
 			cell.text = dmd.isIgnoreCase() ? "Yes" : "No";
 		} else if ("skip".equals(column.getUserObject())) {
 			cell.text = dmd.isSkipRecord() ? "Yes" : "No";
+		} else if ("validFrom".equals(column.getUserObject())) {
+			cell.text = dmd.getValidFrom() != null ? df.format(dmd.getValidFrom()) : "";
+		} else if ("validTo".equals(column.getUserObject())) {
+			cell.text = dmd.getValidTo() != null ? df.format(dmd.getValidTo()) : "";
 		}
 		return cell;
 	}

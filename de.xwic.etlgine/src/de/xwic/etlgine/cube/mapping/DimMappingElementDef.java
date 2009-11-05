@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.cube.mapping;
 
+import java.util.Date;
+
 /**
  * @author lippisch
  *
@@ -17,7 +19,9 @@ public class DimMappingElementDef {
 	private boolean ignoreCase = false;
 	private String elementPath = null;
 	private boolean skipRecord = false;
-	
+	private Date validFrom = null;
+	private Date validTo = null;
+
 	/**
 	 * @return the dimMapKey
 	 */
@@ -113,6 +117,30 @@ public class DimMappingElementDef {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+	/**
+	 * @return the validFrom
+	 */
+	public Date getValidFrom() {
+		return validFrom;
+	}
+	/**
+	 * @param validFrom the validFrom to set
+	 */
+	public void setValidFrom(Date validFrom) {
+		this.validFrom = validFrom;
+	}
+	/**
+	 * @return the validTo
+	 */
+	public Date getValidTo() {
+		return validTo;
+	}
+	/**
+	 * @param validTo the validTo to set
+	 */
+	public void setValidTo(Date validTo) {
+		this.validTo = validTo;
 	}
 	
 }

@@ -126,8 +126,8 @@ public class DPMappingControl extends BaseContentContainer {
 		contentProvider = new MappingContentProvider();
 		table.setContentProvider(contentProvider);
 		table.setTableLabelProvider(new DPDimMapTableLabelProvider());
-		table.setWidth(799);
-		table.setHeight(300);
+		table.setWidth(949);
+		table.setHeight(500);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);
 		table.setShowStatusBar(false);

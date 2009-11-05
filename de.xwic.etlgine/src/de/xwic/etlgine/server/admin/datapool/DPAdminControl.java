@@ -63,7 +63,7 @@ public class DPAdminControl extends BaseContentContainer {
 			}
 		});
 		table.setTableLabelProvider(new DPTableLabelProvider());
-		table.setWidth(799);
+		table.setWidth(949);
 		table.setHeight(300);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);

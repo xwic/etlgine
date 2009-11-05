@@ -10,6 +10,7 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ButtonControl;
 import de.jwic.controls.CheckboxControl;
+import de.jwic.controls.DateInputBoxControl;
 import de.jwic.controls.InputBoxControl;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.jwic.ecolib.tableviewer.TableModel;
@@ -39,6 +40,8 @@ public class MappingElementEditorControl extends ControlContainer {
 	private InputBoxControl inpExpression;
 	private DimensionElementSelector selElement;
 	private CheckboxControl chkOptions;
+	private DateInputBoxControl inpValidFrom;
+	private DateInputBoxControl inpValidTo;
 	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown, btMoveTop, btMoveBtm;
 	
 	private DimMappingElementDef currElement = null;
@@ -66,6 +69,9 @@ public class MappingElementEditorControl extends ControlContainer {
 		inpExpression.setMultiLine(true);
 		inpExpression.setWidth(400);
 		inpExpression.setRows(4);
+		
+		inpValidFrom = new DateInputBoxControl(this, "inpValidFrom");
+		inpValidTo = new DateInputBoxControl(this, "inpValidTo");
 		
 		selElement = null; // see setDimension(..)
 		
@@ -184,6 +190,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		currElement.setIgnoreCase(chkOptions.isKeySelected("ignoreCase"));
 		currElement.setRegExp(chkOptions.isKeySelected("regExp"));
 		currElement.setSkipRecord(chkOptions.isKeySelected("skipRecord"));
+		currElement.setValidFrom(inpValidFrom.getDate());
+		currElement.setValidTo(inpValidTo.getDate());
 		
 		if (insert) {
 			mappingList.add(currElement);
@@ -204,6 +212,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		if (selElement != null) {
 			selElement.actionFirst();
 		}
+		inpValidFrom.setDate(null);
+		inpValidTo.setDate(null);
 		btUpdate.setTitle("Insert");
 		btDelete.setEnabled(false);
 		refreshMoveButtons();
@@ -220,7 +230,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		labelProvider = new MappingElementTableLabelProvider();
 		
 		table.setTableLabelProvider(labelProvider);
-		table.setWidth(793);
+		table.setWidth(943);
 		table.setHeight(300);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);
@@ -234,6 +244,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		tableModel.addColumn(new TableColumn("RegExp", 60, "regExp"));
 		tableModel.addColumn(new TableColumn("Ignore Case", 90, "ignoreCase"));
 		tableModel.addColumn(new TableColumn("Skip", 60, "skip"));
+		tableModel.addColumn(new TableColumn("From", 75, "validFrom"));
+		tableModel.addColumn(new TableColumn("To", 75, "validTo"));
 		tableModel.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
 				onElementSelection((String)event.getElement());
@@ -253,6 +265,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		currElement = mappingList.get(idx);
 		inpExpression.setText(currElement.getExpression());
 		inpExpression.forceFocus();
+		inpValidFrom.setDate(currElement.getValidFrom());
+		inpValidTo.setDate(currElement.getValidTo());
 		
 		StringBuilder sb = new StringBuilder();
 		if (currElement.isRegExp()) sb.append("regExp;");

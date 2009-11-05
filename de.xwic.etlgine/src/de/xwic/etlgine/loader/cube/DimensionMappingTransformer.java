@@ -6,6 +6,7 @@ package de.xwic.etlgine.loader.cube;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,9 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	protected DimMappingDef mappingDef = null;
 	protected IColumn[] sourceColumns = null;
 	protected IColumn targetColumn = null;
+	protected IColumn dateColumn = null;
+	protected String dateColumnName = null;
+	
 	protected List<DimMappingElementDef> mappingElements = null;
 	protected List<DimMapper> mappers = null;
 	protected IDimensionElement parentElm;
@@ -157,6 +161,14 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		}
 		targetColumn = dataSet.getColumn(targetColumnName);
 		
+		if (dateColumnName != null) {
+			if (!dataSet.containsColumn(dateColumnName)) {
+				throw new ETLException("The DataSet does not contain the date column " + dateColumnName);
+			}
+			dateColumn = dataSet.getColumn(dateColumnName);
+			
+		}
+		
 		if (getOnFailTransformer() != null) {
 			getOnFailTransformer().preSourceProcessing(processContext);
 		}
@@ -213,14 +225,31 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	protected void doMapping(IProcessContext processContext, IRecord record, String value) throws ETLException {
 		
+		// NOTE: If date check is enabled, the caching is not used.
+		
+		Date testDate = null;
+		boolean withDateCheck = false;
+		if (dateColumn != null) {
+			withDateCheck = true;
+			Object o = record.getData(dateColumn);
+			if (o != null && !(o instanceof Date)) {
+				throw new ETLException("Specified date column is not of type Date but " + o.getClass().getName());
+			}
+			testDate = (Date)o;
+		}
+		
 		// lookup MappingDef
-		DimMappingElementDef elmDef = cachedDimMappingElementDef.get(value);
+		DimMappingElementDef elmDef = withDateCheck ? null : cachedDimMappingElementDef.get(value);
 		if (elmDef == null) {
 			for (DimMapper mapper : mappers) {
 				if (mapper.match(value)) {
-					elmDef = mapper.getDimMappingElementDef();
-					cachedDimMappingElementDef.put(value, elmDef);
-					break;
+					if (!withDateCheck || mapper.isValid(testDate)) {
+						elmDef = mapper.getDimMappingElementDef();
+						if (!withDateCheck) {
+							cachedDimMappingElementDef.put(value, elmDef);
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -425,6 +454,20 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	public DimensionMappingTransformer getOnFailTransformer() {
 		return onFailTransformer;
+	}
+
+	/**
+	 * @return the dateColumn
+	 */
+	public String getDateColumn() {
+		return dateColumnName;
+	}
+
+	/**
+	 * @param dateColumn the dateColumn to set
+	 */
+	public void setDateColumn(String dateColumn) {
+		this.dateColumnName = dateColumn;
 	}
 	
 }

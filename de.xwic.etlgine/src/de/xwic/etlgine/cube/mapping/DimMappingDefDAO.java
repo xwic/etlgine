@@ -56,7 +56,6 @@ public class DimMappingDefDAO {
 				log.warn("SQL Result: " + sw);
 			}
 		}
-		
 	}
 
 	/**

@@ -7,9 +7,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
  * Simple, direct JDBC usage DAO.
@@ -20,11 +27,15 @@ import java.util.List;
  */
 public class DimMappingElementDefDAO {
 
+	public final static String TABLE_NAME = "XCUBE_DIMMAP_ELEMENTS";
+	
 	private Connection connection;
 	private PreparedStatement psInsert;
 	private PreparedStatement psUpdate;
 	private PreparedStatement psDeleteByDimMapKey;
 	private int orderIndex = 0;
+	
+	protected final Log log = LogFactory.getLog(getClass());
 	
 	/**
 	 * @param connection
@@ -34,10 +45,22 @@ public class DimMappingElementDefDAO {
 		super();
 		this.connection = connection;
 		
-		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)");
-		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP_ELEMENTS] SET Expression=?, isRegExp=?, IgnoreCase=?, ElementPath=?, SkipRecord=? WHERE ID = ?");
+		if (!JDBCUtil.columnExists(connection, TABLE_NAME, "ValidFrom")) {
+			log.warn("Column 'ValidFrom', 'ValidTo' not found, trying to create column.");
+			Statement stmt = connection.createStatement();
+			stmt.execute("ALTER TABLE [" + TABLE_NAME + "] ADD [ValidFrom] DateTime, [ValidTo] DateTime");
+			SQLWarning sw = stmt.getWarnings();
+			if (sw != null) {
+				log.warn("SQL Result: " + sw);
+			}
+			
+		}
+		
+		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, order_index, ValidFrom, ValidTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP_ELEMENTS] SET Expression=?, isRegExp=?, IgnoreCase=?, ElementPath=?, SkipRecord=?, ValidFrom=?, ValidTo=? WHERE ID = ?");
 		psDeleteByDimMapKey = connection.prepareStatement("DELETE FROM [XCUBE_DIMMAP_ELEMENTS] WHERE DimMapKey = ?");
 		
+
 	}
 
 	/**
@@ -50,7 +73,7 @@ public class DimMappingElementDefDAO {
 		List<DimMappingElementDef> list = new ArrayList<DimMappingElementDef>(); 
 		
 		Statement stmt = connection.createStatement();
-		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord FROM XCUBE_DIMMAP_ELEMENTS ORDER BY DimMapKey, order_index ASC";
+		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, ValidFrom, ValidTo FROM XCUBE_DIMMAP_ELEMENTS ORDER BY DimMapKey, order_index ASC";
 		ResultSet rs = stmt.executeQuery(sql);
 		while (rs.next()) {
 			DimMappingElementDef dmElm = new DimMappingElementDef();
@@ -61,6 +84,8 @@ public class DimMappingElementDefDAO {
 			dmElm.setIgnoreCase(rs.getBoolean("IgnoreCase"));
 			dmElm.setElementPath(rs.getString("ElementPath"));
 			dmElm.setSkipRecord(rs.getBoolean("SkipRecord"));
+			dmElm.setValidFrom(rs.getDate("ValidFrom"));
+			dmElm.setValidTo(rs.getDate("ValidTo"));
 			list.add(dmElm);
 		}
 		rs.close();
@@ -78,7 +103,7 @@ public class DimMappingElementDefDAO {
 		
 		List<DimMappingElementDef> list = new ArrayList<DimMappingElementDef>(); 
 		
-		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord FROM XCUBE_DIMMAP_ELEMENTS WHERE DimMapKey = ? ORDER BY order_index ASC";
+		String sql = "SELECT [ID], DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, ValidFrom, ValidTo FROM XCUBE_DIMMAP_ELEMENTS WHERE DimMapKey = ? ORDER BY order_index ASC";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		stmt.setString(1, dimMapKey);
 		ResultSet rs = stmt.executeQuery();
@@ -91,6 +116,8 @@ public class DimMappingElementDefDAO {
 			dmElm.setIgnoreCase(rs.getBoolean("IgnoreCase"));
 			dmElm.setElementPath(rs.getString("ElementPath"));
 			dmElm.setSkipRecord(rs.getBoolean("SkipRecord"));
+			dmElm.setValidFrom(rs.getDate("ValidFrom"));
+			dmElm.setValidTo(rs.getDate("ValidTo"));
 			list.add(dmElm);
 		}
 		rs.close();
@@ -114,6 +141,16 @@ public class DimMappingElementDefDAO {
 		psUpdate.setBoolean(idx++, dimMapElm.isIgnoreCase());
 		psUpdate.setString(idx++, dimMapElm.getElementPath());
 		psUpdate.setBoolean(idx++, dimMapElm.isSkipRecord());
+		if (dimMapElm.getValidFrom() != null) {
+			psUpdate.setDate(idx++, new java.sql.Date(dimMapElm.getValidFrom().getTime()));
+		} else {
+			psUpdate.setNull(idx++, Types.DATE);
+		}
+		if (dimMapElm.getValidTo() != null) {
+			psUpdate.setDate(idx++, new java.sql.Date(dimMapElm.getValidTo().getTime()));
+		} else {
+			psUpdate.setNull(idx++, Types.DATE);
+		}
 		psUpdate.setInt(idx++, dimMapElm.getId());
 		
 		int count = psUpdate.executeUpdate(); 
@@ -149,6 +186,16 @@ public class DimMappingElementDefDAO {
 		psInsert.setString(idx++, dimMapElm.getElementPath());
 		psInsert.setBoolean(idx++, dimMapElm.isSkipRecord());
 		psInsert.setInt(idx++, order_index);
+		if (dimMapElm.getValidFrom() != null) {
+			psInsert.setDate(idx++, new java.sql.Date(dimMapElm.getValidFrom().getTime()));
+		} else {
+			psInsert.setNull(idx++, Types.DATE);
+		}
+		if (dimMapElm.getValidTo() != null) {
+			psInsert.setDate(idx++, new java.sql.Date(dimMapElm.getValidTo().getTime()));
+		} else {
+			psInsert.setNull(idx++, Types.DATE);
+		}
 		int count = psInsert.executeUpdate(); 
 		if (count != 1) {
 			throw new SQLException("Error inserting DimMappingElementDef " + dimMapElm.getId() + ": Updated " + count + " but expected 1");

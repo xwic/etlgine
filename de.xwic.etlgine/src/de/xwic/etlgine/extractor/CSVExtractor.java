@@ -17,6 +17,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IExtractor;
+import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.sources.FileSource;
@@ -67,6 +68,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		if (reader != null) {
 			try {
 				reader.close();
+				reader = null;
 			} catch (IOException e) {
 				throw new ETLException("Error closing loader: " + e, e);
 			}
@@ -74,6 +76,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		if (input != null) {
 			try {
 				input.close();
+				input = null;
 			} catch (IOException e) {
 				throw new ETLException("Error closing loader: " + e, e);
 			}
@@ -183,6 +186,17 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.AbstractExtractor#postSourceProcessing(de.xwic.etlgine.IProcessContext)
+	 */
+	@Override
+	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
+		super.postSourceProcessing(processContext);
+		
+		close();
+		
+	}
+	
 	/**
 	 * @return the containsHeader
 	 */

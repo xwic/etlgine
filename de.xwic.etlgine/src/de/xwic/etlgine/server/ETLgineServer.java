@@ -28,6 +28,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.cube.CubeHandler;
+import de.xwic.etlgine.notify.NotificationService;
 
 /**
  * @author Developer
@@ -133,14 +134,18 @@ public class ETLgineServer implements Runnable {
 	 */
 	private void checkTriggers() {
 
-		for (IJob job : serverContext.getJobs()) {
-			if (!job.isDisabled() && !job.isExecuting() && !(job.getState() == IJob.State.ENQUEUED)) {
-				if (job.getState() != State.FINISHED_WITH_ERROR && job.getState() != State.ERROR) {
-					if (job.getTrigger() != null && job.getTrigger().isDue()) {
-						enqueueJob(job);
+		if (serverContext.getPropertyBoolean("trigger.enabled", true)) {
+		
+			for (IJob job : serverContext.getJobs()) {
+				if (!job.isDisabled() && !job.isExecuting() && !(job.getState() == IJob.State.ENQUEUED)) {
+					if (job.getState() != State.FINISHED_WITH_ERROR && job.getState() != State.ERROR) {
+						if (job.getTrigger() != null && job.getTrigger().isDue()) {
+							enqueueJob(job);
+						}
 					}
 				}
 			}
+			
 		}
 		
 	}
@@ -320,6 +325,13 @@ public class ETLgineServer implements Runnable {
 				return false;
 			}
 		}
+		
+		if (serverContext.getPropertyBoolean("notifications.enabled", false)) {
+			log.info("Notification Services enabled");
+			NotificationService nfService = new NotificationService(serverContext);
+			serverContext.addServerContextListener(nfService);
+		}
+		
 		//System.setOut(oldPS);
 		return true;
 		

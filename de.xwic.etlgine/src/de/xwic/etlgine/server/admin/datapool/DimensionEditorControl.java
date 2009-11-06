@@ -312,6 +312,15 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 
+		ButtonControl btSort = new ButtonControl(abar, "sortAll");
+		btSort.setIconEnabled(ImageLibrary.IMAGE_REFRESH);	
+		btSort.setTitle("Sort Elements");
+		btSort.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onSortElements();
+			}
+		});
+
 		ButtonControl btDeleteAll = new ButtonControl(abar, "deleteAll");
 		btDeleteAll.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);	
 		btDeleteAll.setTitle("Delete All Elements");
@@ -321,6 +330,21 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 		btDeleteAll.setConfirmMsg("Do you really want to delete all elements in that dimension?");
+		
+	}
+
+	/**
+	 * 
+	 */
+	protected void onSortElements() {
+		
+		if (editedElement != null) {
+			editedElement.sortDimensionElements();
+		} else {
+			dimension.sortDimensionElements();
+		}
+		table.setRequireRedraw(true);
+		
 		
 	}
 

@@ -1,6 +1,14 @@
 Change Notes
 =============
 
+2009-11-06 FLI
+	- You can now disable triggers by setting 'trigger.enabled' to false in the server.properties
+	- Added 'Sort Elements' action to dimension editor
+	- Added notification service
+	- Added validFrom and validTo date ranges to the mapping
+	- Increased content width to 950 (expecting min. 1280px width)
+	- Implemented Stop action in job list
+	
 2009-11-03 FLI
 	- Added StopFlag into process context - needs to be implemented further thought
 	- Added JDBCUtil.executeUpdate(..)

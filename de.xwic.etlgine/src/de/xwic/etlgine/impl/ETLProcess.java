@@ -255,6 +255,10 @@ public class ETLProcess extends Process implements IETLProcess {
 					monitor.onEvent(processContext, EventType.SOURCE_FINISHED);
 				}
 				
+				if (processContext.isStopFlag()) {
+					break;
+				}
+				
 			}
 
 			// notify transformers and loaders that we are done.

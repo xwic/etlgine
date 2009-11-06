@@ -159,7 +159,11 @@ public class JobAdminControl extends BaseContentContainer {
 			int idx = Integer.parseInt(selection);
 			IJob job = jobList.get(idx);
 			if (job.isExecuting()) {
-				
+				if (job.stop()) {
+					errInfo.showWarning("Stop-Flag set.");
+				} else {
+					errInfo.showError("Unable to stop job.");
+				}
 			} else {
 				errInfo.showError("The selected job is not running at the moment.");
 			}

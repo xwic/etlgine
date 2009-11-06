@@ -138,4 +138,11 @@ public interface IJob {
 	 * @return
 	 */
 	public List<IJobFinalizer> getJobFinalizers();
+	
+	/**
+	 * Stop the job if it is currently running.
+	 * @return
+	 */
+	public boolean stop();
+	
 }

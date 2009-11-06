@@ -14,11 +14,11 @@
  }
  
  #statusBar {
- 	width: 200px;
- 	height: 800px;
+ 	width: 250px;
+ 	height: 1000px;
  	float: left;
  	background-color: #F0F0F0;
- 	background: url(img/sbfade2.png);
+ 	/*background: url(img/sbfade2.png);*/
  }
  
  div.srvStatus {

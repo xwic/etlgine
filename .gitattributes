@@ -730,6 +730,7 @@ de.xwic.etlgine/changes.txt -text
 de.xwic.etlgine/lib/groovy-all-1.5.7.jar -text
 de.xwic.etlgine/lib/jscreen-1.0.jar -text
 de.xwic.etlgine/lib/jtds-1.2.2.jar -text
+de.xwic.etlgine/lib/mail.jar -text
 de.xwic.etlgine/lib/opencsv-1.8.jar -text
 de.xwic.etlgine/lib/poi-3.1-FINAL-20080629.jar -text
 de.xwic.etlgine/lib/spring-1.2-api.jar -text

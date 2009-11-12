@@ -660,6 +660,7 @@ de.xwic.cube/changes.txt -text
 de.xwic.cube/src/de/xwic/cube/DataPoolManagerFactory.java -text
 de.xwic.cube/src/de/xwic/cube/ICell.java -text
 de.xwic.cube/src/de/xwic/cube/ICellListener.java -text
+de.xwic.cube/src/de/xwic/cube/ICellProvider.java -text
 de.xwic.cube/src/de/xwic/cube/ICube.java -text
 de.xwic.cube/src/de/xwic/cube/ICubeCacheControl.java -text
 de.xwic.cube/src/de/xwic/cube/ICubeListener.java -text
@@ -670,6 +671,7 @@ de.xwic.cube/src/de/xwic/cube/IDimension.java -text
 de.xwic.cube/src/de/xwic/cube/IDimensionElement.java -text
 de.xwic.cube/src/de/xwic/cube/IDimensionResolver.java -text
 de.xwic.cube/src/de/xwic/cube/IIdentifyable.java -text
+de.xwic.cube/src/de/xwic/cube/IKeyProvider.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasure.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasureFunction.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasureLoader.java -text
@@ -695,12 +697,16 @@ de.xwic.cube/src/de/xwic/cube/functions/DifferenceFunction.java -text
 de.xwic.cube/src/de/xwic/cube/functions/LastLeafFunction.java -text
 de.xwic.cube/src/de/xwic/cube/impl/AbstractCubeListener.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cell.java -text
+de.xwic.cube/src/de/xwic/cube/impl/CellExt.java -text
+de.xwic.cube/src/de/xwic/cube/impl/CellExtProvider.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubeFlexCalc.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubePreCache.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPool.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPoolManager.java -text
+de.xwic.cube/src/de/xwic/cube/impl/DefaultCellProvider.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DefaultDimensionResolver.java -text
+de.xwic.cube/src/de/xwic/cube/impl/DefaultKeyProvider.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Dimension.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DimensionElement.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Identifyable.java -text

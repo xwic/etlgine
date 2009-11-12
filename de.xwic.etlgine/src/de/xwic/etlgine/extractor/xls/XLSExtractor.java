@@ -23,6 +23,7 @@ import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
+import de.xwic.etlgine.sources.FileSource;
 
 /**
  * Extract data from an XLS file.
@@ -140,15 +141,25 @@ public class XLSExtractor extends AbstractExtractor {
 	 */
 	public void openSource(ISource source, IDataSet dataSet) throws ETLException {
 		
+		reachedEnd = false;
+		
 		IColumn col = dataSet.addColumn(COL_SHEETNAME);
 		col.setExclude(true);
 		
-		if (!(source instanceof XLSFileSource)) {
-			throw new ETLException("Can not handle a source of this type - XLSFileSource type required.");
+		if (!(source instanceof FileSource)) {
+			throw new ETLException("Can not handle a source of this type - FileSource type required.");
 		}
-		currSource = (XLSFileSource)source;
+		
+		FileSource fileSource = (FileSource)source;
+		
+		if (source instanceof XLSFileSource) {
+			currSource = (XLSFileSource)source;
+		} else {
+			currSource = new XLSFileSource();
+			currSource.setFile(fileSource.getFile());
+		}
 		try {
-			inputStream = currSource.getInputStream();
+			inputStream = fileSource.getInputStream();
 			workbook = new HSSFWorkbook(new POIFSFileSystem(inputStream));
 			
 			if (currSource.isContainsHeader()) {

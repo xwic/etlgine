@@ -135,19 +135,17 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 			input = fsrc.getInputStream();
 			
 			// determine encoding
-			if (fsrc.getEncoding() == null) {
-				String encoding = null; // java default
-				byte[] encoding_tag = new byte[2];
-				// find source encoding
-				if (input.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == -1 && encoding_tag[1] == -2) {
-					// used by Cognos CSV reports
-					encoding = "UTF-16LE";
-				} else {
-					input.close();
-					input = fsrc.getInputStream();
-				}
-				fsrc.setEncoding(encoding);
+			String encoding = fsrc.getEncoding(); // null is java default
+			byte[] encoding_tag = new byte[2];
+			// find source encoding
+			if (input.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == -1 && encoding_tag[1] == -2) {
+				// used by Cognos CSV reports
+				encoding = "UTF-16LE";
+			} else {
+				input.close();
+				input = fsrc.getInputStream();
 			}
+			fsrc.setEncoding(encoding);
 			
 			BufferedReader rawReader = new BufferedReader(StreamDecoder.forInputStreamReader(input, fsrc, fsrc.getEncoding()));
 			for (int i = 0; i < skipLines; i++) {

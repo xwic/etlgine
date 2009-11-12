@@ -1,6 +1,15 @@
 Change Notes
 =============
 
+2009-11-12 jbornema
+	- CubeHandler.openDataPool(String) calls init script when de-serialization fails
+	- CSVExtractor.openSource is always checking the encoding (fix when reopen occurs)
+	- JDBCExtractor uses new List<DataType> typeHints field to keep the original DataType from the table
+	  This fixes changed column data types that are used to get the record values
+	- XLSExtractor supports FileSource and can be now be used with ZipSources
+	- DataPoolInitializerUtil removes the cube if the dimensions or measures changed
+	- JDBCLoader supports now boolean in autoDetectColumnTypes
+
 2009-11-06 FLI
 	- You can now disable triggers by setting 'trigger.enabled' to false in the server.properties
 	- Added 'Sort Elements' action to dimension editor

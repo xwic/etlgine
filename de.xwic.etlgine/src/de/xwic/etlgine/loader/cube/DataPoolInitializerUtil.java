@@ -183,6 +183,34 @@ public class DataPoolInitializerUtil {
 	 */
 	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType) {
 		ICube cube = null;
+
+		if (pool.containsCube(key)) {
+			cube = pool.getCube(key);
+			
+			// ensure matching dimension and measure
+			boolean replaceCube = cube.getDimensions().size() != dimKeys.size() || cube.getMeasures().size() != measureKeys.size();
+			if (!replaceCube) {
+				int i = 0;
+				for (IDimension d : cube.getDimensions()) {
+					if (!d.getKey().equals(dimKeys.get(i++))) {
+						replaceCube = true;
+						break;
+					}
+				}
+				if (!replaceCube) {
+					i = 0;
+					for (IMeasure m : cube.getMeasures()) {
+						if (!m.getKey().equals(measureKeys.get(i++))) {
+							replaceCube = true;
+							break;
+						}
+					}
+				}
+			}				
+			if (replaceCube) {
+				cube.remove();
+			}
+		}
 		
 		if (!pool.containsCube(key)) {
 			IDimension[] dimensions = new IDimension[dimKeys.size()];
@@ -195,8 +223,6 @@ public class DataPoolInitializerUtil {
 			}
 			cube = pool.createCube(key, dimensions, measures, cubeType);
 			
-		} else {
-			cube = pool.getCube(key);
 		}
 		
 		// check for cubeType conversion

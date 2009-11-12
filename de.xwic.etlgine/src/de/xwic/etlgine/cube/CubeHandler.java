@@ -138,7 +138,13 @@ public class CubeHandler {
 					if (firstLoad) {
 						log.info("Loading DataPool " + key);
 					}
-					dataPool = dpm.getDataPool(key);
+					try {
+						dataPool = dpm.getDataPool(key);
+					} catch (StorageException e) {
+						log.error("Error opening DataPool " + dataPoolManagerKey + " / " + key + ", create new...", e);
+						dataPool = dpm.createDataPool(key);
+					}
+						
 				} else {
 					dataPool = dpm.createDataPool(key);
 				}

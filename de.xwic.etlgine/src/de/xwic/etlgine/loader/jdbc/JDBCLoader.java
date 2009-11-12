@@ -3,6 +3,7 @@
  */
 package de.xwic.etlgine.loader.jdbc;
 
+import java.math.BigDecimal;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.DataTruncation;
@@ -58,6 +59,9 @@ public class JDBCLoader extends AbstractLoader {
 		UPDATE,
 		INSERT_OR_UPDATE
 	}
+	
+	protected static int[] INT_RANGE = {(int)Math.pow(-2, 31), (int)Math.pow(2, 31) - 1};
+	protected static long[] BIGINT_RANGE = {(long)Math.pow(-2, 63), (long)Math.pow(2, 63) - 1};
 	
 	private String sharedConnectionName = null;
 	private String connectionName = null;
@@ -396,6 +400,7 @@ public class JDBCLoader extends AbstractLoader {
 			boolean isLong = true;
 			boolean isDouble = true;
 			boolean isDate = true;
+			boolean isBoolean = true;
 			int maxLength = 0;
 			int count = 0; 
 		}
@@ -431,25 +436,31 @@ public class JDBCLoader extends AbstractLoader {
 				Number n = null;
 				Date d = null;
 				String s = null;
+				Boolean b = null;
 				if (value instanceof String) {
 					s = (String)value;
 				} else if (value instanceof Number) {
 					n = (Number)value;
 				} else if (value instanceof Date) {
 					d = (Date)value;
+				} else if (value instanceof Boolean) {
+					b = (Boolean)value;
 				} else {
 					s = value.toString();
 				}
 				if (s != null && treatEmptyAsNull && s.length() == 0) {
 					continue;
 				}
-
 				
 				if (s != null) {
 					// check integer
 					if (columnType.isInteger) {
 						try {
-							Integer.parseInt(s);
+							n = Integer.parseInt(s);
+							// check range
+							if (n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1]) {
+								columnType.isInteger = false;
+							}
 						} catch (Exception e) {
 							columnType.isInteger = false;
 						}
@@ -457,7 +468,11 @@ public class JDBCLoader extends AbstractLoader {
 					// check long
 					if (columnType.isLong) {
 						try {
-							Long.parseLong(s);
+							n = Long.parseLong(s);
+							// check range
+							if (n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1]) {
+								columnType.isLong = false;
+							}
 						} catch (Exception e) {
 							columnType.isLong = false;
 						}
@@ -465,7 +480,7 @@ public class JDBCLoader extends AbstractLoader {
 					// check double
 					if (columnType.isDouble) {
 						try {
-							Double.parseDouble(s);
+							n = Double.parseDouble(s);
 						} catch (Exception e) {
 							columnType.isDouble = false;
 						}
@@ -480,19 +495,32 @@ public class JDBCLoader extends AbstractLoader {
 					}
 				} else {
 					if (n != null) {
-						if (columnType.isInteger && !(n instanceof Integer)) {
+						if (columnType.isInteger && (!(n instanceof Integer) || n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1])) {
 							columnType.isInteger = false;
 						}
-						if (columnType.isLong && !(n instanceof Long)) {
+						if (columnType.isLong && (!(n instanceof Long) || n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1])) {
 							columnType.isLong = false;
 						}
-						if (columnType.isDouble && !(n instanceof Double)) {
+						if (columnType.isDouble && !(n instanceof Double) && !(n instanceof BigDecimal)) {
 							columnType.isDouble = false;
 						}
-						if (columnType.isDate && !(d instanceof Date)) {
+					} else {
+						if (columnType.isDate && d == null) {
 							columnType.isDate = false;
+						} else {
+							columnType.isInteger = false;
+							columnType.isLong = false;
+							columnType.isDouble = false;
+						}
+						if (columnType.isBoolean && b == null) {
+							columnType.isBoolean = false;
 						}
 					}
+				}
+				
+				// boolean check
+				if (columnType.isBoolean && (n == null || (n != null && n.doubleValue() != 0 && n.doubleValue() != 1) || d != null)) {
+					columnType.isBoolean = false;
 				}
 				
 				// set max length
@@ -513,14 +541,16 @@ public class JDBCLoader extends AbstractLoader {
 			IColumn column = entry.getKey();
 			ColumnType columnType = entry.getValue();
 			
-			if (column.getTypeHint() != DataType.UNKNOWN) {
+			if (column.getTypeHint() != DataType.UNKNOWN && column.getTypeHint() != DataType.STRING || (column.getTypeHint() == DataType.STRING && column.getLengthHint() > 0 && columnType.count == 0)) {
 				continue;
 			}
 			
 			boolean forceString = columnType.count == 0; 
 			
 			if (!forceString) {
-				if (columnType.isInteger) {
+				if (columnType.isBoolean) {
+					column.setTypeHint(DataType.BOOLEAN);
+				} else if (columnType.isInteger) {
 					column.setTypeHint(DataType.INT);
 				} else if (columnType.isLong) {
 					column.setTypeHint(DataType.LONG);
@@ -531,16 +561,18 @@ public class JDBCLoader extends AbstractLoader {
 				} else {
 					forceString = true;
 				}
-			} else {
-				columnType.maxLength = 256;
 			}
 			
-			if (forceString) {
+			if (forceString && (column.getTypeHint() == DataType.UNKNOWN || column.getTypeHint() == DataType.STRING)) {
 				// TODO support clob for length > 4000
 				column.setTypeHint(DataType.STRING);
 				// set length
 				int lengthHint = 1;
 				for (; lengthHint < columnType.maxLength; lengthHint *= 2);
+				// set default length
+				if (columnType.count == 0) {
+					lengthHint = 255;
+				}
 				column.setLengthHint(lengthHint);
 			}
 		}
@@ -561,10 +593,13 @@ public class JDBCLoader extends AbstractLoader {
 		processContext.getMonitor().logInfo("Creating missing table: " + tablename);
 
 		Statement stmt = connection.createStatement();
-		StringBuilder sb = new StringBuilder();
-		sb.append("CREATE TABLE [").append(tablename).append("] (");
-		sb.append("[Id] [bigint] IDENTITY(1,1) NOT NULL, CONSTRAINT [PK_").append(tablename).append("] PRIMARY KEY (Id))");
-		stmt.execute(sb.toString());
+		StringBuilder sql = new StringBuilder();
+		sql.append("CREATE TABLE [").append(tablename).append("] (");
+		sql.append("[Id] [bigint] IDENTITY(1,1) NOT NULL, CONSTRAINT [PK_").append(tablename).append("] PRIMARY KEY (Id))");
+		
+		processContext.getMonitor().logInfo("Creating missing table: \n" + sql.toString());
+		
+		stmt.execute(sql.toString());
 	}
 
 	/**
@@ -619,38 +654,57 @@ public class JDBCLoader extends AbstractLoader {
 				   .append(col.computeTargetName())
 				   .append("] ");
 				
-				String type;;
+				String type = null;
+				String typeName;
+				
 				switch (col.getTypeHint()) {
 				case DATE:
-					type = "DATETIME";
+					typeName = "DATETIME";
 					dbcd.setType(Types.TIMESTAMP);
 					break;
 				case DATETIME:
-					type = "DATETIME";
+					typeName = "DATETIME";
 					dbcd.setType(Types.TIMESTAMP);
 					break;
 				case DOUBLE:
-					type = "FLOAT";
+					typeName = "FLOAT";
 					dbcd.setType(Types.FLOAT);
 					break;
 				case INT:
-					type = "INT";
+					typeName = "INT";
 					dbcd.setType(Types.INTEGER);
 					break;
 				case LONG:
-					type = "BIGINT";
+					typeName = "BIGINT";
 					dbcd.setType(Types.BIGINT);
+					break;
+				case BOOLEAN:
+					typeName = "BIT";
+					dbcd.setType(Types.BIT);
 					break;
 				default:
 					int length = col.getLengthHint();
 					if (length < 1) {
-						length = 255;
+						if (autoAlterColumns) {
+							// start with size 1
+							length = 1;
+						} else {
+							length = 255;
+						}
+						//length = 255;
 					}
-					type = "VARCHAR(" + length + ")";
+					typeName = "VARCHAR";
+					type = typeName + "(" + length + ")";
 					dbcd.setType(Types.VARCHAR);
 					dbcd.setSize(length);
 					break;
 				}
+				
+				if (type == null) {
+					type = typeName;
+				}
+				
+				dbcd.setTypeName(typeName);
 				
 				sql.append(type)
 				   .append(" NULL");
@@ -804,8 +858,22 @@ public class JDBCLoader extends AbstractLoader {
 				ps.setString(idx, s);
 				break;
 			}
-			case Types.INTEGER:
 			case Types.BIGINT:
+				try {
+					if (value instanceof Number) {
+						ps.setLong(idx, ((Number)value).longValue());
+					} else if (value instanceof String) {
+						ps.setLong(idx, Long.parseLong((String)value));
+					} else {
+						// unknown value
+						ps.setObject(idx, value);
+					}
+					break;
+				} catch (NumberFormatException nfe) {
+					// add column information
+					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
+				}
+			case Types.INTEGER:
 			case Types.SMALLINT:
 				try {
 					if (value instanceof Integer) {
@@ -821,7 +889,7 @@ public class JDBCLoader extends AbstractLoader {
 					break;
 				} catch (NumberFormatException nfe) {
 					// add column information
-					throw new NumberFormatException(nfe.getMessage() + ", column '" + colDef.getName() + "'");
+					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
 				}
 			case Types.DOUBLE:
 			case Types.FLOAT:
@@ -896,11 +964,20 @@ public class JDBCLoader extends AbstractLoader {
 		
 		processContext.getMonitor().logInfo("Alter column '" + colDef.getName() + "' size from " + colDef.getSize() + " to " + newSize);
 
+		String typeName = colDef.getTypeName();
+		if (typeName == null) {
+			// identify column type
+			throw new SQLException("Missing column '" + colDef.getName() + "' typeName");
+		}
+		
 		// alter column
 		Statement stmt = connection.createStatement();
 		StringBuilder sb = new StringBuilder();
 		sb.append("ALTER TABLE [").append(tablename).append("] ALTER COLUMN [");
-		sb.append(colDef.getName()).append("] ").append(colDef.getTypeName()).append("(").append(newSize).append(")");
+		sb.append(colDef.getName()).append("] ").append(typeName).append("(").append(newSize).append(")");
+		
+		processContext.getMonitor().logInfo(sb.toString());
+		
 		stmt.execute(sb.toString());
 		
 		colDef.setSize(newSize);
@@ -942,9 +1019,9 @@ public class JDBCLoader extends AbstractLoader {
 				}
 			}
 			
-		} catch (SQLException se) {
+		} catch (Throwable t) {
 			if (handleException) {
-				handleException(se, record);
+				handleException(t, record);
 			}
 		}
 		
@@ -956,8 +1033,8 @@ public class JDBCLoader extends AbstractLoader {
 	 * @param record
 	 * @throws ETLException 
 	 */
-	protected void handleException(SQLException se, IRecord record) throws ETLException {
-		if (se instanceof DataTruncation || se.getCause() instanceof DataTruncation || se.getMessage().toLowerCase().contains("truncation")) {
+	protected void handleException(Throwable t, IRecord record) throws ETLException {
+		if (t instanceof DataTruncation || t.getCause() instanceof DataTruncation || t.getMessage().toLowerCase().contains("truncation")) {
 			//monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, se);
 			// log field value lengths
 			DbColumnDef hintColDef = null;
@@ -979,10 +1056,10 @@ public class JDBCLoader extends AbstractLoader {
 			if (hintColDef != null) {
 				monitor.logError("Column '" + hintColDef.getName() + "' of size " + hintColDef.getSize() + " requires " + valueSize);
 			}
-			throw new ETLException("A Data Truncation occured during INSERT or UPDATE.", se);
+			throw new ETLException("A Data Truncation occured during INSERT or UPDATE.", t);
 		} else {
 			//monitor.logError("Error during INSERT or UPDATE record: " + record, se);
-			throw new ETLException("A SQLException occured during INSERT or UPDATE: " + se, se);
+			throw new ETLException("A SQLException occured during INSERT or UPDATE: " + t, t);
 		}
 	}
 

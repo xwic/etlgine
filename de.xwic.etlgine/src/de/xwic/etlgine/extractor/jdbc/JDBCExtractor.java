@@ -10,6 +10,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -41,6 +43,8 @@ public class JDBCExtractor extends AbstractExtractor {
 	private int fetchSize = -1;
 	private int returnedCount = 0;
 	private int getNextRecordInvoked = 0;
+	
+	private List<DataType> typeHints = new ArrayList<DataType>();
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractExtractor#initialize(de.xwic.etlgine.IProcessContext)
@@ -83,14 +87,17 @@ public class JDBCExtractor extends AbstractExtractor {
 		if (endReached) {
 			return null;
 		}
+		int i = 1;
+		IColumn col = null;
 		try {
 			if (rs.next()) {
 				IRecord record = context.newRecord();
 				IDataSet ds = context.getDataSet();
-				for (int i = 1; i <= colCount; i++) {
-					IColumn col = ds.getColumnByIndex(i);
+				for (; i <= colCount; i++) {
+					col = ds.getColumnByIndex(i);
+					DataType typeHint = typeHints.get(i - 1);
 					Object value = null;
-					switch (col.getTypeHint()) {
+					switch (typeHint) {
 					case STRING: 
 						value = rs.getString(i);
 						break;
@@ -124,7 +131,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				endReached = true;
 			}
 		} catch (SQLException se) {
-			throw new ETLException("Error reading resultSet: " + se, se);
+			throw new ETLException("Error reading resultSet at column '" + col.getName() + "': " + se, se);
 		}
 		
 		
@@ -195,6 +202,7 @@ public class JDBCExtractor extends AbstractExtractor {
 			
 			ResultSetMetaData metaData = rs.getMetaData();
 			colCount = metaData.getColumnCount();
+			typeHints.clear();
 			for (int i = 1; i <= colCount; i++) {
 				String name = metaData.getColumnLabel(i);
 				IColumn column = null;
@@ -210,7 +218,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				switch (metaData.getColumnType(i)) {
 				case Types.CHAR:
 				case Types.VARCHAR:
-				case Types.NVARCHAR:
+				case -9: //Types.NVARCHAR:
 				case Types.CLOB:
 					dt = DataType.STRING;
 					break;
@@ -231,8 +239,15 @@ public class JDBCExtractor extends AbstractExtractor {
 					break;
 				case Types.BIT:
 					dt = DataType.BOOLEAN;
+					break;
+				default:
+					break;
 				}
+				column.setLengthHint(metaData.getPrecision(i));
+
 				column.setTypeHint(dt);
+				
+				typeHints.add(dt);				
 			}
 			
 			endReached = false;

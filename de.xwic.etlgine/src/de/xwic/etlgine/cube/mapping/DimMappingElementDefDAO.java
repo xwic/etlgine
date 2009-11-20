@@ -33,6 +33,8 @@ public class DimMappingElementDefDAO {
 	private PreparedStatement psInsert;
 	private PreparedStatement psUpdate;
 	private PreparedStatement psDeleteByDimMapKey;
+	private PreparedStatement psDeleteById;
+	
 	private int orderIndex = 0;
 	
 	protected final Log log = LogFactory.getLog(getClass());
@@ -56,11 +58,10 @@ public class DimMappingElementDefDAO {
 			
 		}
 		
-		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, order_index, ValidFrom, ValidTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		psInsert = connection.prepareStatement("INSERT INTO [XCUBE_DIMMAP_ELEMENTS] (DimMapKey, Expression, isRegExp, IgnoreCase, ElementPath, SkipRecord, order_index, ValidFrom, ValidTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 		psUpdate = connection.prepareStatement("UPDATE [XCUBE_DIMMAP_ELEMENTS] SET Expression=?, isRegExp=?, IgnoreCase=?, ElementPath=?, SkipRecord=?, ValidFrom=?, ValidTo=? WHERE ID = ?");
 		psDeleteByDimMapKey = connection.prepareStatement("DELETE FROM [XCUBE_DIMMAP_ELEMENTS] WHERE DimMapKey = ?");
-		
-
+		psDeleteById = connection.prepareStatement("DELETE FROM [XCUBE_DIMMAP_ELEMENTS] WHERE ID = ?");
 	}
 
 	/**
@@ -196,6 +197,7 @@ public class DimMappingElementDefDAO {
 		} else {
 			psInsert.setNull(idx++, Types.DATE);
 		}
+		
 		int count = psInsert.executeUpdate(); 
 		if (count != 1) {
 			throw new SQLException("Error inserting DimMappingElementDef " + dimMapElm.getId() + ": Updated " + count + " but expected 1");
@@ -212,13 +214,24 @@ public class DimMappingElementDefDAO {
 	 * @throws SQLException 
 	 */
 	public int deleteByDimMapKey(String key) throws SQLException {
-
 		psDeleteByDimMapKey.clearParameters();
 		psDeleteByDimMapKey.setString(1, key);
 		return psDeleteByDimMapKey.executeUpdate();
 		
 	}
 
+	
+	/**
+	 * @param id
+	 * @throws SQLException 
+	 */
+	public int deleteById(int id) throws SQLException {
+		psDeleteById.clearParameters();
+		psDeleteById.setInt(1, id);
+		return psDeleteById.executeUpdate();
+	}
+	
+	
 	/**
 	 * @return the orderIndex
 	 */

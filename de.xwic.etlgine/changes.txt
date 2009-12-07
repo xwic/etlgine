@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2009-11-24 FLI
+	- cleared lastException property if a Job is executed
+	- ZipSources now implements IProcessFinalizer to close the zip archive on finish
+	
 2009-11-12 jbornema
 	- CubeHandler.openDataPool(String) calls init script when de-serialization fails
 	- CSVExtractor.openSource is always checking the encoding (fix when reopen occurs)

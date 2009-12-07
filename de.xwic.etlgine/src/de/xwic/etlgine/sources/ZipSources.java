@@ -18,6 +18,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IProcessContext;
+import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.impl.ETLProcess;
 
 /**
@@ -25,7 +27,7 @@ import de.xwic.etlgine.impl.ETLProcess;
  * @author JBORNEMA
  */
 
-public class ZipSources {
+public class ZipSources implements IProcessFinalizer {
 
 	protected File file;
 	private ZipFile zipFile = null;
@@ -69,7 +71,7 @@ public class ZipSources {
 			for (Enumeration<? extends ZipEntry> entries = zipFile .entries(); entries.hasMoreElements(); ) {
 				ZipEntry entry = entries.nextElement();
 				if (!entry.isDirectory()) {
-					ZipEntrySource source = new ZipEntrySource(zipFile , entry);
+					ZipEntrySource source = new ZipEntrySource(this, zipFile, entry);
 					process.addSource(source);
 				}
 			}
@@ -86,6 +88,16 @@ public class ZipSources {
 	public void close() throws IOException {
 		zipFile.close();
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessFinalizer#onFinish(de.xwic.etlgine.IProcessContext)
+	 */
+	public void onFinish(IProcessContext context) throws ETLException {
+		try {
+			close();
+		} catch (IOException e1) {
+			throw new ETLException("Error closing zip archive.", e1);
+		}		
+	}
 
 }

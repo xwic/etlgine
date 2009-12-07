@@ -68,6 +68,7 @@ public class Job implements IJob {
 		executing = true;
 		activeContext = context;
 		lastStarted = new Date();
+		lastException = null;
 		monitor.reset();
 		state = State.RUNNING;
 		if (trigger != null) {

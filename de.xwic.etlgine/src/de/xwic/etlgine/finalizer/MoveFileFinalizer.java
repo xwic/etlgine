@@ -25,6 +25,7 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 	
 	private boolean deleteTargetIfExists = true;
 	private IMonitor monitor;
+	private boolean moveOnError = false;
 	
 	/**
 	 * @param targetPath
@@ -75,6 +76,11 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 		}
 		if (!targetPath.isDirectory()) {
 			monitor.logError("The target path is no directory!");
+			return;
+		}
+		
+		if (!moveOnError && (context.getResult() == Result.FAILED || context.getResult() == Result.FINISHED_WITH_ERRORS)) {
+			monitor.logWarn("File(s) are not moved because process exited with errors");
 			return;
 		}
 	
@@ -149,6 +155,22 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 	 */
 	public void setDeleteTargetIfExists(boolean deleteTargetIfExists) {
 		this.deleteTargetIfExists = deleteTargetIfExists;
+	}
+
+	/**
+	 * @return the moveOnError
+	 */
+	public boolean isMoveOnError() {
+		return moveOnError;
+	}
+
+	/**
+	 * Set to true, if the file(s) should get moved even if the process exited with an error.
+	 * Default is false.
+	 * @param moveOnError the moveOnError to set
+	 */
+	public void setMoveOnError(boolean moveOnError) {
+		this.moveOnError = moveOnError;
 	}
 
 }

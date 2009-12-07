@@ -26,11 +26,11 @@ public class ZipEntrySource extends FileSource {
 
 	protected ZipFile zipFile;
 	protected ZipEntry zipEntry;
-	
-	/**
+		/**
+	 * @param zipSources 
 	 * 
 	 */
-	public ZipEntrySource(ZipFile zipFile, ZipEntry zipEntry) {
+	public ZipEntrySource(ZipSources zipSource, ZipFile zipFile, ZipEntry zipEntry) {
 		this.zipFile = zipFile;
 		this.zipEntry = zipEntry;
 	}

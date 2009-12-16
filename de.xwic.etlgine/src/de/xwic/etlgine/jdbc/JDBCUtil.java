@@ -11,6 +11,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 
@@ -20,6 +23,8 @@ import de.xwic.etlgine.IContext;
 public class JDBCUtil {
 
 	private static final String SHARE_PREFIX = "_sharedConnection.";
+
+	protected final static Log log = LogFactory.getLog(JDBCUtil.class);
 	
 	/**
 	 * Returns the connection with the specified shareName. If the connection does not exist, one is
@@ -121,7 +126,17 @@ public class JDBCUtil {
 			throw new ETLException("Driver " + driver + " can not be found.");
 		}
 		
-		return DriverManager.getConnection(url, username, password);
+		log.info("Opening new JDBC connection to: " + url);
+		
+		Connection con = DriverManager.getConnection(url, username, password);
+
+		DatabaseMetaData meta = con.getMetaData();
+		String databaseName = meta.getDatabaseProductName();
+
+		log.info("RDBMS: " + databaseName + ", version: " + meta.getDatabaseProductVersion().replace("\n", ", ") + 
+				", JDBC driver: " + meta.getDriverName() + ", version: " + meta.getDriverVersion());
+		
+		return con;
 		
 	}
 	

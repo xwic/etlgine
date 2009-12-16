@@ -212,15 +212,16 @@ public class DataPoolInitializerUtil {
 			}
 		}
 		
+		IDimension[] dimensions = new IDimension[dimKeys.size()];
+		for (int i = 0; i < dimKeys.size(); i++) {
+			dimensions[i] = pool.getDimension(dimKeys.get(i));
+		}
+		IMeasure[] measures = new IMeasure[measureKeys.size()];
+		for (int i = 0; i < measureKeys.size(); i++) {
+			measures[i] = pool.getMeasure(measureKeys.get(i));
+		}
+
 		if (!pool.containsCube(key)) {
-			IDimension[] dimensions = new IDimension[dimKeys.size()];
-			for (int i = 0; i < dimKeys.size(); i++) {
-				dimensions[i] = pool.getDimension(dimKeys.get(i));
-			}
-			IMeasure[] measures = new IMeasure[measureKeys.size()];
-			for (int i = 0; i < measureKeys.size(); i++) {
-				measures[i] = pool.getMeasure(measureKeys.get(i));
-			}
 			cube = pool.createCube(key, dimensions, measures, cubeType);
 			
 		}
@@ -233,7 +234,9 @@ public class DataPoolInitializerUtil {
 				cube = new CubePreCache((CubeFlexCalc)cube);
 				log.info("Converted cube '" + key + "' to " + cube.getCubeType());
 			} else {
-				log.warn("Cannot convert cube '" + key + "' from " + cube.getCubeType() + " to " + cubeType);
+				log.warn("Cannot convert cube '" + key + "' from " + cube.getCubeType() + " to " + cubeType + ", create new blank cube");
+				cube.remove();
+				cube = pool.createCube(key, dimensions, measures, cubeType);
 			}
 		}
 		

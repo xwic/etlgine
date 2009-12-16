@@ -1,6 +1,14 @@
 Change Notes
 =============
 
+2009-12-16 jbornema
+	- CubeHandler supports new "[datapool key].datapool.zip" property in etlgine server.properties to
+	  enable zip compression of the datapool.
+	- JDBCUtil.openConnection(...) logs JDBC connection open.
+	- DataPoolInitializerUtil.ensureCube(...) recreates the cube if the definition is different.
+	- JDBCLoader.commitOnProcessFinished property added (true by default) that commits shared connections with disabled autoCommit
+	  in the onProcessFinished event. 
+
 2009-11-24 FLI
 	- cleared lastException property if a Job is executed
 	- ZipSources now implements IProcessFinalizer to close the zip archive on finish

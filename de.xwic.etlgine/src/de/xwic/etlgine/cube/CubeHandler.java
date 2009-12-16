@@ -84,6 +84,7 @@ public class CubeHandler {
 					File fDP = new File(fRoot, path);
 					if (fDP.exists()) {
 						FileDataPoolStorageProvider storageProvider = new FileDataPoolStorageProvider(fDP);
+						storageProvider.setZipDataPool(context.getPropertyBoolean(poolKey + ".datapool.zip", false));
 						IDataPoolManager dpMngr = DataPoolManagerFactory.createDataPoolManager(storageProvider);
 						dataPoolManagerMap.put(poolKey, dpMngr);
 						log.info("DataPoolManager with the key " + poolKey + " loaded.");

@@ -4,6 +4,8 @@
 package de.xwic.etlgine.server.admin.datapool;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import de.jwic.base.ControlContainer;
@@ -144,6 +146,24 @@ public class MappingElementEditorControl extends ControlContainer {
 
 	}
 
+	public void doSort(final boolean byExpression) {
+		
+		Collections.sort(mappingList, new Comparator<DimMappingElementDef>() {
+			public int compare(DimMappingElementDef o1, DimMappingElementDef o2) {
+				String e1 = byExpression ? o1.getExpression() : o1.getElementPath();
+				String e2 = byExpression ? o2.getExpression() : o2.getElementPath();
+				if (e1 == null || e2 == null) {
+					return e1 == null ? -1 : 1;
+				}
+				return e1.toUpperCase().compareTo(e2.toUpperCase());
+			}
+		});
+		tableModel.clearSelection();
+		table.setRequireRedraw(true);
+		refreshMoveButtons(); // refresh buttons
+
+	}
+	
 	/**
 	 * 
 	 */
@@ -234,8 +254,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		table.setHeight(300);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);
-		table.setShowStatusBar(false);
-		
+		table.setShowStatusBar(true);
+				
 		tableModel = table.getModel();
 		tableModel.setSelectionMode(TableModel.SELECTION_SINGLE);
 		tableModel.addColumn(new TableColumn("M", 30, "match"));
@@ -251,7 +271,10 @@ public class MappingElementEditorControl extends ControlContainer {
 				onElementSelection((String)event.getElement());
 			}
 		});
-
+		
+		if (mappingList.size() > 150) {
+			tableModel.setMaxLines(100);
+		}
 	
 	}
 
@@ -383,5 +406,15 @@ public class MappingElementEditorControl extends ControlContainer {
 		labelProvider.setTestString(text);
 		table.setRequireRedraw(true);
 		
+	}
+
+	/**
+	 * 
+	 */
+	public void deleteAll() {
+		tableModel.clearSelection();
+		mappingList.clear();
+		table.setRequireRedraw(true);
+		createNewElement();
 	}
 }

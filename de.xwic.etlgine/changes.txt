@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-01-18 FLI
+	- Mapping editor is now able to sort mapping elements by expression or by path
+	- Mapping editor action 'delete all entries' added
+	
 2009-12-16 jbornema
 	- CubeHandler supports new "[datapool key].datapool.zip" property in etlgine server.properties to
 	  enable zip compression of the datapool.

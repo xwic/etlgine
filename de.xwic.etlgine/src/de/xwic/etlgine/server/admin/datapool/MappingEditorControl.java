@@ -153,8 +153,55 @@ public class MappingEditorControl extends BaseContentContainer {
 				mapEditor.createNewElement();
 			}
 		});
+
+		ButtonControl btSortEx = new ButtonControl(abar, "sortEx");
+		btSortEx.setTitle("Sort By Expression");
+		btSortEx.setIconEnabled(ImageLibrary.IMAGE_REFRESH);
+		btSortEx.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onSortMappings(true);
+			}
+		});
+		
+		ButtonControl btSortPath = new ButtonControl(abar, "sortElm");
+		btSortPath.setTitle("Sort By Element");
+		btSortPath.setIconEnabled(ImageLibrary.IMAGE_REFRESH);
+		btSortPath.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onSortMappings(false);
+			}
+		});
+
+		ButtonControl btDeleteAll = new ButtonControl(abar, "deleteAll");
+		btDeleteAll.setTitle("Delete All");
+		btDeleteAll.setConfirmMsg("Do you really want to delete ALL mapping entries?");
+		btDeleteAll.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_DELETE);
+		btDeleteAll.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onDeleteAll();
+			}
+		});
+
+	}
+	/**
+	 * 
+	 */
+	protected void onDeleteAll() {
+		
+		mapEditor.deleteAll();
+		
 		
 	}
+
+	/**
+	 * @param b
+	 */
+	protected void onSortMappings(final boolean byExpression) {
+		
+		mapEditor.doSort(byExpression);
+		
+	}
+
 	/**
 	 * 
 	 */

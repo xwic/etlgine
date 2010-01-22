@@ -26,6 +26,7 @@ public class ProcessContext extends Context implements IProcessContext {
 	protected int invalidCount = 0;
 	protected IProcess process = null;
 	protected Result result = null;
+	protected Throwable lastException = null;
 	
 	/**
 	 * 
@@ -162,6 +163,23 @@ public class ProcessContext extends Context implements IProcessContext {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Returns the Exception that has interrupted the Process. Can be used
+	 * by finalizers to evaluate the cause of a failed process.
+	 * Returns null if no exception was raised.  
+	 * @return the lastException
+	 */
+	public Throwable getLastException() {
+		return lastException;
+	}
+
+	/**
+	 * @param lastException the lastException to set
+	 */
+	public void setLastException(Throwable lastException) {
+		this.lastException = lastException;
 	}
 
 }

@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2010-01-22 FLI
+	- Added 'lastException' property to ProcessContext
+	
 2010-01-18 FLI
 	- Mapping editor is now able to sort mapping elements by expression or by path
 	- Mapping editor action 'delete all entries' added

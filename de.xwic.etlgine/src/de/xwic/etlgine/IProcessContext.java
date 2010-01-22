@@ -87,5 +87,13 @@ public interface IProcessContext extends IContext {
 	 */
 	public void setStopFlag(boolean stopFlag);
 
+
+	/**
+	 * Returns the Exception that has interrupted the Process. Can be used
+	 * by finalizers to evaluate the cause of a failed process.
+	 * Returns null if no exception was raised.  
+	 * @return the lastException
+	 */
+	public Throwable getLastException();
 	
 }

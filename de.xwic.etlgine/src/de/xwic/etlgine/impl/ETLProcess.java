@@ -276,6 +276,7 @@ public class ETLProcess extends Process implements IETLProcess {
 		} catch (ETLException e) {
 			monitor.logError("Error during ETL processing: " + e, e);
 			result = Result.FAILED;
+			processContext.setLastException(e);
 			throw e;
 		} finally {
 			processContext.setResult(result);

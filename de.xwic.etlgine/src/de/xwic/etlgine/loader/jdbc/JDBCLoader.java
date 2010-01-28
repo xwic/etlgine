@@ -111,6 +111,8 @@ public class JDBCLoader extends AbstractLoader {
 	/** custom jdbc properties */
 	private Properties properties = new Properties();
 	
+	private String identifierSeparator = null;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
@@ -168,6 +170,15 @@ public class JDBCLoader extends AbstractLoader {
 			}
 		}
 
+		if (identifierSeparator == null) {
+			try {
+				identifierSeparator = connection.getMetaData().getIdentifierQuoteString();
+			} catch (SQLException e) {
+				identifierSeparator = "\""; // use this
+				log.warn("Error reading identifierQuoteString", e);
+			}
+		}
+		
 		if (truncateTable) {
 			try {
 				checkTableExists();
@@ -260,12 +271,12 @@ public class JDBCLoader extends AbstractLoader {
 		StringBuilder sql = new StringBuilder();
 		StringBuilder sqlValues = new StringBuilder();
 		StringBuilder sqlUpd = new StringBuilder();
-		sql.append("INSERT INTO [").append(tablename).append("]");
+		sql.append("INSERT INTO ").append(identifierSeparator).append(tablename).append(identifierSeparator);
 		if (withTablock) {
 			sql.append(" WITH (TABLOCK)");
 		}
 		sql.append(" (");
-		sqlUpd.append("UPDATE [").append(tablename).append("]");
+		sqlUpd.append("UPDATE ").append(identifierSeparator).append(tablename).append(identifierSeparator);
 		if (withTablock) {
 			sqlUpd.append(" WITH (TABLOCK)");
 		}
@@ -284,9 +295,9 @@ public class JDBCLoader extends AbstractLoader {
 					sql.append(", ");
 					sqlValues.append(", ");
 				}
-				sql.append("[");
+				sql.append(identifierSeparator);
 				sql.append(colDef.getName());
-				sql.append("]");
+				sql.append(identifierSeparator);
 				sqlValues.append("?");
 
 				// UPDATE Statement (might skip pk)
@@ -296,9 +307,9 @@ public class JDBCLoader extends AbstractLoader {
 					} else {
 						sqlUpd.append(", ");
 					}
-					sqlUpd.append("[");
+					sqlUpd.append(identifierSeparator);
 					sqlUpd.append(colDef.getName());
-					sqlUpd.append("] = ?");
+					sqlUpd.append(identifierSeparator).append(" = ?");
 				}
 			} else {
 				if (!ignoredColumns.contains(colDef.getName())) {
@@ -309,7 +320,7 @@ public class JDBCLoader extends AbstractLoader {
 		sqlValues.append(")");
 		sql.append(") VALUES").append(sqlValues);
 		
-		sqlUpd.append(" WHERE [" + pkColumn + "] = ?");
+		sqlUpd.append(" WHERE ").append(identifierSeparator).append(pkColumn).append(identifierSeparator).append(" = ?");
 		
 		if (mode == Mode.INSERT || mode == Mode.INSERT_OR_UPDATE) {
 			monitor.logInfo("INSERT Statement: " + sql);
@@ -626,8 +637,8 @@ public class JDBCLoader extends AbstractLoader {
 
 		Statement stmt = connection.createStatement();
 		StringBuilder sql = new StringBuilder();
-		sql.append("CREATE TABLE [").append(tablename).append("] (");
-		sql.append("[Id] [bigint] IDENTITY(1,1) NOT NULL, CONSTRAINT [PK_").append(tablename).append("] PRIMARY KEY (Id))");
+		sql.append("CREATE TABLE ").append(identifierSeparator).append(tablename).append(identifierSeparator).append(" (");
+		sql.append("Id [bigint] IDENTITY(1,1) NOT NULL, CONSTRAINT PK_").append(tablename).append(" PRIMARY KEY (Id))");
 		
 		processContext.getMonitor().logInfo("Creating missing table: \n" + sql.toString());
 		
@@ -644,13 +655,13 @@ public class JDBCLoader extends AbstractLoader {
 			int rows;
 			try {
 				// try TRUNCATE TABLE
-				ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM [" + tablename + "]");
+				ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + identifierSeparator + tablename + identifierSeparator);
 				rs.next();
 				rows = rs.getInt(1);
-				stmt.executeUpdate("TRUNCATE TABLE [" + tablename + "]");
+				stmt.executeUpdate("TRUNCATE TABLE " + identifierSeparator + tablename + identifierSeparator );
 			} catch (SQLException e) {
 				// try DELETE FROM
-				rows = stmt.executeUpdate("DELETE FROM [" + tablename + "]");
+				rows = stmt.executeUpdate("DELETE FROM " + identifierSeparator + tablename + identifierSeparator);
 			}
 			processContext.getMonitor().logInfo("TRUNCATED TABLE " + tablename + " - " + rows + " rows have been deleted.");
 		} catch (SQLException e) {
@@ -666,7 +677,7 @@ public class JDBCLoader extends AbstractLoader {
 	private void createColumns(List<IColumn> missingCols, Map<String, DbColumnDef> columns) throws SQLException {
 
 		StringBuilder sql = new StringBuilder();
-		sql.append("ALTER TABLE [").append(tablename).append("] ADD ");
+		sql.append("ALTER TABLE ").append(identifierSeparator).append(tablename).append(identifierSeparator).append(" ADD ");
 		boolean first = true;
 		
 		for (IColumn col : missingCols) {
@@ -682,9 +693,9 @@ public class JDBCLoader extends AbstractLoader {
 					sql.append(", ");
 				}
 				
-				sql.append("[")
+				sql.append(identifierSeparator)
 				   .append(col.computeTargetName())
-				   .append("] ");
+				   .append(identifierSeparator).append(" ");
 				
 				String type = null;
 				String typeName;
@@ -933,6 +944,7 @@ public class JDBCLoader extends AbstractLoader {
 					// add column information
 					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
 				}
+			case Types.DECIMAL:
 			case Types.DOUBLE:
 			case Types.FLOAT:
 			case Types.REAL:
@@ -1015,8 +1027,8 @@ public class JDBCLoader extends AbstractLoader {
 		// alter column
 		Statement stmt = connection.createStatement();
 		StringBuilder sb = new StringBuilder();
-		sb.append("ALTER TABLE [").append(tablename).append("] ALTER COLUMN [");
-		sb.append(colDef.getName()).append("] ").append(typeName).append("(").append(newSize).append(")");
+		sb.append("ALTER TABLE ").append(identifierSeparator).append(tablename).append(identifierSeparator).append(" ALTER COLUMN ").append(identifierSeparator);
+		sb.append(colDef.getName()).append(identifierSeparator).append(" ").append(typeName).append("(").append(newSize).append(")");
 		
 		processContext.getMonitor().logInfo(sb.toString());
 		
@@ -1053,8 +1065,8 @@ public class JDBCLoader extends AbstractLoader {
 		// alter column
 		Statement stmt = connection.createStatement();
 		StringBuilder sb = new StringBuilder();
-		sb.append("ALTER TABLE [").append(tablename).append("] ALTER COLUMN [");
-		sb.append(colDef.getName()).append("] ").append(newTypeName);
+		sb.append("ALTER TABLE ").append(identifierSeparator).append(tablename).append(identifierSeparator).append(" ALTER COLUMN ").append(identifierSeparator);
+		sb.append(colDef.getName()).append(identifierSeparator).append(" ").append(newTypeName);
 		
 		processContext.getMonitor().logInfo(sb.toString());
 		
@@ -1601,6 +1613,21 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setCommitOnProcessFinished(boolean commitOnFinished) {
 		this.commitOnProcessFinished = commitOnFinished;
+	}
+
+	/**
+	 * @return the identifierSeparator
+	 */
+	public String getIdentifierSeparator() {
+		return identifierSeparator;
+	}
+
+	/**
+	 * Set the separator.
+	 * @param identifierSeparator the identifierSeparator to set
+	 */
+	public void setIdentifierSeparator(String identifierSeparator) {
+		this.identifierSeparator = identifierSeparator;
 	}
 
 }

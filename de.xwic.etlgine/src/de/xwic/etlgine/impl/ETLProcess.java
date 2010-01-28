@@ -150,7 +150,9 @@ public class ETLProcess extends Process implements IETLProcess {
 					if (source.isOptional()) {
 						monitor.logWarn("The optional source " + source.getName() + " is not available.");
 					} else {
-						monitor.logError("The mandatory source " + source.getName() + " is not availble. Import aborted.");
+						String msg = "The mandatory source " + source.getName() + " is not availble. Import aborted.";
+						monitor.logError(msg);
+						throw new ETLException(msg);
 					}
 				} else {
 					processContext.setCurrentSource(source);

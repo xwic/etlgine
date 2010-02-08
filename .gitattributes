@@ -302,6 +302,7 @@ de.xwic.appkit.core/src_test/de/pol/platform/transport/xml/EntityQuerySerializer
 de.xwic.appkit.webbase/.classpath -text
 de.xwic.appkit.webbase/.cvsignore -text
 de.xwic.appkit.webbase/.project -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/core/Platform.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/EditorContext.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/GenericEditorInput.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/GenericEntityEditor.java -text
@@ -330,6 +331,13 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryContentP
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistoryLabelProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistorySelWizPage.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/wizard/HistorySelectionWizard.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/IContextPreferenceProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/IPreferenceProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/IPreferenceStore.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/Storage.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/StorageEngine.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/StorageNode.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/StorageProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/EditorToolkit.java -text

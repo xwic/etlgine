@@ -432,7 +432,6 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/EntityInformation
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/ImageLibrary.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/VtlTool.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/tools/extensions/IEntityEditorPerspective.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/CustomListBoxControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/StringUtils.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserConfigXmlReader.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserListConverter.java -text
@@ -443,11 +442,12 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryCo
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryRadioGroupControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/EntityTableViewer.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/EntityTableViewer.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/base/DAOContentProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/base/PropertyLabelProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/colselect.gif -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/ColumnSelectorDialog.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/ColumnSelectorDialog.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/ColumnSelector.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/ColumnSelector.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/EntityTableModelListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/IColumnSelectorHandler.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/viewer/columns/TableColumnInfo.java -text
@@ -1339,6 +1339,7 @@ de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/RolesOverview.java -tex
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/RolesOverviewSubModule.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/RolesView.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/RolesView.vtl -text
+de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/colselect.gif -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/ControlId.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/OtherControlId.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorControl.java -text

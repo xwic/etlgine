@@ -122,6 +122,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ReportFolder.hbm.xml -t
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ReportTemplate.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ST.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/SYNC_STATE.hbm.xml -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/UserListProfile.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/configproperty.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/security.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/export/XmlExport.java -text
@@ -150,6 +151,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IReportTemplateDAO.java -
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISalesTeamDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IServerConfigPropertyDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISyncStateDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IUserListProfileDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/LangKey.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/AnhangDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/EntityCommentDAO.java -text
@@ -163,6 +165,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/ReportTemplateDAO.ja
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SalesTeamDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/ServerConfigPropertyDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SyncStateDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/UserListProfileDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalAnhangDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalMitarbeiterDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalPicklisteDAO.java -text
@@ -180,6 +183,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IReportTemplate.java 
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISalesTeam.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IServerConfigProperty.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISyncState.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IUserListProfile.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/Anhang.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/EntityComment.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/Mitarbeiter.java -text
@@ -194,6 +198,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/ReportTemplate.j
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SalesTeam.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/ServerConfigProperty.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SyncState.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/UserListProfile.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/history/MitarbeiterHistory.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/queries/AllUNBetreuerQuery.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/queries/CMFastSearchQuery.java -text
@@ -434,7 +439,8 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/VtlTool.java -tex
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/tools/extensions/IEntityEditorPerspective.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/StringUtils.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserConfigXmlReader.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserListConverter.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserListUtil.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserProfileWrapper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/IPicklistEntryControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryByIndexComparator.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/picklist/PicklistEntryCheckboxControl.java -text

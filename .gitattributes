@@ -1372,12 +1372,14 @@ de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/RolesView.vtl -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/colselect.gif -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/ControlId.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/OtherControlId.java -text
+de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/OtherControlIdComparator.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorControl.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorControl.vtl -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorModel.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorPage.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorView.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/editor/RolesEditorView.vtl -text
+de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/page_white_wrench.png -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/users/UsersListModel.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/users/UsersOverview.java -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/users/UsersOverview.vtl -text

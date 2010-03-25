@@ -116,11 +116,11 @@ public class CubeLoader extends AbstractLoader {
 			for (IMeasure measure : dataMapper.getMeasures()) {
 				MeasureMapping mm = dataMapper.getMeasureMapping(measure);
 				Double value = mm.getValue(cube, record);
-				if (value != null) {
-					
-					// set loader focus object
-					dataMapper.onAddCellValue(key, measure, value, record);
 
+				// set loader focus object
+				dataMapper.onAddCellValue(key, measure, value, record);
+
+				if (value != null) {
 					// add value to cube
 					cube.addCellValue(key, measure, value);
 				}

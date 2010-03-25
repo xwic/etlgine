@@ -82,6 +82,7 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean ignoreMissingTargetColumns = false;
 	private boolean treatEmptyAsNull = false;
 	private boolean truncateTable = false;
+	private boolean tableTruncated = false;
 	private boolean skipError = false;
 	private int batchSize = -1;
 	private int batchCountInsert = 0;
@@ -169,7 +170,7 @@ public class JDBCLoader extends AbstractLoader {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		}
-
+		
 		if (identifierSeparator == null) {
 			try {
 				identifierSeparator = connection.getMetaData().getIdentifierQuoteString();
@@ -178,16 +179,9 @@ public class JDBCLoader extends AbstractLoader {
 				log.warn("Error reading identifierQuoteString", e);
 			}
 		}
-		
-		if (truncateTable) {
-			try {
-				checkTableExists();
-			} catch (SQLException se) {
-				throw new ETLException("Error initializing target database/tables: " + se, se);
-			}
-			truncateTable();
-		}
-		
+
+		tableTruncated = false;
+
 //		try {
 ////			connection.setAutoCommit(false);
 //		} catch (SQLException e) {
@@ -252,8 +246,14 @@ public class JDBCLoader extends AbstractLoader {
 		// does the table exist?
 		try {
 			
+
 			// check table structure, adds missing columns
 			checkTableStructure();
+			
+			if (truncateTable && !tableTruncated) {
+				// truncate table only once for source processing, set to false in method initialize
+				truncateTable();
+			}
 			
 			// build prepared statement.. and Update statement.
 			buildPreparedStatements();
@@ -651,6 +651,7 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	protected void truncateTable() throws ETLException {
 		try {
+			tableTruncated = true;
 			Statement stmt = connection.createStatement();
 			int rows;
 			try {
@@ -1089,7 +1090,6 @@ public class JDBCLoader extends AbstractLoader {
 					
 					Object value = record.getData(colDef.getColumn());
 					setPSValue(psInsert, idx++, value, colDef);
-					
 					
 				}
 			}

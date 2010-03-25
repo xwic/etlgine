@@ -1,6 +1,13 @@
 Change Notes
 =============
 
+2010-03-01 jbornema
+	- CubeLoader.processRecord processes null values as well
+	- DimensionMappingTransformer.createDimensionElement(IDimensionElement, String),
+	  called by doMapping(IProcessContext, IRecord, String) added 
+	- JDBCLoader truncates table now in preSourceProcessing event (and not in initialize anymore)
+	- ETLgineServer.FORCE_LOG4J_INITIALIZATION boolean added to fix missing log4j initialization
+
 2010-01-22 FLI
 	- Added 'lastException' property to ProcessContext
 	

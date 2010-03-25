@@ -9,7 +9,7 @@ package de.xwic.etlgine;
  */
 public abstract class AbstractLoader implements ILoader {
 
-	protected IProcessContext processContext;
+	protected transient IProcessContext processContext;
 	protected IMonitor monitor;
 
 	/* (non-Javadoc)

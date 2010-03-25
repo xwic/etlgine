@@ -273,15 +273,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 				elmDef.setElementPath(mappingDef.getUnmappedPath());
 				break;
 			case CREATE: {
-				String[] path = value.split("/");
-				IDimensionElement elm = parentElm;
-				for (String key : path) {
-					if (elm.containsDimensionElement(key)) {
-						elm = elm.getDimensionElement(key);
-					} else {
-						elm = elm.createDimensionElement(key);
-					}
-				}
+				IDimensionElement elm = createDimensionElement(parentElm, value);
 				record.setData(targetColumn, elm.getPath());
 				elmDef.setElementPath(elm.getPath());
 			}
@@ -316,6 +308,25 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			}
 		}
 		
+	}
+
+	/**
+	 * Called by doMapping(IProcessContext, IRecord, String) for unmapped values that need to create a non existing dimension element.
+	 * @param parentElm 
+	 * @param value
+	 * @return
+	 */
+	protected IDimensionElement createDimensionElement(IDimensionElement parentElm, String value) {
+		String[] path = value.split("/");
+		IDimensionElement elm = parentElm;
+		for (String key : path) {
+			if (elm.containsDimensionElement(key)) {
+				elm = elm.getDimensionElement(key);
+			} else {
+				elm = elm.createDimensionElement(key);
+			}
+		}
+		return elm;
 	}
 
 	/**

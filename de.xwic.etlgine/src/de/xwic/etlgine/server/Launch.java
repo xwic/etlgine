@@ -38,6 +38,9 @@ public class Launch {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
+		// force log4j initialization
+		ETLgineServer.FORCE_LOG4J_INITIALIZATION = true;
 		
 		System.out.println("ETLgine - XWic ETL Tool");
 		System.out.println("-----------------------");

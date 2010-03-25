@@ -52,6 +52,8 @@ public class ETLgineServer implements Runnable {
 	private boolean doExit = false;
 	private boolean running = false;
 	private boolean exitAfterFinish = false;
+	
+	public static boolean FORCE_LOG4J_INITIALIZATION = false;
 
 	/**
 	 * 
@@ -203,7 +205,7 @@ public class ETLgineServer implements Runnable {
 		//System.setOut(new PrintStream(new ScreenOutputStream(screen)));
 
 		// Initialize logging (only if it had not yet been initialized)
-		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
+		if (FORCE_LOG4J_INITIALIZATION || !Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
 
 			File configFile = new File(pathConfig, "log4j.xml");
 			boolean isXml = configFile.exists(); 

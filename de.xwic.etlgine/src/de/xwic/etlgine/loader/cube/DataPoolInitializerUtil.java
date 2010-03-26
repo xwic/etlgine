@@ -13,6 +13,7 @@ package de.xwic.etlgine.loader.cube;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -182,17 +183,43 @@ public class DataPoolInitializerUtil {
 	 * @return
 	 */
 	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType) {
+		return ensureCube(key, dimKeys, measureKeys, cubeType, null);
+	}
+	
+	/**
+	 * Ensure that the specified cube exists. If it does not exists, it is created with the 
+	 * specified cubeType setting.
+	 * @param key
+	 * @param dimKeys
+	 * @param measureKeys
+	 * @param cubeType
+	 * @param ignoreDimKeys
+	 * @return
+	 */
+	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType, List<String> ignoreDimKeys) {
 		ICube cube = null;
 
 		if (pool.containsCube(key)) {
 			cube = pool.getCube(key);
 			
+			List<String> cubeDimKeys = new ArrayList<String>();
+			List<String> newDimKeys = new ArrayList<String>(dimKeys);
+			if (ignoreDimKeys != null) {
+				newDimKeys.removeAll(ignoreDimKeys);
+			}
+			for (IDimension dim : cube.getDimensions()) {
+				String dimKey = dim.getKey();
+				if (ignoreDimKeys == null || !ignoreDimKeys.contains(dimKey)) {
+					cubeDimKeys.add(dimKey);
+				}
+			}
+			
 			// ensure matching dimension and measure
-			boolean replaceCube = cube.getDimensions().size() != dimKeys.size() || cube.getMeasures().size() != measureKeys.size();
+			boolean replaceCube = cubeDimKeys.size() != newDimKeys.size() || cube.getMeasures().size() != measureKeys.size();
 			if (!replaceCube) {
 				int i = 0;
-				for (IDimension d : cube.getDimensions()) {
-					if (!d.getKey().equals(dimKeys.get(i++))) {
+				for (String dimKey : cubeDimKeys) {
+					if (!dimKey.equals(newDimKeys.get(i++))) {
 						replaceCube = true;
 						break;
 					}

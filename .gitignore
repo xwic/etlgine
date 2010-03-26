@@ -4,3 +4,4 @@ de.xwic.cube/data
 de.xwic.etlgine/_build
 de.xwic.etlgine/doc
 de.xwic.etlgine/server/web/WEB-INF/*.log.?
+external/libs.common.jwic/bin

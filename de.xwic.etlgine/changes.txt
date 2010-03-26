@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-03-26 jbornema
+	- DataPoolInitializerUtil.ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType, List<String> ignoreDimKeys) added
+	  dimension keys in ignoreDimKeys do not trigger a cube replace if missing
+
 2010-03-01 jbornema
 	- CubeLoader.processRecord processes null values as well
 	- DimensionMappingTransformer.createDimensionElement(IDimensionElement, String),

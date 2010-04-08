@@ -48,12 +48,15 @@ public class XLSTool {
 					return cell.getRichStringCellValue().getString();
 				case HSSFCell.CELL_TYPE_FORMULA:
 					// try string first
-					String s = cell.getRichStringCellValue().getString();
-					if (s == null || s.length() == 0) {
+
+					String s = null;
+					try {
+						s = cell.getRichStringCellValue().getString();
+					} catch (Exception e) {
 						return cell.getNumericCellValue();
-					} else {
-						return s;
 					}
+					
+					return s;
 				}
 			}
 		}

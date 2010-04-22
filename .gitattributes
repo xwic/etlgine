@@ -301,6 +301,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/XmlBeanSerializer.java
 de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/XmlEntityTransport.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/ucexec/GetServerDateUseCase.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/ucexec/TestUseCase.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/util/Counter.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/DigestTool.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/ZipUtil.java -text
 de.xwic.appkit.core/src_test/de/pol/platform/transport/xml/EntityQuerySerializerTest.java -text

@@ -8,6 +8,8 @@ import java.util.Date;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 
 /**
  * @author lippisch
@@ -34,9 +36,9 @@ public class XLSTool {
 	 * @param i
 	 * @return
 	 */
-	public static Object getObject(HSSFRow row, int col) {
+	public static Object getObject(Row row, int col) {
 		if (row != null) {
-			HSSFCell cell = row.getCell(col);
+			Cell cell = row.getCell(col);
 			if (cell != null) {
 				switch (cell.getCellType()) {
 				case HSSFCell.CELL_TYPE_NUMERIC:
@@ -48,7 +50,6 @@ public class XLSTool {
 					return cell.getRichStringCellValue().getString();
 				case HSSFCell.CELL_TYPE_FORMULA:
 					// try string first
-
 					String s = null;
 					try {
 						s = cell.getRichStringCellValue().getString();

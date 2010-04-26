@@ -9,12 +9,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
@@ -34,7 +35,7 @@ public class XLSExtractor extends AbstractExtractor {
 	public final static String COL_SHEETNAME = "_XLS_SHEETNAME";
 	
 	private InputStream inputStream;
-	private HSSFWorkbook workbook;
+	private Workbook workbook;
 	
 	private XLSFileSource currSource = null;
 	
@@ -43,11 +44,12 @@ public class XLSExtractor extends AbstractExtractor {
 	private int expectedColumns = 0;
 
 	private List<String> currCols = null;
-	private List<HSSFSheet> sheets = null;
+	private List<Sheet> sheets = null;
 	private List<String> sheetNames = null;
 	private int sheetIdx = 0;
-	private HSSFSheet currSheet = null;
+	private Sheet currSheet = null;
 	private boolean reachedEnd = false;
+	private boolean expectAllColumns = true;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IExtractor#close()
@@ -83,7 +85,7 @@ public class XLSExtractor extends AbstractExtractor {
 		if (!reachedEnd) {
 			try {
 				IRecord record = context.newRecord();
-				HSSFRow row;
+				Row row;
 				// read until we find a row that contains data.
 				while ((row = currSheet.getRow(currRow)) == null) {
 					currRow++;
@@ -101,7 +103,7 @@ public class XLSExtractor extends AbstractExtractor {
 					reachedEnd = true;
 				} else {
 					record.setData(COL_SHEETNAME, sheetNames.get(sheetIdx));
-					if (currSource.isContainsHeader() && row.getLastCellNum() < expectedColumns) {
+					if (currSource.isContainsHeader() && expectAllColumns && (row.getLastCellNum() < expectedColumns)) {
 						record.markInvalid("Expected " + expectedColumns + " columns but row contained " + row.getLastCellNum() + " columns. (row=" + currRow + ")");
 					}
 					
@@ -157,13 +159,24 @@ public class XLSExtractor extends AbstractExtractor {
 		} else {
 			currSource = new XLSFileSource();
 			currSource.setFile(fileSource.getFile());
+			// call isAvailable
+			if (!currSource.isAvailable()) {
+				throw new ETLException("XLSFileSource is not available for FileSource, please use XLSFileSource instead");
+			}
 		}
 		try {
 			inputStream = fileSource.getInputStream();
-			workbook = new HSSFWorkbook(new POIFSFileSystem(inputStream));
+			if (currSource.isOOXML()) {
+				// open xssf workbook
+				workbook = new XSSFWorkbook(inputStream);
+			} else {
+				// open hssf workbook
+				workbook = new HSSFWorkbook(inputStream);
+			}
+
 			
 			if (currSource.isContainsHeader()) {
-				sheets = new ArrayList<HSSFSheet>();
+				sheets = new ArrayList<Sheet>();
 				sheetNames = new ArrayList<String>();
 				if (currSource.getSheetNames() != null && currSource.getSheetNames().size() > 0) {
 					for (String sheetName : currSource.getSheetNames()) {
@@ -178,8 +191,8 @@ public class XLSExtractor extends AbstractExtractor {
 					context.getMonitor().logError("The specified sheet(s) can not be found!");
 					reachedEnd = true;
 				} else {
-					for (HSSFSheet sheet : sheets) {
-						HSSFRow row = sheet.getRow(currSource.getStartRow());
+					for (Sheet sheet : sheets) {
+						Row row = sheet.getRow(currSource.getStartRow());
 						if (row == null) {
 							// file is empty!
 							context.getMonitor().logWarn("The specified header row does not exist. Assume that the file is empty.");
@@ -187,10 +200,10 @@ public class XLSExtractor extends AbstractExtractor {
 						} else {
 							int lastNum = row.getLastCellNum();
 							for (int c = 0; c < lastNum; c++) {
-								HSSFCell cell = row.getCell(c);
+								Cell cell = row.getCell(c);
 								if (cell != null) {
-									if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-										HSSFRichTextString value = cell.getRichStringCellValue();
+									if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+										RichTextString value = cell.getRichStringCellValue();
 										String text = value != null && value.getString() != null ? value.getString() : "";
 										if (text.length() != 0) {
 											if (!dataSet.containsColumn(text)) {
@@ -233,14 +246,14 @@ public class XLSExtractor extends AbstractExtractor {
 		currCols = new ArrayList<String>();
 		// re-read column headers for this sheet.
 		
-		HSSFRow row = currSheet.getRow(currSource.getStartRow());
+		Row row = currSheet.getRow(currSource.getStartRow());
 		int lastNum = row.getLastCellNum();
 		int lastCol = 0;
 		for (int c = 0; c < lastNum; c++) {
-			HSSFCell cell = row.getCell(c);
+			Cell cell = row.getCell(c);
 			if (cell != null) {
-				if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-					HSSFRichTextString value = cell.getRichStringCellValue();
+				if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+					RichTextString value = cell.getRichStringCellValue();
 					String text = value != null && value.getString() != null ? value.getString() : "";
 					if (text.length() != 0) {
 						currCols.add(text);
@@ -255,5 +268,19 @@ public class XLSExtractor extends AbstractExtractor {
 		
 	}
 
+	/**
+	 * @return the expectAllColumns
+	 */
+	public boolean isExpectAllColumns() {
+		return expectAllColumns;
+	}
 
+	/**
+	 * @param expectAllColumns the expectAllColumns to set
+	 */
+	public void setExpectAllColumns(boolean expectAllColumns) {
+		this.expectAllColumns = expectAllColumns;
+	}
+
+	
 }

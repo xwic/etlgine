@@ -143,8 +143,9 @@ public class ETLProcess extends Process implements IETLProcess {
 				loader.initialize(processContext);
 			}
 			
-			// iterate over sources
-			for (ISource source : sources) {
+			// iterate over sources, allow dynamic addition
+			for (int sourceIdx = 0; sourceIdx < sources.size(); sourceIdx++) {
+				ISource source = sources.get(sourceIdx);
 				
 				if (!source.isAvailable()) {
 					if (source.isOptional()) {

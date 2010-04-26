@@ -19,6 +19,10 @@ import de.xwic.etlgine.sources.FileSource;
  */
 public class XLSFileSource extends FileSource {
 
+	public static final String XLS_EXTENSION = ".xls";
+	public static final String XLSX_EXTENSION = ".xlsx";
+	
+	
 	protected final Log log = LogFactory.getLog(getClass());
 	
 	protected List<String> sheetNames = null;
@@ -27,16 +31,20 @@ public class XLSFileSource extends FileSource {
 	protected int startRow = 0;
 
 	protected boolean available = false;
-	protected String endsWith = ".xls";
+	protected String endsWith = XLS_EXTENSION;
 	
-	protected File sourcePath = null;
+	protected boolean isOOXML = false;
 	
 	public XLSFileSource() {
 		
 	}
-	
-	public XLSFileSource(String fileName) {
-		sourcePath = new File(fileName);
+
+	public XLSFileSource(File file) {
+		super(file);
+	}
+
+	public XLSFileSource(String filename) {
+		super(filename);
 	}
 	
 	/* (non-Javadoc)
@@ -54,15 +62,31 @@ public class XLSFileSource extends FileSource {
 	public void checkSource() {
 		
 		available = false;
-		if (sourcePath.exists()) {
+		if (file.exists()) {
 			
-			if (sourcePath.isFile()) {
-				if (sourcePath.getName().toLowerCase().endsWith(endsWith) && checkFilename(sourcePath.getName())) {
-					available = true;
-					file = sourcePath;
+			if (file.isFile()) {
+				// autodetect xls and xlsx
+				boolean checked = file.getName().toLowerCase().endsWith(endsWith);
+				if (!checked) {
+					// try xls
+					checked = file.getName().toLowerCase().endsWith(XLS_EXTENSION);
+					if (checked) {
+						// adjust extension
+						setEndsWith(XLS_EXTENSION);
+					} else {
+						// try xlsx
+						checked = file.getName().toLowerCase().endsWith(XLSX_EXTENSION);
+						if (checked) {
+							// adjust extension
+							setEndsWith(XLSX_EXTENSION);
+						}
+					}
 				}
-			} else if (sourcePath.isDirectory()) {
-				File[] files = sourcePath.listFiles(new FilenameFilter() {
+				if (checked && checkFilename(file.getName())) {
+					available = true;
+				}
+			} else if (file.isDirectory()) {
+				File[] files = file.listFiles(new FilenameFilter() {
 					public boolean accept(File dir, String name) {
 						return name.toLowerCase().endsWith(endsWith);
 					}
@@ -76,7 +100,7 @@ public class XLSFileSource extends FileSource {
 				}
 			}
 			
-			if (available && file != null) {
+			if (available) {
 				try {
 					determineSheetNames(file);
 				} catch (Exception e) {
@@ -87,7 +111,7 @@ public class XLSFileSource extends FileSource {
 			}
 			
 		} else {
-			log.warn("The sourcePath " + sourcePath.getAbsolutePath() + " does not exist.");
+			log.warn("The sourcePath " + file.getAbsolutePath() + " does not exist.");
 		}
 		
 	}
@@ -209,7 +233,23 @@ public class XLSFileSource extends FileSource {
 	 */
 	public void setEndsWith(String endsWith) {
 		this.endsWith = endsWith;
+		if (endsWith != null && endsWith.toLowerCase().endsWith(XLSX_EXTENSION)) {
+			isOOXML = true;
+		}
 	}
 
+	/**
+	 * @return the isOOXML
+	 */
+	public boolean isOOXML() {
+		return isOOXML;
+	}
+
+	/**
+	 * @param isOOXML the isOOXML to set
+	 */
+	public void setOOXML(boolean isOOXML) {
+		this.isOOXML = isOOXML;
+	}
 
 }

@@ -32,8 +32,7 @@ public class FileSource implements ISource {
 	 * @param filename
 	 */
 	public FileSource(String filename) {
-		this.filename = filename;
-		file = new File(filename);
+		setFilename(filename);
 	}
 	
 	/**
@@ -41,8 +40,7 @@ public class FileSource implements ISource {
 	 * @param file
 	 */
 	public FileSource(File file) {
-		this.file = file;
-		this.filename = file.getAbsolutePath();
+		setFile(file);
 	}
 	
 	/* (non-Javadoc)
@@ -67,11 +65,14 @@ public class FileSource implements ISource {
 	}
 
 	/**
+	 * Sets the filename by calling setFile(new File(filename)).
 	 * @param filename the filename to set
 	 */
 	public void setFilename(String filename) {
-		this.filename = filename;
-		file = new File(filename);
+		try {
+			filename = new File(filename).getCanonicalPath();
+		} catch (IOException e) {}
+		setFile(new File(filename));
 	}
 
 	/**

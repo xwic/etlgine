@@ -1,5 +1,8 @@
 Change Notes
 =============
+2010-04-26 jbornema
+	- XLSExtractor uses now poi 3.6 with support of Excel 2007
+	- ETLProcess supports dynamic adding of Sources during Process execution
 
 2010-04-08 RPF
 	- Added fall back in XLSTool while getting values from numeric formular cells to avoid exception and job stop

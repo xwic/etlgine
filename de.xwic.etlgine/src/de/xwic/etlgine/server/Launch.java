@@ -4,6 +4,7 @@
 package de.xwic.etlgine.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -61,12 +62,14 @@ public class Launch {
 		}
 		
 		String path = prop.getProperty(PARAM_PATH, ".");
+		String rootPath = new File(path).getAbsolutePath();
+		try {
+			rootPath = new File(path).getCanonicalPath();
+		} catch (IOException ioe) {}
 		
-		
-		System.setProperty("root", new File(path).getAbsolutePath());
-		
+		System.setProperty("root", rootPath);
 		ETLgineServer server = ETLgineServer.getInstance();
-		server.setRootPath(path);
+		server.setRootPath(rootPath);
 		if (!server.initialize()) {
 			System.out.println("Server start failed.");
 			return;

@@ -1360,9 +1360,13 @@ de.xwic.libs.common/lib/mail.jar -text
 de.xwic.libs.common/lib/opencsv-1.8.jar -text
 de.xwic.libs.common/lib/poi-3.1-FINAL-20080629.jar -text
 de.xwic.libs.common/lib/poi-3.2-FINAL-20081019.jar -text
+de.xwic.libs.common/lib/poi-3.6-20091214.jar -text
+de.xwic.libs.common/lib/poi-ooxml-3.6-20091214.jar -text
+de.xwic.libs.common/lib/poi-ooxml-schemas-3.6-20091214.jar -text
 de.xwic.libs.common/lib/servlet-api-2.5.jar -text
 de.xwic.libs.common/lib/velocity-1.4-log4j-patch.jar -text
 de.xwic.libs.common/lib/velocity-1.4.jar -text
+de.xwic.libs.common/lib/xmlbeans-2.3.0.jar -text
 de.xwic.webkit.admin.user/.classpath -text
 de.xwic.webkit.admin.user/.project -text
 de.xwic.webkit.admin.user/src/de/xwic/webkit/admin/roles/RolesListModel.java -text

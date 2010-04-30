@@ -9,6 +9,7 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -237,6 +238,24 @@ public class ETLgineServer implements Runnable {
 		} catch (IOException e) {
 			log.error("log.error reading server.properties: " + e);
 			return false;
+		}
+		
+		// search for an "override" file
+		File fileServerConfOVR = new File(pathConfig, "server.override.properties");
+		if (fileServerConfOVR.exists()) {
+			Properties props2 = new Properties();
+			try {
+				props2.load(new FileInputStream(fileServerConfOVR));
+			} catch (IOException e) {
+				log.error("log.error reading server.override.properties: " + e);
+				return false;
+			}
+			// merge properties
+			for (Enumeration<Object> e = props2.keys(); e.hasMoreElements(); ) {
+				String key = (String)e.nextElement();
+				String value = props2.getProperty(key);
+				props.setProperty(key, value);
+			}
 		}
 
 		

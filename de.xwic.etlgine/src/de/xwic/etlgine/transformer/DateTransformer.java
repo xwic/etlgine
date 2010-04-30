@@ -29,7 +29,11 @@ import de.xwic.etlgine.IRecord;
 public class DateTransformer extends AbstractTransformer {
 
 	protected SimpleDateFormat dateFormat;
-	protected String pattern = "yyyy-MM-dd HH:mm:ss";
+	
+	protected String pattern = null;
+	
+	protected String[] patternTrials = { "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd.MM.yyyy HH:mm:ss", "MM/dd/yyyy", "yyyy-MM-dd" };
+	
 	protected String[] columns;
 	
 	protected boolean checkDate = false;
@@ -41,19 +45,41 @@ public class DateTransformer extends AbstractTransformer {
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 		super.processRecord(processContext, record);
 		
-		getDateFormat();
-		
 		// iterate columns and generate Date objects
 		for (String name : columns) {
 			Object value = record.getData(name);
 			if (value instanceof Date || value == null || !(value instanceof String)) {
 				continue;
 			}
-			
+
 			String s = (String)value;
 			if (s.length() == 0) {
 				continue;
 			}
+			
+
+			if (dateFormat == null) { // try to find a format
+				if (pattern != null) {
+					dateFormat = new SimpleDateFormat(pattern);
+				} else {
+					// try to find one that works...
+					for (String p : patternTrials) {
+						SimpleDateFormat df = new SimpleDateFormat(p);
+						try {
+							df.parse(s);
+							dateFormat = df;
+							pattern = p;
+							break; // found one!
+						} catch (Exception e) {
+							// continue and check other formats.
+						}
+					}
+					if (dateFormat == null) { // none found
+						throw new ETLException("Can not find a matching date pattern for string: " + s);
+					}
+				}
+			}
+
 			
 			try {
 				Date d = dateFormat.parse(s);

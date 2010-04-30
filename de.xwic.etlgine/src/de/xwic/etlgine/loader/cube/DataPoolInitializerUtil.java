@@ -131,16 +131,16 @@ public class DataPoolInitializerUtil {
 	/**
 	 * Creates a time hierachy with Year/Quater/Month.
 	 * 
-	 * @param timeDimension
+	 * @param dimensionElement
 	 * @param year
 	 * @param firstMonth
 	 */
-	public void ensureTimeElements(IDimension timeDimension, int year, int firstMonth) {
+	public void ensureTimeElements(IDimensionElement dimensionElement, int year, int firstMonth) {
 
 		String keyYear = Integer.toString(year);
-		IDimensionElement deYear = timeDimension
-				.containsDimensionElement(keyYear) ? timeDimension
-				.getDimensionElement(keyYear) : timeDimension
+		IDimensionElement deYear = dimensionElement
+				.containsDimensionElement(keyYear) ? dimensionElement
+				.getDimensionElement(keyYear) : dimensionElement
 				.createDimensionElement(keyYear);
 
 		int month = firstMonth;

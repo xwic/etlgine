@@ -109,6 +109,7 @@ public class JDBCUtil {
 		String url = context.getProperty(name + ".connection.url");
 		String username = context.getProperty(name + ".connection.username");
 		String password = context.getProperty(name + ".connection.password");
+		int isolationLevel = context.getPropertyInt(name + ".connection.transactionIsolation", -1);
 		
 		if (url == null) {
 			throw new ETLException("The URL is not specified for this connection name. ('" + name + "')");
@@ -130,11 +131,41 @@ public class JDBCUtil {
 		
 		Connection con = DriverManager.getConnection(url, username, password);
 
+		// set optional transaction isolation level
+		if (isolationLevel != -1) {
+			con.setTransactionIsolation(isolationLevel);
+		}
+		
 		DatabaseMetaData meta = con.getMetaData();
 		String databaseName = meta.getDatabaseProductName();
 
+		String transIso = null;
+		switch (con.getTransactionIsolation()) {
+		case Connection.TRANSACTION_READ_UNCOMMITTED:
+			transIso = "TRANSACTION_READ_UNCOMMITTED";
+			break;
+		case Connection.TRANSACTION_READ_COMMITTED:
+			transIso = "TRANSACTION_READ_COMMITTED";
+			break;
+		case Connection.TRANSACTION_REPEATABLE_READ:
+			transIso = "TRANSACTION_REPEATABLE_READ";
+			break;
+		case Connection.TRANSACTION_SERIALIZABLE:
+			transIso = "TRANSACTION_SERIALIZABLE";
+			break;
+		case Connection.TRANSACTION_NONE:
+			transIso = "TRANSACTION_NONE";
+			break;
+		case 4096: //4096 corresponds to SQLServerConnection.TRANSACTION_SNAPSHOT
+			transIso = "TRANSACTION_SNAPSHOT";
+			break;
+		default:
+			transIso = "Unknown Transaction Isolation!";
+			break;
+		}
+		
 		log.info("RDBMS: " + databaseName + ", version: " + meta.getDatabaseProductVersion().replace("\n", ", ") + 
-				", JDBC driver: " + meta.getDriverName() + ", version: " + meta.getDriverVersion());
+				", JDBC driver: " + meta.getDriverName() + ", version: " + meta.getDriverVersion() + ", " + transIso);
 		
 		return con;
 		

@@ -192,4 +192,13 @@ public class CubeHandler {
 		return context.getProperty(dataPoolKey + ".datapool.syncTables.connection");
 	}
 	
+	/**
+	 * Returns the shared connection name for the syncTables of the specified dataPoolKey.
+	 * @param dataPoolKey
+	 * @return
+	 */
+	public String getSharedConnectionName(String dataPoolKey) {
+		return context.getProperty(dataPoolKey + ".datapool.syncTables.connection.shared");
+	}
+	
 }

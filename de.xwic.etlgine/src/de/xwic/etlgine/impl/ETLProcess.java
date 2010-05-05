@@ -193,7 +193,7 @@ public class ETLProcess extends Process implements IETLProcess {
 					IRecord record;
 					while ((record = extractor.getNextRecord()) != null) {
 						
-						if (!record.isInvalid() || !skipInvalidRecords) {
+						if ((!record.isInvalid() || !skipInvalidRecords) && (!record.isSkip())) {
 							for (ITransformer transformer : transformers) {
 								List<IRecord> duplicates = record.getDuplicates();
 								int duplicatesSize = duplicates.size();

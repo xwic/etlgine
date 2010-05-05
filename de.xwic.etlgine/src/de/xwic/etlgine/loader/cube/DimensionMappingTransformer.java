@@ -64,6 +64,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	private DimensionMappingTransformer onFailTransformer = null;
 	protected Map<String, DimMappingElementDef> cachedDimMappingElementDef = new HashMap<String, DimMappingElementDef>();
 	private Connection connection = null;
+	private boolean sharedConnection = false;
 	private DimMappingElementDefDAO dmeDAO;
 	
 	/* (non-Javadoc)
@@ -80,12 +81,21 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		
 		CubeHandler cubeHandler = CubeHandler.getCubeHandler(processContext);
 		String conName = cubeHandler.getConnectionName(dataPoolName);
+		String sharedConName = cubeHandler.getSharedConnectionName(dataPoolName);
 		Validate.notNull(conName, "No connection name to the sync tables is specified for the dataPoolManager " + dataPoolName);
 		
 		// load the mapping
 	
 		try {
-			connection = JDBCUtil.openConnection(processContext, conName);
+			if (connection == null) {
+				if (sharedConName == null || sharedConName.isEmpty()) {
+					sharedConnection = false;
+					connection = JDBCUtil.openConnection(processContext, conName);
+				} else {
+					sharedConnection = true;
+					connection = JDBCUtil.getSharedConnection(processContext, sharedConName, conName);
+				}
+			}
 			DimMappingDefDAO dmdDAO = new DimMappingDefDAO(connection);
 			mappingDef = dmdDAO.findMapping(mappingName);
 			Validate.notNull(mappingDef, "A mapping with the name '" + mappingName + "' does not exist.");
@@ -125,12 +135,12 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		super.onProcessFinished(processContext);
-		if (connection != null) {
-			try {
+		try {
+			if (connection != null && !sharedConnection) {
 				connection.close();
-			} catch (SQLException e) {
-				throw new ETLException("Error closing connection: " + e, e);
 			}
+		} catch (SQLException e) {
+			throw new ETLException("Error closing connection: " + e, e);
 		}
 	}
 	

@@ -4,21 +4,27 @@
 package de.xwic.etlgine.finalizer;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IETLProcess;
+import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IJobFinalizer;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.Result;
+import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.sources.FileSource;
 
 /**
  * @author lippisch
  *
  */
-public class MoveFileFinalizer implements IProcessFinalizer {
+public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 
 	private File sourceFile = null;
 	private File targetPath;
@@ -26,6 +32,8 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 	private boolean deleteTargetIfExists = true;
 	private IMonitor monitor;
 	private boolean moveOnError = false;
+	
+	private List<File> moveFiles = null;
 	
 	/**
 	 * @param targetPath
@@ -61,6 +69,31 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 		this.sourceFile = new File(sourceFileName);
 	}
 
+	/**
+	 * Registers this finalizer in the job (for final execution)
+	 * @param job
+	 */
+	public void register(IJob job) {
+		job.addJobFinalizer(this);
+		moveFiles = new ArrayList<File>();
+	}
+	
+	@Override
+	public void onFinish(IJob job) throws ETLException {
+		if (moveFiles != null && moveFiles.size() > 0) {
+			if (!moveOnError && job.getState() != State.FINISHED) {
+				monitor.logWarn("File(s) are not moved because jobs exited with errors");
+				return;
+			}
+			
+			// move files
+			List<File> files = new ArrayList<File>(moveFiles);
+			moveFiles = null;
+			for (File file : files) {
+				moveFile(file);
+			}
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessFinalizer#onFinish(de.xwic.etlgine.IProcessContext)
@@ -116,6 +149,12 @@ public class MoveFileFinalizer implements IProcessFinalizer {
 	 */
 	private boolean moveFile(File file) {
 
+		if (moveFiles != null) {
+			// move file later in job finished event
+			moveFiles.add(file);
+			return true;
+		}
+		
 		if (!file.exists()) {
 			monitor.logWarn("Can not move file " + file.getName() + " because it does not exist.");
 			return false;

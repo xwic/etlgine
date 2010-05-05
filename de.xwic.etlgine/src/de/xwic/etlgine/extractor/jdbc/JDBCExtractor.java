@@ -198,7 +198,9 @@ public class JDBCExtractor extends AbstractExtractor {
 			if (fetchSize > 0) {
 				stmt.setFetchSize(fetchSize);
 			}
-			rs = stmt.executeQuery(currSource.getSqlSelectString());
+			String sql = currSource.getSqlSelectString();
+			log.debug(sql);
+			rs = stmt.executeQuery(sql);
 			
 			ResultSetMetaData metaData = rs.getMetaData();
 			colCount = metaData.getColumnCount();

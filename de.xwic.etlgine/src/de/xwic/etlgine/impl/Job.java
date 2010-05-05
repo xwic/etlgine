@@ -37,7 +37,7 @@ public class Job implements IJob {
 	private String name = null;
 	private boolean executing = false;
 	private boolean disabled = false;
-	private String chainScriptName = null; 
+	private List<String> chainScriptNames = new ArrayList<String>(); 
 	
 	private State state = State.NEW;
 	private Throwable lastException = null;
@@ -76,10 +76,13 @@ public class Job implements IJob {
 		}
 		try {
 			if (processChain == null) {
-				if (chainScriptName == null) {
+				if (chainScriptNames.size() == 0) {
 					throw new ETLException("No processChain or chainScriptName given.");
 				}
-				loadChainFromScript(context);
+				// TODO move this logic to processChain that can contain processChains
+				for (String name : chainScriptNames) {
+					loadChainFromScript(context, name);
+				}
 			}
 			processChain.start();
 			state = processChain.getResult() != Result.SUCCESSFULL ? State.FINISHED_WITH_ERROR : State.FINISHED;
@@ -95,8 +98,9 @@ public class Job implements IJob {
 			executing = false;
 			activeContext = null;
 			lastFinished = new Date();
-			// fun finalizers
-			for (IJobFinalizer finalizer : finalizers) {
+			// run finalizers, allow modification during the loop
+			for (int i = 0; i < finalizers.size(); i++) {
+				IJobFinalizer finalizer = finalizers.get(i);
 				try {
 					finalizer.onFinish(this);
 				} catch (Throwable t) {
@@ -114,9 +118,11 @@ public class Job implements IJob {
 	 * @throws ETLException 
 	 * 
 	 */
-	private void loadChainFromScript(IContext context) throws ETLException {
+	private void loadChainFromScript(IContext context, String chainScriptName) throws ETLException {
 		
-		processChain = ETLgine.createProcessChain(context, chainScriptName);
+		if (processChain == null) {
+			processChain = ETLgine.createProcessChain(context, chainScriptName);
+		}
 		processChain.setMonitor(monitor);
 		
 		Binding binding = new Binding();
@@ -184,6 +190,7 @@ public class Job implements IJob {
 	public ITrigger getTrigger() {
 		return trigger;
 	}
+	
 	/**
 	 * @param trigger the trigger to set
 	 */
@@ -209,14 +216,35 @@ public class Job implements IJob {
 	 * @return the chainScriptName
 	 */
 	public String getChainScriptName() {
-		return chainScriptName;
+		return chainScriptNames == null || chainScriptNames.size() == 0 ? null : chainScriptNames.get(0);
 	}
 
 	/**
 	 * @param chainScriptName the chainScriptName to set
 	 */
 	public void setChainScriptName(String chainScriptName) {
-		this.chainScriptName = chainScriptName;
+		this.chainScriptNames.add(chainScriptName);
+	}
+
+	/**
+	 * @param chainScriptName
+	 */
+	public void addChainScriptName(String chainScriptName) {
+		chainScriptNames.add(chainScriptName);
+	}
+	
+	/**
+	 * @return the chainScriptNames
+	 */
+	public List<String> getChainScriptNames() {
+		return chainScriptNames;
+	}
+
+	/**
+	 * @param chainScriptName the chainScriptName to set
+	 */
+	public void setChainScriptNames(List<String> chainScriptName) {
+		this.chainScriptNames = chainScriptName;
 	}
 
 	/**

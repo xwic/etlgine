@@ -1,5 +1,15 @@
 Change Notes
 =============
+
+2010-05-05 jbornema
+	- CubeHandler support new property <pool key>.datapool.syncTables.connection.shared for shared connections
+	- JDBCExtractor logs debug of the sql statement
+	- MoveFileFinalizer implements IJobFinalizer so the move can take place if the entire job executed without errors
+	- ETLProcess skips records also for the transformers that have the skipped flag right away from the extractor
+	- Job chainScriptName changed to a List - with addChainScriptName multiple chains can be used in the job script
+	- JDBCUtil property <connection key>.connection.transactionIsolation added to support JDBC transaction isolation levels
+	- DimensionMappingTransformer supports shared connections
+
 2010-04-26 jbornema
 	- XLSExtractor uses now poi 3.6 with support of Excel 2007
 	- ETLProcess supports dynamic adding of Sources during Process execution

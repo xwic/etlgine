@@ -140,7 +140,7 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 			for (IColumn col : columns) {
 				if (!col.isExclude()) {
 					exportCols[i] = col;
-					data[i++] = col.getName();
+					data[i++] = col.computeTargetName();
 				}
 			}
 			writer.writeNext(data);

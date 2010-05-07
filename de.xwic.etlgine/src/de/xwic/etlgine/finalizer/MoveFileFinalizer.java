@@ -78,7 +78,7 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 		moveFiles = new ArrayList<File>();
 	}
 	
-	@Override
+
 	public void onFinish(IJob job) throws ETLException {
 		if (moveFiles != null && moveFiles.size() > 0) {
 			if (!moveOnError && job.getState() != State.FINISHED) {

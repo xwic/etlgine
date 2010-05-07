@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2010-05-07 RPF
+	- CSVLoader uses "Target Column Names" now, if there are some specified
+
 2010-05-05 jbornema
 	- CubeHandler support new property <pool key>.datapool.syncTables.connection.shared for shared connections
 	- JDBCExtractor logs debug of the sql statement

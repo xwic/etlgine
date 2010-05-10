@@ -3,6 +3,7 @@
  */
 package de.xwic.etlgine.loader.csv;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -109,14 +110,15 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 			OutputStream out;
 			if (zipOutput) {
 				FileOutputStream osZipFile = new FileOutputStream(zipFilename);
-				zipOut = new ZipOutputStream(osZipFile);
+				BufferedOutputStream bos = new BufferedOutputStream(osZipFile);
+				zipOut = new ZipOutputStream(bos);
 				
 				ZipEntry entry = new ZipEntry(filename);
 				zipOut.putNextEntry(entry);
 				
 				out = zipOut;
 			} else {
-				out = new FileOutputStream(filename);
+				out = new BufferedOutputStream(new FileOutputStream(filename));
 			}
 			Writer w = new BufferedWriter(StreamEncoder.forOutputStreamWriter(out, filename, encoding));
 			writer = new CSVWriter(w, separator, quoteChar);

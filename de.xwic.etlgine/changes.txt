@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-05-10 FLI
+	- CSVLoader is now able to write the output file directly into a ZIP archive.
+	- Added 'ei' package for further use. Not yet integrated...
+	
 2010-05-07 RPF
 	- CSVLoader uses "Target Column Names" now, if there are some specified
 

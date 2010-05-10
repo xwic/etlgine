@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import sun.nio.cs.StreamEncoder;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -29,12 +31,17 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	private char separator = ',';
 	private char quoteChar = '"';
 	private String filename = null;
+	
+	private boolean zipOutput = false;
+	private String zipFilename = null;
 	private CSVWriter writer;
 	
 	private int colCount = 0;
 	private IColumn[] exportCols = null;
 	
 	private String encoding = null;
+	
+	private ZipOutputStream zipOut = null;
 	
 	/**
 	 * @return the filename
@@ -99,7 +106,18 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	public void initialize(IProcessContext processContext) throws ETLException {
 		
 		try {
-			OutputStream out = new FileOutputStream(filename);
+			OutputStream out;
+			if (zipOutput) {
+				FileOutputStream osZipFile = new FileOutputStream(zipFilename);
+				zipOut = new ZipOutputStream(osZipFile);
+				
+				ZipEntry entry = new ZipEntry(filename);
+				zipOut.putNextEntry(entry);
+				
+				out = zipOut;
+			} else {
+				out = new FileOutputStream(filename);
+			}
 			Writer w = new BufferedWriter(StreamEncoder.forOutputStreamWriter(out, filename, encoding));
 			writer = new CSVWriter(w, separator, quoteChar);
 		} catch (IOException e) {
@@ -115,6 +133,8 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		try {
 			writer.flush();
+
+			zipOut.closeEntry();
 			writer.close();
 		} catch (IOException e) {
 			throw new ETLException("Error closing writer: " + e, e);
@@ -174,5 +194,33 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+
+	/**
+	 * @return the zipOutput
+	 */
+	public boolean isZipOutput() {
+		return zipOutput;
+	}
+
+	/**
+	 * @param zipOutput the zipOutput to set
+	 */
+	public void setZipOutput(boolean zipOutput) {
+		this.zipOutput = zipOutput;
+	}
+
+	/**
+	 * @return the zipFilename
+	 */
+	public String getZipFilename() {
+		return zipFilename;
+	}
+
+	/**
+	 * @param zipFilename the zipFilename to set
+	 */
+	public void setZipFilename(String zipFilename) {
+		this.zipFilename = zipFilename;
 	}
 }

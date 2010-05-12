@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-05-12 FLI
+	- DimensionEditor and MappingEditor now allows "Mass Insert" of dimensions and mappings
+	- Added "Auto Assign" feature during insert, mainly for Mass Insert to automatically find a matching dimension element.
+	
 2010-05-10 FLI
 	- CSVLoader is now able to write the output file directly into a ZIP archive.
 	- Added 'ei' package for further use. Not yet integrated...

@@ -12,15 +12,13 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.commons.logging"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.log4j"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/servlet-api-2.5-6.1.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/jetty-6.1.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/jetty-util-6.1.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/start.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.libs.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.dom4j"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.webui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.xlsbridge"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/OpenCSV"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

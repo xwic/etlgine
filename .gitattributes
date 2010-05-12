@@ -1367,7 +1367,6 @@ de.xwic.libs.common/lib/jta.jar -text
 de.xwic.libs.common/lib/jtds-1.1.jar -text
 de.xwic.libs.common/lib/jtds-1.2.2.jar -text
 de.xwic.libs.common/lib/jwic-4.0.4.jar -text
-de.xwic.libs.common/lib/jwic-ecolib-2.0.0.jar -text
 de.xwic.libs.common/lib/jwic-ecolib.jar -text
 de.xwic.libs.common/lib/jwic_compatibility.jar -text
 de.xwic.libs.common/lib/log4j-1.2.9.jar -text

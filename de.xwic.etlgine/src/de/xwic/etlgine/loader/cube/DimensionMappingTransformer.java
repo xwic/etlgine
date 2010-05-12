@@ -207,6 +207,21 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	 */
 	protected void doMappingByColumns(IProcessContext processContext, IRecord record, IColumn... sourceColumns) throws ETLException {
 		// build the source key
+		doMapping(processContext, record, getSourceKey(processContext, record, sourceColumns));
+		
+	}
+	
+	/**
+	 * Returns the key build from all source columns.
+	 * @param processContext
+	 * @param record
+	 * @param sourceColumns
+	 * @return
+	 * @throws ETLException
+	 */
+	protected String getSourceKey(IProcessContext processContext, IRecord record, IColumn... sourceColumns) throws ETLException {
+
+		// build the source key
 		StringBuilder sbSource = new StringBuilder();
 		for (IColumn sourceCol : sourceColumns) {
 			if (sbSource.length() > 0) {
@@ -222,9 +237,8 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			}
 		}
 		
-		String value = sbSource.toString();
-		
-		doMapping(processContext, record, value);
+		return sbSource.toString();
+
 	}
 
 	/**

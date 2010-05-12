@@ -3,8 +3,12 @@
  */
 package de.xwic.etlgine.server.admin.datapool;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
+
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
+import de.jwic.controls.Button;
 import de.jwic.controls.ButtonControl;
 import de.jwic.controls.InputBoxControl;
 import de.jwic.controls.LabelControl;
@@ -32,8 +36,8 @@ public class DimensionEditorControl extends BaseContentContainer {
 	private TableModel tableModel;
 	
 	private LabelControl lblParent;
-	private InputBoxControl inpKey, inpTitle, inpWeight;
-	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown;
+	private InputBoxControl inpKey, inpTitle, inpWeight, inpMassInput;
+	private Button btUpdate, btDelete, btMoveUp, btMoveDown, btMassInput;
 	
 	private IDimensionElement editedElement = null;
 	private boolean insertMode = false;
@@ -72,6 +76,8 @@ public class DimensionEditorControl extends BaseContentContainer {
 		btDelete.setEnabled(enabled);
 		btMoveUp.setEnabled(enabled && !insertMode && editedElement.getIndex() > 0);
 		btMoveDown.setEnabled(enabled && !insertMode && editedElement.getIndex() + 1 < editedElement.getParent().getDimensionElements().size());
+		
+		btMassInput.setEnabled(enabled && insertMode);
 	}
 
 	/**
@@ -90,7 +96,21 @@ public class DimensionEditorControl extends BaseContentContainer {
 		inpWeight = new InputBoxControl(this, "inpWeight");
 		inpWeight.setWidth(60);
 		
-		btUpdate = new ButtonControl(this, "btUpdate");
+		inpMassInput = new InputBoxControl(this, "inpMassInsert");
+		inpMassInput.setWidth(450);
+		inpMassInput.setHeight(100);
+		inpMassInput.setMultiLine(true);
+		
+		btMassInput = new Button(this, "btMassInsert");
+		btMassInput.setTitle("Insert All");
+		btMassInput.addSelectionListener(new SelectionListener() {
+			@Override
+			public void objectSelected(SelectionEvent event) {
+				onMassInput();
+			}
+		});
+		
+		btUpdate = new Button(this, "btUpdate");
 		btUpdate.setTitle("Update");
 		btUpdate.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -101,7 +121,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 		
-		btDelete = new ButtonControl(this, "btDelete");
+		btDelete = new Button(this, "btDelete");
 		btDelete.setTitle("Delete");
 		btDelete.setConfirmMsg("Do you really want to delete this dimension?");
 		btDelete.addSelectionListener(new SelectionListener() {
@@ -113,7 +133,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 		
-		btMoveUp = new ButtonControl(this, "btMoveUp");
+		btMoveUp = new Button(this, "btMoveUp");
 		btMoveUp.setTitle("Move Up");
 		btMoveUp.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -124,7 +144,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			} 
 		});
 		
-		btMoveDown = new ButtonControl(this, "btMoveDown");
+		btMoveDown = new Button(this, "btMoveDown");
 		btMoveDown.setTitle("Move Down");
 		btMoveDown.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -134,6 +154,65 @@ public class DimensionEditorControl extends BaseContentContainer {
 				onMoveDown();				
 			}
 		});
+		
+	}
+
+	protected void onMassInput() {
+		
+		String text = inpMassInput.getText();
+		if (text.isEmpty()) {
+			errInfo.showError("No data in the text field...");
+		}
+		
+		BufferedReader reader = new BufferedReader(new StringReader(text));
+
+		try {
+			int count = 0;
+			int existed = 0;
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String key;
+				String title = null;
+				int idx = line.indexOf('|'); 
+				if (idx != -1) {
+					key = line.substring(0, idx).trim();
+					title = line.substring(idx + 1).trim();
+				} else {
+					key = line.trim();
+				}
+				
+				if (key.indexOf('/') != -1) {
+					if (title == null) {
+						title = key;
+					}
+					key = key.replace('/', '_');
+				}
+				
+				if (!key.isEmpty()) {
+					if (!editedElement.containsDimensionElement(key)) {
+						IDimensionElement elm ;
+						if (insertChild) {
+							elm = editedElement.createDimensionElement(key);
+						} else {
+							elm = editedElement.getParent().createDimensionElement(key);
+						}
+						if (title != null) {
+							elm.setTitle(title.length() == 0 ? null : title);
+						}
+						count++;
+					} else {
+						existed++;
+					}
+				}
+			}
+			errInfo.showWarning("Created " + count + " elements. (" + existed + " elements did already exist.)");
+			tableModel.clearSelection();
+			table.setRequireRedraw(true);
+
+		} catch (Exception e) {
+			errInfo.showError(e);
+		}
+
 		
 	}
 
@@ -246,7 +325,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 		
 		table.setContentProvider(new DimensionContentProvider(dimension));
 		table.setTableLabelProvider(new DimensionEditorLabelProvider());
-		table.setWidth(799);
+		table.setWidth(949);
 		table.setHeight(300);
 		table.setResizeableColumns(true);
 		table.setScrollable(true);

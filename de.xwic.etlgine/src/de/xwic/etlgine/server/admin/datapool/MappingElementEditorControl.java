@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.server.admin.datapool;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,7 +12,7 @@ import java.util.List;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
 import de.jwic.controls.CheckboxControl;
 import de.jwic.controls.DateInputBoxControl;
 import de.jwic.controls.InputBoxControl;
@@ -44,7 +46,7 @@ public class MappingElementEditorControl extends ControlContainer {
 	private CheckboxControl chkOptions;
 	private DateInputBoxControl inpValidFrom;
 	private DateInputBoxControl inpValidTo;
-	private ButtonControl btUpdate, btDelete, btMoveUp, btMoveDown, btMoveTop, btMoveBtm;
+	private Button btUpdate, btMassInsert, btDelete, btMoveUp, btMoveDown, btMoveTop, btMoveBtm;
 	
 	private DimMappingElementDef currElement = null;
 	private MappingElementTableLabelProvider labelProvider;
@@ -82,8 +84,9 @@ public class MappingElementEditorControl extends ControlContainer {
 		chkOptions.addElement("Is RegExp", "regExp");
 		chkOptions.addElement("Ignore Case", "ignoreCase");
 		chkOptions.addElement("Skip Record", "skipRecord");
+		chkOptions.addElement("Auto Assign Dimension (On Insert)", "autoAssign");
 		
-		btUpdate = new ButtonControl(this, "btUpdate");
+		btUpdate = new Button(this, "btUpdate");
 		btUpdate.setTitle("Update");
 		btUpdate.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {
@@ -91,7 +94,16 @@ public class MappingElementEditorControl extends ControlContainer {
 			}
 		});
 		
-		btDelete = new ButtonControl(this, "btDelete");
+		btMassInsert = new Button(this, "btMassInsert");
+		btMassInsert.setTitle("Mass Insert");
+		btMassInsert.addSelectionListener(new SelectionListener() {
+			@Override
+			public void objectSelected(SelectionEvent event) {
+				onMassInsert();
+			}
+		});
+		
+		btDelete = new Button(this, "btDelete");
 		btDelete.setTitle("Delete");
 		btDelete.setConfirmMsg("Are you sure?");
 		btDelete.addSelectionListener(new SelectionListener() {
@@ -100,7 +112,7 @@ public class MappingElementEditorControl extends ControlContainer {
 			}
 		});
 		
-		btMoveUp = new ButtonControl(this, "btMoveUp");
+		btMoveUp = new Button(this, "btMoveUp");
 		btMoveUp.setTitle("Move Up");
 		btMoveUp.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -111,7 +123,7 @@ public class MappingElementEditorControl extends ControlContainer {
 			} 
 		});
 		
-		btMoveDown = new ButtonControl(this, "btMoveDown");
+		btMoveDown = new Button(this, "btMoveDown");
 		btMoveDown.setTitle("Move Down");
 		btMoveDown.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -122,7 +134,7 @@ public class MappingElementEditorControl extends ControlContainer {
 			}
 		});
 
-		btMoveTop = new ButtonControl(this, "btMoveTop");
+		btMoveTop = new Button(this, "btMoveTop");
 		btMoveTop.setTitle("Move Top");
 		btMoveTop.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -133,7 +145,7 @@ public class MappingElementEditorControl extends ControlContainer {
 			}
 		});
 
-		btMoveBtm = new ButtonControl(this, "btMoveBtm");
+		btMoveBtm = new Button(this, "btMoveBtm");
 		btMoveBtm.setTitle("Move Bottom");
 		btMoveBtm.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)
@@ -144,6 +156,82 @@ public class MappingElementEditorControl extends ControlContainer {
 			}
 		});
 
+	}
+
+	protected void onMassInsert() {
+		
+		String text = inpExpression.getText();
+		if (text.isEmpty()) {
+			return; // ignore
+		}
+
+		boolean autoAssign = chkOptions.isKeySelected("autoAssign");
+		
+		BufferedReader reader = new BufferedReader(new StringReader(text));
+
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String key = line.trim();
+				key = key.replace('/', '_');
+
+				if (!key.isEmpty()) {
+					String dimPath = null;
+					if (autoAssign) {
+						// search matching element
+						dimPath = findDimensionMatch(dimension, key);
+					}
+					if (dimPath == null) {
+						dimPath = selElement.getDimensionElement().getPath();
+					}
+					
+					currElement = new DimMappingElementDef();
+					
+					currElement.setExpression(key);
+					currElement.setDimensionKey(dimension.getKey());
+					currElement.setDimMapKey(null);
+					currElement.setElementPath(dimPath);
+					currElement.setIgnoreCase(chkOptions.isKeySelected("ignoreCase"));
+					currElement.setRegExp(chkOptions.isKeySelected("regExp"));
+					currElement.setSkipRecord(chkOptions.isKeySelected("skipRecord"));
+					currElement.setValidFrom(inpValidFrom.getDate());
+					currElement.setValidTo(inpValidTo.getDate());
+					
+					mappingList.add(currElement);
+				}
+				
+			}
+			
+			table.setRequireRedraw(true);
+			tableModel.clearSelection();
+			createNewElement();
+
+		} catch (Exception e) { 
+			log.error("Error creating elements", e);
+			throw new RuntimeException("Error creating elements: " + e, e);
+		}
+		
+	}
+
+	/**
+	 * Tries to find a dimension element that matches the key.
+	 * @param elm
+	 * @param key
+	 * @return
+	 */
+	private String findDimensionMatch(IDimensionElement elm, String key) {
+
+		for (IDimensionElement child : elm.getDimensionElements()) {
+			if (child.getKey().equalsIgnoreCase(key)) {
+				return child.getPath();
+			}
+			String result = findDimensionMatch(child, key);
+			if (result != null) {
+				return result;
+			}
+		}
+		return null;
+		
 	}
 
 	public void doSort(final boolean byExpression) {
@@ -206,7 +294,16 @@ public class MappingElementEditorControl extends ControlContainer {
 		currElement.setExpression(inpExpression.getText().trim());
 		currElement.setDimensionKey(dimension.getKey());
 		currElement.setDimMapKey(null);
-		currElement.setElementPath(selElement.getDimensionElement().getPath());
+		
+		String path = selElement.getDimensionElement().getPath();
+		if (chkOptions.isKeySelected("autoAssign")) {
+			path = findDimensionMatch(dimension, inpExpression.getText().trim());
+			if (path == null) {
+				path = "NOT FOUND";
+			}
+		}
+		
+		currElement.setElementPath(path);
 		currElement.setIgnoreCase(chkOptions.isKeySelected("ignoreCase"));
 		currElement.setRegExp(chkOptions.isKeySelected("regExp"));
 		currElement.setSkipRecord(chkOptions.isKeySelected("skipRecord"));
@@ -236,6 +333,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		inpValidTo.setDate(null);
 		btUpdate.setTitle("Insert");
 		btDelete.setEnabled(false);
+		btMassInsert.setEnabled(true);
 		refreshMoveButtons();
 	}
 	
@@ -306,6 +404,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		
 		btUpdate.setTitle("Update");
 		btDelete.setEnabled(true);
+		btMassInsert.setEnabled(false);
 	
 		refreshMoveButtons();
 	}

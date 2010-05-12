@@ -3,6 +3,9 @@ $insert.control("table")
 $insert.control("errInfo")
 <br>
 <table>
+ <tr>
+  <td valign="bottom">
+<table>
 	<tr>
 		<td width="150">Parent</td>
 		<td>$insert.control("lblParent")</td>
@@ -21,7 +24,40 @@ $insert.control("errInfo")
 	</tr>
 	<tr>
 		<td width="150"></td>
-		<td>$insert.control("btUpdate") $insert.control("btDelete") $insert.control("btMoveUp") $insert.control("btMoveDown")</td>
+		<td>
+		    <table cellspacing="3" cellpadding="0">
+		     <tr>
+		      <td>$insert.control("btUpdate")</td>
+		      <td>$insert.control("btDelete")</td>
+		      <td>$insert.control("btMoveUp")</td>
+		      <td>$insert.control("btMoveDown")</td>
+		     </tr>
+		    </table>
+		</td>
 	</tr>
+</table>
+  </td>
+  <td valign="top">
+    <table>
+     <tr>
+      <td>Mass Insert:</td>
+     </tr>
+     <tr>
+      <td>$insert.control("inpMassInsert")<br>
+  			<span style="color: #808080; font-size: 8pt;">One entry per line. Format is Key[|Title] (title is optional, | as separator).</span>
+  	  </td>
+  	 </tr>
+  	 <tr>
+  	  <td>  	
+  	  		<table cellspacing="3" cellpadding="0">
+		     <tr>
+		     	<td>$insert.control("btMassInsert")</td>
+		     </tr>
+			</table>
+	  </td>
+	 </tr>
+	</table>
+  </td>
+ </tr>
 </table>
 <br>

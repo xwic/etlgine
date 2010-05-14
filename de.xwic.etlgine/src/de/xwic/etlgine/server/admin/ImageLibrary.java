@@ -39,6 +39,8 @@ public class ImageLibrary {
 	public static final ImageRef IMAGE_TABLE_EDIT = new ImageRef("img/table_edit.png");
 	public static final ImageRef IMAGE_TABLE_SAVE = new ImageRef("img/table_save.png");
 	public static final ImageRef IMAGE_TABLE_DELETE = new ImageRef("img/table_delete.png");
+	public static final ImageRef IMAGE_LOCK = new ImageRef("img/lock.png");
+	public static final ImageRef IMAGE_LOCK_OPEN = new ImageRef("img/lock_open.png");
 	public static final ImageRef IMAGE_ZOOM = new ImageRef("img/zoom.png");
 	public static final ImageRef IMAGE_CONTROL_PAUSE = new ImageRef("img/control_pause.png");
 	public static final ImageRef IMAGE_CANCEL = new ImageRef("img/cancel.png");

@@ -44,6 +44,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 	private boolean insertChild = false;
 
 	private ErrorWarningControl errInfo;
+	private ButtonControl btSeal;
 	
 	/**
 	 * @param container
@@ -409,6 +410,29 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 		btDeleteAll.setConfirmMsg("Do you really want to delete all elements in that dimension?");
+
+		btSeal = new ButtonControl(abar, "seal");
+		btSeal.setIconEnabled(dimension.isSealed() ? ImageLibrary.IMAGE_LOCK : ImageLibrary.IMAGE_LOCK_OPEN);
+		btSeal.setTitle(dimension.isSealed() ? "Unlock Sealed Dimension" : "Seal Dimension");
+		btSeal.addSelectionListener(new SelectionListener() {
+			/* (non-Javadoc)
+			 * @see de.jwic.events.SelectionListener#objectSelected(de.jwic.events.SelectionEvent)
+			 */
+			@Override
+			public void objectSelected(SelectionEvent event) {
+				onSeal();
+			}
+		});
+	}
+
+	/**
+	 * 
+	 */
+	protected void onSeal() {
+		
+		dimension.setSealed(!dimension.isSealed());
+		btSeal.setIconEnabled(dimension.isSealed() ? ImageLibrary.IMAGE_LOCK : ImageLibrary.IMAGE_LOCK_OPEN);
+		btSeal.setTitle(dimension.isSealed() ? "Unlock Sealed Dimension" : "Seal Dimension");
 		
 	}
 

@@ -660,6 +660,7 @@ de.xwic.cube.webui/web/xwiccube/xwiccube.js -text
 de.xwic.cube.xlsbridge/.classpath -text
 de.xwic.cube.xlsbridge/.project -text
 de.xwic.cube.xlsbridge/src/de/xwic/cube/viewer2xls/InsertViewerFunction.java -text
+de.xwic.cube.xlsbridge/src/de/xwic/cube/viewer2xls/View2Excel.java -text
 de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/AbstractFunction.java -text
 de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/CubeToExcel.java -text
 de.xwic.cube.xlsbridge/src/de/xwic/cube/xlsbridge/FilterInfoFunction.java -text

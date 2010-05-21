@@ -60,6 +60,7 @@ public class JDBCExtractor extends AbstractExtractor {
 	public void close() throws ETLException {
 		if (rs != null) {
 			try {
+				rs.getStatement().close();
 				rs.close();
 			} catch (SQLException se) {
 				context.getMonitor().logError("Error closing ResultSet", se);

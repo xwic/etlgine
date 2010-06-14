@@ -85,6 +85,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		chkOptions.addElement("Ignore Case", "ignoreCase");
 		chkOptions.addElement("Skip Record", "skipRecord");
 		chkOptions.addElement("Auto Assign Dimension (On Insert)", "autoAssign");
+		chkOptions.addElement("Escape '/'", "escape");
 		
 		btUpdate = new Button(this, "btUpdate");
 		btUpdate.setTitle("Update");
@@ -166,6 +167,7 @@ public class MappingElementEditorControl extends ControlContainer {
 		}
 
 		boolean autoAssign = chkOptions.isKeySelected("autoAssign");
+		boolean escape = chkOptions.isKeySelected("escape");
 		
 		BufferedReader reader = new BufferedReader(new StringReader(text));
 
@@ -173,7 +175,9 @@ public class MappingElementEditorControl extends ControlContainer {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String key = line.trim();
-				key = key.replace('/', '_');
+				if (escape) {
+					key = key.replace('/', '&');
+				}
 
 				if (!key.isEmpty()) {
 					String dimPath = null;
@@ -291,7 +295,12 @@ public class MappingElementEditorControl extends ControlContainer {
 			insert = true;
 			currElement = new DimMappingElementDef();
 		}
-		currElement.setExpression(inpExpression.getText().trim());
+		boolean escape = chkOptions.isKeySelected("escape");
+		String exp = inpExpression.getText().trim();
+		if (escape) {
+			exp = exp.replace('/', '&');
+		}
+		currElement.setExpression(exp);
 		currElement.setDimensionKey(dimension.getKey());
 		currElement.setDimMapKey(null);
 		

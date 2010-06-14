@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimension;
@@ -66,6 +68,8 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 	private Connection connection = null;
 	private boolean sharedConnection = false;
 	private DimMappingElementDefDAO dmeDAO;
+	
+	private Set<String> skippedKeys = new HashSet<String>();
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#initialize(de.xwic.etlgine.IProcessContext)
@@ -292,6 +296,10 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 		// do the mapping...
 		if (elmDef != null) {
 			if (elmDef.isSkipRecord()) {
+				if (!skippedKeys.contains(value)) {
+					skippedKeys.add(value);
+					processContext.getMonitor().logInfo("Skipping value '" + value + "' due to mapping '" + getMappingName() + "'");
+				}
 				record.setSkip(true);
 			} else {
 				record.setData(targetColumn, elmDef.getElementPath());

@@ -9,13 +9,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
@@ -166,14 +166,7 @@ public class XLSExtractor extends AbstractExtractor {
 		}
 		try {
 			inputStream = fileSource.getInputStream();
-			if (currSource.isOOXML()) {
-				// open xssf workbook
-				workbook = new XSSFWorkbook(inputStream);
-			} else {
-				// open hssf workbook
-				workbook = new HSSFWorkbook(inputStream);
-			}
-
+			workbook = WorkbookFactory.create(inputStream);
 			
 			if (currSource.isContainsHeader()) {
 				sheets = new ArrayList<Sheet>();
@@ -225,9 +218,9 @@ public class XLSExtractor extends AbstractExtractor {
 			throw new ETLException("Source file not found (" + source.getName() + ") : " + e, e);
 		} catch (IOException e) {
 			throw new ETLException("Error reading file (" + source.getName() + ") : " + e, e);
+		} catch (InvalidFormatException e) {
+			throw new ETLException("File has no valid excel format for POI! (" + source.getName() + ") : " + e, e);
 		}
-
-
 	}
 
 	/**

@@ -1,6 +1,14 @@
 Change Notes
 =============
 
+2010-06-16 RPF
+	- Added 'AutoDirectoryMode' in XLSFileSource. This will make it possible to import any file type (xls, xlsx) if
+	  only a directory is set as a source File
+	- Added directory and file prefix usage in ZipSource. It is possible now to give a directory (first zip found is taken)
+	  and an optional File Prefix, then the first file matching the prefix is taken (first zip, if no matching)
+	- ZipSource throws an ETLException now, if now files can be found to avoid NullPointerException
+	- Fixed ZipSource/MoveFileFinalizer: if only a target path was set, the ZipSource didn't work!
+	  
 2010-05-14 FLI
 	- Added possibility to seal/unseal a dimension
 	

@@ -56,6 +56,7 @@ public class ZipEntrySource extends FileSource {
 	 */
 	@Override
 	public File getFile() {
+		//RPF: WHATTHEFUCK????????????? Why is this returning null??? the movefilefinalizer does not work because of this!
 		return null;
 	}
 	
@@ -73,6 +74,10 @@ public class ZipEntrySource extends FileSource {
 	@Override
 	public boolean isAvailable() {
 		return zipFile != null && zipEntry != null && !zipEntry.isDirectory();
+	}
+	
+	public ZipFile getZipParent() {
+		return zipFile;
 	}
 	
 }

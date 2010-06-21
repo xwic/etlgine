@@ -33,7 +33,8 @@ public class XLSFileSource extends FileSource {
 	protected boolean available = false;
 	protected String endsWith = XLS_EXTENSION;
 	
-	protected boolean isOOXML = false;
+	//default behavior to keep old settings compatible
+	protected boolean directoryAutoMode = false;
 	
 	public XLSFileSource() {
 		
@@ -88,11 +89,18 @@ public class XLSFileSource extends FileSource {
 			} else if (file.isDirectory()) {
 				File[] files = file.listFiles(new FilenameFilter() {
 					public boolean accept(File dir, String name) {
-						return name.toLowerCase().endsWith(endsWith);
+						//no automode -> check the specific endsWith setting
+						if (!isDirectoryAutoMode()) {
+							return name.toLowerCase().endsWith(endsWith);
+						} else {
+							//directory auto mode -> check if file is XLSX or XLS!
+							return name.toLowerCase().endsWith(XLS_EXTENSION) || name.toLowerCase().endsWith(XLSX_EXTENSION);
+						}
 					}
 				});
 				for(File xlsFile : files) {
 					if (checkFilename(xlsFile.getName())) {
+						setEndsWith(xlsFile.getName().substring(xlsFile.getName().lastIndexOf("."), xlsFile.getName().length()));
 						available = true;
 						file = xlsFile;
 						break;
@@ -109,11 +117,9 @@ public class XLSFileSource extends FileSource {
 					file = null;
 				}
 			}
-			
 		} else {
 			log.warn("The sourcePath " + file.getAbsolutePath() + " does not exist.");
 		}
-		
 	}
 
 	
@@ -233,23 +239,19 @@ public class XLSFileSource extends FileSource {
 	 */
 	public void setEndsWith(String endsWith) {
 		this.endsWith = endsWith;
-		if (endsWith != null && endsWith.toLowerCase().endsWith(XLSX_EXTENSION)) {
-			isOOXML = true;
-		}
 	}
 
 	/**
-	 * @return the isOOXML
+	 * @return the directoryAutoMode
 	 */
-	public boolean isOOXML() {
-		return isOOXML;
+	public boolean isDirectoryAutoMode() {
+		return directoryAutoMode;
 	}
 
 	/**
-	 * @param isOOXML the isOOXML to set
+	 * @param directoryAutoMode the directoryAutoMode to set
 	 */
-	public void setOOXML(boolean isOOXML) {
-		this.isOOXML = isOOXML;
+	public void setDirectoryAutoMode(boolean directoryAutoMode) {
+		this.directoryAutoMode = directoryAutoMode;
 	}
-
 }

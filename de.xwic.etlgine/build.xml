@@ -12,6 +12,7 @@
 		<fileset dir="${basedir}/server/jetty" includes="*.jar"/>
 		<fileset dir="${basedir}/../de.xwic.libs.common/lib" includes="*.jar"/>
 		<fileset dir="${basedir}/../org.apache.commons.logging" includes="*.jar"/>
+		<fileset dir="${basedir}/../org.dom4j" includes="*.jar"/>
 	</path>
 	
 	<path id="buildClasspath">

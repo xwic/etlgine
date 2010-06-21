@@ -19,6 +19,7 @@ import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.Result;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.sources.FileSource;
+import de.xwic.etlgine.sources.ZipEntrySource;
 
 /**
  * @author lippisch
@@ -126,7 +127,19 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 			if (process instanceof IETLProcess) {
 				IETLProcess etlp = (IETLProcess)process;
 				for (ISource source : etlp.getSources()) {
-					if (source instanceof FileSource) {
+					//RPF: HACK! because of a problem with ZIP files, the MoveFileFinalizer does not work!!
+					if (source instanceof ZipEntrySource) {
+						ZipEntrySource fs = (ZipEntrySource)source;
+						File file = new File(fs.getZipParent().getName());
+						if (file != null && file.exists()) {
+							if (!moveFile(file))  {
+								context.setResult(Result.FINISHED_WITH_ERRORS);
+							}
+						}
+						
+					}
+					
+					else if (source instanceof FileSource) {
 						FileSource fs = (FileSource)source;
 						File file = fs.getFile();
 						if (file != null && file.exists()) {

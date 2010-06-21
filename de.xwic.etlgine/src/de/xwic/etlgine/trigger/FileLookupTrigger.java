@@ -20,9 +20,17 @@ import de.xwic.etlgine.ITrigger;
 public class FileLookupTrigger implements ITrigger {
 
 	private File file;
-	private Map<String, Long> fmLastSize = new HashMap<String, Long>(); 
+	private Map<String, SizeStamp> fmLastSize = new HashMap<String, SizeStamp>(); 
 	private String prefix = null;
 	private String suffix = null;
+	
+	private long minFileSize = 0;
+	private long minSizeMonitorTime = 2800; // 2.8 sec
+	
+	private class SizeStamp {
+		long lastChange = 0;
+		long size = 0;
+	}
 	
 	private FilenameFilter fnFilter = new FilenameFilter() {
 		/* (non-Javadoc)
@@ -87,7 +95,7 @@ public class FileLookupTrigger implements ITrigger {
 	 */
 	private boolean testFile(File testFile) {
 		
-		long lastSize = fmLastSize.containsKey(testFile.getName()) ? fmLastSize.get(testFile.getName()) : -1;  
+		SizeStamp stamp = fmLastSize.containsKey(testFile.getName()) ? fmLastSize.get(testFile.getName()) : null;  
 		
 		try {
 			FileOutputStream fos = new FileOutputStream(testFile, true);
@@ -110,17 +118,27 @@ public class FileLookupTrigger implements ITrigger {
 			// sure that the file is no longer "downloaded".
 			// This fixes a problem with the NEO downloader who is not locking
 			// the file.
-			if (size == lastSize) {		
-				return true;
+			if (stamp != null) {
+				long age = System.currentTimeMillis() - stamp.lastChange; 
+				if (size == stamp.size && age > minSizeMonitorTime) {		
+					return true;
+				} else if (size != stamp.size) {
+					// size has changed
+					stamp.lastChange = System.currentTimeMillis();
+					stamp.size = size;
+				}
+			} else {
+				stamp = new SizeStamp();
+				stamp.lastChange = System.currentTimeMillis();
+				stamp.size = size;
 			}
-			lastSize = size;
 		} catch (Throwable t) {
 			// the file is not yet ready to be opened -> most probably still being
 			// written 
-			lastSize = -1;
+			stamp = null;
 		}
 		
-		fmLastSize.put(testFile.getName(), lastSize);
+		fmLastSize.put(testFile.getName(), stamp);
 		
 		return false;
 	}
@@ -144,6 +162,37 @@ public class FileLookupTrigger implements ITrigger {
 	 */
 	public File getFile() {
 		return file;
+	}
+
+	/**
+	 * @return the minFileSize
+	 */
+	public long getMinFileSize() {
+		return minFileSize;
+	}
+
+	/**
+	 * Set the minimum size a file must have to trigger. Default is 0
+	 * @param minFileSize the minFileSize to set
+	 */
+	public void setMinFileSize(long minFileSize) {
+		this.minFileSize = minFileSize;
+	}
+
+	/**
+	 * @return the minSizeMonitorTime
+	 */
+	public long getMinSizeMonitorTime() {
+		return minSizeMonitorTime;
+	}
+
+	/**
+	 * Set the time in ms a files size must remain unchanged before it
+	 * can trigger the trigger. Default is 2800 ms.
+	 * @param minSizeMonitorTime the minSizeMonitorTime to set
+	 */
+	public void setMinSizeMonitorTime(long minSizeMonitorTime) {
+		this.minSizeMonitorTime = minSizeMonitorTime;
 	}
 
 }

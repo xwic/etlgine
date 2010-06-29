@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2010-06-29 RPF
+	- Fixed a Bug in ZipSource (was opened twice which caused IO file lock)
+
 2010-06-16 RPF
 	- Added 'AutoDirectoryMode' in XLSFileSource. This will make it possible to import any file type (xls, xlsx) if
 	  only a directory is set as a source File

@@ -674,6 +674,7 @@ de.xwic.cube/.project -text
 de.xwic.cube/.settings/org.eclipse.jdt.ui.prefs -text
 de.xwic.cube/changes.txt -text
 de.xwic.cube/src/de/xwic/cube/DataPoolManagerFactory.java -text
+de.xwic.cube/src/de/xwic/cube/DimensionBehavior.java -text
 de.xwic.cube/src/de/xwic/cube/ICell.java -text
 de.xwic.cube/src/de/xwic/cube/ICellListener.java -text
 de.xwic.cube/src/de/xwic/cube/ICellProvider.java -text
@@ -739,12 +740,14 @@ de.xwic.cube/src/de/xwic/cube/util/FindUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/JDBCSerializerUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/TimeUtil.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeFlexCalcTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/CubePreCacheTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeSpeedTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/DataPoolManagerTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/Demo.java -text
 de.xwic.cube/src_test/de/xwic/cube/SizeOptimizationTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/SpeedTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/TestBehavior.java -text
 de.xwic.entitygenerator/.classpath -text
 de.xwic.entitygenerator/.project -text
 de.xwic.entitygenerator/.settings/org.eclipse.jdt.core.prefs -text

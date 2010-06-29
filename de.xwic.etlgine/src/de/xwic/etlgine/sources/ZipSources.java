@@ -134,14 +134,16 @@ public class ZipSources implements IProcessFinalizer {
 					//take first zip file in any case!!
 					if (i == 0) {
 						file = locZFile;
-						zipFile = new ZipFile(locZFile); 
 					}
 					//check file prefix, if found get out!
 					if (filePrefix != null && locZFile.getName().toLowerCase().startsWith(filePrefix.toLowerCase())) {
 						file = locZFile;
-						zipFile = new ZipFile(locZFile); 
 						break;
 					}
+				}
+				
+				if (file != null && file.exists() && file.isFile()) {
+					zipFile = new ZipFile(file);
 				}
 			}
 			

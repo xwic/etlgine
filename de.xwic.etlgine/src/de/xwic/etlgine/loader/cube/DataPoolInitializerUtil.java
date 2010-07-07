@@ -193,7 +193,7 @@ public class DataPoolInitializerUtil {
 	 * @param dimKeys
 	 * @param measureKeys
 	 * @param cubeType
-	 * @param ignoreDimKeys
+	 * @param ignoreDimKeys list of dimensions that are not checked for an existing cube
 	 * @return
 	 */
 	public ICube ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType, List<String> ignoreDimKeys) {
@@ -270,13 +270,27 @@ public class DataPoolInitializerUtil {
 		return cube;
 	}
 	
-	public void initFromDatabase(String dbProfile) throws ETLException, SQLException {
+	public void initFromDatabase() throws ETLException, SQLException {
+		String key = pool.getKey() + ".datapool.syncTables.connection"; 
+		String connectionName = context.getProperty(key);
+		String sharedName = context.getProperty(key + ".shared");
+		initFromDatabase(connectionName, sharedName);
+	}
+	
+	public void initFromDatabase(String connectionName) throws ETLException, SQLException {
+		initFromDatabase(connectionName, null);
+	}
+
+	public void initFromDatabase(String connectionName, String sharedName) throws ETLException, SQLException {
 		
-		Connection connection = JDBCUtil.openConnection(context, dbProfile);
+		boolean shared = sharedName != null;
+		Connection connection = shared ? JDBCUtil.getSharedConnection(context, sharedName, connectionName): JDBCUtil.openConnection(context, connectionName);
 		try {
 			JDBCSerializerUtil.restoreDimensions(connection, pool, "XCUBE_DIMENSIONS", "XCUBE_DIMENSION_ELEMENTS");
 		} finally {
-			connection.close();
+			if (!shared) {
+				connection.close();
+			}
 		}
 		
 	}

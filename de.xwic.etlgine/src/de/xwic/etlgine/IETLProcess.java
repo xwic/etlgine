@@ -57,6 +57,13 @@ public interface IETLProcess extends IProcess {
 	public void addTransformer(ITransformer transformer);
 
 	/**
+	 * Add a transformer at specified index.
+	 * @param transformer
+	 * @param index
+	 */
+	public void addTransformer(ITransformer transformer, int index);
+
+	/**
 	 * Returns the list of transformers.
 	 * @return
 	 */

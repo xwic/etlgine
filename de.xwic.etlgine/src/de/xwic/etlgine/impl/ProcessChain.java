@@ -88,8 +88,9 @@ public class ProcessChain implements IProcessChain {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		
-		IETLProcess process = new ETLProcess(globalContext, name);
+		ETLProcess process = new ETLProcess(globalContext, name);
 		process.setMonitor(monitor);
+		process.setScriptFilename(file.getAbsolutePath());
 		
 		Binding binding = new Binding();
 		binding.setVariable("context", globalContext);

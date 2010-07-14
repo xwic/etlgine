@@ -3,6 +3,13 @@
  */
 package de.xwic.etlgine.impl;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +38,7 @@ public class ETLProcess extends Process implements IETLProcess {
 	protected IExtractor extractor = null;
 	protected int stopAfterRecords = 0;
 	protected boolean skipInvalidRecords = true;
+	protected String scriptFilename = null;
 
 	/**
 	 * @param context
@@ -85,6 +93,11 @@ public class ETLProcess extends Process implements IETLProcess {
 	 */
 	public void addTransformer(ITransformer transformer) {
 		transformers.add(transformer);
+	}
+	
+	@Override
+	public void addTransformer(ITransformer transformer, int index) {
+		transformers.add(index, transformer);
 	}
 	
 	/**
@@ -332,4 +345,57 @@ public class ETLProcess extends Process implements IETLProcess {
 		this.skipInvalidRecords = skipInvalidRecords;
 	}
 
+	/**
+	 * @return the scriptFilename
+	 */
+	public String getScriptFilename() {
+		return scriptFilename;
+	}
+
+	/**
+	 * @param scriptFilename the scriptFilename to set
+	 */
+	public void setScriptFilename(String scriptFilename) {
+		this.scriptFilename = scriptFilename;
+	}
+
+	/**
+	 * Like Class.getResourceAsStream(String) returns the resource if name is not found as a file
+	 * in script directory or in file system (for absolute name).
+	 * @param name
+	 * @return
+	 */
+	public InputStream getResourceAsStream(String name) {
+		File file = new File(name);
+		if (!file.isAbsolute() && getScriptFilename() != null) {
+			file = new File(new File(getScriptFilename()).getParentFile(), name);
+		}
+		if (file.exists()) {
+			try {
+				return new BufferedInputStream(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				// return null if not found
+				return null;
+			}
+		}
+		return getClass().getResourceAsStream(name);
+	}
+	
+	/**
+	 * Provides a OutputStream for given name.
+	 * @param name
+	 * @return
+	 */
+	public OutputStream getResourceAsOutputStream(String name) {
+		File file = new File(name);
+		if (!file.isAbsolute() && getScriptFilename() != null) {
+			file = new File(new File(getScriptFilename()).getParentFile(), name);
+		}
+		try {
+			return new FileOutputStream(file);
+		} catch (FileNotFoundException e) {
+			// return null if not found
+			return null;
+		}
+	}
 }

@@ -132,7 +132,7 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 
 	
 	/**
-	 * Add a IMNeasureLoader for customer measure setting other than default sum aggregation.
+	 * Add a IMeasureLoader for customer measure setting other than default sum aggregation.
 	 * @param measureKey
 	 * @param columnName
 	 * @param loader

@@ -28,16 +28,19 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import de.xwic.etlgine.AbstractLoader;
+import de.xwic.etlgine.AbstractTransformer;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IExtractor;
+import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.ITransformer;
 import de.xwic.etlgine.IColumn.DataType;
 import de.xwic.etlgine.impl.DataSet;
+import de.xwic.etlgine.impl.ETLProcess;
 import de.xwic.etlgine.jdbc.DbColumnDef;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.util.Validate;
@@ -114,6 +117,10 @@ public class JDBCLoader extends AbstractLoader {
 	
 	private String identifierSeparator = null;
 	
+	private String replaceOnAutoIncrementColumn = "Id";
+	private String[] replaceOnColumns = null;
+	private Object replaceOnMaxId = null;
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
@@ -182,25 +189,51 @@ public class JDBCLoader extends AbstractLoader {
 
 		tableTruncated = false;
 
-//		try {
-////			connection.setAutoCommit(false);
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		/* 
+		 * register JDBCLoader also as first Transformer to execute bulk updates before other Transformers
+		 * to ensure all records are committed.
+		 */
 		
+		IProcess iProcess = processContext.getProcess();
+		if (iProcess instanceof ETLProcess) {
+			ETLProcess etlProcess = (ETLProcess)iProcess;
+			etlProcess.addTransformer(new AbstractTransformer() {
+				@Override
+				public void postSourceProcessing(IProcessContext processContext) throws ETLException {
+					// call Loader method first, calling twice is ok
+					JDBCLoader.this.postSourceProcessing();
+				}
+			}, 0);
+		}
 	}
 	
 	@Override
 	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
 		super.postSourceProcessing(processContext);
 		
+		// called from finalizer as well
+		postSourceProcessing();
+	}
+
+	/**
+	 * Finish the open records, execute replace on columns.
+	 * @throws ETLException 
+	 */
+	protected void postSourceProcessing() throws ETLException {
 		if (connection != null) {
 			// check open batch statements
 			executeBatch();
+
+			// if replace on columns is enabled and records existed, ensure consistency 
+			try {
+				executeDeleteForReplace();
+			} catch (SQLException e) {
+				throw new ETLException(e);
+			}
+			
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
@@ -211,7 +244,7 @@ public class JDBCLoader extends AbstractLoader {
 			try {
 				// check open batch statements
 				executeBatch();
-				
+
 				if (sharedConnectionName == null) {
 					// only close the connection if it is not shared!
 					connection.close();
@@ -231,6 +264,49 @@ public class JDBCLoader extends AbstractLoader {
 		monitor.logInfo("JDBCLoader " + insertCount + " records inserted, " + updateCount + " records updated.");
 	}
 	
+	/**
+	 * Deletes the records that had been inserted.
+	 * @throws SQLException
+	 */
+	protected void executeDeleteForReplace() throws SQLException {
+		// check for replace
+		if (replaceOnMaxId != null) {
+			StringBuilder sql = new StringBuilder("delete t\n");
+			sql
+			.append("from [" + tablename + "] t\n")
+			.append("inner join (\n")
+			.append("select distinct ");
+			StringBuilder on = new StringBuilder();
+			for (String col : replaceOnColumns) {
+				if (on.length() > 0) {
+					sql.append(", ");
+					on.append(" and ");
+				}
+				col = "[" + col + "]";
+				sql.append(col);
+				on.append("n.").append(col).append(" = t.").append(col);
+			}
+			sql.append(" from [" + tablename + "] where [" + replaceOnAutoIncrementColumn + "] > ?\n")
+			.append(") n on ").append(on).append("\n")
+			.append("where t.[").append(replaceOnAutoIncrementColumn).append("] <= ?");
+
+			PreparedStatement ps = connection.prepareStatement(sql.toString());
+			ps.setObject(1, replaceOnMaxId);
+			ps.setObject(2, replaceOnMaxId);
+			try {
+				monitor.logInfo("JDBCLoader executes delete statement on table '" + tablename + "'"); 
+				int cnt = ps.executeUpdate();
+				if (cnt > 0) {
+					monitor.logInfo("JDBCLoader " + cnt + " records deleted.");
+				}
+			} finally {
+				// clear max id
+				replaceOnMaxId = null;
+				ps.close();
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
@@ -342,13 +418,37 @@ public class JDBCLoader extends AbstractLoader {
 	protected DatabaseMetaData checkTableExists() throws SQLException, ETLException {
 		DatabaseMetaData metaData = connection.getMetaData();
 		ResultSet rs = metaData.getTables(connection.getCatalog(), null, tablename, null);
-		if (!rs.next()) {
-			if (!autoCreateTable) {
-				throw new ETLException("The target table '" + tablename + "' does not exist.");
+		try {
+			if (!rs.next()) {
+				if (!autoCreateTable) {
+					throw new ETLException("The target table '" + tablename + "' does not exist.");
+				}
+				createTable();
+			} else {
+				// table existed, check if incremental replace is enabled for INSERT mode
+				if (mode == Mode.INSERT && replaceOnColumns != null && replaceOnColumns.length > 0) {
+					// get max auto increment id for replace
+					Statement stmt = connection.createStatement();
+					ResultSet rs_max = stmt.executeQuery("select max([" + replaceOnAutoIncrementColumn + "]) from [" + tablename + "]");
+					rs_max.next();
+					replaceOnMaxId = rs_max.getObject(1);
+					rs_max.close();
+					stmt.close();
+					if (replaceOnMaxId != null) {
+						StringBuilder cols = new StringBuilder();
+						for (String col : replaceOnColumns) {
+							if (cols.length() > 0) {
+								cols.append(", ");
+							}
+							cols.append("[").append(col).append("]");
+						}
+						monitor.logInfo("Using  max([" + replaceOnAutoIncrementColumn + "]) = " + replaceOnMaxId + " to replace records on columns " + cols);
+					}
+				}
 			}
-			createTable();
+		} finally {
+			rs.close();
 		}
-		rs.close();
 		return metaData;
 	}
 	
@@ -640,7 +740,7 @@ public class JDBCLoader extends AbstractLoader {
 		sql.append("CREATE TABLE ").append(identifierSeparator).append(tablename).append(identifierSeparator).append(" (");
 		sql.append("Id [bigint] IDENTITY(1,1) NOT NULL, CONSTRAINT PK_").append(tablename).append(" PRIMARY KEY (Id))");
 		
-		processContext.getMonitor().logInfo("Creating missing table: \n" + sql.toString());
+		processContext.getMonitor().logInfo("Creating missing table sql: \n" + sql.toString());
 		
 		stmt.execute(sql.toString());
 	}
@@ -1328,8 +1428,8 @@ public class JDBCLoader extends AbstractLoader {
 	}
 
 	/**
-	 * Add columns that exist in the target table but are not touched. This eleminates
-	 * a warning about columns that exist int he table but do not come from the source.
+	 * Add columns that exist in the target table but are not touched. This eliminates
+	 * a warning about columns that exist in the table but do not come from the source.
 	 * @param columns
 	 */
 	public void addIgnoreableColumns(String... columns) {
@@ -1630,4 +1730,38 @@ public class JDBCLoader extends AbstractLoader {
 		this.identifierSeparator = identifierSeparator;
 	}
 
+	/**
+	 * @return the connection
+	 */
+	protected Connection getConnection() {
+		return connection;
+	}
+
+	/**
+	 * @return the replaceOnAutoIncrement
+	 */
+	public String getReplaceOnAutoIncrementColumn() {
+		return replaceOnAutoIncrementColumn;
+	}
+
+	/**
+	 * @param replaceOnAutoIncrement the replaceOnAutoIncrement to set
+	 */
+	public void setReplaceOnAutoIncrementColumn(String replaceOnAutoIncrement) {
+		this.replaceOnAutoIncrementColumn = replaceOnAutoIncrement;
+	}
+
+	/**
+	 * @return the replaceOnColumns
+	 */
+	public String[] getReplaceOnColumns() {
+		return replaceOnColumns;
+	}
+
+	/**
+	 * @param replaceOnColumns the replaceOnColumns to set
+	 */
+	public void setReplaceOnColumns(String... replaceOnColumns) {
+		this.replaceOnColumns = replaceOnColumns;
+	}	
 }

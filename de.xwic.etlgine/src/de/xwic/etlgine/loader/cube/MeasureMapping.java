@@ -38,7 +38,7 @@ public class MeasureMapping {
 	 * @throws ETLException 
 	 */
 	public Double getValue(ICube cube, IRecord record) throws ETLException {
-		if (fixedValue != null) {
+		if (fixedValue != null || columnName == null) {
 			return fixedValue;
 		}
 		return record.getDataAsDouble(columnName);

@@ -108,7 +108,7 @@ public class ZipSources implements IProcessFinalizer {
 	}
 	
 	/**
-	 * Adds all zip content as sources in process.
+	 * Adds all zip content as sources in process and registers this as process finalizer as well.
 	 * @param process
 	 * @throws ETLException 
 	 */
@@ -151,11 +151,16 @@ public class ZipSources implements IProcessFinalizer {
 				new ETLException("Cannot find any valid ZIP Archive by given file/directory names! " + file.getAbsolutePath());
 			}
 			
+			boolean finilizerAdded = false;
 			for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
 				ZipEntry entry = entries.nextElement();
 				if (!entry.isDirectory()) {
 					ZipEntrySource source = new ZipEntrySource(this, zipFile, entry);
 					process.addSource(source);
+					if (!finilizerAdded) {
+						finilizerAdded = true;
+						process.addProcessFinalizer(this);
+					}
 				}
 			}
 		} catch (IOException ioe) {

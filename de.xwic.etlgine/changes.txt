@@ -1,6 +1,17 @@
 Change Notes
 =============
 
+2010-07-14 jbornema
+	- IETLProcess.addTransformer(ITransformer transformer, int index) added
+	- ETLProcess property scriptFilename added which is set with the groovy script it was created by,
+	  used by getResourceAsStream and getResourceAsOutputStream to find the folder to access resources in there
+	- ProcessChain sets scriptFilename in ETLProcess
+	- MeasureMapping added support for fixed null values when columnName is null as well
+	- JDBCLoader "replace on" feature added that replaces exiting records user the auto increment PK and a list
+	  of columns used as "replace on". Properties replaceOnColumns and replaceOnAutoIncrementColumn added.
+	  JDBCLoader injects a local transformer at index 0 to call postSourceProcessing early.
+	- ZipSources auto registers as a process finalizer to close the zip.   
+
 2010-06-29 RPF
 	- Fixed a Bug in ZipSource (was opened twice which caused IO file lock)
 

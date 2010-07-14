@@ -69,7 +69,7 @@ public class CubeLoader extends AbstractLoader {
 		}
 		
 		if (!dataPool.containsCube(targetCubeKey)) {
-			throw new ETLException("The DataPool does not contain a cube with the key " + targetCubeKey + ".");
+			throw new ETLException("The DataPool " + dataPool.getKey() + " does not contain a cube with the key " + targetCubeKey + ".");
 		}
 
 		cube = dataPool.getCube(targetCubeKey);

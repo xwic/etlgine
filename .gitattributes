@@ -1201,6 +1201,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/IRecord.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ISource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ITrigger.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/Integrity.properties -text
 de.xwic.etlgine/src/de/xwic/etlgine/Result.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeExportUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/cube/CubeHandler.java -text

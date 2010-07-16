@@ -65,6 +65,7 @@ public class Job implements IJob {
 		if (executing) {
 			throw new ETLException("The job is already beeing executed.");
 		}
+		ETLgine.integrityTest();
 		executing = true;
 		activeContext = context;
 		lastStarted = new Date();

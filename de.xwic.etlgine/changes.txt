@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2010-07-16 FLI
+	- Added integrity check
+	
 2010-07-14 jbornema
 	- IETLProcess.addTransformer(ITransformer transformer, int index) added
 	- ETLProcess property scriptFilename added which is set with the groovy script it was created by,

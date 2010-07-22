@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2010-07-22 jbornema
+	- CubeLoader, ICubeDataMapper, BaseCubeDataMapper supports now ICellLoader
+	- FilesSource.isAvailable checks if file.length() > 0
+		
 2010-07-16 FLI
 	- Added integrity check
 	

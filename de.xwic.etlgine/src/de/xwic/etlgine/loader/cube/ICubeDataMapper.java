@@ -78,6 +78,7 @@ public interface ICubeDataMapper {
 	 * @param measure
 	 * @param value
 	 * @param record
+	 * @throws ETLException
 	 */
 	public void onAddCellValue(Key key, IMeasure measure, Double value, IRecord record) throws ETLException;
 
@@ -85,5 +86,13 @@ public interface ICubeDataMapper {
 	 * @return the enforceDimensionMapping
 	 */
 	public boolean isEnforceDimensionMapping();
+
+	/**
+	 * After the cell had been loaded with values, all ICellLoader objects are invoked here.
+	 * @param key
+	 * @param record
+	 * @throws ETLException 
+	 */
+	public void onCellProcessed(Key key, IRecord record) throws ETLException;
 
 }

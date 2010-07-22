@@ -54,7 +54,7 @@ public class FileSource implements ISource {
 	 * @see de.xwic.etlgine.ISource#isAvailable()
 	 */
 	public boolean isAvailable() {
-		return file.exists() && !file.isDirectory();
+		return file.exists() && !file.isDirectory() && file.length() > 0;
 	}
 
 	/**

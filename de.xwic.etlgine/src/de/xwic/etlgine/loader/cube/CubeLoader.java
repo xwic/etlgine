@@ -125,6 +125,8 @@ public class CubeLoader extends AbstractLoader {
 					cube.addCellValue(key, measure, value);
 				}
 			}
+			
+			dataMapper.onCellProcessed(key, record);
 		}
 		
 	}

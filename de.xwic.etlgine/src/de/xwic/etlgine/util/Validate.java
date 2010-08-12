@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.util;
 
+import java.util.Collection;
+
 import de.xwic.etlgine.ETLException;
 
 /**
@@ -40,5 +42,46 @@ public class Validate {
 			throw new ETLException(message);
 		}
 	}
+
+	/**
+	 * Returns true if the specified Object is a String, isn't null and not empty (trimmed!).
+	 * @param string
+	 * @return
+	 */
+	public static boolean validString(Object object) {
+		return object != null && object instanceof String && ((String)object).trim().length() > 0;
+	}
 	
+	/**
+	 * Returns true if the collection isn't null and not empty. 
+	 * @param collection
+	 * @return
+	 */
+	public static boolean notEmpty(Collection<?> collection) {
+		return collection != null && collection.size() > 0;
+	}
+	
+	/**
+	 * Throws an ETLException if the specified string is null or empty.
+	 * @param string
+	 * @param message
+	 * @throws ETLException
+	 */
+	public static void validString(Object string, String message) throws ETLException {
+		if (validString(string) == false) {
+			throw new ETLException(message);
+		}
+	}
+	
+	/**
+	 * Throws an ETLException if the specified collection is null or empty.
+	 * @param collection
+	 * @param message
+	 * @throws ETLException
+	 */
+	public static void notEmpty(Collection<?> collection, String message) throws ETLException {
+		if (notEmpty(collection) == false) {
+			throw new ETLException(message);
+		}
+	}
 }

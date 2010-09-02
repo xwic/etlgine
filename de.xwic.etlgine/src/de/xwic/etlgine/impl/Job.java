@@ -371,6 +371,7 @@ public class Job implements IJob {
 	 */
 	public void addJobFinalizer(IJobFinalizer finalizer) {
 		finalizers.add(finalizer);
+		monitor.logInfo("Added job finalizer '" + finalizer + "' at index " + (finalizers.size() - 1));
 		
 	}
 

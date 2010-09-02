@@ -392,7 +392,7 @@ public class MappingEditorControl extends BaseContentContainer {
 		if (element != null && element.length() != 0) {
 			IDimension dimension = dataPool.getDimension(element);
 			elmSelector = new DimensionElementSelector(this, "elmSelector", dimension);
-			elmSelector.setSelectLeafsOnly(true);
+			//elmSelector.setSelectLeafsOnly(true);
 			mapEditor.setDimension(dimension);
 		} else {
 			elmSelector = null;

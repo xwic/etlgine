@@ -21,6 +21,7 @@ public class Record implements IRecord, Cloneable {
 	protected final IDataSet dataSet;
 	protected boolean invalid = false;
 	protected boolean skip = false;
+	protected boolean hasNext = true;
 	protected String invalidReason = null;
 	protected Map<IColumn, Object> data = new HashMap<IColumn, Object>();
 	protected Map<IColumn, Object> oldData = new HashMap<IColumn, Object>();
@@ -234,5 +235,21 @@ public class Record implements IRecord, Cloneable {
 	@Override
 	public String toString() {
 		return data.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#hasNext()
+	 */
+	@Override
+	public boolean hasNext() {
+		return hasNext;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IRecord#setHasNext(boolean)
+	 */
+	@Override
+	public void setHasNext(boolean hasNext) {
+		this.hasNext = hasNext;
 	}
 }

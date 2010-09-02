@@ -203,8 +203,12 @@ public class ETLProcess extends Process implements IETLProcess {
 					}
 					
 					// iterate over records
-					IRecord record;
-					while ((record = extractor.getNextRecord()) != null) {
+					IRecord nextRecord = null;
+					for (IRecord record = extractor.getNextRecord(); record != null; record = nextRecord) {
+						nextRecord = extractor.getNextRecord();
+						if (nextRecord == null) {
+							record.setHasNext(false);
+						}
 						
 						if ((!record.isInvalid() || !skipInvalidRecords) && (!record.isSkip())) {
 							for (ITransformer transformer : transformers) {

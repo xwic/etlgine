@@ -56,6 +56,8 @@ public interface ICubeDataMapper {
 	
 	public MeasureMapping getMeasureMapping(IMeasure measure);
 	
+	public DimensionMapping getDimensionMapping(IDimension dimension);
+	
 	/**
 	 * Returns true if the record may be loaded into the cube. The default
 	 * implementation returns true, but it may be overwritten to implement

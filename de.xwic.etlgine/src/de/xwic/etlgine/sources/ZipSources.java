@@ -115,7 +115,7 @@ public class ZipSources implements IProcessFinalizer {
 	public void addSources(ETLProcess process) throws ETLException {
 		try {
 			if (file == null) {
-				new ETLException("No file set!");
+				throw new ETLException("No file set!");
 			}
 
 			if (file.isFile()) {
@@ -148,7 +148,7 @@ public class ZipSources implements IProcessFinalizer {
 			}
 			
 			if (zipFile == null) {
-				new ETLException("Cannot find any valid ZIP Archive by given file/directory names! " + file.getAbsolutePath());
+				throw new ETLException("Cannot find any valid ZIP Archive by given file/directory names! " + file.getAbsolutePath());
 			}
 			
 			boolean finilizerAdded = false;

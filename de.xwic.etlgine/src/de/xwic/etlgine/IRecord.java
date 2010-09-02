@@ -148,4 +148,16 @@ public interface IRecord {
 	 * @return
 	 */
 	public List<IRecord> getDuplicates();
+	
+	/**
+	 * Returns if this record is not the last record provided by IExtractor (default true).
+	 * @return
+	 */
+	public boolean hasNext();
+
+	/**
+	 * If set to false (default true) this record is the last record provided by IExtractor.
+	 * @param b
+	 */
+	public void setHasNext(boolean hasNext);
 }

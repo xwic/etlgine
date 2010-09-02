@@ -4,9 +4,12 @@
 package de.xwic.etlgine.loader.cube;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.xwic.cube.ICube;
 import de.xwic.cube.IDimension;
@@ -24,6 +27,8 @@ public class DimensionMapping {
 	private IDimension dimension = null;
 	private String[] columnNames = null;
 	private boolean autoCreate = true;
+	private Set<String> missingColumns = new TreeSet<String>();
+	private boolean skipMissingColumns = false;
 	private String unmappedElementPath = null;
 	private String contextPropertyName = null;
 	private IDimensionElement unmappedElement = null;
@@ -120,6 +125,27 @@ public class DimensionMapping {
 	}
 
 	/**
+	 * Returns IRecord.getDataAsString(columnName).
+	 * If skipMissingColumns is true, no ETLException is thrown and the columns is added to missingColumns.
+	 * @param record
+	 * @param columnName
+	 * @throws ETLException 
+	 */
+	protected String getDataAsString(IRecord record, String columnName) throws ETLException {
+		try {
+			return record.getDataAsString(columnName);
+		} catch (ETLException ee) {
+			// column missing
+			if (skipMissingColumns) {
+				missingColumns.add(columnName);
+			} else {
+				throw ee;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Map the element.
 	 * @param cube
 	 * @param record
@@ -136,14 +162,14 @@ public class DimensionMapping {
 			}
 		} else {
 			if (columnNames.length == 1) {
-				value = record.getDataAsString(columnNames[0]);
+				value = getDataAsString(record, columnNames[0]);
 				if (value == null) {
 					value = "null"; // sb.append(null) compatible
 				}
 			} else {
 				StringBuilder sb = new StringBuilder();
 				for (String col : columnNames) {
-					String val = record.getDataAsString(col);
+					String val = getDataAsString(record, col);
 					if (sb.length() != 0) {
 						sb.append("/");
 					}
@@ -238,5 +264,35 @@ public class DimensionMapping {
 	public void setContextPropertyName(String contextPropertyName) {
 		this.contextPropertyName = contextPropertyName;
 	}
+
+	/**
+	 * @return the skipMissingColumns
+	 */
+	public boolean isSkipMissingColumns() {
+		return skipMissingColumns;
+	}
+
+	/**
+	 * @param skipMissingColumns the skipMissingColumns to set
+	 */
+	public void setSkipMissingColumns(boolean skipMissingColumns) {
+		this.skipMissingColumns = skipMissingColumns;
+	}
+
+	/**
+	 * @return the missingColumns
+	 */
+	public Set<String> getMissingColumns() {
+		return missingColumns;
+	}
 	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(dimension.getID());
+		sb.append(", [Column:").append(Arrays.toString(columnNames)).append("]");
+		if (skipMissingColumns && missingColumns.size() > 0) {
+			sb.append(", [Missing columns:").append(missingColumns).append("]");
+		}
+		return sb.toString();
+	}
 }

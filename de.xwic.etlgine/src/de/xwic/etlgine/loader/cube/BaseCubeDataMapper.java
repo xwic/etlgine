@@ -38,6 +38,7 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	protected Map<String, ICellLoader> cellLoaderMap = new HashMap<String, ICellLoader>();
 	
 	protected boolean enforceDimensionMapping = true;
+	protected boolean skipMissingColumns = false;
 	
 	
 	/* (non-Javadoc)
@@ -109,6 +110,7 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 		
 		IDimension dim = cube.getDataPool().getDimension(dimKey);
 		DimensionMapping dm = new DimensionMapping(dim);
+		dm.setSkipMissingColumns(skipMissingColumns);
 		dm.setColumnNames(columnNames);
 		dimMap.put(dim, dm);
 		return dm;
@@ -180,7 +182,7 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	 */
 	@Override
 	public IDimensionElement getElement(IDimension dim, IRecord record) throws ETLException {
-		DimensionMapping dm = dimMap.get(dim);
+		DimensionMapping dm = getDimensionMapping(dim);
 		if (dm == null) {
 			if (!enforceDimensionMapping) {
 				return null;
@@ -214,6 +216,11 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	public MeasureMapping getMeasureMapping(IMeasure measure) {
 		MeasureMapping mm = measureMap.get(measure);
 		return mm;
+	}
+	
+	@Override
+	public DimensionMapping getDimensionMapping(IDimension dimension) {
+		return dimMap.get(dimension);
 	}
 	
 	/* (non-Javadoc)
@@ -285,5 +292,25 @@ public class BaseCubeDataMapper implements ICubeDataMapper {
 	public void setEnforceDimensionMapping(boolean enforceDimensionMapping) {
 		this.enforceDimensionMapping = enforceDimensionMapping;
 	}
-	
+
+	/**
+	 * @return the skipMissingColumns
+	 */
+	public boolean isSkipMissingColumns() {
+		return skipMissingColumns;
+	}
+
+	/**
+	 * @param skipMissingColumns the skipMissingColumns to set
+	 */
+	public void setSkipMissingColumns(boolean skipMissingColumns) {
+		this.skipMissingColumns = skipMissingColumns;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("[");
+		sb.append(getClass().getSimpleName()).append("], [Cube:").append(cube.getKey()).append("]");
+		return sb.toString();
+	}
 }

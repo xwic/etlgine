@@ -120,6 +120,7 @@ public class JDBCLoader extends AbstractLoader {
 	private String replaceOnAutoIncrementColumn = "Id";
 	private String[] replaceOnColumns = null;
 	private Object replaceOnMaxId = null;
+	private Object lastReplaceOnMaxId = null;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
@@ -270,6 +271,7 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	protected void executeDeleteForReplace() throws SQLException {
 		// check for replace
+		lastReplaceOnMaxId = null;
 		if (replaceOnMaxId != null) {
 			StringBuilder sql = new StringBuilder("delete t\n");
 			sql
@@ -300,6 +302,7 @@ public class JDBCLoader extends AbstractLoader {
 					monitor.logInfo("JDBCLoader " + cnt + " records deleted.");
 				}
 			} finally {
+				lastReplaceOnMaxId = replaceOnMaxId;
 				// clear max id
 				replaceOnMaxId = null;
 				ps.close();
@@ -363,6 +366,11 @@ public class JDBCLoader extends AbstractLoader {
 		boolean firstU = true;
 		for (DbColumnDef colDef : columns.values()) {
 			if (colDef.getColumn() != null) {
+				
+				// ignore identity columns for insert and update
+				if (colDef.getTypeName().toLowerCase().indexOf("identity") != -1) {
+					continue;
+				}
 				
 				// INSERT Statement
 				if (firstI) {
@@ -662,7 +670,7 @@ public class JDBCLoader extends AbstractLoader {
 				}
 				
 				// boolean check
-				if (columnType.isBoolean && (n == null || (n != null && n.doubleValue() != 0 && n.doubleValue() != 1) || d != null)) {
+				if (columnType.isBoolean && (b == null || (n != null && n.doubleValue() != 0 && n.doubleValue() != 1) || d != null)) {
 					columnType.isBoolean = false;
 				}
 				
@@ -895,7 +903,19 @@ public class JDBCLoader extends AbstractLoader {
 		}
 		
 	}
-
+	
+	/**
+	 * Invoked after update statement received changed record data to allow customer flagging.
+	 * Must return true to update the prepared statement again. 
+	 * @param processContext
+	 * @param record
+	 * @return
+	 * @throws ETLException
+	 */
+	protected boolean onRecordUpdated(IProcessContext processContext, IRecord record) throws ETLException {
+		return false;
+	}
+	
 	private void doUpdate(IProcessContext processContext, IRecord record) throws ETLException {
 		
 		
@@ -905,19 +925,30 @@ public class JDBCLoader extends AbstractLoader {
 			int idx = 1;
 			boolean modified = false;
 			DbColumnDef pkColDef = null;
-			for (DbColumnDef colDef : columns.values()) {
-				if (colDef.getColumn() != null && !colDef.getName().equalsIgnoreCase(pkColumn)) {
-					
-					Object value = record.getData(colDef.getColumn());
-					setPSValue(psUpdate, idx++, value, colDef);
-					
-					modified = modified | record.isChanged(colDef.getColumn());
-					
+			
+			for (int i = 0; i < 2; i++) { 
+				for (DbColumnDef colDef : columns.values()) {
+					if (colDef.getColumn() != null && !colDef.getName().equalsIgnoreCase(pkColumn) && colDef.getTypeName().toLowerCase().indexOf("identity") == -1) {
+						
+						Object value = record.getData(colDef.getColumn());
+						setPSValue(psUpdate, idx++, value, colDef);
+						
+						modified = modified | record.isChanged(colDef.getColumn());
+						
+					}
+	
+					// PK might be excluded
+					if (colDef.getName().equals(pkColumn)) {
+						pkColDef = colDef;
+					}
 				}
-
-				// PK might be excluded
-				if (colDef.getName().equals(pkColumn)) {
-					pkColDef = colDef;
+				
+				if (modified && onRecordUpdated(processContext, record)) {
+					// record updated and onRecordUpdated return true to run again
+					idx = 1;
+				} else {
+					// early exist
+					break;
 				}
 			}
 
@@ -977,9 +1008,6 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws ETLException 
 	 */
 	protected void setPSValue(PreparedStatement ps, int idx, Object value, DbColumnDef colDef) throws SQLException, ETLException {
-		if (colDef.getName().equals("ASUP Status") && value instanceof String && ((String)value).length() > 1) {
-			toString();
-		}
 		if (value == null || (treatEmptyAsNull && value instanceof String && ((String)value).length() == 0)) {
 			ps.setNull(idx, colDef.getType());
 		} else {
@@ -1187,6 +1215,11 @@ public class JDBCLoader extends AbstractLoader {
 			int idx = 1;
 			for (DbColumnDef colDef : columns.values()) {
 				if (colDef.getColumn() != null) {
+					
+					// ignore identity columns for insert and update
+					if (colDef.getTypeName().toLowerCase().indexOf("identity") != -1) {
+						continue;
+					}
 					
 					Object value = record.getData(colDef.getColumn());
 					setPSValue(psInsert, idx++, value, colDef);
@@ -1763,5 +1796,14 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setReplaceOnColumns(String... replaceOnColumns) {
 		this.replaceOnColumns = replaceOnColumns;
-	}	
+	}
+
+	/**
+	 * @return the lastReplaceOnMaxId
+	 */
+	public Object getLastReplaceOnMaxId() {
+		return lastReplaceOnMaxId;
+	}
+	
+	
 }

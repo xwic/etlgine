@@ -1191,6 +1191,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/IETLProcess.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IExtractor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IGlobalContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IJob.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/IJobContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IJobFinalizer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/ILoader.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/IMonitor.java -text
@@ -1246,6 +1247,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/impl/DataSet.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ETLProcess.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/GlobalContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Job.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/impl/JobContext.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/Process.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ProcessChain.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/impl/ProcessContext.java -text

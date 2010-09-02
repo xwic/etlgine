@@ -1,6 +1,19 @@
 Change Notes
 =============
 
+2010-10-02 jbornema
+	- IJobContext / JobContact added
+	- IRecord / Record: hasNext() and setHasNext(boolean) added to support check on following records provided by extractor
+	- ICubeDataMapper.getDimensionMapping(IDimension) added
+	- BaseCubeDataMapper.getDimensionMapping(IDimension) and boolean property skipMissingColumns to skip missing columns
+	- DimensionMapping boolean property skipMissingColumns added
+	- CubeLoader.onProcessFinished(...) clears cache of cubes to ensure during load no cached cells had been created
+	- JDBCLoader.getLastReplaceOnMaxId() added, identity table columns are skipped, minor fixes,
+	  protected boolean onRecordUpdated(IProcessContext processContext, IRecord record) added to support on extensions
+	  additional record updates.
+	- ZipSources fixed missing throw expressions
+	- BooleanTransformer(String...) and default constructor added	
+
 2010-07-22 jbornema
 	- CubeLoader, ICubeDataMapper, BaseCubeDataMapper supports now ICellLoader
 	- FilesSource.isAvailable checks if file.length() > 0

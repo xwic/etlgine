@@ -156,6 +156,14 @@ public class CubeLoader extends AbstractLoader {
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		super.onProcessFinished(processContext);
 		
+		// log warning
+		for (IDimension dim : cube.getDimensions()) {
+			DimensionMapping dimMap = dataMapper.getDimensionMapping(dim);
+			if (dimMap.isSkipMissingColumns() && dimMap.getMissingColumns().size() > 0) {
+				processContext.getMonitor().logWarn(dataMapper + ": Missing columns for dimension mapping " + dimMap);
+			}
+		}
+		
 		if (getCacheStatsUrl() != null) {
 			try {
 				URL url = new URL(getCacheStatsUrl());
@@ -172,6 +180,12 @@ public class CubeLoader extends AbstractLoader {
 				}
 			} catch (Exception e) {
 				processContext.getMonitor().logWarn("Can not rebuild cache: " + e);
+			}
+		} else {
+			// ensure cube was not accessed during the loading
+			if (cube instanceof ICubeCacheControl) {
+				ICubeCacheControl ccc = (ICubeCacheControl)cube;
+				ccc.clearCache();
 			}
 		}
 		

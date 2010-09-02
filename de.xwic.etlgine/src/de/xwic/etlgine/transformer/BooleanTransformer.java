@@ -28,6 +28,15 @@ public class BooleanTransformer extends AbstractTransformer {
 	}
 	protected String[] columns = null;
 	
+	public BooleanTransformer() {
+		super();
+	}
+
+	public BooleanTransformer(String... columns) {
+		super();
+		setColumns(columns);
+	}
+
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);

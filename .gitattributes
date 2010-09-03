@@ -4,6 +4,7 @@ de.xwic.appkit.core/.cvsignore -text
 de.xwic.appkit.core/.project -text
 de.xwic.appkit.core/META-INF/MANIFEST.MF -text
 de.xwic.appkit.core/build.properties -text
+de.xwic.appkit.core/changes.txt -text
 de.xwic.appkit.core/lib/commons-logging-1.0.4.jar -text
 de.xwic.appkit.core/lib/crimson.jar -text
 de.xwic.appkit.core/lib/dom4j-1.5.2.jar -text
@@ -82,6 +83,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/config/model/XmlEntityDescriptorRead
 de.xwic.appkit.core/src/de/xwic/appkit/core/config/model/XmlEntityDescriptorReader2.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/config/utils/ListSetupFileIconWrapper.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/AbstractDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/dao/AbstractHistoryDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/DAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/DAOCallback.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/DAOFactory.java -text

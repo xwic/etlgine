@@ -60,4 +60,13 @@ public class URLFileSource extends FileSource {
 		return url == null ? super.getInputStream() : url.openStream();
 	}
 	
+	@Override
+	public boolean isAvailable() {
+		return url == null ? super.isAvailable() : true;
+	}
+
+	@Override
+	public String getName() {
+		return url == null ? super.getName() : url.toString();
+	}
 }

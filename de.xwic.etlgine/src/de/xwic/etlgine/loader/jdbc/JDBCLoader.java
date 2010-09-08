@@ -489,6 +489,12 @@ public class JDBCLoader extends AbstractLoader {
 		
 		// Check if the columns apply.
 		for (IColumn column : processContext.getDataSet().getColumns()) {
+			
+			// exclude "" empty columns
+			if (column.computeTargetName() == null || column.computeTargetName().isEmpty()) {
+				column.setExclude(true);
+			}
+			
 			if (!column.isExclude()) {
 				DbColumnDef dbc = columns.get(column.computeTargetName().toUpperCase());
 				if (dbc == null) {
@@ -602,6 +608,9 @@ public class JDBCLoader extends AbstractLoader {
 					if (columnType.isInteger) {
 						try {
 							n = Integer.parseInt(s);
+							if (s.startsWith("0") && s.length() > 1) {
+								columnType.isInteger = false;
+							}
 							// check range
 							/*if (n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1]) {
 								columnType.isInteger = false;
@@ -614,6 +623,9 @@ public class JDBCLoader extends AbstractLoader {
 					if (columnType.isLong) {
 						try {
 							n = Long.parseLong(s);
+							if (s.startsWith("0") && s.length() > 1) {
+								columnType.isLong = false;
+							}
 							// check range
 							/*if (n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1]) {
 								columnType.isLong = false;
@@ -626,6 +638,9 @@ public class JDBCLoader extends AbstractLoader {
 					if (columnType.isDouble) {
 						try {
 							n = Double.parseDouble(s);
+							if (s.startsWith("0") && !s.startsWith("0.") && s.length() > 1) {
+								columnType.isDouble = false;
+							}
 						} catch (Exception e) {
 							columnType.isDouble = false;
 						}

@@ -1,6 +1,11 @@
 Change Notes
 =============
 
+2010-10-08 jbornema
+	- JDBCLoader skips "" columns for table column creation
+	- JDBCLoader treat String for type detection like "002123" now as String instead of Number
+	- URLFileSource.IsAvailable() and getName() implemented
+
 2010-10-02 jbornema
 	- IJobContext / JobContact added
 	- IRecord / Record: hasNext() and setHasNext(boolean) added to support check on following records provided by extractor

@@ -305,11 +305,13 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/ucexec/GetServerDateUseCase.java -te
 de.xwic.appkit.core/src/de/xwic/appkit/core/ucexec/TestUseCase.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/Counter.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/DigestTool.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/util/Equals.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/ZipUtil.java -text
 de.xwic.appkit.core/src_test/de/pol/platform/transport/xml/EntityQuerySerializerTest.java -text
 de.xwic.appkit.webbase/.classpath -text
 de.xwic.appkit.webbase/.cvsignore -text
 de.xwic.appkit.webbase/.project -text
+de.xwic.appkit.webbase/changes.txt -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/core/Platform.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/EditorContext.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/GenericEditorInput.java -text

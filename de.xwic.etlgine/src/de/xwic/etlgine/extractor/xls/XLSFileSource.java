@@ -5,6 +5,8 @@ package de.xwic.etlgine.extractor.xls;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +38,14 @@ public class XLSFileSource extends FileSource {
 	//default behavior to keep old settings compatible
 	protected boolean directoryAutoMode = false;
 	
+	protected FileSource otherSource = null;
+	
 	public XLSFileSource() {
 		
+	}
+
+	public XLSFileSource(FileSource otherSource) {
+		this.otherSource = otherSource;
 	}
 
 	public XLSFileSource(File file) {
@@ -57,36 +65,58 @@ public class XLSFileSource extends FileSource {
 		return available;
 	}
 	
+	@Override
+	public String getFilename() {
+		return file != null ? super.getFilename() : otherSource != null ? otherSource.getFilename() : null;
+	}
+
+	@Override
+	public InputStream getInputStream() throws IOException {
+		return file != null ? super.getInputStream() : otherSource != null ? otherSource.getInputStream() : null;
+	}
+	
+	@Override
+	public String getName() {
+		return file != null ? super.getName() : otherSource != null ? otherSource.getName() : null;
+	}
+	
+	@Override
+	public boolean isOptional() {
+		return file != null ? super.isOptional() : otherSource != null ? otherSource.isOptional() : null;
+	}
+	
 	/**
 	 * 
 	 */
 	public void checkSource() {
 		
 		available = false;
-		if (file.exists()) {
-			
-			if (file.isFile()) {
+		boolean filesExists = (file != null && file.exists()) || (otherSource != null && otherSource.isAvailable());
+		if (filesExists) {
+			String fileName = file != null ? file.getName() : otherSource.getFilename();
+			String fileNameToLowerCase = fileName.toLowerCase();
+			if (file == null || file.isFile()) {
 				// autodetect xls and xlsx
-				boolean checked = file.getName().toLowerCase().endsWith(endsWith);
+				boolean checked = fileNameToLowerCase.endsWith(endsWith);
 				if (!checked) {
 					// try xls
-					checked = file.getName().toLowerCase().endsWith(XLS_EXTENSION);
+					checked = fileNameToLowerCase.endsWith(XLS_EXTENSION);
 					if (checked) {
 						// adjust extension
 						setEndsWith(XLS_EXTENSION);
 					} else {
 						// try xlsx
-						checked = file.getName().toLowerCase().endsWith(XLSX_EXTENSION);
+						checked = fileNameToLowerCase.endsWith(XLSX_EXTENSION);
 						if (checked) {
 							// adjust extension
 							setEndsWith(XLSX_EXTENSION);
 						}
 					}
 				}
-				if (checked && checkFilename(file.getName())) {
+				if (checked && checkFilename(fileName)) {
 					available = true;
 				}
-			} else if (file.isDirectory()) {
+			} else if (file != null && file.isDirectory()) {
 				File[] files = file.listFiles(new FilenameFilter() {
 					public boolean accept(File dir, String name) {
 						//no automode -> check the specific endsWith setting

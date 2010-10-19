@@ -111,6 +111,13 @@ public class XLSExtractor extends AbstractExtractor {
 					int max = Math.min(expectedColumns, row.getLastCellNum()) + 1;
 					for (int i = 0; i < max; i++) {
 						String name = this.currCols.get(i);
+						if (name == null) {
+							// missing column name, auto generate now
+							name = "Column" + i;
+							if (!context.getDataSet().containsColumn(name)) {
+								context.getDataSet().addColumn(name);
+							}
+						}
 						record.setData(name, XLSTool.getObject(row, i));
 					}
 					
@@ -157,15 +164,14 @@ public class XLSExtractor extends AbstractExtractor {
 		if (source instanceof XLSFileSource) {
 			currSource = (XLSFileSource)source;
 		} else {
-			currSource = new XLSFileSource();
-			currSource.setFile(fileSource.getFile());
+			currSource = new XLSFileSource(fileSource);
 			// call isAvailable
 			if (!currSource.isAvailable()) {
 				throw new ETLException("XLSFileSource is not available for FileSource, please use XLSFileSource instead");
 			}
 		}
 		try {
-			inputStream = fileSource.getInputStream();
+			inputStream = currSource.getInputStream();
 			workbook = WorkbookFactory.create(inputStream);
 			
 			if (currSource.isContainsHeader()) {
@@ -255,6 +261,8 @@ public class XLSExtractor extends AbstractExtractor {
 						currCols.add(null);
 					}
 				}
+			} else {
+				currCols.add(null);
 			}
 		}
 		expectedColumns = lastCol;

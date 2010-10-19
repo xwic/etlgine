@@ -702,6 +702,11 @@ public class JDBCLoader extends AbstractLoader {
 			}
 		}
 		
+		// invoke transformers
+		for (ITransformer transformer : process.getTransformers()) {
+			transformer.postSourceProcessing(processContext);
+		}
+
 		// set collected column type information
 		for (Map.Entry<IColumn, ColumnType> entry : columnTypes.entrySet()) {
 			IColumn column = entry.getKey();

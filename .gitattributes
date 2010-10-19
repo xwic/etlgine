@@ -1366,6 +1366,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/trigger/FileLookupTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/JobExecutedTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledFileChangedTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledTrigger.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/trigger/TriggerList.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/util/CryptHelper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/util/Validate.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/util/XmlUtil.java -text

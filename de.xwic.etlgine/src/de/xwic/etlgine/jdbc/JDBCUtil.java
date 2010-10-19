@@ -166,9 +166,24 @@ public class JDBCUtil {
 		
 		log.info("RDBMS: " + databaseName + ", version: " + meta.getDatabaseProductVersion().replace("\n", ", ") + 
 				", JDBC driver: " + meta.getDriverName() + ", version: " + meta.getDriverVersion() + ", " + transIso);
-		
 		return con;
 		
+		/*
+		return new DelegatingConnection(con) {
+			@Override
+			public void commit() throws SQLException {
+				super.commit();
+			}
+			@Override
+			public void rollback() throws SQLException {
+				super.rollback();
+			}
+			@Override
+			public void close() throws SQLException {
+				super.close();
+			}
+		};
+		*/
 	}
 	
 	/**
@@ -237,6 +252,37 @@ public class JDBCUtil {
 			columns.close();
 		}
 		
+	}
+	
+	/**
+	 * Checks if the specified column exists and return false if it does.
+	 * If not the column is created and true returned.
+	 * @param con
+	 * @param tableName
+	 * @param columnName
+	 * @param sqlTypeDef
+	 * @return
+	 * @throws SQLException
+	 */
+	public static boolean ensureColumn(Connection con, String tableName, String columnName, String sqlTypeDef) throws SQLException {
+		
+		boolean exists = columnExists(con, tableName, columnName);
+		if (exists) {
+			// nothing to do
+			return false;
+		}
+		
+		// create column
+		Statement stmt = con.createStatement();
+		try {
+			String sql = "alter table [" + tableName + "] add [" + columnName + "] " + sqlTypeDef;
+			stmt.executeUpdate(sql);
+			log.debug("Table column added: " + sql);
+		} finally {
+			stmt.close();
+		}
+		
+		return true;
 	}
 
 	/**

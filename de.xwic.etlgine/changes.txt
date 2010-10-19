@@ -1,6 +1,16 @@
 Change Notes
 =============
 
+2010-10-19 jbornema
+	- XLSExtractor uses Column0..xx for unnamed columns, new XLSFileSource(FilesSource) is used for non XLSFileSource sources
+	- XLSFileSource.otherSource added, overwritten missing interface methods
+	- JDBCUtil.ensureColumn(Connection con, String tableName, String columnName, String sqlTypeDef) added
+	- CubeLoader: fixed NPE in onProcessFinished (using missing columns function)
+	- JDBCLoader: call transformer.postSourceProcessing on all tranformers in autoDetectColumnTypes method
+	- URLFileSource.getFilename() implemented
+	- DateTransformer additional pattern added and opened the parsing for the outside
+	- TriggerList added to have a list of triggers that can be used for a job (first one being due will be used) 
+
 2010-10-08 jbornema
 	- JDBCLoader skips "" columns for table column creation
 	- JDBCLoader treat String for type detection like "002123" now as String instead of Number

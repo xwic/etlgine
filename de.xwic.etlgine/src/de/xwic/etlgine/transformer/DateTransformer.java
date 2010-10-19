@@ -13,8 +13,10 @@ package de.xwic.etlgine.transformer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import de.xwic.etlgine.AbstractTransformer;
 import de.xwic.etlgine.ETLException;
@@ -32,11 +34,26 @@ public class DateTransformer extends AbstractTransformer {
 	
 	protected String pattern = null;
 	
-	protected String[] patternTrials = { "yyyy-MM-dd HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd.MM.yyyy HH:mm:ss", "MM/dd/yyyy", "yyyy-MM-dd" };
+	protected List<SimpleDateFormat> dateFormats = new ArrayList<SimpleDateFormat>();
 	
 	protected String[] columns;
 	
 	protected boolean checkDate = false;
+	
+	protected boolean retryOnError = false;
+	
+	@Override
+	public void initialize(IProcessContext processContext) throws ETLException {
+		super.initialize(processContext);
+		
+		// initialize default patterns
+		dateFormats.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+		dateFormats.add(new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"));
+		dateFormats.add(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"));
+		dateFormats.add(new SimpleDateFormat("MM/dd/yyyy"));
+		dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
+		dateFormats.add(new SimpleDateFormat("dd-MMM-yyyy"));
+	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractTransformer#processRecord(de.xwic.etlgine.IProcessContext, de.xwic.etlgine.IRecord)
@@ -53,45 +70,72 @@ public class DateTransformer extends AbstractTransformer {
 			}
 
 			String s = (String)value;
+
 			if (s.length() == 0) {
 				continue;
 			}
 			
-
-			if (dateFormat == null) { // try to find a format
-				if (pattern != null) {
-					dateFormat = new SimpleDateFormat(pattern);
-				} else {
-					// try to find one that works...
-					for (String p : patternTrials) {
-						SimpleDateFormat df = new SimpleDateFormat(p);
-						try {
-							df.parse(s);
-							dateFormat = df;
-							pattern = p;
-							break; // found one!
-						} catch (Exception e) {
-							// continue and check other formats.
-						}
-					}
-					if (dateFormat == null) { // none found
-						throw new ETLException("Can not find a matching date pattern for string: " + s);
-					}
-				}
-			}
-
-			
 			try {
-				Date d = dateFormat.parse(s);
-				
-				// check date
-				d = checkDate(d);
+				Date d = parse(s);
 			
 				record.setData(name, d);
 			} catch (ParseException e) {
 				throw new ETLException("Error parsing date string '" + s + "' in field " + name, e);
 			}
 		}
+	}
+
+	/**
+	 * Parse date using current dateFormat (initializes if null).
+	 * @param s
+	 * @param retried 
+	 * @return
+	 * @throws ETLException 
+	 * @throws ParseException 
+	 */
+	public Date parse(String s) throws ETLException, ParseException {
+		if (s == null || s.length() == 0) {
+			return null;
+		}
+		
+		if (dateFormat == null) { // try to find a format
+			if (pattern != null) {
+				dateFormat = new SimpleDateFormat(pattern);
+			} else {
+				// try to find one that works...
+				for (SimpleDateFormat df : getDateFormats()) {
+					try {
+						df.parse(s);
+						dateFormat = df;
+						pattern = df.toPattern();
+						break; // found one!
+					} catch (Exception e) {
+						// continue and check other formats.
+					}
+				}
+				if (dateFormat == null) { // none found
+					throw new ETLException("Cannot find a matching date pattern for string: " + s);
+				}
+			}
+		}
+		Date d = null;
+		try {
+			d = dateFormat.parse(s);
+		} catch (ParseException pe) {
+			if (retryOnError) {
+				// recursive call that doesn't end in infinite loop because dateFormat and pattern are null'd
+				dateFormat = null;
+				pattern = null;
+				d = parse(s);
+			} else {
+				throw pe;
+			}
+		}
+		
+		// check date
+		d = checkDate(d);
+	
+		return d;
 	}
 	
 	/**
@@ -170,5 +214,33 @@ public class DateTransformer extends AbstractTransformer {
 			}
 		}
 		return d;
+	}
+
+	/**
+	 * @return the dateFormats
+	 */
+	public List<SimpleDateFormat> getDateFormats() {
+		return dateFormats;
+	}
+
+	/**
+	 * @param dateFormats the dateFormats to set
+	 */
+	public void setDateFormats(List<SimpleDateFormat> dateFormats) {
+		this.dateFormats = dateFormats;
+	}
+
+	/**
+	 * @return the retryOnError
+	 */
+	public boolean isRetryOnError() {
+		return retryOnError;
+	}
+
+	/**
+	 * @param retryOnError the retryOnError to set
+	 */
+	public void setRetryOnError(boolean retryOnError) {
+		this.retryOnError = retryOnError;
 	}
 }

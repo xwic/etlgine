@@ -159,7 +159,7 @@ public class CubeLoader extends AbstractLoader {
 		// log warning
 		for (IDimension dim : cube.getDimensions()) {
 			DimensionMapping dimMap = dataMapper.getDimensionMapping(dim);
-			if (dimMap.isSkipMissingColumns() && dimMap.getMissingColumns().size() > 0) {
+			if (dimMap != null && dimMap.getMissingColumns() != null && dimMap.isSkipMissingColumns() && dimMap.getMissingColumns().size() > 0) {
 				processContext.getMonitor().logWarn(dataMapper + ": Missing columns for dimension mapping " + dimMap);
 			}
 		}

@@ -69,4 +69,9 @@ public class URLFileSource extends FileSource {
 	public String getName() {
 		return url == null ? super.getName() : url.toString();
 	}
+	
+	@Override
+	public String getFilename() {
+		return url == null ? super.getFilename() : getName();
+	}
 }

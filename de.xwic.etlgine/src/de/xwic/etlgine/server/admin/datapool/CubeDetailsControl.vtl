@@ -4,6 +4,9 @@ $insert.control("actionBar")
 <div class="detailView">
 
 <h3>Cube $cube.key</h3>
+<h4>Type</h4>
+$cube.cubeType ($cube.getClass().getName())
+
 <h4>Dimensions</h4>
     <ul>
 	#foreach($dim in $cube.dimensions)
@@ -19,5 +22,9 @@ $insert.control("actionBar")
 <h4>Statistics</h4>
 $cube.getSize() Cells<br>
 #set($totalSize = ($cube.getSize() * (($cube.measures.size() * 8) + ($cube.dimensions.size() * 4) + 32)) / 1024)
-$totalSize kB					
+$totalSize kB<br>
+
+#if ($!cube.getCacheSize())
+Cache Size: $!cube.getCacheSize()
+#end		
 	

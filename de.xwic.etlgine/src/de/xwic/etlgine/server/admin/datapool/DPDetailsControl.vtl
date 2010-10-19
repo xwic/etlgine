@@ -10,12 +10,12 @@ $insert.control("errInfo")
 	<p>
 		<table width="100%" class="tbl" cellspacing="0">
 			<tr>
-				<th width=150>Key</th>
+				<th width=170>Key</th>
 				<th>Title</th>
 				<th width="250">Elements</th>
 				<th width="80">Size</th>
 			</tr>
-		#foreach($dim in $pool.dimensions)
+		#foreach($dim in $control.dimensions)
 			<tr>
 				<td class="data"><a href="$control.createActionURL("dimEdit", $dim.key)"><img src="img/pencil.png" border="0"> $dim.key</a></td>
 				<td class="data">$!dim.title</td>
@@ -29,16 +29,17 @@ $insert.control("errInfo")
 	<p>
 			<table width="100%" class="tbl" cellspacing="0">
 			<tr>
-				<th width=150>Key</th>
+				<th width=170>Key</th>
 				<th>Title</th>
 				<th width="170">Dimensions</th>
 				<th width="170">Measures</th>
 				<th width="120">Size*</th>
 			</tr>
-		#foreach($cube in $pool.cubes)
+		#foreach($cube in $control.cubes)
 			<tr>
 				<td class="data" valign="top"><a href="$control.createActionURL("viewCube", $cube.key)">$cube.key</a><br>
 				<a class="small" href="$control.createActionURL("exportCube", $cube.key)">Download as CSV</a> <a class="small" href="$control.createActionURL("exportFullCube", $cube.key)">(Full)</a><br>
+					<span style="font-size: 8pt;">$cube.cubeType</font>
 				</td>
 				<td class="data" valign="top">$!cube.title</td>
 				<td class="data" width="170" valign="top"><ul>
@@ -54,7 +55,10 @@ $insert.control("errInfo")
 				<td class="data" valign="top">
 					$cube.getSize() Cells<br>
 #set($totalSize = ($cube.getSize() * (($cube.measures.size() * 8) + ($cube.dimensions.size() * 4) + 32)) / 1024)
-					$totalSize kB					
+					$totalSize kB<br>
+#if ($!cube.getCacheSize())
+$!cube.getCacheSize() cached<br>
+#end					
 					</td>
 			</tr>
 		#end
@@ -65,7 +69,7 @@ $insert.control("errInfo")
 	<p>
 		<table width="100%" class="tbl" cellspacing="0">
 			<tr>
-				<th width=150>Key</th>
+				<th width=170>Key</th>
 				<th>Title</th>
 				<th width="80">Functional</th>
 			</tr>

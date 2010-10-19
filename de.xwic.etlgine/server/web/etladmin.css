@@ -119,6 +119,10 @@
      text-decoration: underline;
  }
  
+ a.small {
+ 	font-size: 8pt;
+ }
+ 
  td.caption { color: #4040FF; font-weight: bold; }
  
  table.errorMessage {

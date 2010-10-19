@@ -4,7 +4,11 @@
 package de.xwic.etlgine.server.admin.datapool;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
@@ -280,4 +284,41 @@ public class DPDetailsControl extends BaseContentContainer {
 		return dataPool;
 	}
 
+	/**
+	 * Returns a sorted list of dimensions.
+	 * @return
+	 */
+	public List<IDimension> getDimensions() {
+		
+		List<IDimension> dimList = new ArrayList<IDimension>();
+		dimList.addAll(dataPool.getDimensions());
+		Collections.sort(dimList, new Comparator<IDimension> () {
+			@Override
+			public int compare(IDimension o1, IDimension o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+		return dimList;
+		
+	}
+
+	/**
+	 * Returns a sorted list of dimensions.
+	 * @return
+	 */
+	public List<ICube> getCubes() {
+		
+		List<ICube> cubeList = new ArrayList<ICube>();
+		cubeList.addAll(dataPool.getCubes());
+		Collections.sort(cubeList, new Comparator<ICube> () {
+			@Override
+			public int compare(ICube o1, ICube o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+		return cubeList;
+		
+	}
+
+	
 }

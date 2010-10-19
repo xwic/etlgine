@@ -195,6 +195,7 @@ public class CubeLoader extends AbstractLoader {
 				dataPool.save();
 				processContext.getMonitor().logInfo("Storing DataPool finished...");
 			} catch (StorageException e) {
+				processContext.getMonitor().logError("Error saving dataPool " + e, e);
 				throw new ETLException("Error saving dataPool", e);
 			}
 		}

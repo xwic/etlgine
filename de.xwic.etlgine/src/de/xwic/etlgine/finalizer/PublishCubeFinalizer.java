@@ -83,7 +83,8 @@ public class PublishCubeFinalizer implements IProcessFinalizer {
 				FileChannel inChannel = new FileInputStream(sourceFile).getChannel();
 				FileChannel outChannel = new FileOutputStream(targetFile).getChannel();
 		        try {
-		        	int maxCount = (64 * 1024 * 1024) - (32 * 1024); // copy in blocks of 64 MB because of windows limitations
+		        	//int maxCount = (64 * 1024 * 1024) - (32 * 1024); // copy in blocks of 64 MB because of windows limitations
+		        	int maxCount = (1024 * 1024); // copy in blocks of 1 MB.
 		            long size = inChannel.size();
 		            long position = 0;
 		            while (position < size) {

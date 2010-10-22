@@ -308,6 +308,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/util/DigestTool.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/Equals.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/util/ZipUtil.java -text
 de.xwic.appkit.core/src_test/de/pol/platform/transport/xml/EntityQuerySerializerTest.java -text
+de.xwic.appkit.core/src_test/de/xwic/appkit/core/util/EqualsTest.java -text
 de.xwic.appkit.webbase/.classpath -text
 de.xwic.appkit.webbase/.cvsignore -text
 de.xwic.appkit.webbase/.project -text

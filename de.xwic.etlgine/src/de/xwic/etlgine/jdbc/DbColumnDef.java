@@ -144,4 +144,9 @@ public class DbColumnDef {
 		this.typeName = typeName;
 	}
 	
+	@Override
+	public String toString() {
+		return name + " " + typeName + "(" + size + ")";
+	}
+	
 }

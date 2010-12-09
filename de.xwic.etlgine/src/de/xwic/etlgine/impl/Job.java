@@ -34,6 +34,7 @@ public class Job implements IJob {
 	private ITrigger trigger = null;
 	private Date lastStarted = null;
 	private Date lastFinished = null;
+	private long lastDuration = 0;
 	private String name = null;
 	private boolean executing = false;
 	private boolean disabled = false;
@@ -99,6 +100,7 @@ public class Job implements IJob {
 			executing = false;
 			activeContext = null;
 			lastFinished = new Date();
+			lastDuration = lastFinished.getTime() - lastStarted.getTime();
 			// run finalizers, allow modification during the loop
 			for (int i = 0; i < finalizers.size(); i++) {
 				IJobFinalizer finalizer = finalizers.get(i);
@@ -381,4 +383,12 @@ public class Job implements IJob {
 	public List<IJobFinalizer> getJobFinalizers() {
 		return Collections.unmodifiableList(finalizers);
 	}
+
+	/**
+	 * @return the lastDuration in milliseconds
+	 */
+	public long getLastDuration() {
+		return lastDuration;
+	}
+	
 }

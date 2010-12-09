@@ -4,20 +4,27 @@
 package de.xwic.etlgine.server.admin.jobs;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import de.jwic.ecolib.tableviewer.CellLabel;
 import de.jwic.ecolib.tableviewer.ITableLabelProvider;
 import de.jwic.ecolib.tableviewer.RowContext;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.ITrigger;
 import de.xwic.etlgine.server.admin.ImageLibrary;
 import de.xwic.etlgine.trigger.ScheduledTrigger;
+import de.xwic.etlgine.trigger.TriggerList;
 
 /**
  * @author Developer
  *
  */
 public class JobTableLabelProvider implements ITableLabelProvider {
+
+	private static final long serialVersionUID = 1L;
 
 	/* (non-Javadoc)
 	 * @see de.jwic.ecolib.tableviewer.ITableLabelProvider#getCellLabel(java.lang.Object, de.jwic.ecolib.tableviewer.TableColumn, de.jwic.ecolib.tableviewer.RowContext)
@@ -67,10 +74,29 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 		} else if ("nextRun".equals(column.getUserObject())) {
 			cell.text = "-";
 			if (job.getTrigger() != null) {
-				if (job.getTrigger() instanceof ScheduledTrigger) {
-					ScheduledTrigger st = (ScheduledTrigger)job.getTrigger();
-					if (st.getNextStart() != null) {
-						cell.text = DateFormat.getDateTimeInstance().format(st.getNextStart());
+				Collection<ITrigger> triggers = null;
+				if (job.getTrigger() instanceof TriggerList) {
+					triggers = ((TriggerList)job.getTrigger()).getTriggers();
+				} else {
+					triggers = new ArrayList<ITrigger>();
+					triggers.add(job.getTrigger());
+				}
+				for (ITrigger trigger : triggers) {
+					if (trigger instanceof ScheduledTrigger) {
+						ScheduledTrigger st = (ScheduledTrigger)trigger;
+						if (st.getNextStart() != null) {
+							String time = new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(st.getNextStart());
+							if (cell.text.equals("-")) {
+								cell.text = time;
+							} else {
+								if (cell.text.length() > 12 && time.length() > 12 && cell.text.substring(0,12).equals(time.substring(0,12))) {
+									// remove same date
+									cell.text += ", " + time.substring(12);
+								} else {
+									cell.text += ", " + time;
+								}
+							}
+						}
 					}
 				}
 			}

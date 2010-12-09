@@ -24,6 +24,7 @@ import java.util.zip.ZipFile;
 
 public class ZipEntrySource extends FileSource {
 
+	protected ZipSources zipSource;
 	protected ZipFile zipFile;
 	protected ZipEntry zipEntry;
 		/**
@@ -31,6 +32,7 @@ public class ZipEntrySource extends FileSource {
 	 * 
 	 */
 	public ZipEntrySource(ZipSources zipSource, ZipFile zipFile, ZipEntry zipEntry) {
+		this.zipSource = zipSource;
 		this.zipFile = zipFile;
 		this.zipEntry = zipEntry;
 	}
@@ -57,7 +59,8 @@ public class ZipEntrySource extends FileSource {
 	@Override
 	public File getFile() {
 		//RPF: WHATTHEFUCK????????????? Why is this returning null??? the movefilefinalizer does not work because of this!
-		return null;
+		//return null;
+		return zipSource.getFile();
 	}
 	
 	/* (non-Javadoc)

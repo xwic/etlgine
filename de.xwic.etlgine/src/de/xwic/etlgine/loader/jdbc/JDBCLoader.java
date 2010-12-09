@@ -78,6 +78,7 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean autoCreateTable = false;
 	private boolean autoCreateColumns = false;
 	private boolean autoDetectColumnTypes = false;
+	private boolean autoDetectColumnTypesRunning = false;
 	private boolean autoAlterColumns = false;	
 	private boolean autoDataTruncate = false;
 	private boolean commitOnProcessFinished = true;
@@ -117,10 +118,12 @@ public class JDBCLoader extends AbstractLoader {
 	
 	private String identifierSeparator = null;
 	
+	private boolean replaceOnColumnsOnProcessFinished = false;
 	private String replaceOnAutoIncrementColumn = "Id";
 	private String[] replaceOnColumns = null;
 	private Object replaceOnMaxId = null;
 	private Object lastReplaceOnMaxId = null;
+	private String replaceOnColumnsNullValue = null;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
@@ -225,13 +228,14 @@ public class JDBCLoader extends AbstractLoader {
 			// check open batch statements
 			executeBatch();
 
-			// if replace on columns is enabled and records existed, ensure consistency 
-			try {
-				executeDeleteForReplace();
-			} catch (SQLException e) {
-				throw new ETLException(e);
-			}
-			
+			if (!replaceOnColumnsOnProcessFinished) {
+				// if replace on columns is enabled and records existed, ensure consistency 
+				try {
+					executeDeleteForReplace();
+				} catch (SQLException e) {
+					throw new ETLException(e);
+				}
+			}			
 		}
 	}
 
@@ -245,6 +249,15 @@ public class JDBCLoader extends AbstractLoader {
 			try {
 				// check open batch statements
 				executeBatch();
+
+				if (replaceOnColumnsOnProcessFinished) {
+					// if replace on columns is enabled and records existed, ensure consistency 
+					try {
+						executeDeleteForReplace();
+					} catch (SQLException e) {
+						throw new ETLException(e);
+					}
+				}			
 
 				if (sharedConnectionName == null) {
 					// only close the connection if it is not shared!
@@ -270,6 +283,11 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException
 	 */
 	protected void executeDeleteForReplace() throws SQLException {
+		// exit if not applicable
+		if (autoDetectColumnTypesRunning) {
+			return;
+		}
+		
 		// check for replace
 		lastReplaceOnMaxId = null;
 		if (replaceOnMaxId != null) {
@@ -286,7 +304,13 @@ public class JDBCLoader extends AbstractLoader {
 				}
 				col = "[" + col + "]";
 				sql.append(col);
-				on.append("n.").append(col).append(" = t.").append(col);
+				if (replaceOnColumnsNullValue == null) {
+					// default behavior
+					on.append("n.").append(col).append(" = t.").append(col);
+				} else {
+					// use coalesce on null values
+					on.append("coalesce(n.").append(col).append(",").append(replaceOnColumnsNullValue).append(") = coalesce(t.").append(col).append(",").append(replaceOnColumnsNullValue).append(")");
+				}
 			}
 			sql.append(" from [" + tablename + "] where [" + replaceOnAutoIncrementColumn + "] > ?\n")
 			.append(") n on ").append(on).append("\n")
@@ -298,9 +322,7 @@ public class JDBCLoader extends AbstractLoader {
 			try {
 				monitor.logInfo("JDBCLoader executes delete statement on table '" + tablename + "'"); 
 				int cnt = ps.executeUpdate();
-				if (cnt > 0) {
-					monitor.logInfo("JDBCLoader " + cnt + " records deleted.");
-				}
+				monitor.logInfo("JDBCLoader " + cnt + " records deleted.");
 			} finally {
 				lastReplaceOnMaxId = replaceOnMaxId;
 				// clear max id
@@ -434,7 +456,7 @@ public class JDBCLoader extends AbstractLoader {
 				createTable();
 			} else {
 				// table existed, check if incremental replace is enabled for INSERT mode
-				if (mode == Mode.INSERT && replaceOnColumns != null && replaceOnColumns.length > 0) {
+				if (mode == Mode.INSERT && replaceOnColumns != null && replaceOnColumns.length > 0 && (!replaceOnColumnsOnProcessFinished || replaceOnMaxId == null)) {
 					// get max auto increment id for replace
 					Statement stmt = connection.createStatement();
 					ResultSet rs_max = stmt.executeQuery("select max([" + replaceOnAutoIncrementColumn + "]) from [" + tablename + "]");
@@ -450,7 +472,7 @@ public class JDBCLoader extends AbstractLoader {
 							}
 							cols.append("[").append(col).append("]");
 						}
-						monitor.logInfo("Using  max([" + replaceOnAutoIncrementColumn + "]) = " + replaceOnMaxId + " to replace records on columns " + cols);
+						monitor.logInfo("Using max([" + replaceOnAutoIncrementColumn + "]) = " + replaceOnMaxId + " to replace records on columns " + cols);
 					}
 				}
 			}
@@ -530,230 +552,234 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws ETLException 
 	 */
 	protected void autoDetectColumnTypes(List<IColumn> missingCols) throws ETLException {
-		
-		IETLProcess process = (IETLProcess)processContext.getProcess();
-		
-		process.getMonitor().logInfo("Auto detect missing columns " + missingCols);
-		
-		IExtractor extractor = process.getExtractor();
-
-		class ColumnType {
-			boolean isInteger = true;
-			boolean isLong = true;
-			boolean isDouble = true;
-			boolean isDate = true;
-			boolean isBoolean = true;
-			int maxLength = 0;
-			int count = 0; 
-		}
-		
-		Map<IColumn, ColumnType> columnTypes = new HashMap<IColumn, ColumnType>();
-		
-		SimpleDateFormat[] dateFormat = new SimpleDateFormat[] {
-			new SimpleDateFormat("MM/DD/yyyy"),
-			new SimpleDateFormat("DD-MMM-yyyy"),
-			new SimpleDateFormat("yyyy-MM-DD")
-		};
-		
-		// assume source is opened already, iterate all records
-		IRecord record;
-		while ((record = extractor.getNextRecord()) != null) {
-
-			// skip invalid records
-			if (record.isInvalid()) {
-				continue;
+		autoDetectColumnTypesRunning = true;
+		try {
+			IETLProcess process = (IETLProcess)processContext.getProcess();
+			
+			process.getMonitor().logInfo("Auto detect missing columns " + missingCols);
+			
+			IExtractor extractor = process.getExtractor();
+	
+			class ColumnType {
+				boolean isInteger = true;
+				boolean isLong = true;
+				boolean isDouble = true;
+				boolean isDate = true;
+				boolean isBoolean = true;
+				int maxLength = 0;
+				int count = 0; 
+			}
+			
+			Map<IColumn, ColumnType> columnTypes = new HashMap<IColumn, ColumnType>();
+			
+			SimpleDateFormat[] dateFormat = new SimpleDateFormat[] {
+				new SimpleDateFormat("MM/DD/yyyy"),
+				new SimpleDateFormat("DD-MMM-yyyy"),
+				new SimpleDateFormat("yyyy-MM-DD")
+			};
+			
+			// assume source is opened already, iterate all records
+			IRecord record;
+			while ((record = extractor.getNextRecord()) != null) {
+	
+				// skip invalid records
+				if (record.isInvalid()) {
+					continue;
+				}
+				
+				// invoke transformers
+				for (ITransformer transformer : process.getTransformers()) {
+					transformer.processRecord(processContext, record);
+				}
+				
+				// iterate missing columns
+				for (IColumn column : missingCols) {
+					
+					ColumnType columnType = columnTypes.get(column);
+					if (columnType == null) {
+						columnType = new ColumnType();
+						columnTypes.put(column, columnType);
+					}
+					
+					Object value = record.getData(column);
+					if (value == null) {
+						continue;
+					}
+					
+					// identify type
+					Number n = null;
+					Date d = null;
+					String s = null;
+					Boolean b = null;
+					if (value instanceof String) {
+						s = (String)value;
+					} else if (value instanceof Number) {
+						n = (Number)value;
+					} else if (value instanceof Date) {
+						d = (Date)value;
+					} else if (value instanceof Boolean) {
+						b = (Boolean)value;
+					} else {
+						s = value.toString();
+					}
+					if (s != null && treatEmptyAsNull && s.length() == 0) {
+						continue;
+					}
+					
+					if (s != null) {
+						// check integer
+						if (columnType.isInteger) {
+							try {
+								n = Integer.parseInt(s);
+								if (s.startsWith("0") && s.length() > 1) {
+									columnType.isInteger = false;
+								}
+								// check range
+								/*if (n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1]) {
+									columnType.isInteger = false;
+								}*/
+							} catch (Exception e) {
+								columnType.isInteger = false;
+							}
+						}
+						// check long
+						if (columnType.isLong) {
+							try {
+								n = Long.parseLong(s);
+								if (s.startsWith("0") && s.length() > 1) {
+									columnType.isLong = false;
+								}
+								// check range
+								/*if (n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1]) {
+									columnType.isLong = false;
+								}*/
+							} catch (Exception e) {
+								columnType.isLong = false;
+							}
+						}
+						// check double
+						if (columnType.isDouble) {
+							try {
+								n = Double.parseDouble(s);
+								if (s.startsWith("0") && !s.startsWith("0.") && s.length() > 1) {
+									columnType.isDouble = false;
+								}
+							} catch (Exception e) {
+								columnType.isDouble = false;
+							}
+						}
+						// check date
+						if (columnType.isDate) {
+							boolean isDate = false;
+							for (SimpleDateFormat format : dateFormat) {
+								try {
+									format.parse(s);
+									isDate = true;
+									break;
+								} catch (Exception e) {}
+							}
+							if (!isDate) {
+								columnType.isDate = false;
+							}
+						}
+					} else {
+						if (n != null) {
+							if (columnType.isInteger && (!(n instanceof Integer) /*|| n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1]*/)) {
+								columnType.isInteger = false;
+							}
+							if (columnType.isLong && (!(n instanceof Long) /*|| n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1]*/)) {
+								columnType.isLong = false;
+							}
+							if (columnType.isDouble && !(n instanceof Double) && !(n instanceof BigDecimal)) {
+								columnType.isDouble = false;
+							}
+						} else {
+							if (columnType.isDate && d == null) {
+								columnType.isDate = false;
+							} else {
+								columnType.isInteger = false;
+								columnType.isLong = false;
+								columnType.isDouble = false;
+							}
+							if (columnType.isBoolean && b == null) {
+								columnType.isBoolean = false;
+							}
+						}
+					}
+					
+					// boolean check
+					if (columnType.isBoolean && (b == null || (n != null && n.doubleValue() != 0 && n.doubleValue() != 1) || d != null)) {
+						columnType.isBoolean = false;
+					}
+					
+					// set max length
+					if (s != null) {
+						int l = s.length();
+						if (l > columnType.maxLength) {
+							columnType.maxLength = l;
+						}
+					}
+					
+					// increase value count
+					columnType.count++;
+				}
 			}
 			
 			// invoke transformers
 			for (ITransformer transformer : process.getTransformers()) {
-				transformer.processRecord(processContext, record);
+				transformer.postSourceProcessing(processContext);
 			}
-			
-			// iterate missing columns
-			for (IColumn column : missingCols) {
+	
+			// set collected column type information
+			for (Map.Entry<IColumn, ColumnType> entry : columnTypes.entrySet()) {
+				IColumn column = entry.getKey();
+				ColumnType columnType = entry.getValue();
 				
-				ColumnType columnType = columnTypes.get(column);
-				if (columnType == null) {
-					columnType = new ColumnType();
-					columnTypes.put(column, columnType);
-				}
-				
-				Object value = record.getData(column);
-				if (value == null) {
+				if (column.getTypeHint() != DataType.UNKNOWN && column.getTypeHint() != DataType.STRING || (column.getTypeHint() == DataType.STRING && column.getLengthHint() > 0 && columnType.count == 0)) {
 					continue;
 				}
 				
-				// identify type
-				Number n = null;
-				Date d = null;
-				String s = null;
-				Boolean b = null;
-				if (value instanceof String) {
-					s = (String)value;
-				} else if (value instanceof Number) {
-					n = (Number)value;
-				} else if (value instanceof Date) {
-					d = (Date)value;
-				} else if (value instanceof Boolean) {
-					b = (Boolean)value;
-				} else {
-					s = value.toString();
-				}
-				if (s != null && treatEmptyAsNull && s.length() == 0) {
-					continue;
-				}
+				boolean forceString = columnType.count == 0; 
 				
-				if (s != null) {
-					// check integer
-					if (columnType.isInteger) {
-						try {
-							n = Integer.parseInt(s);
-							if (s.startsWith("0") && s.length() > 1) {
-								columnType.isInteger = false;
-							}
-							// check range
-							/*if (n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1]) {
-								columnType.isInteger = false;
-							}*/
-						} catch (Exception e) {
-							columnType.isInteger = false;
-						}
-					}
-					// check long
-					if (columnType.isLong) {
-						try {
-							n = Long.parseLong(s);
-							if (s.startsWith("0") && s.length() > 1) {
-								columnType.isLong = false;
-							}
-							// check range
-							/*if (n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1]) {
-								columnType.isLong = false;
-							}*/
-						} catch (Exception e) {
-							columnType.isLong = false;
-						}
-					}
-					// check double
-					if (columnType.isDouble) {
-						try {
-							n = Double.parseDouble(s);
-							if (s.startsWith("0") && !s.startsWith("0.") && s.length() > 1) {
-								columnType.isDouble = false;
-							}
-						} catch (Exception e) {
-							columnType.isDouble = false;
-						}
-					}
-					// check date
-					if (columnType.isDate) {
-						boolean isDate = false;
-						for (SimpleDateFormat format : dateFormat) {
-							try {
-								format.parse(s);
-								isDate = true;
-								break;
-							} catch (Exception e) {}
-						}
-						if (!isDate) {
-							columnType.isDate = false;
-						}
-					}
-				} else {
-					if (n != null) {
-						if (columnType.isInteger && (!(n instanceof Integer) /*|| n.intValue() < INT_RANGE[0] || n.intValue() > INT_RANGE[1]*/)) {
-							columnType.isInteger = false;
-						}
-						if (columnType.isLong && (!(n instanceof Long) /*|| n.longValue() < BIGINT_RANGE[0] || n.longValue() > BIGINT_RANGE[1]*/)) {
-							columnType.isLong = false;
-						}
-						if (columnType.isDouble && !(n instanceof Double) && !(n instanceof BigDecimal)) {
-							columnType.isDouble = false;
-						}
+				if (!forceString) {
+					if (columnType.isBoolean) {
+						column.setTypeHint(DataType.BOOLEAN);
+					} else if (columnType.isInteger) {
+						column.setTypeHint(DataType.INT);
+					} else if (columnType.isLong) {
+						column.setTypeHint(DataType.LONG);
+					} else if (columnType.isDouble) {
+						column.setTypeHint(DataType.DOUBLE);
+					} else if (columnType.isDate) {
+						column.setTypeHint(DataType.DATE);
 					} else {
-						if (columnType.isDate && d == null) {
-							columnType.isDate = false;
-						} else {
-							columnType.isInteger = false;
-							columnType.isLong = false;
-							columnType.isDouble = false;
-						}
-						if (columnType.isBoolean && b == null) {
-							columnType.isBoolean = false;
-						}
+						forceString = true;
 					}
 				}
 				
-				// boolean check
-				if (columnType.isBoolean && (b == null || (n != null && n.doubleValue() != 0 && n.doubleValue() != 1) || d != null)) {
-					columnType.isBoolean = false;
-				}
-				
-				// set max length
-				if (s != null) {
-					int l = s.length();
-					if (l > columnType.maxLength) {
-						columnType.maxLength = l;
+				if (forceString && (column.getTypeHint() == DataType.UNKNOWN || column.getTypeHint() == DataType.STRING)) {
+					// TODO support clob for length > 4000
+					column.setTypeHint(DataType.STRING);
+					// set length
+					int lengthHint = 1;
+					for (; lengthHint < columnType.maxLength; lengthHint *= 2);
+					// set default length
+					if (columnType.count == 0) {
+						lengthHint = 255;
 					}
-				}
-				
-				// increase value count
-				columnType.count++;
-			}
-		}
-		
-		// invoke transformers
-		for (ITransformer transformer : process.getTransformers()) {
-			transformer.postSourceProcessing(processContext);
-		}
-
-		// set collected column type information
-		for (Map.Entry<IColumn, ColumnType> entry : columnTypes.entrySet()) {
-			IColumn column = entry.getKey();
-			ColumnType columnType = entry.getValue();
-			
-			if (column.getTypeHint() != DataType.UNKNOWN && column.getTypeHint() != DataType.STRING || (column.getTypeHint() == DataType.STRING && column.getLengthHint() > 0 && columnType.count == 0)) {
-				continue;
-			}
-			
-			boolean forceString = columnType.count == 0; 
-			
-			if (!forceString) {
-				if (columnType.isBoolean) {
-					column.setTypeHint(DataType.BOOLEAN);
-				} else if (columnType.isInteger) {
-					column.setTypeHint(DataType.INT);
-				} else if (columnType.isLong) {
-					column.setTypeHint(DataType.LONG);
-				} else if (columnType.isDouble) {
-					column.setTypeHint(DataType.DOUBLE);
-				} else if (columnType.isDate) {
-					column.setTypeHint(DataType.DATE);
-				} else {
-					forceString = true;
+					column.setLengthHint(lengthHint);
 				}
 			}
 			
-			if (forceString && (column.getTypeHint() == DataType.UNKNOWN || column.getTypeHint() == DataType.STRING)) {
-				// TODO support clob for length > 4000
-				column.setTypeHint(DataType.STRING);
-				// set length
-				int lengthHint = 1;
-				for (; lengthHint < columnType.maxLength; lengthHint *= 2);
-				// set default length
-				if (columnType.count == 0) {
-					lengthHint = 255;
-				}
-				column.setLengthHint(lengthHint);
-			}
+			// close source
+			extractor.close();
+			
+			// open again
+			ISource source = processContext.getCurrentSource();
+			extractor.openSource(source, new DataSet());
+		} finally {
+			autoDetectColumnTypesRunning = false;
 		}
-		
-		// close source
-		extractor.close();
-		
-		// open again
-		ISource source = processContext.getCurrentSource();
-		extractor.openSource(source, new DataSet());
 	}
 
 	/**
@@ -1064,6 +1090,18 @@ public class JDBCLoader extends AbstractLoader {
 					}
 					break;
 				} catch (NumberFormatException nfe) {
+					if (autoAlterColumns) {
+						// check if column can be converted to float
+						try {
+							float f = Float.parseFloat(value.toString());
+							// data truncate sql exception might happen: alter pro-active the table
+							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
+							executeBatch();
+							alterColumnType(colDef, Types.FLOAT);
+							ps.setFloat(idx, f);
+							break;
+						} catch (NumberFormatException e) {}
+					}
 					// add column information
 					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
 				}
@@ -1090,6 +1128,27 @@ public class JDBCLoader extends AbstractLoader {
 					}
 					break;
 				} catch (NumberFormatException nfe) {
+					if (autoAlterColumns) {
+						// check if column can be converted to long or float
+						try {
+							long l = Long.parseLong(value.toString());
+							// data truncate sql exception might happen: alter pro-active the table
+							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
+							executeBatch();
+							alterColumnType(colDef, Types.BIGINT);
+							ps.setLong(idx, l);
+							break;
+						} catch (NumberFormatException e) {}
+						try {
+							float f = Float.parseFloat(value.toString());
+							// data truncate sql exception might happen: alter pro-active the table
+							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
+							executeBatch();
+							alterColumnType(colDef, Types.FLOAT);
+							ps.setFloat(idx, f);
+							break;
+						} catch (NumberFormatException e) {}
+					}
 					// add column information
 					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
 				}
@@ -1165,7 +1224,7 @@ public class JDBCLoader extends AbstractLoader {
 		int newSize = 1;
 		for (; newSize < size; newSize *= 2);
 		
-		processContext.getMonitor().logInfo("Alter column '" + colDef.getName() + "' size from " + colDef.getSize() + " to " + newSize);
+		processContext.getMonitor().logWarn("Alter column '" + colDef.getName() + "' size from " + colDef.getSize() + " to " + newSize);
 
 		String typeName = colDef.getTypeName();
 		if (typeName == null) {
@@ -1199,11 +1258,13 @@ public class JDBCLoader extends AbstractLoader {
 		case Types.BIGINT:
 			newTypeName = "bigint";
 			break;
+		case Types.FLOAT:
+			newTypeName = "float";
+			break;
 		default:
-			processContext.getMonitor().logError("Unsupported column type for alter: " + type);
-			return;
+			throw new SQLException("Unsupported column type " + type + " for alter column " + colDef);
 		}
-		processContext.getMonitor().logInfo("Alter column '" + colDef.getName() + "' type from " + colDef.getTypeName() + " to " + newTypeName);
+		processContext.getMonitor().logWarn("Alter column '" + colDef.getName() + "' type from " + colDef.getTypeName() + " to " + newTypeName);
 
 		String typeName = colDef.getTypeName();
 		if (typeName == null) {
@@ -1824,6 +1885,33 @@ public class JDBCLoader extends AbstractLoader {
 	public Object getLastReplaceOnMaxId() {
 		return lastReplaceOnMaxId;
 	}
-	
-	
+
+	/**
+	 * @return the replaceOnColumnsOnProcessFinished
+	 */
+	public boolean isReplaceOnColumnsOnProcessFinished() {
+		return replaceOnColumnsOnProcessFinished;
+	}
+
+	/**
+	 * @param replaceOnColumnsOnProcessFinished the replaceOnColumnsOnProcessFinished to set
+	 */
+	public void setReplaceOnColumnsOnProcessFinished(boolean replaceOnColumnsOnProcessFinished) {
+		this.replaceOnColumnsOnProcessFinished = replaceOnColumnsOnProcessFinished;
+	}
+
+	/**
+	 * @return the replaceOnColumnsNullValue
+	 */
+	public String getReplaceOnColumnsNullValue() {
+		return replaceOnColumnsNullValue;
+	}
+
+	/**
+	 * @param replaceOnColumnsNullValue the replaceOnColumnsNullValue to set
+	 */
+	public void setReplaceOnColumnsNullValue(String replaceOnColumnsNullValue) {
+		this.replaceOnColumnsNullValue = replaceOnColumnsNullValue;
+	}
+
 }

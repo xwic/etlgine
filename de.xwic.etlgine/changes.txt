@@ -1,6 +1,17 @@
 Change Notes
 =============
 
+2010-12-09 jbornema
+	- EmptyExtractor using now a FileSource with no data for better compatibility
+	- Job lastDuration property added, so even if the job is running the last duration can be retrieved
+	- DbColumnDef.toString() implemented
+	- JDBCLoader.replaceOnColumnsNullValue property added used on the replaceOnColumn sql join to capture also "null" joined records
+	  Method autoDetectColumnTypes uses boolean autoDetectColumnTypesRunning to fix autoDetect bug that created inconsistent table data
+	  when both features are in use
+	  Auto alter feature support not conversion of long to float
+	- JobTableLabelProvider support TriggerList
+	- ZipEntrySource return now the zip file
+
 2010-10-19 jbornema
 	- XLSExtractor uses Column0..xx for unnamed columns, new XLSFileSource(FilesSource) is used for non XLSFileSource sources
 	- XLSFileSource.otherSource added, overwritten missing interface methods

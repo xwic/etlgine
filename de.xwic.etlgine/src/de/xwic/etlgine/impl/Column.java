@@ -154,7 +154,7 @@ public class Column implements IColumn {
 	 */
 	@Override
 	public String toString() {
-		return name;
+		return computeTargetName();
 	}
 
 	/**

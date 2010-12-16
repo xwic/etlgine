@@ -575,7 +575,9 @@ public class JDBCLoader extends AbstractLoader {
 			SimpleDateFormat[] dateFormat = new SimpleDateFormat[] {
 				new SimpleDateFormat("MM/DD/yyyy"),
 				new SimpleDateFormat("DD-MMM-yyyy"),
-				new SimpleDateFormat("yyyy-MM-DD")
+				new SimpleDateFormat("yyyy-MM-DD"),
+				new SimpleDateFormat("MM/DD/yy"),
+				new SimpleDateFormat("yyyy-MM-DD HH:mm:ss.S"),
 			};
 			
 			// assume source is opened already, iterate all records

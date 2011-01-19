@@ -38,6 +38,7 @@ public class Job implements IJob {
 	private String name = null;
 	private boolean executing = false;
 	private boolean disabled = false;
+	private boolean stopTriggerAfterError = true;
 	private List<String> chainScriptNames = new ArrayList<String>(); 
 	
 	private State state = State.NEW;
@@ -390,5 +391,20 @@ public class Job implements IJob {
 	public long getLastDuration() {
 		return lastDuration;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IJob#isStopTriggerAfterError()
+	 */
+	@Override
+	public boolean isStopTriggerAfterError() {
+		return stopTriggerAfterError;
+	}
+
+	/**
+	 * @param stopTriggerAfterError the stopTriggerAfterError to set
+	 */
+	public void setStopTriggerAfterError(boolean stopTriggerAfterError) {
+		this.stopTriggerAfterError = stopTriggerAfterError;
+	}
+
 }

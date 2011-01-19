@@ -1,6 +1,12 @@
 Change Notes
 =============
 
+2011-01-13 jbornema
+	- IJob.isStopTriggerAfterError() added to control trigger behavior after job error
+	- Job.stopTriggerAfterError property added
+	- ETLgibeServer.checkTriggers(): jobs with errors are executed when Job.stopTriggerAfterError is false
+	- ScheduledTrigger weekly and monthly supported in early version, alternative setting for after error added
+
 2010-12-09 jbornema
 	- EmptyExtractor using now a FileSource with no data for better compatibility
 	- Job lastDuration property added, so even if the job is running the last duration can be retrieved

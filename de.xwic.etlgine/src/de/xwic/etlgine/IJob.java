@@ -144,5 +144,13 @@ public interface IJob {
 	 * @return
 	 */
 	public boolean stop();
+
+	/**
+	 * If the job finishes with error the job is not executed by trigger again when 
+	 * method returns true (default behavior).
+	 * @return
+	 */
+	public boolean isStopTriggerAfterError();
+
 	
 }

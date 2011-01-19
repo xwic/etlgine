@@ -141,7 +141,7 @@ public class ETLgineServer implements Runnable {
 		
 			for (IJob job : serverContext.getJobs()) {
 				if (!job.isDisabled() && !job.isExecuting() && !(job.getState() == IJob.State.ENQUEUED)) {
-					if (job.getState() != State.FINISHED_WITH_ERROR && job.getState() != State.ERROR) {
+					if ((job.getState() != State.FINISHED_WITH_ERROR && job.getState() != State.ERROR) || !job.isStopTriggerAfterError()) {
 						if (job.getTrigger() != null && job.getTrigger().isDue()) {
 							enqueueJob(job);
 						}

@@ -294,6 +294,9 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/sync/SyncManager.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/sync/SyncSessionHandler.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/sync/impl/SyncProfile.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/sync/impl/SyncSession.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/trace/Trace.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/trace/TraceContext.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/trace/TraceDuration.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transfer/EntityTransferObject.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transfer/IEntityInvocationHandler.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transfer/PropertyValue.java -text
@@ -443,6 +446,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/EntityInformation
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/ImageLibrary.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/VtlTool.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/tools/extensions/IEntityEditorPerspective.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/HttpTraceFilter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/StringUtils.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserConfigXmlReader.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserListUtil.java -text

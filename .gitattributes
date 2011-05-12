@@ -124,6 +124,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ReportFolder.hbm.xml -t
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ReportTemplate.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ST.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/SYNC_STATE.hbm.xml -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/SystemTraceStatistic.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/UserListProfile.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/configproperty.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/security.hbm.xml -text
@@ -153,6 +154,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IReportTemplateDAO.java -
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISalesTeamDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IServerConfigPropertyDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISyncStateDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISystemTraceStatisticDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IUserListProfileDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/LangKey.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/AnhangDAO.java -text
@@ -167,6 +169,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/ReportTemplateDAO.ja
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SalesTeamDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/ServerConfigPropertyDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SyncStateDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SystemTraceStatisticDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/UserListProfileDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalAnhangDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalMitarbeiterDAO.java -text
@@ -185,6 +188,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IReportTemplate.java 
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISalesTeam.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IServerConfigProperty.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISyncState.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISystemTraceStatistic.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IUserListProfile.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/Anhang.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/EntityComment.java -text
@@ -200,6 +204,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/ReportTemplate.j
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SalesTeam.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/ServerConfigProperty.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SyncState.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SystemTraceStatistic.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/UserListProfile.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/history/MitarbeiterHistory.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/queries/AllUNBetreuerQuery.java -text
@@ -298,6 +303,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/trace/ITraceCategory.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/trace/ITraceContext.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/trace/ITraceDataManager.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/trace/ITraceOperation.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/trace/SystemTraceStatisticAgent.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/trace/Trace.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/trace/impl/DisabledTraceContext.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/trace/impl/DisabledTraceOperation.java -text
@@ -456,6 +462,21 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/ImageLibrary.java
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/VtlTool.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/tools/extensions/IEntityEditorPerspective.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/HttpTraceFilter.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/JWicTraceDataManager.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceControlPage.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceControlPage.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceHistoryContentProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceHistoryLabelProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceHistoryView.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceHistoryView.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceOptionsControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceOptionsControl.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceStatGraph.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceStatGraph.js -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceStatGraph.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceStatModel.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceStatView.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/ui/TraceStatView.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/StringUtils.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserConfigXmlReader.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/utils/UserListUtil.java -text

@@ -763,6 +763,7 @@ de.xwic.cube/src/de/xwic/cube/impl/Cube.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubeFlexCalc.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubeIndexed.java -text
 de.xwic.cube/src/de/xwic/cube/impl/CubePreCache.java -text
+de.xwic.cube/src/de/xwic/cube/impl/CubeSwapIndexed.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPool.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DataPoolManager.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DefaultCellProvider.java -text
@@ -770,6 +771,7 @@ de.xwic.cube/src/de/xwic/cube/impl/DefaultDimensionResolver.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DefaultKeyProvider.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Dimension.java -text
 de.xwic.cube/src/de/xwic/cube/impl/DimensionElement.java -text
+de.xwic.cube/src/de/xwic/cube/impl/FileIndexedDataTable.java -text
 de.xwic.cube/src/de/xwic/cube/impl/ICellStore.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Identifyable.java -text
 de.xwic.cube/src/de/xwic/cube/impl/IndexedData.java -text
@@ -778,7 +780,6 @@ de.xwic.cube/src/de/xwic/cube/impl/MapCellStore.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Measure.java -text
 de.xwic.cube/src/de/xwic/cube/impl/Query.java -text
 de.xwic.cube/src/de/xwic/cube/storage/impl/FileDataPoolStorageProvider.java -text
-de.xwic.cube/src/de/xwic/cube/storage/impl/JDBCDataPoolStorageProvider.java -text
 de.xwic.cube/src/de/xwic/cube/util/CountLoader.java -text
 de.xwic.cube/src/de/xwic/cube/util/CubeExportUtil.java -text
 de.xwic.cube/src/de/xwic/cube/util/CubeImportUtil.java -text
@@ -795,8 +796,11 @@ de.xwic.cube/src_test/de/xwic/cube/CubeIndexedTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubePerformanceTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubePreCacheTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeSpeedTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/CubeSwapIndexedPerformanceTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/CubeSwapIndexedTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/DataPoolManagerTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/DataPoolTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/Demo.java -text
 de.xwic.cube/src_test/de/xwic/cube/IndexedDataTableTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/SizeOptimizationTest.java -text

@@ -1,0 +1,34 @@
+/* WindowControl */ 
+table.e_dsk_win { 
+	border-right: 1px solid #000000; 
+	border-bottom: 1px solid #000000; 
+}
+td.e_dsk_ttl { 
+	background-color: #A0C8F0; color: #FFFFFF; 
+	font-size: 10pt; 
+	font-weight: bold; 
+	background-image: url("window/win_bar.gif"); 
+	background-repeat: repeat-y; 
+	background-position: left top; 
+	border-bottom: 1px solid #000000; 
+	border-top: 1px solid #000000  
+}
+td.e_dsk_ttl_in { 
+	color: #FFFFFF; 
+	font-size: 10pt; 
+	font-weight: bold; 
+}
+td.e_dsk_body { 
+	background-color: #E0DFE3; 
+	border-left: 1px solid #000000 
+}
+td.e_dsk_body2 { 
+	background-color: #E0DFE3; 
+}
+td.e_dsk_top { 
+	background-color: transparent; 
+	background-image: url("window/win_ecke.gif"); 
+	background-repeat: no-repeat; 
+	background-position: left top; 
+	border-bottom: 0px solid #000000; 
+}

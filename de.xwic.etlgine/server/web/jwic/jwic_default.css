@@ -1,0 +1,513 @@
+/* 
+ * The default styles for all jWic elements.
+ */
+body {
+	font-family: Tahoma, sans-serif, Arial;
+	font-size: 10pt;
+	background-color: transparent;
+}
+
+form {
+	margin-top: 0;
+	margin-bottom: 0
+}
+
+.clickBlocker {
+	background-color: #E0E0E0;
+	color: #000000;
+	font-size: 12pt;
+	font-weight: bold;
+	border: 1px solid #000000;
+}
+
+/*
+  * TabStrip
+  */
+.default_tabstrip {
+	empty-cells: show;
+}
+
+.default_tabstrip td.tab_normal_body a {
+	color: #000000;
+}
+
+.default_tabstrip td.tab_spacing {
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_normal_left {
+	width: 3px;
+	background-image: url(tabstrip/normal_l.png);
+	background-repeat: no-repeat;
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_normal_body {
+	width: 3px;
+	background-image: url(tabstrip/normal_body.png);
+	background-repeat: repeat-x;
+	font-size: 8pt;
+	padding-left: 5pt;
+	padding-right: 5pt;
+	padding-top: 2pt;
+	padding-bottom: 2pt;
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_normal_right {
+	width: 3px;
+	background-image: url(tabstrip/normal_r.png);
+	background-repeat: no-repeat;
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_active_left {
+	width: 3px;
+	background-image: url(tabstrip/active_l.png);
+	background-repeat: no-repeat;
+}
+
+.default_tabstrip td.tab_active_body {
+	width: 3px;
+	background-image: url(tabstrip/active_body.png);
+	background-repeat: repeat-x;
+	font-size: 8pt;
+	font-weight: bold;
+	padding-left: 5pt;
+	padding-right: 5pt;
+	padding-top: 2pt;
+	padding-bottom: 2pt;
+}
+
+.default_tabstrip td.tab_active_right {
+	width: 3px;
+	background-image: url(tabstrip/active_r.png);
+	background-repeat: no-repeat;
+}
+
+.tabstrip_tab_left {
+	padding: 5px;
+	margin-bottom: 2px;
+	border: 1px solid #202020;
+	background-color: #f0f0f0;
+	background-image: url("tabstrip/leftfade.png");
+	background-repeat: repeat-y;
+	font-size: 8pt;
+}
+
+.default_tabstrip.left td.tabstrip_content {
+	padding-left: 5px;
+}
+
+
+.tabstrip_tab_left:hover {
+	background-color: #E0E0FF;
+	background-image: none;
+}
+
+.tabstrip_tab_left a {
+	color: #000000;
+}
+.tabstrip_tab_left a:visited {
+	color: #000000;
+}
+
+.tabstrip_tab_left.active {
+	background-color: #F0F0F0;
+	font-weight: bold;
+	border-right: 0px;
+}
+
+/*
+  *  Input box field.
+  */
+.j-inputbox-intable {
+	font-size: 8pt;
+	border: 1px solid #FFFFFF;
+	font-family: tahoma, sans-serif, Arial;
+	background: #FFFFFF;
+}
+.j-inputbox {
+	background-image: url(gfx/inputbg.png);
+	background-repeat: repeat-x;;
+	font-size: 10pt;
+	font-family: tahoma, sans-serif, Arial;
+	border: 1px solid #B0B0B0;
+	padding: 2px;
+}
+
+.j-inputbox.x-readonly {
+	background-color: #E0E0E0;
+	background-image: none;
+}
+
+.j-inputbox.x-error {
+	border: 1px solid #FF0000;
+}
+input.j-inputbox.x-error {
+	background-image: url(gfx/inputbg-error.png);
+	background-repeat: repeat-x;;
+}
+
+.j-inputbox.x-focus {
+	border: 1px solid #8080E0;
+}
+
+.j-inputbox.x-empty {
+	color: #D0D0D0;
+}
+
+/*
+ * Checkbox 
+ */
+
+input.j-checkbox {
+	vertical-align: middle;
+	padding: 0px;
+	margin: 0px;
+}
+
+label.j-checkbox {
+	padding-top: 0px;
+}
+
+/*
+   * ListBox
+   */
+.default_listbox {
+	background-image: url(gfx/inputbg.png);
+	background-repeat: repeat-x;;
+	font-size: 10pt;
+	font-family: tahoma, sans-serif, Arial;
+	border: 1px solid #B0B0B0;
+	padding: 2px;
+}
+
+/*
+   * Button
+   */
+.default_button td {
+	font-size: 9pt;
+	font-family: tahoma, sans-serif, Arial;
+	padding: 1pt;
+}
+
+/**
+  * ProgressBar styles
+  */
+div.progressBar {
+	border: 1px solid #404040;
+	background-color: #ffffff;
+	padding: 1px;
+}
+
+div.progressBar div.progressBarSmooth {
+	background-color: #0000ff;
+}
+
+div.progressBar td.done { /*border: 1px solid #E0E0E0;*/
+	background-color: #0000ff;
+}
+
+div.progressBar td.notdone { /*border: 1px solid #E0E0E0;*/
+	background-color: transparent;
+}
+
+/*
+  * Simple standard table layout.
+  */
+table.datatable {
+	border-collapse: collapse;
+	border: 1px solid #808080;
+}
+
+table.datatable th {
+	border: 1px solid #808080;
+	background-color: buttonface;
+	color: buttontext;
+	font-size: 8pt;
+}
+
+table.datatable td {
+	background-color: window;
+	color: windowtext;
+	border: 1px solid #808080;
+	padding: 1px;
+	font-size: 8pt;
+}
+
+/*
+   * Window layout.
+   */
+div.j-window {
+	border: 1px solid #C0C0C0;
+	background-color: #f0f0f0;
+}
+
+div.j-window div.title {
+	background: #E0E0E0;
+	background-image: url(window/headerfade4.png);
+	padding: 3px;
+	border-bottom: 1px solid #C0C0C0;
+}
+
+div.j-window div.title .title_text {
+	color: #505050;
+	font-weight: bold;
+	font-size: 10pt;
+}
+
+div.j-window div.content {
+	color: #505050;
+	padding: 0px;
+}
+
+/*GroupControl styles*/
+table.grpDefault td.grpTitle {
+	font-size: 8pt;
+	padding-left: 2px;
+	padding-right: 8px;
+}
+
+table.grpDefault td.grpTL {
+	background-image: url("gfx/grp_tl.png");
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 8px;
+}
+
+table.grpDefault td.grpTR {
+	background-image: url("gfx/grp_tr.png");
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 8px;
+}
+
+table.grpDefault td.grpML {
+	background-image: url("gfx/grp_vl.png");
+	background-repeat: repeat-y;
+	width: 8px;
+}
+
+table.grpDefault td.grpMR {
+	background-image: url("gfx/grp_vr.png");
+	background-repeat: repeat-y;
+	width: 8px;
+}
+
+table.grpDefault td.grpTH {
+	background-image: url("gfx/grp_hor.png");
+	background-repeat: repeat-x;
+}
+
+table.grpDefault td.grpBH {
+	background-image: url("gfx/grp_hor.png");
+	background-repeat: repeat-x;
+}
+
+table.grpDefault td.grpBL {
+	background-image: url("gfx/grp_bl.png");
+	background-repeat: no-repeat;
+}
+
+table.grpDefault td.grpBR {
+	background-image: url("gfx/grp_br.png");
+	background-repeat: no-repeat;
+}
+
+/**
+ * Combo
+ */
+
+.j-combo {
+	height: 20px;
+	border: 1px solid #B0B0B0;
+	background: #ffffff url(gfx/inputbg.png) repeat-x;
+}
+a.j-combo_open {
+	width: 17px;
+	height: 18px;
+	display: block;
+	background: #F0F0F0 url(gfx/combo.png) no-repeat;
+	background-position: 1px 1px;
+	border-left: 1px solid #FFFFFF;
+	float: right;
+	cursor: pointer;
+	padding: 1px;
+}
+
+a.j-combo_open:hover {
+	background: #F0F0F0 url(gfx/combo_hl.png) no-repeat;
+	background-position: 1px 1px;
+	border-left: 1px solid #8080E0;
+}
+
+.j-combo input {
+	background-color: transparent;
+	font-family: tahoma, sans-serif, Arial;
+	font-size: 10pt;
+	height: 16px;
+	margin: 0px;
+	padding: 1px;
+	border: 0px;
+}
+
+.j-combo.x-readonly {
+	background-color: #E0E0E0;
+	background-image: none;
+}
+
+.j-combo.x-error {
+	border: 1px solid #FF0000;
+}
+.j-combo.x-error {
+	background-image: url(gfx/inputbg-error.png);
+	background-repeat: repeat-x;;
+}
+
+.j-combo.x-focus {
+	border: 1px solid #8080E0;
+}
+
+div.j-combo input.x-empty {
+	color: #D0D0D0;
+}
+
+div.j-combo_element {
+	display: block;
+	font-size: 10pt;
+	padding: 2px;
+	color: #000000;
+	cursor: pointer;
+}
+div.j-combo_element.selected {
+	background-color: #BBD9EE;
+}
+div.j-combo_element.hover {
+	background-color: #CCEAFF;
+}
+
+div.j-combo_element img {
+	margin-right: 3px;
+}
+
+input.j-combo-chkbox {
+		float: left;
+}
+
+/** BUTTON **/
+
+table.j-button {
+	cursor: pointer;
+}
+table.j-button td.j-button-nw {
+	width: 2px;
+	height: 2px;
+	background: transparent  url(gfx/buttonedge_sm.gif);
+}
+
+table.j-button td.j-button-ne {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -2px 0px no-repeat;
+}
+
+table.j-button td.j-button-sw {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) 0px -2px no-repeat;
+}
+table.j-button td.j-button-se {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -2px -2px no-repeat;
+}
+table.j-button td.j-button-n {
+	height: 2px;
+	background: transparent url(gfx/btn_n.gif) 0px 0px repeat-x;
+}
+table.j-button td.j-button-s {
+	height: 2px;
+	background: transparent url(gfx/btn_s.gif) 0px 0px repeat-x;
+}
+table.j-button td.j-button-e {
+	width: 2px;
+	background: transparent url(gfx/btn_e.gif) 0px 0px repeat-y;
+}
+table.j-button td.j-button-w {
+	width: 2px;
+	background: transparent url(gfx/btn_w.gif) 0px 0px repeat-y;
+}
+table.j-button td.j-button-c {
+	background: transparent url(gfx/btn_cnt.gif) 0px 0px repeat-x;
+}
+
+table.j-button.j-hover td.j-button-nw {
+	width: 2px;
+	height: 2px;
+	background: transparent  url(gfx/buttonedge_sm.gif) -4px 0px no-repeat;
+}
+
+table.j-button.j-hover td.j-button-ne {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -6px 0px no-repeat;
+}
+
+table.j-button.j-hover td.j-button-sw {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -4px -2px no-repeat;
+}
+table.j-button.j-hover td.j-button-se {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -6px -2px no-repeat;
+}
+table.j-button.j-hover td.j-button-n {
+	height: 2px;
+	background: transparent url(gfx/btn_n_hov.gif) 0px 0px repeat-x;
+}
+table.j-button.j-hover td.j-button-s {
+	height: 2px;
+	background: transparent url(gfx/btn_s_hov.gif) 0px 0px repeat-x;
+}
+table.j-button.j-hover td.j-button-e {
+	width: 2px;
+	background: transparent url(gfx/btn_e_hov.gif) 0px 0px repeat-y;
+}
+table.j-button.j-hover td.j-button-w {
+	width: 2px;
+	background: transparent url(gfx/btn_w_hov.gif) 0px 0px repeat-y;
+}
+table.j-button.j-hover td.j-button-c {
+	background: transparent url(gfx/btn_cnt_hov.gif) 0px 0px repeat-x;
+}
+table.j-button button.j-button-btn {
+	border: 0px;
+	background-color: transparent;
+	cursor: pointer;
+	font-style: normal;
+	margin: 0px; 
+	padding:0 .25em;
+	width:auto;
+	overflow:visible;
+}
+
+table.j-button.j-btn-small button.j-button-btn {
+	font-size: 8pt;
+}
+
+table.j-button button.j-button-btn img {
+	padding-right: 3px;
+}
+
+/**
+ * Tree
+ */
+
+ div.j-tree {
+ 	border: 1px solid #000000;
+ 	background-color: #ffffff;
+ }
+ 

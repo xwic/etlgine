@@ -1,0 +1,144 @@
+.overlay_jwicdefault {
+	background-color: #666666;
+	filter:alpha(opacity=60);
+	-moz-opacity: 0.6;
+	opacity: 0.6;
+}
+
+.jwicdefault_nw {
+	width: 9px;
+	height: 23px;
+	background: transparent url(jwicdefault/top_left.gif) no-repeat 0 0;		
+}
+
+.jwicdefault_n {
+	background: transparent url(jwicdefault/top_mid.gif) repeat-x 0 0;	
+	height: 23px;
+}
+
+.jwicdefault_ne {
+	width: 9px;
+	height: 23px;
+	background: transparent url(jwicdefault/top_right.gif) no-repeat 0 0;		
+}
+
+.jwicdefault_e {
+	width: 2px;
+	background: transparent url(jwicdefault/center_right.gif) repeat-y 0 0;	
+}
+
+.jwicdefault_w {
+	width: 2px;
+	background: transparent url(jwicdefault/center_left.gif) repeat-y 0 0;		
+}
+
+.jwicdefault_sw {
+	width: 9px;
+	height: 19px;
+	background: transparent url(jwicdefault/bottom_left.gif) no-repeat 0 0;			
+}
+
+.jwicdefault_s {
+	background: transparent url(jwicdefault/bottom_mid.gif) repeat-x 0 0;		
+	height: 19px;
+}
+
+.jwicdefault_se {
+	width: 9px;
+	height: 19px;
+	background: transparent url(jwicdefault/bottom_right.gif) no-repeat 0 0;			
+}
+
+.jwicdefault_sizer {
+	width: 9px;
+	height: 19px;
+	background: transparent url(jwicdefault/sizer.gif) no-repeat 0 0;	
+	cursor:se-resize;	
+}
+
+.jwicdefault_close {
+	width: 15px;
+	height: 9px;
+	background: transparent url(jwicdefault/close.gif) no-repeat 0 0;			
+	position:absolute;
+	top:8px;
+	right:9px;
+	cursor:pointer;
+	z-index:2000;
+}
+
+.jwicdefault_minimize {
+	width: 15px;
+	height: 9px;
+	background: transparent url(jwicdefault/minimize.gif) no-repeat 0 0;			
+	position:absolute;
+	top:8px;
+	right:41px;
+	cursor:pointer;
+	z-index:2000;
+}
+
+.jwicdefault_maximize {
+	width: 15px;
+	height: 9px;
+	background: transparent url(jwicdefault/maximize.gif) no-repeat 0 0;			
+	position:absolute;
+	top:8px;
+	right: 25px;
+	cursor:pointer;
+	z-index:2000;
+}
+
+.jwicdefault_title {
+	float:left;
+	height:14px;
+	font-family: Tahoma, Arial, sans-serif;
+	font-size:12px;
+	text-align:center;
+	width:100%;
+	color:#000;
+}
+
+.jwicdefault_content {
+	overflow:auto;
+	color: #000000;
+	font-family: Tahoma, Arial, sans-serif;
+	font-size: 10px;
+	background-color:#F0F0F0;
+}
+
+.status_bar {
+  font-size:12px;
+}
+.status_bar input{
+  font-size:12px;
+}
+
+.wired_frame {
+	display: block;
+  position: absolute;
+  border: 1px #000 dashed;
+}
+
+/* DO NOT CHANGE THESE VALUES*/
+.jwicdefault {
+	display: block;
+	position: absolute;
+}
+
+.jwicdefault table.table_window  { 
+  border-collapse: collapse; 
+  border-spacing: 0; 
+  width: 100%;
+	margin: 0px;
+	padding:0px;
+}
+
+.jwicdefault table.table_window td , .jwicdefault table.table_window th { 
+  padding: 0; 
+}
+
+.jwicdefault .title_window {
+  -moz-user-select:none;
+}                                                    
+

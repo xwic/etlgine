@@ -1,0 +1,157 @@
+.overlay_j-combo-content {
+	background-color: #FFFFFF;
+	filter:alpha(opacity=60);
+	-moz-opacity: 0.6;
+	opacity: 0.6;
+}
+
+.j-combo-content_nw {
+	width: 1px;
+	height: 1px;
+	border-left: 1px solid #202020;
+	border-top: 1px solid #202020;
+	background-color: #FFFFFF;
+}
+
+.j-combo-content_n {
+	height: 1px;
+	border-top: 1px solid #202020;
+	background-color: #FFFFFF;
+}
+
+.j-combo-content_ne {
+	width: 1px;
+	height: 1px;
+	border-top: 1px solid #202020;
+	border-right: 1px solid #202020;
+	background-color: #FFFFFF;		
+}
+
+.j-combo-content_e {
+	width: 1px;
+	border-right: 1px solid #202020;
+	background-color: #FFFFFF;	
+}
+
+.j-combo-content_w {
+	width: 1px;
+	border-left: 1px solid #202020;
+	background-color: #FFFFFF;		
+}
+
+.j-combo-content_sw {
+	width: 1px;
+	height: 4px;
+	border-left: 1px solid #202020;
+	border-bottom: 1px solid #202020;
+	background-color: #FFFFFF;			
+}
+
+.j-combo-content_s {
+	height: 4px;
+	border-bottom: 1px solid #202020;
+	background-color: #FFFFFF;
+}
+
+.j-combo-content_se {
+	width: 1px;
+	height: 4px;
+	border-right: 1px solid #202020;
+	background-color: #FFFFFF;			
+}
+
+.j-combo-content_sizer {
+	width: 9px;
+	height: 4px;
+	background: transparent url(j-combo-content/sizer.gif) no-repeat 0 0;	
+	cursor:se-resize;	
+	border-bottom: 1px solid #202020;
+	border-right: 1px solid #202020;
+}
+
+.j-combo-content_close {
+	width: 15px;
+	height: 9px;
+	background: transparent url(j-combo-content/close.gif) no-repeat 0 0;			
+	position:absolute;
+	top:8px;
+	right:9px;
+	cursor:pointer;
+	z-index:2000;
+}
+
+.j-combo-content_minimize {
+	width: 15px;
+	height: 9px;
+	background: transparent url(j-combo-content/minimize.gif) no-repeat 0 0;			
+	position:absolute;
+	top:8px;
+	right:41px;
+	cursor:pointer;
+	z-index:2000;
+}
+
+.j-combo-content_maximize {
+	width: 15px;
+	height: 9px;
+	background: transparent url(j-combo-content/maximize.gif) no-repeat 0 0;			
+	position:absolute;
+	top:8px;
+	right: 25px;
+	cursor:pointer;
+	z-index:2000;
+}
+
+.j-combo-content_title {
+	float:left;
+	height:2px;
+	font-family: Tahoma, Arial, sans-serif;
+	font-size:2px;
+	text-align:center;
+	width:100%;
+	color:#000;
+}
+
+.j-combo-content_content {
+	overflow:auto;
+	color: #000000;
+	font-family: Tahoma, Arial, sans-serif;
+	font-size: 10px;
+	background-color:#FFFFFF;
+}
+
+.status_bar {
+  font-size:12px;
+}
+.status_bar input{
+  font-size:12px;
+}
+
+.wired_frame {
+	display: block;
+  position: absolute;
+  border: 1px #000 dashed;
+}
+
+/* DO NOT CHANGE THESE VALUES*/
+.j-combo-content {
+	display: block;
+	position: absolute;
+}
+
+.j-combo-content table.table_window  { 
+  border-collapse: collapse; 
+  border-spacing: 0; 
+  width: 100%;
+	margin: 0px;
+	padding:0px;
+}
+
+.j-combo-content table.table_window td , .j-combo-content table.table_window th { 
+  padding: 0; 
+}
+
+.j-combo-content .title_window {
+  -moz-user-select:none;
+}                                                    
+

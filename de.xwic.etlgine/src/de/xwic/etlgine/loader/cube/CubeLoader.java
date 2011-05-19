@@ -146,6 +146,7 @@ public class CubeLoader extends AbstractLoader {
 		if (isClearCubeBeforeStart()) {
 			dataMapper.clearCube(cube);
 		}
+		cube.beginMassUpdate();
 
 	}
 	
@@ -188,6 +189,8 @@ public class CubeLoader extends AbstractLoader {
 				ccc.clearCache();
 			}
 		}
+		
+		cube.massUpdateFinished();
 		
 		if (isSaveDataPoolOnFinish()) {
 			try {

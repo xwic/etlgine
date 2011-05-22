@@ -61,6 +61,8 @@ public class CubeImportUtil {
 	 */
 	private void _importCSV(InputStream in, ICube cube) throws IOException, ETLException {
 		
+		cube.beginMassUpdate();
+		
 		CSVReader csvIn = new CSVReader(new BufferedReader(new InputStreamReader(in)));
 		
 		String[] header = csvIn.readNext();
@@ -115,9 +117,18 @@ public class CubeImportUtil {
 			int keyIdx = 0;
 			for (IDimension dim : cube.getDimensions()) {
 				idx = dimRef.get(dim);
-				String path = data[idx];
-				
-				IDimensionElement elm = dim.parsePath(path);
+				String[] path = data[idx].split("/");
+				IDimensionElement elm = dim;
+				for (String s : path) {
+					if (elm.containsDimensionElement(s)) {
+						elm = elm.getDimensionElement(s);
+					} else {
+						elm = elm.createDimensionElement(s);
+					}
+				}
+				if (elm == null) { // not found & no auto create
+					continue; // skip this record.
+				}
 				key.setDimensionElement(keyIdx, elm);
 				keyIdx++;
 			}
@@ -137,6 +148,7 @@ public class CubeImportUtil {
 			
 		}
 		
+		cube.massUpdateFinished();
 	}
 	
 }

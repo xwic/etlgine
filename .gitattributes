@@ -798,6 +798,7 @@ de.xwic.cube/src_test/de/xwic/cube/CubePreCacheTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeSpeedTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeSwapIndexedPerformanceTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeSwapIndexedTest.java -text
+de.xwic.cube/src_test/de/xwic/cube/CubeSwapOptimization.java -text
 de.xwic.cube/src_test/de/xwic/cube/CubeTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/DataPoolManagerTest.java -text
 de.xwic.cube/src_test/de/xwic/cube/DataPoolTest.java -text

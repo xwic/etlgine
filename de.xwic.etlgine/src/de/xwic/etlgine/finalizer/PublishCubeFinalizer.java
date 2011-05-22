@@ -4,17 +4,22 @@
 package de.xwic.etlgine.finalizer;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.FileChannel;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.Result;
+import de.xwic.etlgine.util.FileUtils;
 
 /**
  * Publishes a DataPool that is stored in the file system. The finalizer simply copies the
@@ -66,39 +71,48 @@ public class PublishCubeFinalizer implements IProcessFinalizer {
 	public void onFinish(IProcessContext context) throws ETLException {
 
 		if (context.getResult() == Result.SUCCESSFULL) {
-			
-			File targetFile = new File(targetPath, sourceFile.getName());
-			if (targetFile.exists()) {
-				File backupFile = new File(targetPath, sourceFile.getName() + ".bak");
-				if (backupFile.exists()) {
-					backupFile.delete();
-				}
-				if (!targetFile.renameTo(backupFile)) {
-					context.getMonitor().logError("Making a backup of the target file failed!");
-					return;
-				}
-			}
-			
-			try {
-				FileChannel inChannel = new FileInputStream(sourceFile).getChannel();
-				FileChannel outChannel = new FileOutputStream(targetFile).getChannel();
-		        try {
-		        	//int maxCount = (64 * 1024 * 1024) - (32 * 1024); // copy in blocks of 64 MB because of windows limitations
-		        	int maxCount = (1024 * 1024); // copy in blocks of 1 MB.
-		            long size = inChannel.size();
-		            long position = 0;
-		            while (position < size) {
-		               position += 
-		                 inChannel.transferTo(position, maxCount, outChannel);
-		            }	
-		        } finally {
-		            if (inChannel != null) inChannel.close();
-		            if (outChannel != null) outChannel.close();
-		        }
-			} catch (Exception e) {
-				throw new ETLException("Error copying file! " + e, e);
-			}
 
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HHmmss");
+			String dpVersionName = df.format(new Date());
+			
+			File target = new File(targetPath, dpVersionName + ".datapool");
+			int i = 1;
+			while (target.exists()) {
+				target = new File(targetPath, dpVersionName + "_" + (i++) + ".datapool");
+			}
+			target.mkdirs();
+			
+			// copy DataPool
+			try {
+				List<File> sourceFiles = new ArrayList<File>();
+				sourceFiles.add(sourceFile);
+				
+				// add cube files
+				String fName = sourceFile.getName();
+				int idx = fName.indexOf('.');
+				if (idx == -1) {
+					idx = fName.length();
+				}
+				final String prefix = fName.substring(0, idx);
+				File[] cubes = sourceFile.getParentFile().listFiles(new FileFilter() {
+					@Override
+					public boolean accept(File file) {
+						return file.getName().startsWith(prefix) && file.getName().endsWith(".cube");
+					}
+				});
+				for (File f : cubes) {	// add to list
+					sourceFiles.add(f);
+				}
+				
+				for (File f : sourceFiles) {
+					context.getMonitor().logInfo("Copy file " + f.getName() + " to " + target.getName() + " (" + (f.length() / 1024) + "kByte)");
+					FileUtils.copyFile(f, target);
+				}
+				
+			} catch (IOException e) {
+				throw new ETLException("Error copying data pool", e);
+			}
+			
 			// now notify the foreign system
 			if (refreshUrl != null) {
 				try {

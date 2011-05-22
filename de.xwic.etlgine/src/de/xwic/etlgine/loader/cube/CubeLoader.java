@@ -166,6 +166,7 @@ public class CubeLoader extends AbstractLoader {
 		}
 		
 		if (getCacheStatsUrl() != null) {
+			processContext.getMonitor().logInfo("Rebuild cache from URL " + getCacheStatsUrl());
 			try {
 				URL url = new URL(getCacheStatsUrl());
 				if (cube instanceof ICubeCacheControl) {

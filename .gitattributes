@@ -823,7 +823,6 @@ de.xwic.entitygenerator/src/de/xwic/entitygenerator/EntityProperty.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/Package.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/generator/IEntityGenerator.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/generator/impl/EntityGeneratorImpl.java -text
-de.xwic.entitygenerator/src/de/xwic/entitygenerator/main/EntityGenerator.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/property/EntityProperty.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/reader/IEntityReader.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/reader/IEntityReaderSource.java -text

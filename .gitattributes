@@ -332,6 +332,15 @@ de.xwic.appkit.webbase/.cvsignore -text
 de.xwic.appkit.webbase/.project -text
 de.xwic.appkit.webbase/changes.txt -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/core/Platform.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/AbstractDialogLayout.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/AbstractDialogWindow.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/ButtonContainer.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/CenteredWindow.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/DialogContent.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/DialogContent.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/DialogEvent.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/DialogWindowAdapter.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/dialog/IDialogWindowListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/EditorContext.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/GenericEditorInput.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/GenericEntityEditor.java -text
@@ -379,6 +388,9 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableModel.java -t
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/IColumnLabelProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/IEntityTableListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/RowData.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/columns/ColumnSelectorContent.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/columns/ColumnSelectorContent.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/columns/ColumnSelectorDialog.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/AbstractFilterControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/ColumnAction.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/ColumnAction.vtl -text
@@ -392,6 +404,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/DefaultFilter.vtl
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/PicklistFilter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/PicklistFilter.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filterinfo/FilterInfoControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filterinfo/FilterInfoControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/BreadCrumbControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/app/EditorToolkit.java -text

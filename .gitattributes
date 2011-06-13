@@ -863,11 +863,17 @@ de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/applic
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/popup/actions/NewAction.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/GeneratorWizard.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/GeneratorWizardModel.java -text
+de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/filespage/FilesSelectionPage.java -text
+de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/hbmpage/HbmCellModifier.java -text
+de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/hbmpage/HbmContentProvider.java -text
+de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/hbmpage/HbmLabelProvider.java -text
+de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/hbmpage/HibernateMappingPage.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/propertiespage/Constants.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/propertiespage/PropertiesCellModifier.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/propertiespage/PropertiesContentProvider.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/propertiespage/PropertiesIdentificationPage.java -text
 de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/propertiespage/PropertiesLabelProvider.java -text
+de.xwic.entitygenerator.eclipse.ui/src/de/xwic/entitygenerator/eclipse/ui/wizard/summary/SummaryPage.java -text
 de.xwic.entitygenerator/.classpath -text
 de.xwic.entitygenerator/.project -text
 de.xwic.entitygenerator/.settings/org.eclipse.jdt.core.prefs -text
@@ -880,7 +886,6 @@ de.xwic.entitygenerator/lib/velocity-1.4.jar -text
 de.xwic.entitygenerator/lib/xwic-appkit-core.jar -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/EntityGeneratorManager.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/EntityInfo.java -text
-de.xwic.entitygenerator/src/de/xwic/entitygenerator/EntityProperty.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/Package.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/generator/IEntityGenerator.java -text
 de.xwic.entitygenerator/src/de/xwic/entitygenerator/generator/impl/EntityGeneratorImpl.java -text

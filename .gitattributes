@@ -126,6 +126,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/ST.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/SYNC_STATE.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/SystemTraceStatistic.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/UserListProfile.hbm.xml -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/UserViewConfiguration.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/configproperty.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/dao/impl/hbn/security.hbm.xml -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/export/XmlExport.java -text
@@ -156,6 +157,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IServerConfigPropertyDAO.
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISyncStateDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/ISystemTraceStatisticDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IUserListProfileDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/IUserViewConfigurationDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/LangKey.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/AnhangDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/EntityCommentDAO.java -text
@@ -171,6 +173,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/ServerConfigProperty
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SyncStateDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/SystemTraceStatisticDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/UserListProfileDAO.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/UserViewConfigurationDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalAnhangDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalMitarbeiterDAO.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/daos/impl/local/LocalPicklisteDAO.java -text
@@ -190,6 +193,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IServerConfigProperty
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISyncState.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/ISystemTraceStatistic.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IUserListProfile.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/IUserViewConfiguration.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/Anhang.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/EntityComment.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/Mitarbeiter.java -text
@@ -206,6 +210,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/ServerConfigProp
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SyncState.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/SystemTraceStatistic.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/UserListProfile.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/UserViewConfiguration.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/entities/impl/history/MitarbeiterHistory.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/queries/AllUNBetreuerQuery.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/queries/CMFastSearchQuery.java -text
@@ -378,6 +383,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/MappingExcepti
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/PropertyMapper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/UserConfigurationsDropDown.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistorySelectionModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistoryVersion.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/PropertyVersionHelper.java -text
@@ -396,6 +402,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/StorageEngine.j
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/StorageNode.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/prefstore/impl/StorageProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/Column.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/ColumnsConfigurationUtil.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/DefaultColumnLabelProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityContentProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityLabelProvider.java -text

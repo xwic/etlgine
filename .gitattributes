@@ -410,6 +410,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTable.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTable.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableAdapter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableEvent.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableExtensionHelper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/IColumnLabelProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/IEntityTableListener.java -text

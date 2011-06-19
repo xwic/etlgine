@@ -419,6 +419,8 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/columns/ColumnSelectorCo
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/columns/ColumnSelectorContent.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/columns/ColumnSelectorDialog.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/AbstractFilterControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/BooleanFilter.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/BooleanFilter.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/ColumnAction.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/ColumnAction.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/ColumnFilterControl.java -text

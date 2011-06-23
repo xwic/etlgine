@@ -381,9 +381,11 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/ControlPropert
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/InputboxMapper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/MappingException.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/PropertyMapper.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/ClearFiltersButton.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.vtl -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/UserConfigurationsDropDown.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/UserConfigurationWindow.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/UserConfigurationWindow_content.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistorySelectionModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistoryVersion.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/PropertyVersionHelper.java -text

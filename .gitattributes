@@ -384,8 +384,14 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/PropertyMapper
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/ClearFiltersButton.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.vtl -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/UserConfigurationWindow.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/UserConfigurationWindow_content.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/IUserViewConfigurationControlListener.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.js -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow_config_controls.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow_content.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistorySelectionModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistoryVersion.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/PropertyVersionHelper.java -text

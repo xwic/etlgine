@@ -392,6 +392,11 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfig
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow_content.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/ILoadSharedConfigurationListener.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/UserViewConfigurationCombo.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/UserViewConfigurationJsonSerializer.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistorySelectionModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistoryVersion.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/PropertyVersionHelper.java -text
@@ -534,6 +539,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/BundleAccessor.ja
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/EntityInformationActionBarControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/EntityInformationActionBarControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/ImageLibrary.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/SimpleEntityContentProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/toolkit/util/VtlTool.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/tools/extensions/IEntityEditorPerspective.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/trace/HttpTraceFilter.java -text

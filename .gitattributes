@@ -388,10 +388,12 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/IUserViewC
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.js -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.vtl -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow_config_controls.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow_content.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationsTab.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationsTab_config_controls.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControlAdapter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/ILoadSharedConfigurationListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.vtl -text

@@ -384,6 +384,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/editors/mappers/PropertyMapper
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/ClearFiltersButton.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListViewConfiguration.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/IUserViewConfigurationControlListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.js -text
@@ -424,6 +425,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityLabelProvider.java
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTable.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTable.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableAdapter.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableConfiguration.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableEvent.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableExtensionHelper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/EntityTableModel.java -text

@@ -400,6 +400,8 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadS
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/UserViewConfigurationCombo.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/UserViewConfigurationJsonSerializer.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/quickfilter/AbstractQuickFilterPanel.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/quickfilter/IQuickFilterPanelCreator.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistorySelectionModel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/HistoryVersion.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/history/PropertyVersionHelper.java -text

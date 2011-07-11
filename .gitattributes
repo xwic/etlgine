@@ -449,6 +449,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/DateFilter.java -
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/DateFilter.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/DefaultFilter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/DefaultFilter.vtl -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/IFilterControlCreator.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/IFilterControlListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/PicklistFilter.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/table/filter/PicklistFilter.vtl -text

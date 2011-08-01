@@ -165,6 +165,8 @@ public class CubeLoader extends AbstractLoader {
 			}
 		}
 		
+		cube.massUpdateFinished();
+
 		if (getCacheStatsUrl() != null) {
 			processContext.getMonitor().logInfo("Rebuild cache from URL " + getCacheStatsUrl());
 			try {
@@ -191,7 +193,6 @@ public class CubeLoader extends AbstractLoader {
 			}
 		}
 		
-		cube.massUpdateFinished();
 		
 		if (isSaveDataPoolOnFinish()) {
 			try {

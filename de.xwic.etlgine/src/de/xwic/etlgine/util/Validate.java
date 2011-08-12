@@ -52,6 +52,18 @@ public class Validate {
 		return object != null && object instanceof String && ((String)object).trim().length() > 0;
 	}
 	
+    /**
+     * Returns true if the specified Object isn't null and not empty (toString().trim().length() > 0).
+     * It's the users responsibility to ensure that toString() delivers a valid value, also "" or null if the
+     * object in the case the object is empty/has no value/invalid.
+     * @param Object
+     * @return
+     */
+    public static boolean validObject(Object object) {
+        return object != null && object.toString() != null && object.toString().trim().length() > 0;
+    }
+	
+	
 	/**
 	 * Returns true if the collection isn't null and not empty. 
 	 * @param collection

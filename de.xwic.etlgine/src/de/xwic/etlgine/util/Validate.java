@@ -4,6 +4,7 @@
 package de.xwic.etlgine.util;
 
 import java.util.Collection;
+import java.util.Map;
 
 import de.xwic.etlgine.ETLException;
 
@@ -72,7 +73,33 @@ public class Validate {
 	public static boolean notEmpty(Collection<?> collection) {
 		return collection != null && collection.size() > 0;
 	}
-	
+    /**
+     * Returns true if the parameter is a Collection, isn't null and not empty. 
+     * @param collection
+     * @return
+     */
+    public static boolean validCollection(Object collection) {
+        return collection != null && collection instanceof Collection && ((Collection<?>) collection).size() > 0;
+    }
+
+    /**
+     * Returns true if the map isn't null and not empty. 
+     * @param collection
+     * @return
+     */
+	public static boolean notEmpty(Map<?,?> map) {
+	    return map != null && map.size() > 0;
+	}
+
+    /**
+     * Returns true if the parameter is a Map, isn't null and not empty. 
+     * @param collection
+     * @return
+     */
+	public static boolean validMap(Object  map) {
+        return map != null && map instanceof Map && ((Map<?, ?>)map).size() > 0;
+    }
+
 	/**
 	 * Throws an ETLException if the specified string is null or empty.
 	 * @param string

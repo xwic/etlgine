@@ -395,11 +395,6 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfig
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControl.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserViewConfigurationControlAdapter.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/ILoadSharedConfigurationListener.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/LoadSharedConfigurationControl.vtl -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/UserViewConfigurationCombo.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/load/UserViewConfigurationJsonSerializer.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/quickfilter/AbstractQuickFilterPanel.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/quickfilter/IQuickFilterControl.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/quickfilter/IQuickFilterPanelCreator.java -text

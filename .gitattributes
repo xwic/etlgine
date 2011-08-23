@@ -385,6 +385,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/ClearFiltersButto
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListView.vtl -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/EntityListViewConfiguration.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/IUserConfigurationWindowListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/IUserViewConfigurationControlListener.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/entityviewer/config/UserConfigurationWindow.js -text

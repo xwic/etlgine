@@ -20,12 +20,12 @@ import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
+import de.xwic.etlgine.IMonitor.EventType;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.ITransformer;
 import de.xwic.etlgine.Result;
-import de.xwic.etlgine.IMonitor.EventType;
 
 /**
  * @author lippisch
@@ -304,8 +304,9 @@ public class ETLProcess extends Process implements IETLProcess {
 			if (extractor != null) {
 				extractor.close();
 			}
-			// fun finalizers
-			for (IProcessFinalizer finalizer : finalizers) {
+			// run finalizers, allow modification during the loop
+			for (int i = 0; i < finalizers.size(); i++) {
+				IProcessFinalizer finalizer = finalizers.get(i);
 				try {
 					finalizer.onFinish(processContext);
 				} catch (Throwable t) {

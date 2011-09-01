@@ -177,9 +177,20 @@ public class XLSExtractor extends AbstractExtractor {
 			if (currSource.isContainsHeader()) {
 				sheets = new ArrayList<Sheet>();
 				sheetNames = new ArrayList<String>();
+				int sheetCnt = workbook.getNumberOfSheets();
+				context.getMonitor().logInfo("Found " + sheetCnt + " sheets in " + currSource);
+				for (int i = 0; i < sheetCnt; i++) {
+					String sheetName = workbook.getSheetName(i);
+					context.getMonitor().logInfo("Found sheet '" + sheetName + "' at index " + i);
+				}
 				if (currSource.getSheetNames() != null && currSource.getSheetNames().size() > 0) {
 					for (String sheetName : currSource.getSheetNames()) {
-						sheets.add(workbook.getSheet(sheetName));
+						Sheet sheet = workbook.getSheet(sheetName);
+						if (sheet == null) {
+							context.getMonitor().logError("Sheet '" + sheetName + "' not found");
+							continue;
+						}
+						sheets.add(sheet);
 						sheetNames.add(sheetName);
 					}
 				} else {
@@ -234,7 +245,8 @@ public class XLSExtractor extends AbstractExtractor {
 	 */
 	private void initSheet(int idx) {
 		
-		context.getMonitor().logInfo("Now switching to sheet " + idx);
+		String sheetName = sheetNames.get(idx);
+		context.getMonitor().logInfo("Now switching to sheet '" + sheetName + "'");
 		
 		sheetIdx = idx;
 		currSheet = sheets.get(sheetIdx);

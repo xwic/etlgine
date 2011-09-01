@@ -9,8 +9,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -44,6 +46,9 @@ public class JDBCExtractor extends AbstractExtractor {
 	private int returnedCount = 0;
 	private int getNextRecordInvoked = 0;
 	
+	private int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE; // on MSSQL using jTDS ResultSet.TYPE_FORWARD_ONLY should be used TODO check changing default to ResultSet.TYPE_FORWARD_ONLY 
+	private int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
+	
 	private List<DataType> typeHints = new ArrayList<DataType>();
 	
 	/* (non-Javadoc)
@@ -60,21 +65,24 @@ public class JDBCExtractor extends AbstractExtractor {
 	public void close() throws ETLException {
 		if (rs != null) {
 			try {
-				rs.getStatement().close();
+				Statement stmt = rs.getStatement();
+				if (stmt != null) {
+					stmt.close();
+				}
 				rs.close();
-			} catch (SQLException se) {
-				context.getMonitor().logError("Error closing ResultSet", se);
+			} catch (Throwable t) {
+				context.getMonitor().logError("Error closing ResultSet", t);
 				// continue -> try to close the connection..
 			}
 		}
 		if (connection != null && currSource.getSharedConnectionName() == null) {
 			try {
 				connection.close();
-			} catch (SQLException e) {
-				throw new ETLException("Error closing connection: " + e, e);
+			} catch (Throwable t) {
+				throw new ETLException("Error closing Connection", t);
 			}
-			connection = null;
 		}
+		connection = null;
 
 	}
 
@@ -110,7 +118,14 @@ public class JDBCExtractor extends AbstractExtractor {
 						break;
 					case DATE:
 					case DATETIME:
-						value = rs.getDate(i);
+						if (currSource.isUseJavaDate()) {
+							Timestamp ts = rs.getTimestamp(i);
+							if (ts != null) {
+								value = new Date(ts.getTime());
+							}
+						} else {
+							value = rs.getDate(i); // loses the time in jTDS, use useJavaDate instead (sql.TimeStamp could be used as well)
+						}
 						break;
 					case DOUBLE:
 						value = rs.getDouble(i);
@@ -189,7 +204,8 @@ public class JDBCExtractor extends AbstractExtractor {
 		}
 
 		try {
-			stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			//stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			stmt = connection.createStatement(resultSetType, resultSetConcurrency);
 
 			// set fetch size
 			if (fetchSize == -1) {
@@ -221,6 +237,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				switch (metaData.getColumnType(i)) {
 				case Types.CHAR:
 				case Types.VARCHAR:
+				case -15: //Types.NCHAR:
 				case -9: //Types.NVARCHAR:
 				case Types.CLOB:
 					dt = DataType.STRING;
@@ -254,6 +271,12 @@ public class JDBCExtractor extends AbstractExtractor {
 			}
 			
 			endReached = false;
+			
+			if (sql.contains("/* break */")) {
+				// break point helper, please ignore
+				toString();
+			}
+			
 		} catch (SQLException se) {
 			throw new ETLException("Error executing SQL SELECT statement " + currSource.getSqlSelectString() + ": " + se, se);
 		}
@@ -275,4 +298,31 @@ public class JDBCExtractor extends AbstractExtractor {
 		this.fetchSize = fetchSize;
 	}
 
+	/**
+	 * @return the resultSetType
+	 */
+	public int getResultSetType() {
+		return resultSetType;
+	}
+
+	/**
+	 * @param resultSetType the resultSetType to set
+	 */
+	public void setResultSetType(int resultSetType) {
+		this.resultSetType = resultSetType;
+	}
+
+	/**
+	 * @return the resultSetConcurrency
+	 */
+	public int getResultSetConcurrency() {
+		return resultSetConcurrency;
+	}
+
+	/**
+	 * @param resultSetConcurrency the resultSetConcurrency to set
+	 */
+	public void setResultSetConcurrency(int resultSetConcurrency) {
+		this.resultSetConcurrency = resultSetConcurrency;
+	}
 }

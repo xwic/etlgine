@@ -5,7 +5,10 @@ package de.xwic.etlgine.transformer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.xwic.etlgine.AbstractTransformer;
@@ -22,6 +25,7 @@ public class NumberTransformer extends AbstractTransformer {
 	private Set<String> logMessages = new HashSet<String>();
 	protected Class<? extends Number> numberClass = Integer.class;
 	protected String[] columns = null;
+	protected List<NumberFormat> numberFormats = new ArrayList<NumberFormat>();
 	
 	private boolean ignoreError = true;
 	private boolean logError = true;
@@ -54,26 +58,43 @@ public class NumberTransformer extends AbstractTransformer {
 			}
 			Number n = null; 
 			if (value != null) {
-				try {
-					Constructor<? extends Number> c = numberClass.getConstructor(String.class);
-					n = c.newInstance(value.toString());
-				} catch (InvocationTargetException ite) {
-					if (ignoreError) {
-						// warn
-						if (logError) {
-							String msg = "Execption parsing value '" + value + "' to " + numberClass.getSimpleName() + ", column '" + column + "'";
-							if (logMessages.add(msg)) {
-								processContext.getMonitor().logWarn(msg);
+				if (numberFormats != null && numberFormats.size() > 0) {
+					// first try one of the number formats
+					try {
+						for (NumberFormat nf : numberFormats) {
+							try {
+								n = nf.parse(value.toString());
+								break;
+							} catch (Throwable t) {
+								// try next
 							}
 						}
-					} else {
-						throw new ETLException(ite.getTargetException());
+					} catch (Throwable t) {
+						if (!ignoreError) {
+							throw new ETLException(t);
+						}
 					}
-				} catch (Exception e) {
-					throw new ETLException(e);
 				}
-			} else if (value != null) {
-				// parse string
+				if (n == null) {
+					try {
+						Constructor<? extends Number> c = numberClass.getConstructor(String.class);
+						n = c.newInstance(value.toString());
+					} catch (InvocationTargetException ite) {
+						if (ignoreError) {
+							// warn
+							if (logError) {
+								String msg = "Execption parsing value '" + value + "' to " + numberClass.getSimpleName() + ", column '" + column + "'";
+								if (logMessages.add(msg)) {
+									processContext.getMonitor().logWarn(msg);
+								}
+							}
+						} else {
+							throw new ETLException(ite.getTargetException());
+						}
+					} catch (Exception e) {
+						throw new ETLException(e);
+					}
+				}
 			}
 			
 			record.setData(column, n);
@@ -135,5 +156,19 @@ public class NumberTransformer extends AbstractTransformer {
 	public void setLogError(boolean logError) {
 		this.logError = logError;
 	}
-	
+
+	/**
+	 * @return the numberFormats
+	 */
+	public List<NumberFormat> getNumberFormats() {
+		return numberFormats;
+	}
+
+	/**
+	 * @param numberFormats the numberFormats to set
+	 */
+	public void setNumberFormats(List<NumberFormat> numberFormats) {
+		this.numberFormats = numberFormats;
+	}
+
 }

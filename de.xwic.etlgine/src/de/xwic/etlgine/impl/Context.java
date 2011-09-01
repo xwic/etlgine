@@ -142,6 +142,9 @@ public abstract class Context implements IContext {
 	 * @return the stopFlag
 	 */
 	public boolean isStopFlag() {
+		if (!stopFlag && parentContext != null) {
+			return parentContext.isStopFlag();
+		}
 		return stopFlag;
 	}
 
@@ -151,4 +154,5 @@ public abstract class Context implements IContext {
 	public void setStopFlag(boolean stopFlag) {
 		this.stopFlag = stopFlag;
 	}
+	
 }

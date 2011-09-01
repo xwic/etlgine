@@ -1,6 +1,23 @@
 Change Notes
 =============
 
+2011-09-01 jbornema
+	- JDBCSource/JDBCExtractor/JDBCLoader lost time information on DateTime, so it uses now getTimeStamp and created a new java.util.Date object
+	  when new JDBCSource.useJavaDate is true (for compatibility it's by default false, with "losing" time information behavior)
+	  JDBCExtractor.resultSetType and resultSetConcurrency added
+	  JDBCLoader - fixed bugs in auto detect columns types routine and added support for TEXT type
+				 - Added support for sql Types.NCHAR, Types.NUMERIC, Types.OTHER and Types.JAVA_OBJECT
+				 - Added deleteTable behavior that executes a "delete from table_name"
+				 - Fixed strance oracle behavior that returns a PreparedStatement.executeUpdate() of -2 instead of 1
+				 - Changed visibility of getConnection() to pulic	  
+	- XLSExtractor improved message logging
+	- XLSTool added support for cell errors
+	- Context.isStopFlag return true if parent context has set a stop flag
+	- ETLProcess supports now adding IProcessFinalizer while they are processed
+	- BooleanTransformer uses "x" as true
+	- NumberTransformer.numberFormats (of type List<NumberFormat>) added to support custom number formats
+	- ScheduledTrigger.dayOfWeek added to support weekly trigger
+	
 2011-01-13 jbornema
 	- IJob.isStopTriggerAfterError() added to control trigger behavior after job error
 	- Job.stopTriggerAfterError property added

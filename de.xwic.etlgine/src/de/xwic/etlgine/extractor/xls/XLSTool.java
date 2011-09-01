@@ -41,6 +41,8 @@ public class XLSTool {
 			Cell cell = row.getCell(col);
 			if (cell != null) {
 				switch (cell.getCellType()) {
+				case HSSFCell.CELL_TYPE_ERROR:
+					return null;
 				case HSSFCell.CELL_TYPE_NUMERIC:
 					if (HSSFDateUtil.isCellDateFormatted(cell)) {
 						return HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
@@ -56,7 +58,13 @@ public class XLSTool {
 					try {
 						s = cell.getRichStringCellValue().getString();
 					} catch (Exception e) {
-						return cell.getNumericCellValue();
+						try {
+							return cell.getNumericCellValue();
+						} catch (Throwable t) {
+							// fix #N/A
+							//int err = cell.getErrorCellValue();
+							return null;
+						}
 					}
 					
 					return s;

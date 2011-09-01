@@ -26,6 +26,7 @@ public class ScheduledTrigger implements ITrigger {
 	private Date notBefore = null;
 	private Date notAfter = null;
 	
+	private int dayOfWeek = -1; // 0..6 Sun. - Mon., -1: not used
 	private int hourOfDay = 0;
 	private int minuteOfDay = 0;
 	private Integer hourOfDayAfterError;
@@ -49,13 +50,26 @@ public class ScheduledTrigger implements ITrigger {
 	 * @param minuteOfDay
 	 */
 	public ScheduledTrigger(int hourOfDay, int minuteOfDay) {
-		super();
-		this.hourOfDay = hourOfDay;
-		this.minuteOfDay = minuteOfDay;
-		type = Type.DAILY;
-		calculateNextStart();
+		this(-1, hourOfDay, minuteOfDay);
 	}
 
+	/**
+	 * @param hourOfDay
+	 * @param minuteOfDay
+	 */
+	public ScheduledTrigger(int dayOfWeek, int hourOfDay, int minuteOfDay) {
+		super();
+		this.dayOfWeek = dayOfWeek;
+		this.hourOfDay = hourOfDay;
+		this.minuteOfDay = minuteOfDay;
+		if (dayOfWeek == -1) {
+			type = Type.DAILY;
+		} else {
+			type = Type.WEEKLY;
+		}
+		calculateNextStart();
+	}
+	
 	/**
 	 * @param hourOfDay
 	 * @param minuteOfDay
@@ -128,6 +142,19 @@ public class ScheduledTrigger implements ITrigger {
 			}
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
+			
+			if (type == Type.WEEKLY) {
+				int dayOfWeekNow = cal.get(Calendar.DAY_OF_WEEK);
+				int diff = dayOfWeekNow - dayOfWeek;
+				if (diff != 0) {
+					// adjust date
+					if (diff < 0) {
+						cal.add(Calendar.DATE, -diff);
+					} else {
+						cal.add(Calendar.DATE, 7 - diff);
+					}
+				}
+			}
 			
 			if (cal.getTime().before(last)) {
 				switch (type) {
@@ -330,5 +357,19 @@ public class ScheduledTrigger implements ITrigger {
 	public void setMinuteOfDayAfterError(Integer minuteOfDayAfterError) {
 		this.minuteOfDayAfterError = minuteOfDayAfterError;
 	}
-	
+
+	/**
+	 * @return the dayOfWeek
+	 */
+	public int getDayOfWeek() {
+		return dayOfWeek;
+	}
+
+	/**
+	 * @param dayOfWeek the dayOfWeek to set
+	 */
+	public void setDayOfWeek(int dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
+	}
+
 }

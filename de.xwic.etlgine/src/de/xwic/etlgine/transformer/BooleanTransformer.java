@@ -25,6 +25,7 @@ public class BooleanTransformer extends AbstractTransformer {
 		trueValues.add("-1");
 		trueValues.add("y");
 		trueValues.add("yes");
+		trueValues.add("x");
 	}
 	protected String[] columns = null;
 	

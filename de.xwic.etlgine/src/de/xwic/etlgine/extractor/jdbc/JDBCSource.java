@@ -20,7 +20,7 @@ public class JDBCSource implements ISource {
 	private String password = null;
 	
 	private String sqlSelectString = null;
-
+	private boolean useJavaDate = false;
 	
 	/**
 	 * @param driverName
@@ -196,6 +196,20 @@ public class JDBCSource implements ISource {
 	 */
 	public void setSharedConnectionName(String sharedConnectionName) {
 		this.sharedConnectionName = sharedConnectionName;
+	}
+
+	/**
+	 * @return the useJavaDate
+	 */
+	public boolean isUseJavaDate() {
+		return useJavaDate;
+	}
+
+	/**
+	 * @param useJavaDate the useJavaDate to set
+	 */
+	public void setUseJavaDate(boolean useJavaDate) {
+		this.useJavaDate = useJavaDate;
 	}
 
 }

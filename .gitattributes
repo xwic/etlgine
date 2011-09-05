@@ -244,7 +244,9 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/model/util/FormatUtils.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/util/ServerConfig.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/util/TemplateUtil.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/model/util/TimeFormat.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/registry/ExtensionPriorityComparator.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/registry/ExtensionRegistry.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/registry/ExtensionSortIndexComparator.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/registry/IExtension.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/registry/IExtensionFactory.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/registry/IExtensionPoint.java -text

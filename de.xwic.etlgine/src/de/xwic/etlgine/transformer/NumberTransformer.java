@@ -13,6 +13,7 @@ import java.util.Set;
 
 import de.xwic.etlgine.AbstractTransformer;
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
@@ -29,12 +30,14 @@ public class NumberTransformer extends AbstractTransformer {
 	
 	private boolean ignoreError = true;
 	private boolean logError = true;
+    private boolean avoidDouble = false;
+    private boolean autoColumn = false;
 	
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
 		
-		if (columns == null || columns.length == 0) {
+		if ((columns == null || columns.length == 0) && !autoColumn) {
 			throw new ETLException("No columns configured");
 		}
 	}
@@ -49,14 +52,48 @@ public class NumberTransformer extends AbstractTransformer {
 	@Override
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
 		super.processRecord(processContext, record);
-		
+		if (autoColumn && columns == null) {
+			ArrayList<String> numberColumns = new ArrayList<String>();
+			for (IColumn column : processContext.getDataSet().getColumns()) {
+				if (avoidDouble) {
+					switch (column.getTypeHint()) {
+						case UNKNOWN:
+						case INT:
+						case LONG:
+						case DOUBLE: {
+							numberColumns.add(column.getName());
+						}
+					}
+				} else {
+					numberColumns.add(column.getName());
+				}
+			}
+			columns = (String[]) numberColumns.toArray(new String[numberColumns.size()]);
+		}
+
 		for (String column : columns) {
 			Object value = record.getData(column);
 			if (value instanceof Number) {
-				// nothing to transform
+				if (avoidDouble) {
+					Number nr = (Number) value;
+					if (nr.longValue() != nr.doubleValue()) {
+						// nothing to transform, keep it as double
+					} else if (nr.longValue() <= Integer.MAX_VALUE && nr.longValue() >= Integer.MIN_VALUE) {
+						record.setData(column, new Integer(nr.intValue()));
+					} else {
+						record.setData(column, new Long(nr.longValue()));
+					}
+				}
 				continue;
 			}
-			Number n = null; 
+			if (autoColumn && avoidDouble) {
+				// As we say, unfortunately most of the types will be UNKNOWN,
+				// so we have to leave here and
+				// handle only Numeric values detected by the instanceof, keep
+				// the rest as it is.
+				continue;
+			}
+			Number n = null;
 			if (value != null) {
 				if (numberFormats != null && numberFormats.size() > 0) {
 					// first try one of the number formats
@@ -83,7 +120,8 @@ public class NumberTransformer extends AbstractTransformer {
 						if (ignoreError) {
 							// warn
 							if (logError) {
-								String msg = "Execption parsing value '" + value + "' to " + numberClass.getSimpleName() + ", column '" + column + "'";
+								String msg = "Execption parsing value '" + value + "' to " + numberClass.getSimpleName()
+										+ ", column '" + column + "'";
 								if (logMessages.add(msg)) {
 									processContext.getMonitor().logWarn(msg);
 								}
@@ -96,7 +134,7 @@ public class NumberTransformer extends AbstractTransformer {
 					}
 				}
 			}
-			
+
 			record.setData(column, n);
 		}
 	}
@@ -169,6 +207,34 @@ public class NumberTransformer extends AbstractTransformer {
 	 */
 	public void setNumberFormats(List<NumberFormat> numberFormats) {
 		this.numberFormats = numberFormats;
+	}
+
+	/**
+	 * @return the avoidDouble
+	 */
+	public boolean isAvoidDouble() {
+		return avoidDouble;
+	}
+
+	/**
+	 * @param avoidDouble the avoidDouble to set
+	 */
+	public void setAvoidDouble(boolean avoidDouble) {
+		this.avoidDouble = avoidDouble;
+	}
+
+	/**
+	 * @return the autoColumn
+	 */
+	public boolean isAutoColumn() {
+		return autoColumn;
+	}
+
+	/**
+	 * @param autoColumn the autoColumn to set
+	 */
+	public void setAutoColumn(boolean autoColumn) {
+		this.autoColumn = autoColumn;
 	}
 
 }

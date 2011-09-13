@@ -1,6 +1,12 @@
 Change Notes
 =============
 
+2011-09-02 jbornema
+	- JDBCUtil.setSharedConnection(IContext context, String shareName, Connection connection) added to support
+	  custom setting of share connections
+	- NumberTransformer avoidDouble added that tries to use Integer or Long instead of Double
+	  autoColumn added to use all UNKNOWN or numeric columns in avoidDouble mode or otherwise all columns for number transformation 
+
 2011-09-01 jbornema
 	- JDBCSource/JDBCExtractor/JDBCLoader lost time information on DateTime, so it uses now getTimeStamp and created a new java.util.Date object
 	  when new JDBCSource.useJavaDate is true (for compatibility it's by default false, with "losing" time information behavior)

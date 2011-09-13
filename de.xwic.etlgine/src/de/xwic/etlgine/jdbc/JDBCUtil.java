@@ -44,11 +44,21 @@ public class JDBCUtil {
 		Connection con = (Connection) context.getData(SHARE_PREFIX + shareName);
 		if (con == null || con.isClosed()) {
 			con = openConnection(context, connectName);
-			context.setData(SHARE_PREFIX + shareName, con);
+			setSharedConnection(context, shareName, con);
 		}
 		
 		return con;
 		
+	}
+
+	/**
+	 * Sets the connection with specified shareName in context without checking if it already exists.
+	 * @param context
+	 * @param shareName
+	 * @param connection
+	 */
+	public static void setSharedConnection(IContext context, String shareName, Connection connection) {
+		context.setData(SHARE_PREFIX + shareName, connection);
 	}
 	
 	/**

@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2011-09-13 jbornema
+	- Job fixed incorrect setting of activeContext
+
 2011-09-02 jbornema
 	- JDBCUtil.setSharedConnection(IContext context, String shareName, Connection connection) added to support
 	  custom setting of share connections

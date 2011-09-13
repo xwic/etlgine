@@ -69,7 +69,7 @@ public class Job implements IJob {
 		}
 		ETLgine.integrityTest();
 		executing = true;
-		activeContext = context;
+		//activeContext = context; // disabled because context here is ServerContext
 		lastStarted = new Date();
 		lastException = null;
 		monitor.reset();
@@ -87,6 +87,7 @@ public class Job implements IJob {
 					loadChainFromScript(context, name);
 				}
 			}
+			activeContext = processChain.getGlobalContext();
 			processChain.start();
 			state = processChain.getResult() != Result.SUCCESSFULL ? State.FINISHED_WITH_ERROR : State.FINISHED;
 		} catch (ETLException ee) {

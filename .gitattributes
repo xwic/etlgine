@@ -329,6 +329,7 @@ de.xwic.appkit.core/src/de/xwic/appkit/core/transfer/EntityTransferObject.java -
 de.xwic.appkit.core/src/de/xwic/appkit/core/transfer/IEntityInvocationHandler.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transfer/PropertyValue.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/EntityQuerySerializer.java -text
+de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/ICustomObjectSerializer.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/TransportException.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/XmlBeanSerializer.java -text
 de.xwic.appkit.core/src/de/xwic/appkit/core/transport/xml/XmlEntityTransport.java -text

@@ -352,7 +352,7 @@ de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/EntityActionEdit.java 
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/EntityActionNew.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/EntityActionsHelper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/IEntityAction.java -text
-de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/IEntitySelectionProvider.java -text
+de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/IEntityProvider.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/editors/AbstractEntityEditorCreator.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/editors/EditorHelper.java -text
 de.xwic.appkit.webbase/src/de/xwic/appkit/webbase/actions/editors/IEntityEditorCreator.java -text

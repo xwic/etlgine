@@ -21,5 +21,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.xlsbridge"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.dom4j"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

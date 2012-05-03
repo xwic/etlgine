@@ -824,6 +824,7 @@ de.xwic.cube/src/de/xwic/cube/IIdentifyable.java -text
 de.xwic.cube/src/de/xwic/cube/IKeyProvider.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasure.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasureFunction.java -text
+de.xwic.cube/src/de/xwic/cube/IMeasureFunctionQuerySupport.java -text
 de.xwic.cube/src/de/xwic/cube/IMeasureLoader.java -text
 de.xwic.cube/src/de/xwic/cube/IQuery.java -text
 de.xwic.cube/src/de/xwic/cube/IUserObject.java -text

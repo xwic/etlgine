@@ -1647,6 +1647,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/MeasureMapping.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/NamedDataPoolProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/cube/ScriptedCubeDataMapper.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/JDBCLoader.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/loader/jdbc/SqlDialect.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/mail/AbstractMailAgent.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/mail/EmptyMail.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/mail/IAttachment.java -text
@@ -1658,10 +1659,12 @@ de.xwic.etlgine/src/de/xwic/etlgine/mail/MailFactory.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/mail/impl/FormatUtil.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/mail/impl/JavaMailManager.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/mail/impl/VelocityTemplateEngine.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/monitor/jdbc/JDBCMonitor.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/notify/NotificationService.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineConsole.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ETLgineServer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/IServerContextListener.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/server/IServerInitializingListener.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/JobQueue.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/Launch.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/ScreenOutputStream.java -text
@@ -1716,6 +1719,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.java -te
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobDetailsControl.vtl -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/admin/jobs/JobTableLabelProvider.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/server/spring/ETLgineServerFactoryBean.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/sources/EmptySource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/FileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/URLFileSource.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/sources/ZipEntrySource.java -text

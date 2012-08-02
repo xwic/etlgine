@@ -38,6 +38,7 @@ public class JDBCExtractor extends AbstractExtractor {
 	private ResultSet rs = null;
 	private Connection connection = null;
 	private JDBCSource currSource = null;
+	private boolean logSqlSelectString = true;
 	
 	private boolean endReached = false;
 	private int colCount = 0;
@@ -46,7 +47,7 @@ public class JDBCExtractor extends AbstractExtractor {
 	private int returnedCount = 0;
 	private int getNextRecordInvoked = 0;
 	
-	private int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE; // on MSSQL using jTDS ResultSet.TYPE_FORWARD_ONLY should be used TODO check changing default to ResultSet.TYPE_FORWARD_ONLY 
+	private int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE; // on MSSQL using jTDS ResultSet.TYPE_FORWARD_ONLY should be used TODO check changing default to ResultSet.TYPE_FORWARD_ONLY
 	private int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
 	
 	private List<DataType> typeHints = new ArrayList<DataType>();
@@ -73,6 +74,8 @@ public class JDBCExtractor extends AbstractExtractor {
 			} catch (Throwable t) {
 				context.getMonitor().logError("Error closing ResultSet", t);
 				// continue -> try to close the connection..
+			} finally {
+				rs = null;
 			}
 		}
 		if (connection != null && currSource.getSharedConnectionName() == null) {
@@ -216,7 +219,9 @@ public class JDBCExtractor extends AbstractExtractor {
 				stmt.setFetchSize(fetchSize);
 			}
 			String sql = currSource.getSqlSelectString();
-			log.debug(sql);
+			if (isLogSqlSelectString()) {
+				log.debug(sql);
+			}
 			rs = stmt.executeQuery(sql);
 			
 			ResultSetMetaData metaData = rs.getMetaData();
@@ -234,13 +239,25 @@ public class JDBCExtractor extends AbstractExtractor {
 					dataSet.updateColumn(column);
 				}
 				IColumn.DataType dt = column.getTypeHint();
-				switch (metaData.getColumnType(i)) {
+				int lengthHint = metaData.getPrecision(i);
+				int scale = metaData.getScale(i);
+				int type = metaData.getColumnType(i);
+				switch (type) {
 				case Types.CHAR:
 				case Types.VARCHAR:
 				case -15: //Types.NCHAR:
 				case -9: //Types.NVARCHAR:
 				case Types.CLOB:
 					dt = DataType.STRING;
+					break;
+				case Types.NUMERIC: // Oracle NUMBER is handled here
+					if (scale > 0) {
+						dt = DataType.DOUBLE;
+					} else if (lengthHint > 10) {
+						dt = DataType.LONG;
+					} else {
+						dt = DataType.INT;
+					}
 					break;
 				case Types.INTEGER:
 					dt = DataType.INT;
@@ -249,6 +266,7 @@ public class JDBCExtractor extends AbstractExtractor {
 					dt = DataType.LONG;
 					break;
 				case Types.FLOAT:
+				case Types.DOUBLE:
 					dt = DataType.DOUBLE;
 					break;
 				case Types.TIMESTAMP:
@@ -261,9 +279,10 @@ public class JDBCExtractor extends AbstractExtractor {
 					dt = DataType.BOOLEAN;
 					break;
 				default:
+					context.getMonitor().logWarn("Unknown SQL Type " + type + " on column " + name);
 					break;
 				}
-				column.setLengthHint(metaData.getPrecision(i));
+				column.setLengthHint(lengthHint);
 
 				column.setTypeHint(dt);
 				
@@ -325,4 +344,19 @@ public class JDBCExtractor extends AbstractExtractor {
 	public void setResultSetConcurrency(int resultSetConcurrency) {
 		this.resultSetConcurrency = resultSetConcurrency;
 	}
+
+	/**
+	 * @return the logSqlSelectString
+	 */
+	public boolean isLogSqlSelectString() {
+		return logSqlSelectString;
+	}
+
+	/**
+	 * @param logSqlSelectString the logSqlSelectString to set
+	 */
+	public void setLogSqlSelectString(boolean logSqlSelectString) {
+		this.logSqlSelectString = logSqlSelectString;
+	}
+	
 }

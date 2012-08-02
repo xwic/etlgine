@@ -54,11 +54,12 @@ public class CubeDownloadControl extends Control implements IResourceControl {
 		try {
 			String filename = cube.getKey() + ".csv";
 			res.setContentType("application/x-msdownload");
-			res.setHeader("Content-Disposition", "attachment; filename=" + filename);
+			// added double quotes to fix chrome error: Error 349 (net::ERR_RESPONSE_HEADERS_MULTIPLE_CONTENT_DISPOSITION): Multiple Content-Disposition headers received. This is disallowed to protect against HTTP response splitting attacks. 
+			res.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 			exportUtil.export(cube, res.getOutputStream(), leafsOnly);
 			res.getOutputStream().close();
 		} catch (Exception e) {
-			log.error("Error generating CSV File:", e);
+			log.error("Error generating CSV File", e);
 		}
 
 		

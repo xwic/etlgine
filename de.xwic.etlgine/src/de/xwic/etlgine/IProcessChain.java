@@ -4,6 +4,8 @@
 package de.xwic.etlgine;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Adds one or more IProcess into a chain, executing each process
@@ -43,6 +45,13 @@ public interface IProcessChain {
 	 */
 	public void start() throws ETLException;
 	
+	/*
+	 * Finish the process chain.
+	 * This calls also the IJobFinalizer.
+	 * @param job
+	 */
+	public void finish(IJob job);
+	
 	/**
 	 * @return the monitor
 	 */
@@ -72,4 +81,26 @@ public interface IProcessChain {
 	 */
 	public Result getResult();
 
+	/**
+	 * Add a job finalizer.
+	 */
+	public void addJobFinalizer(IJobFinalizer finalizer);
+
+	/**
+	 * Returns the job finalizers.
+	 * @return
+	 */
+	public List<IJobFinalizer> getJobFinalizers();
+	
+	/**
+	 * Returns the unmodifiable collection of processes.
+	 * @return
+	 */
+	public Collection<IProcess> getProcesses();
+
+	/**
+	 * Returns the process chain creator information, like the groovy script name.
+	 * @return
+	 */
+	public String getCreatorInfo();
 }

@@ -28,6 +28,8 @@ public abstract class Process implements IProcess {
 	protected IMonitor monitor = new DefaultMonitor();
 	protected ProcessContext processContext;
 	protected Result result = null;
+
+	protected String creatorInfo = null;
 	
 	/**
 	 * Construct a new process.
@@ -101,6 +103,20 @@ public abstract class Process implements IProcess {
 	 */
 	public IProcessContext getContext() {
 		return processContext;
+	}
+
+	/**
+	 * @return the creatorInfo
+	 */
+	public String getCreatorInfo() {
+		return creatorInfo;
+	}
+
+	/**
+	 * @param creatorInfo the creatorInfo to set
+	 */
+	public void setCreatorInfo(String creatorInfo) {
+		this.creatorInfo = creatorInfo;
 	}
 
 }

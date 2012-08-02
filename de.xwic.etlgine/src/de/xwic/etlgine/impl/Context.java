@@ -5,6 +5,7 @@ package de.xwic.etlgine.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.etlgine.IContext;
 
@@ -67,6 +68,14 @@ public abstract class Context implements IContext {
 			}
 		}
 		return value;
+	}
+	
+	/**
+	 * Returns all property keys of this context.
+	 * @return
+	 */
+	public Set<String> getPropertyKeys() {
+		return properties.keySet();
 	}
 	
 	/**

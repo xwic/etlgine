@@ -71,12 +71,13 @@ public class XlsDownloadControl extends Control implements IResourceControl {
 			HSSFWorkbook wb = cte.createWorkbook(inTpl);
 	
 			res.setContentType("application/x-msdownload");
-			res.setHeader("Content-Disposition", "attachment; filename=" + filename);
+			// added double quotes to fix chrome error: Error 349 (net::ERR_RESPONSE_HEADERS_MULTIPLE_CONTENT_DISPOSITION): Multiple Content-Disposition headers received. This is disallowed to protect against HTTP response splitting attacks. 
+			res.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 			wb.write(res.getOutputStream());
 			res.getOutputStream().close();
 			logInfo = cte.getLog();
 		} catch (Exception e) {
-			log.error("Error generating workbook:", e);
+			log.error("Error generating workbook", e);
 			logInfo = e.toString() + "\n\n" + cte.getLog();
 		}
 

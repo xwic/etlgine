@@ -3,6 +3,9 @@
  */
 package de.xwic.etlgine.server.admin.jobs;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
@@ -47,6 +50,7 @@ public class JobDetailsControl extends BaseContentContainer {
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				onReturn();
 			}
@@ -56,6 +60,7 @@ public class JobDetailsControl extends BaseContentContainer {
 		btDisable.setIconEnabled(ImageLibrary.IMAGE_CONTROL_PAUSE);
 		btDisable.setTitle(job.isDisabled() ? "Enable" : "Disable");
 		btDisable.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				onDisable();
 			}
@@ -84,5 +89,20 @@ public class JobDetailsControl extends BaseContentContainer {
 	 */
 	public IJob getJob() {
 		return job;
+	}
+	
+	/**
+	 * @return the last exception's stack trace
+	 */
+	public String getLastExceptionStackTrace() {
+		if (job == null || job.getLastException() == null) {
+			return null;
+		}
+		ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
+		PrintWriter pw = new PrintWriter(stackTrace);
+		job.getLastException().printStackTrace(pw);
+		pw.flush();
+		
+		return stackTrace.toString();
 	}
 }

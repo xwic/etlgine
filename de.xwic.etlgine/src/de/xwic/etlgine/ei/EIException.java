@@ -6,7 +6,7 @@
 package de.xwic.etlgine.ei;
 
 /**
- * Invoked if a generic exception occured during an EI process.
+ * Invoked if a generic exception occurred during an EI process.
  * @author lippisch
  */
 public class EIException extends Exception {

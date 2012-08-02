@@ -9,7 +9,6 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +19,7 @@ import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJobFinalizer;
 import de.xwic.etlgine.IMonitor;
+import de.xwic.etlgine.IMonitor.EventType;
 import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.ITrigger;
 import de.xwic.etlgine.Result;
@@ -49,7 +49,7 @@ public class Job implements IJob {
 	
 	private String jobId = null;
 	
-	protected List<IJobFinalizer> finalizers = new ArrayList<IJobFinalizer>();
+	private String creatorInfo = null;
 
 	/**
 	 * @param name
@@ -74,6 +74,7 @@ public class Job implements IJob {
 		lastException = null;
 		monitor.reset();
 		state = State.RUNNING;
+		monitor.onEvent(context, EventType.JOB_EXECUTION_START, this);
 		if (trigger != null) {
 			trigger.notifyJobStarted();
 		}
@@ -93,28 +94,33 @@ public class Job implements IJob {
 		} catch (ETLException ee) {
 			state = State.ERROR;
 			lastException = ee;
+			if (ee.getProcess() == null && processChain != null) {
+				ee.setProcess(processChain.getActiveProcess());
+			}
 			throw ee;
 		} catch (Throwable t) {
 			state = State.ERROR;
 			lastException = t;
-			throw new ETLException("Error executing job: " + t, t);
-		} finally {
-			executing = false;
-			activeContext = null;
-			lastFinished = new Date();
-			lastDuration = lastFinished.getTime() - lastStarted.getTime();
-			// run finalizers, allow modification during the loop
-			for (int i = 0; i < finalizers.size(); i++) {
-				IJobFinalizer finalizer = finalizers.get(i);
-				try {
-					finalizer.onFinish(this);
-				} catch (Throwable t) {
-					monitor.logError("Error executing finalizer!", t);
-				}
+			ETLException ee = new ETLException("Error executing job: " + t, t);
+			if (processChain != null) {
+				ee.setProcess(processChain.getActiveProcess());
 			}
-			processChain = null;
-			if (trigger != null) {
-				trigger.notifyJobFinished(state == State.ERROR);
+			throw ee;
+		} finally {
+			try {
+				executing = false;
+				activeContext = null;
+				lastFinished = new Date();
+				lastDuration = lastFinished.getTime() - lastStarted.getTime();
+				if (processChain != null) {
+					processChain.finish(this);
+					processChain = null;
+				}
+				if (trigger != null) {
+					trigger.notifyJobFinished(state == State.ERROR);
+				}
+			} finally {
+				monitor.onEvent(context, EventType.JOB_EXECUTION_END, this);
 			}
 		}
 	}
@@ -125,18 +131,6 @@ public class Job implements IJob {
 	 */
 	private void loadChainFromScript(IContext context, String chainScriptName) throws ETLException {
 		
-		if (processChain == null) {
-			processChain = ETLgine.createProcessChain(context, chainScriptName);
-		}
-		processChain.setMonitor(monitor);
-		
-		Binding binding = new Binding();
-		binding.setVariable("context", context);
-		binding.setVariable("job", this);
-		binding.setVariable("processChain", processChain);
-		
-		GroovyShell shell = new GroovyShell(binding);
-		
 		File jobPath = new File(context.getProperty(IContext.PROPERTY_SCRIPTPATH, "."));
 		if (!jobPath.exists()) {
 			throw new ETLException("The job path " + jobPath.getAbsolutePath() + " does not exist.");
@@ -145,6 +139,25 @@ public class Job implements IJob {
 		if (!file.exists()) {
 			throw new ETLException("The script file " + file.getAbsolutePath() + " does not exist.");
 		}
+		
+		if (processChain == null) {
+			processChain = ETLgine.createProcessChain(context, chainScriptName);
+		}
+		processChain.setMonitor(monitor);
+		
+		// update creator info
+		if (processChain instanceof ProcessChain) {
+			((ProcessChain)processChain).setCreatorInfo(chainScriptName);
+		}
+		
+		monitor.onEvent(processChain.getGlobalContext(), EventType.PROCESSCHAIN_LOAD_FROM_SCRIPT, processChain);
+		
+		Binding binding = new Binding();
+		binding.setVariable("context", context);
+		binding.setVariable("job", this);
+		binding.setVariable("processChain", processChain);
+		
+		GroovyShell shell = new GroovyShell(binding);
 		
 		try {
 			shell.evaluate(file);
@@ -369,21 +382,17 @@ public class Job implements IJob {
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.IJob#addJobFinalizer(de.xwic.etlgine.IJobFinalizer)
-	 */
-	public void addJobFinalizer(IJobFinalizer finalizer) {
-		finalizers.add(finalizer);
-		monitor.logInfo("Added job finalizer '" + finalizer + "' at index " + (finalizers.size() - 1));
-		
-	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.IJob#getJobFinalizers()
-	 */
+	@Override
+	@Deprecated
+	public void addJobFinalizer(IJobFinalizer finalizer) {
+		processChain.addJobFinalizer(finalizer);
+	}
+	
+	@Override
+	@Deprecated
 	public List<IJobFinalizer> getJobFinalizers() {
-		return Collections.unmodifiableList(finalizers);
+		return processChain.getJobFinalizers();
 	}
 
 	/**
@@ -408,4 +417,17 @@ public class Job implements IJob {
 		this.stopTriggerAfterError = stopTriggerAfterError;
 	}
 
+	/**
+	 * @return the creatorInfo
+	 */
+	public String getCreatorInfo() {
+		return creatorInfo;
+	}
+
+	/**
+	 * @param creatorInfo the creatorInfo to set
+	 */
+	public void setCreatorInfo(String creatorInfo) {
+		this.creatorInfo = creatorInfo;
+	}
 }

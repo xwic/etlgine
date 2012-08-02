@@ -10,6 +10,7 @@ import java.util.List;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.IJobFinalizer;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcess;
@@ -17,9 +18,7 @@ import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.Result;
-import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.sources.FileSource;
-import de.xwic.etlgine.sources.ZipEntrySource;
 
 /**
  * @author lippisch
@@ -35,6 +34,7 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 	private boolean moveOnError = false;
 	
 	private List<File> moveFiles = null;
+	private String prefix = null;
 	
 	/**
 	 * @param targetPath
@@ -75,12 +75,14 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 	 * @param job
 	 */
 	public void register(IJob job) {
-		job.addJobFinalizer(this);
+		setMonitor(job.getProcessChain().getMonitor());
+		job.getProcessChain().addJobFinalizer(this);
 		moveFiles = new ArrayList<File>();
 	}
 	
 
 	public void onFinish(IJob job) throws ETLException {
+		
 		if (moveFiles != null && moveFiles.size() > 0) {
 			if (!moveOnError && job.getState() != State.FINISHED) {
 				monitor.logWarn("File(s) are not moved because jobs exited with errors");
@@ -101,7 +103,7 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 	 */
 	public void onFinish(IProcessContext context) {
 		
-		monitor = context.getMonitor();
+		setMonitor(context.getMonitor());
 		if (!targetPath.exists()) {
 			if (!targetPath.mkdirs()) {
 				monitor.logError("Error creating target directory: " + targetPath.getAbsolutePath());
@@ -127,24 +129,16 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 			if (process instanceof IETLProcess) {
 				IETLProcess etlp = (IETLProcess)process;
 				for (ISource source : etlp.getSources()) {
-					//RPF: HACK! because of a problem with ZIP files, the MoveFileFinalizer does not work!!
-					if (source instanceof ZipEntrySource) {
-						ZipEntrySource fs = (ZipEntrySource)source;
-						File file = new File(fs.getZipParent().getName());
-						if (file != null && file.exists()) {
-							if (!moveFile(file))  {
-								context.setResult(Result.FINISHED_WITH_ERRORS);
-							}
-						}
-						
-					}
-					
-					else if (source instanceof FileSource) {
+					if (source instanceof FileSource) {
 						FileSource fs = (FileSource)source;
 						File file = fs.getFile();
-						if (file != null && file.exists()) {
-							if (!moveFile(file))  {
-								context.setResult(Result.FINISHED_WITH_ERRORS);
+						if (file != null) {
+							if (file.exists()) {
+								if (!moveFile(file))  {
+									context.setResult(Result.FINISHED_WITH_ERRORS);
+								}
+							} else {
+								monitor.logWarn("Cannot move source " + source.getName() + " as as the file does not exist: " + file.getAbsolutePath());
 							}
 						}
 					} else {
@@ -169,11 +163,15 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 		}
 		
 		if (!file.exists()) {
-			monitor.logWarn("Can not move file " + file.getName() + " because it does not exist.");
+			monitor.logWarn("Cannot move file " + file.getName() + " because it does not exist.");
 			return false;
 		}
 		
-		File destFile = new File(targetPath, file.getName());
+		File destFile = new File(targetPath, prefix != null ? prefix + file.getName() : file.getName());
+		if (destFile.equals(file)) {
+			monitor.logWarn("Cannot move file " + file.getName() + " into source location");
+			return false;
+		}
 		if (destFile.exists() && !deleteTargetIfExists) {
 			monitor.logWarn("Cannot move file " + file.getName() + " as it already exists in the target location.");
 			return false;
@@ -223,6 +221,62 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 	 */
 	public void setMoveOnError(boolean moveOnError) {
 		this.moveOnError = moveOnError;
+	}
+
+	/**
+	 * @return the sourceFile
+	 */
+	public File getSourceFile() {
+		return sourceFile;
+	}
+
+	/**
+	 * @param sourceFile the sourceFile to set
+	 */
+	public void setSourceFile(File sourceFile) {
+		this.sourceFile = sourceFile;
+	}
+
+	/**
+	 * @return the targetPath
+	 */
+	public File getTargetPath() {
+		return targetPath;
+	}
+
+	/**
+	 * @param targetPath the targetPath to set
+	 */
+	public void setTargetPath(File targetPath) {
+		this.targetPath = targetPath;
+	}
+
+	/**
+	 * @return the monitor
+	 */
+	public IMonitor getMonitor() {
+		return monitor;
+	}
+
+	/**
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(IMonitor monitor) {
+		this.monitor = monitor;
+	}
+
+	/**
+	 * @return the prefix
+	 */
+	public String getPrefix() {
+		return prefix;
+	}
+
+	/**
+	 * @param prefix the prefix to set
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
 	}
 
 }

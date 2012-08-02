@@ -43,6 +43,11 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 
 	private InputStream input = null;
 	
+	private boolean autoMode = false;
+	private char initial_separator = separator;
+	private char initial_quoteChar = quoteChar;
+	
+
 	public List<ICSVExtractorListener> listeners = new ArrayList<ICSVExtractorListener>();
 	
 	/**
@@ -125,36 +130,79 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		this.dataSet = dataSet;
 		
 		if (!(source instanceof FileSource)) {
-			throw new ETLException("Can not handle a source of this type - FileSource type required.");
+			throw new ETLException("Cannot handle a source of this type - FileSource type required.");
 		}
 		FileSource fsrc = (FileSource)source;
 		try {
 			recordNumber = 0;
 			reachedEnd = false;
+
+			BufferedReader rawReader = initializeStream(fsrc);
 			
-			input = fsrc.getInputStream();
-			
-			// determine encoding
-			String encoding = fsrc.getEncoding(); // null is java default
-			byte[] encoding_tag = new byte[2];
-			// find source encoding
-			if (input.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == -1 && encoding_tag[1] == -2) {
-				// used by Cognos CSV reports
-				encoding = "UTF-16LE";
-			} else {
-				input.close();
-				input = fsrc.getInputStream();
-			}
-			fsrc.setEncoding(encoding);
-			
-			BufferedReader rawReader = new BufferedReader(StreamDecoder.forInputStreamReader(input, fsrc, fsrc.getEncoding()));
-			for (int i = 0; i < skipLines; i++) {
-				String skipLine = rawReader.readLine();
-				for (ICSVExtractorListener listener : listeners) {
-					listener.onLineSkipped(skipLine, i);
+			class Helper {
+				public void prepareRawReader(BufferedReader rawReader) throws IOException {
+					for (int i = 0; i < skipLines; i++) {
+						String skipLine = rawReader.readLine();
+						for (ICSVExtractorListener listener : listeners) {
+							listener.onLineSkipped(skipLine, i);
+						}
+					}
 				}
+				public int count(String s, String c) {
+					return (s.length() - s.replace(c, "").length()) / c.length();
+				}
+				
+				public Character find(String s, char[] chars) {
+					Character found = null;
+					int i = 0;
+					for (char ch : chars) {
+						Character c = ch;
+						int j = count(s, c.toString());
+						if (j > 0 && j > i) {
+							i = j;
+							found = c;
+						}
+					}
+					return found;
+				}
+			};
+			Helper helper = new Helper();
+			helper.prepareRawReader(rawReader);
+			
+			if (autoMode) {
+				// detect separator and quoteChar from first line
+				String line = rawReader.readLine();
+				if (line != null && line.length() > 0) {
+					// check for separator and quoteChar
+					char[] separators = new char[]{';',',','\t'};
+					char[] quoteChars = new char[]{'"','\''};
+					Character new_separator = helper.find(line, separators);
+					Character new_quoteChar = helper.find(line, quoteChars);
+					if (new_separator != null && new_quoteChar != null) {
+						// check that it makes sense
+						int count = helper.count(line, new_separator.toString() + new_quoteChar);
+						if (count == 0) {
+							throw new ETLException("AutoMode failed with detected separator (" + new_separator + ") and quoteChar (" + new_quoteChar + ")");
+						}
+					}
+					// restore initial settings
+					separator = initial_separator;
+					quoteChar = initial_quoteChar;
+					if (new_separator != null) {
+						separator = new_separator;
+						context.getMonitor().logInfo("AutoMode identified separator " + new_separator + " (0x" + Integer.toHexString(new_separator) + ")");
+					}
+					if (new_quoteChar != null) {
+						quoteChar = new_quoteChar;
+						context.getMonitor().logInfo("AutoMode identified quoteChar " + new_quoteChar + " (0x" + Integer.toHexString(new_quoteChar) + ")");
+					}
+				}
+				rawReader = initializeStream(fsrc);
+				helper.prepareRawReader(rawReader);
 			}
-			reader  = new CSVReader(rawReader, separator, quoteChar, 0);
+			
+			context.getMonitor().logInfo("CSVExtractor uses separator " + separator + " (0x" + Integer.toHexString(separator) + ") and quoteChar " + quoteChar + " (0x" + Integer.toHexString(quoteChar) + ")");
+			reader = new CSVReader(rawReader, separator, quoteChar, 0);
 			if (containsHeader) {
 				String[] header = reader.readNext();
 				if (header == null) {
@@ -184,6 +232,44 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		
 	}
 
+	/**
+	 * 
+	 * @param fsrc
+	 * @return
+	 * @throws IOException
+	 */
+	protected BufferedReader initializeStream(FileSource fsrc) throws IOException {
+		if (input != null) {
+			input.close();
+		}
+		input = fsrc.getInputStream();
+		
+		// determine encoding
+		String encoding = fsrc.getEncoding(); // null is java default
+		byte[] encoding_tag = new byte[2];
+		// find source encoding
+		if (input.read(encoding_tag, 0, 2) == 2) {
+			if (encoding_tag[0] == -1 && encoding_tag[1] == -2) {
+				// used by Cognos CSV reports
+				encoding = "UTF-16LE";
+			} else if (encoding_tag[0] == -2 && encoding_tag[1] == -1) {
+				// used by SFDC as of 2012-07-26
+				encoding = "UTF-16BE";
+			} else {
+				input.close();
+				input = fsrc.getInputStream();
+			}
+		} else {
+			input.close();
+			input = fsrc.getInputStream();
+		}
+		fsrc.setEncoding(encoding);
+		
+		BufferedReader rawReader = new BufferedReader(StreamDecoder.forInputStreamReader(input, fsrc, fsrc.getEncoding()));
+		
+		return rawReader;
+	}
+
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.AbstractExtractor#postSourceProcessing(de.xwic.etlgine.IProcessContext)
 	 */
@@ -192,7 +278,6 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		super.postSourceProcessing(processContext);
 		
 		close();
-		
 	}
 	
 	/**
@@ -221,6 +306,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	 */
 	public void setSeparator(char separator) {
 		this.separator = separator;
+		initial_separator = separator;
 	}
 
 	/**
@@ -235,6 +321,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	 */
 	public void setQuoteChar(char quoteChar) {
 		this.quoteChar = quoteChar;
+		initial_quoteChar = quoteChar;
 	}
 
 	/**
@@ -251,5 +338,18 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		this.skipLines = skipLines;
 	}
 
-	
+	/**
+	 * @return the autoMode
+	 */
+	public boolean isAutoMode() {
+		return autoMode;
+	}
+
+	/**
+	 * @param autoMode the autoMode to set
+	 */
+	public void setAutoMode(boolean autoMode) {
+		this.autoMode = autoMode;
+	}
+
 }

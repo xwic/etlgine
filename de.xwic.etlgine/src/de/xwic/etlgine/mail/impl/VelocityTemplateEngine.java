@@ -41,9 +41,7 @@ public class VelocityTemplateEngine implements ITemplateEngine {
 		try {
 			velocityEngine.init();
 		} catch (Exception ex) {
-			log.error(ex);
-			throw new RuntimeException("VelocityEngine initialization failed: "
-					+ ex, ex);
+			throw new RuntimeException("VelocityEngine initialization failed", ex);
 		}
 
 	}
@@ -80,7 +78,7 @@ public class VelocityTemplateEngine implements ITemplateEngine {
 				in.close();
 			}
 		} catch (Exception ex) {
-			log.error(ex);
+			log.error(null, ex);
 			return ex.getMessage();
 		}
 	}
@@ -112,7 +110,7 @@ public class VelocityTemplateEngine implements ITemplateEngine {
 
 			return writer.toString();
 		} catch (Exception ex) {
-			log.error(ex);
+			log.error(null, ex);
 			return ex.getMessage();
 		}
 	}
@@ -142,7 +140,7 @@ public class VelocityTemplateEngine implements ITemplateEngine {
 			velocityEngine.evaluate(vlContext, writer, "VTE", template);
 			return writer.toString();
 		} catch (Exception ex) {
-			log.error(ex);
+			log.error(null, ex);
 			return ex.getMessage();
 		}
 	}

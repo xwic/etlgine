@@ -42,6 +42,8 @@ public class DateTransformer extends AbstractTransformer {
 	
 	protected boolean retryOnError = false;
 	
+	protected boolean skipMissingColumns = false;
+	
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
@@ -52,7 +54,24 @@ public class DateTransformer extends AbstractTransformer {
 		dateFormats.add(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"));
 		dateFormats.add(new SimpleDateFormat("MM/dd/yyyy"));
 		dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
-		dateFormats.add(new SimpleDateFormat("dd-MMM-yyyy"));
+		dateFormats.add(new SimpleDateFormat("dd-MMM-yy")); // changed from "dd-MMM-yyyy" to "dd-MMM-yy" to better support two digit years
+	}
+	
+	/**
+	 * 
+	 * @param args
+	 * @throws ETLException 
+	 * @throws ParseException 
+	 */
+	public static void main(String[] args) throws ETLException, ParseException  {
+		String[] s = {"02-JAN-10","2012-04-02"}; 
+		DateTransformer dt = new DateTransformer();
+		dt.setRetryOnError(true);
+		//dt.dateFormats.add(new SimpleDateFormat("dd-MMM-yy"));
+		dt.initialize(null);
+		for (String ds : s) {
+			System.out.println(ds + " to " + dt.parse(ds));
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -64,6 +83,9 @@ public class DateTransformer extends AbstractTransformer {
 		
 		// iterate columns and generate Date objects
 		for (String name : columns) {
+			if (skipMissingColumns && !processContext.getDataSet().containsColumn(name)) {
+				continue;
+			}
 			Object value = record.getData(name);
 			if (value instanceof Date || value == null || !(value instanceof String)) {
 				continue;
@@ -242,5 +264,19 @@ public class DateTransformer extends AbstractTransformer {
 	 */
 	public void setRetryOnError(boolean retryOnError) {
 		this.retryOnError = retryOnError;
+	}
+
+	/**
+	 * @return the skipMissingColumns
+	 */
+	public boolean isSkipMissingColumns() {
+		return skipMissingColumns;
+	}
+
+	/**
+	 * @param skipMissingColumns the skipMissingColumns to set
+	 */
+	public void setSkipMissingColumns(boolean skipMissingColumns) {
+		this.skipMissingColumns = skipMissingColumns;
 	}
 }

@@ -166,7 +166,7 @@ public class EIManager {
 			try {
 				ch.destroy();
 			} catch (Exception e) {
-				log.error("Error closing connection handler: " + ch.getConnectionId());
+				log.error("Error closing connection handler: " + ch.getConnectionId(), e);
 			}
 		}
 	}

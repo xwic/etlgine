@@ -95,7 +95,7 @@ public class JobQueue implements Runnable {
 					activeJob.execute(context);
 					log.info("[Queue " + name +"]: Job " + activeJob.getName() + " finished execution.");
 				} catch (Throwable t) {
-					log.error("Error executing job " + activeJob.getName() + " in queue " + name + ": " + t, t);
+					log.error("Error executing job " + activeJob.getName() + " in queue " + name, t);
 				}
 				context.fireEvent(EventType.JOB_EXECUTION_END, new ServerContextEvent(this, activeJob, activeJob.getState()));
 				activeJob = null;

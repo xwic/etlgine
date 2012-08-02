@@ -11,6 +11,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
+import de.xwic.etlgine.IColumn.DataType;
+
 /**
  * @author lippisch
  *
@@ -31,12 +33,16 @@ public class XLSTool {
 		return null;
 	}
 	
+	public static Object getObject(Row row, int col) {
+		return getObject(row, col, null);
+	}
+	
 	/**
 	 * @param row
 	 * @param i
 	 * @return
 	 */
-	public static Object getObject(Row row, int col) {
+	public static Object getObject(Row row, int col, DataType dataType) {
 		if (row != null) {
 			Cell cell = row.getCell(col);
 			if (cell != null) {
@@ -47,6 +53,11 @@ public class XLSTool {
 					if (HSSFDateUtil.isCellDateFormatted(cell)) {
 						return HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
 					} 
+					if (dataType != null && dataType == DataType.STRING) {
+						// dirty trick to get cell.getRichStringCellValue() working
+						cell.setCellType(Cell.CELL_TYPE_STRING);
+						return cell.getRichStringCellValue().getString();
+					}
 					return cell.getNumericCellValue();
 				case HSSFCell.CELL_TYPE_STRING:
 					return cell.getRichStringCellValue().getString();

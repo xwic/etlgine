@@ -7,7 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -50,6 +52,7 @@ public class XLSExtractor extends AbstractExtractor {
 	private Sheet currSheet = null;
 	private boolean reachedEnd = false;
 	private boolean expectAllColumns = true;
+	private boolean dedupeColumnName = false;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IExtractor#close()
@@ -58,10 +61,18 @@ public class XLSExtractor extends AbstractExtractor {
 		try {
 			if (inputStream != null) {
 				inputStream.close();
-				workbook = null;
-				sheets = null;
-				currSheet = null;
 				inputStream = null;
+				workbook = null;
+				currSource = null;
+				currRow = 0;
+				maxRow = 0;
+				expectedColumns = 0;
+				currCols = null;
+				sheets = null;
+				sheetNames = null;
+				sheetIdx = 0;
+				currSheet = null;
+				reachedEnd = false;
 			}
 		} catch (IOException e) {
 			throw new ETLException("Error closing input stream: " + e, e);
@@ -99,41 +110,42 @@ public class XLSExtractor extends AbstractExtractor {
 					}
 				}
 				
-				if (row == null) {
-					reachedEnd = true;
-				} else {
-					record.setData(COL_SHEETNAME, sheetNames.get(sheetIdx));
-					if (currSource.isContainsHeader() && expectAllColumns && (row.getLastCellNum() < expectedColumns)) {
-						record.markInvalid("Expected " + expectedColumns + " columns but row contained " + row.getLastCellNum() + " columns. (row=" + currRow + ")");
-					}
-					
-					// try to load what's there
-					int max = Math.min(expectedColumns, row.getLastCellNum()) + 1;
-					for (int i = 0; i < max; i++) {
-						String name = this.currCols.get(i);
-						if (name == null) {
-							// missing column name, auto generate now
-							name = "Column" + i;
-							if (!context.getDataSet().containsColumn(name)) {
-								context.getDataSet().addColumn(name);
-							}
-						}
-						record.setData(name, XLSTool.getObject(row, i));
-					}
-					
-					currRow++;
-					if (currRow > maxRow) {
-						sheetIdx++;
-						if (sheetIdx >= sheets.size()) {
-							reachedEnd = true;
-						} else {
-							initSheet(sheetIdx);
-						}
-					}
-					record.resetChangeFlag();
-					return record;
+				record.setData(COL_SHEETNAME, sheetNames.get(sheetIdx));
+				if (currSource.isContainsHeader() && expectAllColumns && (row.getLastCellNum() < expectedColumns)) {
+					record.markInvalid("Expected " + expectedColumns + " columns but row contained " + row.getLastCellNum() + " columns. (row=" + currRow + ")");
 				}
 				
+				// try to load what's there
+				int max = Math.min(expectedColumns, row.getLastCellNum()) + 1;
+				IDataSet ds = context.getDataSet();
+				for (int i = 0; i < max; i++) {
+					IColumn column = null;
+					String name = i < currCols.size() ? currCols.get(i) : null;
+					//String name = currCols.get(i);
+					if (name == null) {
+						// missing column name, auto generate now
+						name = "Column" + i;
+						if (!ds.containsColumn(name)) {
+							column = ds.addColumn(name);
+						}
+					}
+					if (column == null) {
+						column = ds.getColumn(name);
+					}
+					record.setData(column, XLSTool.getObject(row, i, column.getTypeHint()));
+				}
+				
+				currRow++;
+				if (currRow > maxRow) {
+					sheetIdx++;
+					if (sheetIdx >= sheets.size()) {
+						reachedEnd = true;
+					} else {
+						initSheet(sheetIdx);
+					}
+				}
+				record.resetChangeFlag();
+				return record;
 				
 			} catch (Exception e) {
 				throw new ETLException("Error reading record at row " + currRow + ": " + e, e);
@@ -198,11 +210,18 @@ public class XLSExtractor extends AbstractExtractor {
 					sheetNames.add(Integer.toString(currSource.getSheetIndex()));
 				}
 				if (sheets.size() == 0) {
-					context.getMonitor().logError("The specified sheet(s) can not be found!");
+					if (!source.isOptional()) {
+						if (currSource.getSheetName() != null) {
+							throw new ETLException("The specified sheet(s) cannot be found (" + currSource.getSheetName() + ")!");	
+						}
+						throw new ETLException("The specified sheet(s) cannot be found!");	
+					}
+					context.getMonitor().logError("The specified sheet(s) cannot be found!");
 					reachedEnd = true;
 				} else {
 					for (Sheet sheet : sheets) {
 						Row row = sheet.getRow(currSource.getStartRow());
+						Set<String> addedColumnNames = new HashSet<String>();
 						if (row == null) {
 							// file is empty!
 							context.getMonitor().logWarn("The specified header row does not exist. Assume that the file is empty.");
@@ -216,9 +235,20 @@ public class XLSExtractor extends AbstractExtractor {
 										RichTextString value = cell.getRichStringCellValue();
 										String text = value != null && value.getString() != null ? value.getString() : "";
 										if (text.length() != 0) {
+											if (dedupeColumnName && addedColumnNames.contains(text)) {
+												String newText = null;
+												for (int i = 2; ; i++) {
+													newText = text + i;
+													if (!addedColumnNames.contains(newText)) {
+														text = newText;
+														break;
+													}
+												}
+											}
 											if (!dataSet.containsColumn(text)) {
 												dataSet.addColumn(text);
 											}
+											addedColumnNames.add(text);
 										}
 									}
 								}
@@ -267,11 +297,23 @@ public class XLSExtractor extends AbstractExtractor {
 					RichTextString value = cell.getRichStringCellValue();
 					String text = value != null && value.getString() != null ? value.getString() : "";
 					if (text.length() != 0) {
+						if (dedupeColumnName && currCols.contains(text)) {
+							String newText = null;
+							for (int i = 2; ; i++) {
+								newText = text + i;
+								if (!currCols.contains(newText)) {
+									text = newText;
+									break;
+								}
+							}
+						}
 						currCols.add(text);
 						lastCol = c;
 					} else {
 						currCols.add(null);
 					}
+				} else {
+					currCols.add(null);
 				}
 			} else {
 				currCols.add(null);
@@ -295,5 +337,18 @@ public class XLSExtractor extends AbstractExtractor {
 		this.expectAllColumns = expectAllColumns;
 	}
 
-	
+	/**
+	 * @return the dedupeColumnName
+	 */
+	public boolean isDedupeColumnName() {
+		return dedupeColumnName;
+	}
+
+	/**
+	 * @param dedupeColumnName the dedupeColumnName to set
+	 */
+	public void setDedupeColumnName(boolean dedupeColumnName) {
+		this.dedupeColumnName = dedupeColumnName;
+	}
+
 }

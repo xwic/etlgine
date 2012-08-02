@@ -139,7 +139,17 @@ public class JDBCUtil {
 		
 		log.info("Opening new JDBC connection to: " + url);
 		
-		Connection con = DriverManager.getConnection(url, username, password);
+		Connection con;
+		try {
+			con = DriverManager.getConnection(url, username, password);
+		} catch (UnsatisfiedLinkError ule) {
+			if (ule.getMessage().contains("java.library.path")) {
+				String libPath = System.getProperty("java.library.path");
+				throw new ETLException("Problem loading linking library from lava.library.path: " + libPath, ule);
+			} else {
+				throw new ETLException(ule);
+			}
+		}
 
 		// set optional transaction isolation level
 		if (isolationLevel != -1) {
@@ -311,6 +321,23 @@ public class JDBCUtil {
 		}
 		
 		
+	}
+
+	/**
+	 * Returns the JDBC identifier separator.
+	 * On SQLException " is used as fallback.
+	 * @param connection
+	 * @return
+	 */
+	public static String getIdentifierSeparator(Connection connection) {
+		String identifierSeparator = null;
+		try {
+			identifierSeparator = connection.getMetaData().getIdentifierQuoteString();
+		} catch (SQLException e) {
+			identifierSeparator = "\""; // use this
+			log.warn("Error reading identifierQuoteString", e);
+		}
+		return identifierSeparator;
 	}
 
 }

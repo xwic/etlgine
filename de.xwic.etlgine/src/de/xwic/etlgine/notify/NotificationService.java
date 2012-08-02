@@ -3,10 +3,16 @@
  */
 package de.xwic.etlgine.notify;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.util.Locale;
 import java.util.Properties;
 
+import de.jwic.renderer.util.JWicTools;
+import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
+import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.mail.IMailManager;
 import de.xwic.etlgine.mail.MailFactory;
 import de.xwic.etlgine.server.IServerContextListener;
@@ -109,13 +115,27 @@ public class NotificationService implements IServerContextListener {
 		String subject = "ETLgine [" + serverContext.getProperty("name", "Unnamed") + "]: " +
 				"Job '" + job.getName() + "' finished with result " + result.toString();
 		
-		String content = "<html><body>" +
-				"Job Name: " + job.getName() + "<br>" +
-				"Duration: " + job.getDurationInfo() + "<br>";
+		String content = "<html><body>Job Name: " + job.getName() + "<br>";
 		if (job.getLastException() != null) {
-			content = content + "Last Exception: " + job.getLastException();
-		};
-		content = content + "</body></html>";
+			// get process info
+			IProcess process = null;
+			if (job.getLastException() instanceof ETLException) {
+				ETLException ee = (ETLException)job.getLastException();
+				process = ee.getProcess();
+			}
+			content += "Process Name: " + (process != null ? process.getName() : "<i>UNKNOWN</i>") + "<br>";
+			content += "Duration: " + job.getDurationInfo() + "<br>";
+			// get stack trace
+			ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
+			PrintWriter pw = new PrintWriter(stackTrace);
+			job.getLastException().printStackTrace(pw);
+			pw.flush();
+			JWicTools jt = new JWicTools(Locale.getDefault());
+			content += "Last Exception: " + jt.formatHtml(stackTrace.toString());
+		} else {
+			content += "Duration: " + job.getDurationInfo() + "<br>";
+		}
+		content += "</body></html>";
 		
 		mailManager.sendEmail(content, subject, mailTo.split(";"), new String[0], mailFrom);
 		

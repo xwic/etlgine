@@ -16,8 +16,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.impl.Context;
 import de.xwic.etlgine.impl.Job;
 
@@ -33,7 +36,9 @@ public class ServerContext extends Context {
 	}
 	
 	public final static String DEFAULT_QUEUE = "default";
+	public static final String PROPERTY_INITIALIZING_LISTENER = "initializing.listener.classnames";
 	public final static String PROPERTY_WEBSERVER_START = "webserver.start";
+	public final static String PROPERTY_MONITOR_CLASSNAME = "monitor.classname";
 	
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -97,14 +102,7 @@ public class ServerContext extends Context {
 		if (jobs.containsKey(name)) {
 			throw new ETLException("A job with the name already exist. (" + name + ")");
 		}
-		IJob job = new Job(name);
-		
-		Binding binding = new Binding();
-		binding.setVariable("context", this);
-		binding.setVariable("job", job);
 
-		GroovyShell shell = new GroovyShell(binding);
-		
 		File jobPath = new File(getProperty(PROPERTY_SCRIPTPATH, "."));
 		if (!jobPath.exists()) {
 			throw new ETLException("The job path " + jobPath.getAbsolutePath() + " does not exist.");
@@ -113,6 +111,18 @@ public class ServerContext extends Context {
 		if (!file.exists()) {
 			throw new ETLException("The script file " + file.getAbsolutePath() + " does not exist.");
 		}
+		
+		Job job = new Job(name);
+		job.setMonitor(createDefaultMonitor());
+		job.setCreatorInfo(scriptFile);
+		
+		job.getMonitor().onEvent(this, de.xwic.etlgine.IMonitor.EventType.JOB_LOAD_FROM_SCRIPT, job);
+		
+		Binding binding = new Binding();
+		binding.setVariable("context", this);
+		binding.setVariable("job", job);
+
+		GroovyShell shell = new GroovyShell(binding);
 		
 		try {
 			shell.evaluate(file);
@@ -179,4 +189,26 @@ public class ServerContext extends Context {
 	}
 
 	
+	/**
+	 * Creates a new default IMonitor.
+	 * @return
+	 * @throws ETLException 
+	 */
+	public IMonitor createDefaultMonitor() throws ETLException {
+		IContext context = this;
+		IMonitor monitor = null;
+		String classname = context.getProperty(PROPERTY_MONITOR_CLASSNAME);
+		if (classname != null) {
+			try {
+				monitor = (IMonitor)Class.forName(classname).newInstance();
+				monitor.initialize(context);
+				return monitor;
+			} catch (Throwable e) {
+				log.error("Cannot create new instance of monitor " + classname + ", " + DefaultMonitor.class.getName() + " is used instead", e);
+			}
+		}
+		monitor = new DefaultMonitor();
+		monitor.initialize(context);
+		return monitor;
+	}
 }

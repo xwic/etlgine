@@ -61,8 +61,8 @@ public class DPMappingControl extends BaseContentContainer {
 				DimMappingDefDAO dao = new DimMappingDefDAO(connection);
 				lastList = dao.listMappings();
 			} catch (Exception se) {
-				log.error("Error in DPMappingControl.setupTable()", se);
-				throw new RuntimeException("Error reading data: " + se, se);
+				//log.error("Error in DPMappingControl.setupTable()", se);
+				throw new RuntimeException("Error reading data", se);
 			}
 			
 			return lastList.iterator();

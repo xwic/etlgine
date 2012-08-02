@@ -64,7 +64,7 @@ public class JobAdminControl extends BaseContentContainer {
 		});
 		
 		
-		table.setContentProvider(new ListContentProvider(jobList));
+		table.setContentProvider(new ListContentProvider<IJob>(jobList));
 		table.setTableLabelProvider(new JobTableLabelProvider());
 		table.setWidth(949);
 		table.setHeight(500);
@@ -80,6 +80,7 @@ public class JobAdminControl extends BaseContentContainer {
 		model.addColumn(new TableColumn("Next Run", 130, "nextRun"));
 		
 		model.addElementSelectedListener(new ElementSelectedListener() {
+			private static final long serialVersionUID = 1L;
 			public void elementSelected(ElementSelectedEvent event) {
 				updateButtons();
 			}
@@ -105,6 +106,7 @@ public class JobAdminControl extends BaseContentContainer {
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				close();
 			}
@@ -114,6 +116,7 @@ public class JobAdminControl extends BaseContentContainer {
 		btRun.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_GO);
 		btRun.setTitle("Run Job");
 		btRun.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				onRunJob();
 			}
@@ -123,6 +126,7 @@ public class JobAdminControl extends BaseContentContainer {
 		btRefresh.setIconEnabled(ImageLibrary.IMAGE_REFRESH);
 		btRefresh.setTitle("Refresh");
 		btRefresh.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				onRefresh();
 			}
@@ -132,6 +136,7 @@ public class JobAdminControl extends BaseContentContainer {
 		btViewJob.setIconEnabled(ImageLibrary.IMAGE_ZOOM);
 		btViewJob.setTitle("View Job");
 		btViewJob.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				onViewJob();
 			}
@@ -141,6 +146,7 @@ public class JobAdminControl extends BaseContentContainer {
 		btStopJob.setIconEnabled(ImageLibrary.IMAGE_CANCEL);
 		btStopJob.setTitle("Stop Job");
 		btStopJob.addSelectionListener(new SelectionListener() {
+			private static final long serialVersionUID = 1L;
 			public void objectSelected(SelectionEvent event) {
 				onStopJob();
 			}

@@ -157,8 +157,8 @@ public class DPAdminControl extends BaseContentContainer {
 				}
 				table.setRequireRedraw(true);
 			} catch (StorageException se) {
-				log.error("Error releasing dataPool", se);
-				throw new RuntimeException("Error releasing DP" + se, se);
+				//log.error("Error releasing dataPool", se);
+				throw new RuntimeException("Error releasing DP", se);
 			}
 		}
 	}
@@ -213,8 +213,8 @@ public class DPAdminControl extends BaseContentContainer {
 				pool.save();
 				table.setRequireRedraw(true);
 			} catch (Exception e) {
-				log.error("Error initializing pool: " + e, e);
-				throw new RuntimeException("Error initializing pool. " + e, e);
+				//log.error("Error initializing pool: " + e, e);
+				throw new RuntimeException("Error initializing pool", e);
 			}
 		}
 		

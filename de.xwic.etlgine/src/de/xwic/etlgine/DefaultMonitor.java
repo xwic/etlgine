@@ -5,6 +5,9 @@ package de.xwic.etlgine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,14 +18,14 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultMonitor implements IMonitor {
 
 	public final static long STATUS_INTERVALL = 30 * 1000; // 30 sec.
-	public final static int MAX_LOG_BUFFER = 256000; // 256k log buffer
+	public final static int MAX_LOG_BUFFER = 4 * 1024 * 1024; // 4 MB log buffer
 	
 	protected long startTime = 0;
 	protected long nextStatus = 0;
 	protected int lastRecordsCount = 0;
 	protected Log log = LogFactory.getLog(DefaultMonitor.class);
 	protected StringBuilder logBuffer = new StringBuilder();
-	
+	protected DateFormat dateFormat = new SimpleDateFormat("dd-MMM:HH:mm:ss.SSS");
 	
 	/**
 	 * Reset the monitor prior to a new job execution.
@@ -33,49 +36,61 @@ public class DefaultMonitor implements IMonitor {
 		logBuffer.setLength(0);
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.IMonitor#onEvent(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IMonitor.EventType)
-	 */
+	@Override
+	public void initialize(IContext context) throws ETLException {
+		// nothing to do
+	}
+	
+	@Override
 	public void onEvent(IProcessContext processContext, EventType eventType) {
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IMonitor#onEvent(de.xwic.etlgine.IContext, de.xwic.etlgine.IMonitor.EventType, java.lang.Object)
+	 */
+	public void onEvent(IContext context, EventType eventType, Object eventSource) {
 		
-		if (eventType != EventType.RECORD_PROCESSED) {
-			log.debug("[EVENT] " + eventType.name());
-		} else {
-			if (System.currentTimeMillis() > nextStatus) {
-				nextStatus = System.currentTimeMillis() + STATUS_INTERVALL;
-				String sourceName = processContext.getCurrentSource() != null ? processContext.getCurrentSource().getName() : "NO-SOURCE";
-				Runtime rt = Runtime.getRuntime();
-				logInfo("Processing: " 
-						+ processContext.getRecordsCount() + "/"
-						+ (processContext.getRecordsCount() - lastRecordsCount) + "/"
-						+ processContext.getSkippedCount() + "/" 
-						+ processContext.getInvalidCount() 
-						+ " (total/now/skipped/invalid) records from " + sourceName + ", "
-						+ "Java Heap: " + rt.totalMemory() / 1024 / 1024 + "MB/" + rt.freeMemory() / 1024 / 1024 + "MB (total/free)");
-				lastRecordsCount = processContext.getRecordsCount();
-				/*
-				if (rt.freeMemory() < 16 * 1024 * 1024) {
-					logInfo("Low free memory < 16MB");
+		if (context instanceof IProcessContext) {
+			// Process event
+			IProcessContext processContext = (IProcessContext)context;
+			//call onEvent for backwards compatibility
+			onEvent(processContext, eventType);
+			if (eventType != EventType.RECORD_PROCESSED) {
+				logDebug("[EVENT] " + eventType);
+			} else {
+				if (System.currentTimeMillis() > nextStatus) {
+					nextStatus = System.currentTimeMillis() + STATUS_INTERVALL;
+					String sourceName = processContext.getCurrentSource() != null ? processContext.getCurrentSource().getName() : "NO-SOURCE";
+					Runtime rt = Runtime.getRuntime();
+					logInfo("Processing: " 
+							+ processContext.getRecordsCount() + "/"
+							+ (processContext.getRecordsCount() - lastRecordsCount) + "/"
+							+ processContext.getSkippedCount() + "/" 
+							+ processContext.getInvalidCount() 
+							+ " (total/now/skipped/invalid) records from " + sourceName + ", "
+							+ "Java Heap: " + rt.totalMemory() / 1024 / 1024 + "MB/" + rt.freeMemory() / 1024 / 1024 + "MB (total/free)");
+					lastRecordsCount = processContext.getRecordsCount();
 				}
-				*/
 			}
+			
+			switch (eventType) {
+			case PROCESS_START:
+				lastRecordsCount = 0;
+				startTime = System.currentTimeMillis();
+				nextStatus = startTime + STATUS_INTERVALL;
+				break;
+			case PROCESS_FINISHED:
+				long duration = System.currentTimeMillis() - startTime;
+				logInfo("Total duration (in ms): " + duration);
+				logInfo("Records processed:      " + processContext.getRecordsCount());
+				logInfo("Records skipped:        " + processContext.getSkippedCount());
+				logInfo("Records invalid:        " + processContext.getInvalidCount());
+				break;
+			}
+			
+		} else {
+			logDebug("[EVENT] " + eventType);
 		}
-		
-		switch (eventType) {
-		case PROCESS_START:
-			lastRecordsCount = 0;
-			startTime = System.currentTimeMillis();
-			nextStatus = startTime + STATUS_INTERVALL;
-			break;
-		case PROCESS_FINISHED:
-			long duration = System.currentTimeMillis() - startTime;
-			logInfo("Total duration (in ms): " + duration);
-			logInfo("Records processed:      " + processContext.getRecordsCount());
-			logInfo("Records skipped:        " + processContext.getSkippedCount());
-			logInfo("Records invalid:        " + processContext.getInvalidCount());
-			break;
-		}
-		
 	}
 	
 	/* (non-Javadoc)
@@ -87,13 +102,11 @@ public class DefaultMonitor implements IMonitor {
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.etlgine.IMonitor#logError(java.lang.String, java.lang.Exception)
+	 * @see de.xwic.etlgine.IMonitor#logError(java.lang.String, java.lang.Throwable)
 	 */
 	public void logError(String message, Throwable e) {
 		log.error(message, e);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		e.printStackTrace(new PrintWriter(bos));
-		logToBuffer("ERROR", message + "\n" + bos.toString());
+		logToBuffer("ERROR", message, e);
 		
 	}
 
@@ -113,12 +126,35 @@ public class DefaultMonitor implements IMonitor {
 		logToBuffer("WARN", message);
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IMonitor#logDebug(java.lang.String)
+	 */
+	public void logDebug(String message) {
+		log.debug(message);
+		logToBuffer("DEBUG", message);
+	}
+	
 	protected void logToBuffer(String prefix, String message) {
+		logToBuffer(prefix, message, null);
+	}
+	
+	protected void logToBuffer(String prefix, String message, Throwable e) {
 		if (logBuffer.length() > MAX_LOG_BUFFER) {
 			// cut away first 1024 chars if buffer is to small.
 			logBuffer = new StringBuilder(logBuffer.substring(1024, logBuffer.length()));
 		}
-		logBuffer.append("[").append(prefix).append("] ").append(message).append("\n");
+		logBuffer.append(dateFormat.format(new Date()))
+			.append(" [").append(prefix).append("] ")
+			.append(message)
+			.append("\n");
+		
+		if (e != null) {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			PrintWriter pw = new PrintWriter(bos);
+			e.printStackTrace(pw);
+			pw.flush();
+			logBuffer.append(bos);
+		}
 	}
 	
 	/**

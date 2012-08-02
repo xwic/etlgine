@@ -51,7 +51,7 @@ public class ETLgineServerFactoryBean implements ApplicationContextAware, Factor
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class getObjectType() {
 		return ETLgineServer.class;
 	}

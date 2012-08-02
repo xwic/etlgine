@@ -236,7 +236,7 @@ public class ETLgineServer implements Runnable {
 		try {
 			props.load(new FileInputStream(fileServerConf));
 		} catch (IOException e) {
-			log.error("log.error reading server.properties: " + e);
+			log.error("log.error reading server.properties", e);
 			return false;
 		}
 		
@@ -247,7 +247,7 @@ public class ETLgineServer implements Runnable {
 			try {
 				props2.load(new FileInputStream(fileServerConfOVR));
 			} catch (IOException e) {
-				log.error("log.error reading server.override.properties: " + e);
+				log.error("log.error reading server.override.properties", e);
 				return false;
 			}
 			// merge properties
@@ -268,6 +268,20 @@ public class ETLgineServer implements Runnable {
 			}
 		}
 
+		// invoke server initializing listener
+		String serverInitializingListener = serverContext.getProperty(ServerContext.PROPERTY_INITIALIZING_LISTENER);
+		if (serverInitializingListener != null) {
+			for (String classname : serverInitializingListener.split(";, ")) {
+				IServerInitializingListener listener;
+				try {
+					listener = (IServerInitializingListener)Class.forName(classname).newInstance();
+					listener.initializingServer(this);
+				} catch (Throwable t) {
+					log.error("IServerInitializingListener error for " + classname, t);
+				}
+			}
+		}
+		
 		// load jobs
 		File jobPath = new File(path, serverContext.getProperty(ServerContext.PROPERTY_SCRIPTPATH, "jobs"));
 		if (!jobPath.exists()) {
@@ -330,7 +344,7 @@ public class ETLgineServer implements Runnable {
 				jetty.start();
 				
 			} catch (Exception e) {
-				log.error("Error starting webserver: " + e, e);
+				log.error("Error starting webserver", e);
 			}
 		}
 		
@@ -342,7 +356,7 @@ public class ETLgineServer implements Runnable {
 			try {
 				executeStartScript(scriptName);
 			} catch (Exception e) {
-				log.error("Error running startscript: " + e, e);
+				log.error("Error running startscript", e);
 				return false;
 			}
 		}
@@ -452,7 +466,7 @@ public class ETLgineServer implements Runnable {
 			log.info("Loading Job " + jobName + " from file " + scriptName);
 			return serverContext.loadJob(jobName, scriptName);
 		} catch (Throwable e) {
-			log.error("An error occured during loading of the job " + scriptName + ": " + e, e);
+			log.error("An error occured during loading of the job " + scriptName, e);
 		}
 		return null;
 	}

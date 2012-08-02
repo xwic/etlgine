@@ -132,14 +132,14 @@ public class ETLProcess extends Process implements IETLProcess {
 		result = Result.FAILED;
 		
 		if (sources.size() == 0) {
-			throw new ETLException("No sources defined.");
+			throw new ETLException("No sources defined in process '" + name + "'.");
 		}
 		if (extractor == null) {
-			throw new ETLException("No extractor defined.");
+			throw new ETLException("No extractor defined in process '" + name + "'.");
 		}
 		
 		monitor.logInfo("Starting process '" + name + "'");
-		monitor.onEvent(processContext, EventType.PROCESS_START);
+		monitor.onEvent(processContext, EventType.PROCESS_START, this);
 		
 		try {
 			// initialize the extractor
@@ -189,7 +189,7 @@ public class ETLProcess extends Process implements IETLProcess {
 					
 					extractor.openSource(source, dataSet);
 					
-					monitor.onEvent(processContext, EventType.SOURCE_POST_OPEN);
+					monitor.onEvent(processContext, EventType.SOURCE_POST_OPEN, this);
 
 					extractor.preSourceProcessing(processContext);
 					
@@ -249,7 +249,7 @@ public class ETLProcess extends Process implements IETLProcess {
 						
 						processContext.recordProcessed(record);
 						// TODO track duplicates as well and inform
-						monitor.onEvent(processContext, EventType.RECORD_PROCESSED);
+						monitor.onEvent(processContext, EventType.RECORD_PROCESSED, this);
 						
 						if (stopAfterRecords > 0 && processContext.getRecordsCount() >= stopAfterRecords) {
 							monitor.logWarn("Stopped after " + stopAfterRecords + " records because of stop condition.");
@@ -272,7 +272,7 @@ public class ETLProcess extends Process implements IETLProcess {
 					}
 					
 					extractor.postSourceProcessing(processContext);
-					monitor.onEvent(processContext, EventType.SOURCE_FINISHED);
+					monitor.onEvent(processContext, EventType.SOURCE_FINISHED, this);
 				}
 				
 				if (processContext.isStopFlag()) {
@@ -290,14 +290,18 @@ public class ETLProcess extends Process implements IETLProcess {
 			}
 			
 			extractor.onProcessFinished(processContext);
-			
-			monitor.onEvent(processContext, EventType.PROCESS_FINISHED);
+			// moved to finally part
+			//monitor.onEvent(processContext, EventType.PROCESS_FINISHED);
 			result = processContext.isStopFlag() ? Result.FAILED : Result.SUCCESSFULL;
 		} catch (ETLException e) {
-			monitor.logError("Error during ETL processing: " + e, e);
+			//monitor.logError("Error during ETL processing: " + e, e);
 			result = Result.FAILED;
 			processContext.setLastException(e);
 			throw e;
+		} catch (Throwable t) {
+			result = Result.FAILED;
+			processContext.setLastException(t);
+			throw new ETLException("Error during ETL processing: " + t, t);
 		} finally {
 			processContext.setResult(result);
 			// close everything
@@ -315,8 +319,10 @@ public class ETLProcess extends Process implements IETLProcess {
 			}
 			
 			// copy back the result, as it might have changed
-			// bye a finalizer that failed.
+			// by a finalizer that failed.
 			result = processContext.getResult();
+			
+			monitor.onEvent(processContext, EventType.PROCESS_FINISHED, this);
 		}
 		
 		return result;

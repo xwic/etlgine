@@ -9,6 +9,8 @@ package de.xwic.etlgine;
  */
 public class ETLException extends Exception {
 
+	protected IProcess process = null;
+	
 	/**
 	 * 
 	 */
@@ -41,6 +43,20 @@ public class ETLException extends Exception {
 	 */
 	public ETLException(Throwable cause) {
 		super(cause);
+	}
+
+	/**
+	 * @return the process
+	 */
+	public IProcess getProcess() {
+		return process;
+	}
+
+	/**
+	 * @param process the process to set
+	 */
+	public void setProcess(IProcess process) {
+		this.process = process;
 	}
 
 }

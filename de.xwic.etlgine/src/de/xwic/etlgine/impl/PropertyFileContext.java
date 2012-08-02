@@ -71,7 +71,7 @@ public class PropertyFileContext extends Context {
 				props.load(new FileInputStream(name));
 			}
 		} catch (IOException e) {
-			log.error("log.error reading server.properties: " + e);
+			log.error("log.error reading server.properties", e);
 			return;
 		}
 		

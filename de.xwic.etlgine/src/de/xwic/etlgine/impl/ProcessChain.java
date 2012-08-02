@@ -9,14 +9,19 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import de.xwic.etlgine.DefaultMonitor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IGlobalContext;
+import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IJobFinalizer;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IETLProcess;
+import de.xwic.etlgine.IMonitor.EventType;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.Result;
@@ -35,6 +40,10 @@ public class ProcessChain implements IProcessChain {
 	
 	private IProcess activeProcess = null;
 	private Result result = null;
+	
+	protected List<IJobFinalizer> finalizers = new ArrayList<IJobFinalizer>();
+
+	private String creatorInfo = null;
 	
 	/**
 	 * Constructor.
@@ -59,8 +68,9 @@ public class ProcessChain implements IProcessChain {
 	 * @see de.xwic.etlgine.IProcessChain#addCustomProcess(de.xwic.etlgine.IProcess)
 	 */
 	public void addCustomProcess(IProcess process) {
-		processList.add(process);
 		process.setMonitor(monitor);
+		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_ADD_CUSTOM_PROCESS, process);
+		processList.add(process);
 	}
 	
 	/* (non-Javadoc)
@@ -69,6 +79,7 @@ public class ProcessChain implements IProcessChain {
 	public IETLProcess createProcess(String name) {
 		IETLProcess process = new ETLProcess(globalContext, name);
 		process.setMonitor(monitor);
+		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_CREATE_PROCESS, process);
 		processList.add(process);
 		return process;
 	}
@@ -91,6 +102,9 @@ public class ProcessChain implements IProcessChain {
 		ETLProcess process = new ETLProcess(globalContext, name);
 		process.setMonitor(monitor);
 		process.setScriptFilename(file.getAbsolutePath());
+		process.setCreatorInfo(filename);
+		
+		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_CREATE_PROCESS_FROM_SCRIPT, process);
 		
 		Binding binding = new Binding();
 		binding.setVariable("context", globalContext);
@@ -134,6 +148,10 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
+		// keep globalContext's monitor up to date
+		if (globalContext != null) {
+			globalContext.setMonitor(monitor);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -141,6 +159,8 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public void start() throws ETLException {
 		
+		monitor.onEvent(globalContext, EventType.PROCESSCHAIN_START, this);
+
 		try {
 			result = Result.SUCCESSFULL;
 			for (IProcess process : processList) {
@@ -156,6 +176,23 @@ public class ProcessChain implements IProcessChain {
 			activeProcess = null;
 		}
 
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#finish(de.xwic.etlgine.IJob)
+	 */
+	public void finish(IJob job) {
+		// run finalizers, allow modification during the loop
+		for (int i = 0; i < finalizers.size(); i++) {
+			IJobFinalizer finalizer = finalizers.get(i);
+			try {
+				finalizer.onFinish(job);
+			} catch (Throwable t) {
+				monitor.logError("Error executing finalizer!", t);
+			}
+		}
+		
+		monitor.onEvent(globalContext, EventType.PROCESSCHAIN_FINISHED, this);
 	}
 
 	/**
@@ -177,6 +214,43 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public void setResult(Result result) {
 		this.result = result;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#addJobFinalizer(de.xwic.etlgine.IJobFinalizer)
+	 */
+	public void addJobFinalizer(IJobFinalizer finalizer) {
+		finalizers.add(finalizer);
+		monitor.logInfo("Added job finalizer '" + finalizer + "' at index " + (finalizers.size() - 1));
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#getJobFinalizers()
+	 */
+	public List<IJobFinalizer> getJobFinalizers() {
+		return Collections.unmodifiableList(finalizers);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#getProcesses()
+	 */
+	@Override
+	public Collection<IProcess> getProcesses() {
+		return Collections.unmodifiableCollection(processList);
+	}
+
+	/**
+	 * @return the creatorInfo
+	 */
+	public String getCreatorInfo() {
+		return creatorInfo;
+	}
+
+	/**
+	 * @param creatorInfo the creatorInfo to set
+	 */
+	public void setCreatorInfo(String creatorInfo) {
+		this.creatorInfo = creatorInfo;
 	}
 
 }

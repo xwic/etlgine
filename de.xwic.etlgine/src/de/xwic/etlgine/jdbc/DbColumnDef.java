@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine.jdbc;
 
+import java.sql.Types;
+
 import de.xwic.etlgine.IColumn;
 
 /**
@@ -143,10 +145,24 @@ public class DbColumnDef {
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
 	}
+
+	/**
+	 * @return the full SQL type name with length for varchar
+	 */
+	public String getTypeNameDetails() {
+		String s = typeName;
+		switch (type) {
+		case Types.VARCHAR:
+		case Types.NVARCHAR:
+			s += "(" + size + ")";
+			break;
+		}
+		return s;
+	}
 	
 	@Override
 	public String toString() {
-		return name + " " + typeName + "(" + size + ")";
+		return name + " " + getTypeNameDetails();
 	}
 	
 }

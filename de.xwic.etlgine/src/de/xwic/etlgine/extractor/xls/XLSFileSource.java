@@ -23,7 +23,7 @@ public class XLSFileSource extends FileSource {
 
 	public static final String XLS_EXTENSION = ".xls";
 	public static final String XLSX_EXTENSION = ".xlsx";
-	
+	public static final String XLSM_EXTENSION = ".xlsm";
 	
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -110,6 +110,13 @@ public class XLSFileSource extends FileSource {
 						if (checked) {
 							// adjust extension
 							setEndsWith(XLSX_EXTENSION);
+						} else {
+							// try xlsm
+							checked = fileNameToLowerCase.endsWith(XLSM_EXTENSION);
+							if (checked) {
+								// adjust extension
+								setEndsWith(XLSM_EXTENSION);
+							}							
 						}
 					}
 				}
@@ -124,7 +131,7 @@ public class XLSFileSource extends FileSource {
 							return name.toLowerCase().endsWith(endsWith);
 						} else {
 							//directory auto mode -> check if file is XLSX or XLS!
-							return name.toLowerCase().endsWith(XLS_EXTENSION) || name.toLowerCase().endsWith(XLSX_EXTENSION);
+							return name.toLowerCase().endsWith(XLS_EXTENSION) || name.toLowerCase().endsWith(XLSX_EXTENSION) || name.toLowerCase().endsWith(XLSM_EXTENSION);
 						}
 					}
 				});
@@ -142,7 +149,7 @@ public class XLSFileSource extends FileSource {
 				try {
 					determineSheetNames(file);
 				} catch (Exception e) {
-					log.error("Error determining sheets: " + e, e);
+					log.error("Error determining sheets", e);
 					available = false;
 					file = null;
 				}

@@ -130,11 +130,13 @@ public interface IJob {
 
 	/**
 	 * Add a job finalizer.
+	 * @deprecated use IProcessChain.addJobFinalizer(IJobFinalizer)
 	 */
 	public void addJobFinalizer(IJobFinalizer finalizer);
 	
 	/**
 	 * Returns the job finalizers.
+	 * @deprecated use IProcessChain.getJobFinalizers()
 	 * @return
 	 */
 	public List<IJobFinalizer> getJobFinalizers();
@@ -152,5 +154,9 @@ public interface IJob {
 	 */
 	public boolean isStopTriggerAfterError();
 
-	
+	/**
+	 * Returns the job creator information, like the groovy script name.
+	 * @return
+	 */
+	public String getCreatorInfo();
 }

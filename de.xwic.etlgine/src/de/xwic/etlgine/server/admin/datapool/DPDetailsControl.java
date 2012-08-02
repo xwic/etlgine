@@ -247,7 +247,7 @@ public class DPDetailsControl extends BaseContentContainer {
 				selectorMap.put(dim, dsc);
 			}
 		} catch (Exception e) {
-			log.error("Error loading datapool: " + e, e);
+			log.error("Error loading datapool", e);
 		}
 		
 		btSave.setEnabled(syncTableConnectionName != null);

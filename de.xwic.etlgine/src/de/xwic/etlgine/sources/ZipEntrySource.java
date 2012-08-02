@@ -12,6 +12,7 @@
 package de.xwic.etlgine.sources;
 
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -25,15 +26,13 @@ import java.util.zip.ZipFile;
 public class ZipEntrySource extends FileSource {
 
 	protected ZipSources zipSource;
-	protected ZipFile zipFile;
 	protected ZipEntry zipEntry;
 		/**
 	 * @param zipSources 
 	 * 
 	 */
-	public ZipEntrySource(ZipSources zipSource, ZipFile zipFile, ZipEntry zipEntry) {
+	public ZipEntrySource(ZipSources zipSource, ZipEntry zipEntry) {
 		this.zipSource = zipSource;
-		this.zipFile = zipFile;
 		this.zipEntry = zipEntry;
 	}
 
@@ -58,8 +57,7 @@ public class ZipEntrySource extends FileSource {
 	 */
 	@Override
 	public File getFile() {
-		//RPF: WHATTHEFUCK????????????? Why is this returning null??? the movefilefinalizer does not work because of this!
-		//return null;
+		// TODO check if logic is correct to return here the zip file archive...
 		return zipSource.getFile();
 	}
 	
@@ -68,7 +66,14 @@ public class ZipEntrySource extends FileSource {
 	 */
 	@Override
 	public InputStream getInputStream() throws IOException {
-		return zipFile.getInputStream(zipEntry);
+		return new FilterInputStream(getZipFile().getInputStream(zipEntry)) {
+			@Override
+			public void close() throws IOException {
+				super.close();
+				// also close the zip archive
+				zipSource.close();
+			}
+		};
 	}
 
 	/* (non-Javadoc)
@@ -76,11 +81,37 @@ public class ZipEntrySource extends FileSource {
 	 */
 	@Override
 	public boolean isAvailable() {
-		return zipFile != null && zipEntry != null && !zipEntry.isDirectory();
+		try {
+			return zipEntry != null && !zipEntry.isDirectory() && getZipFile() != null;
+		} catch (IOException e) {
+			// TODO check if it might be better to throw an exception than swallow it
+			return false;
+		}
 	}
 	
-	public ZipFile getZipParent() {
-		return zipFile;
+	/**
+	 * @return ZipSources
+	 * @throws IOException 
+	 */
+	public ZipSources getZipSources() throws IOException {
+		return zipSource;
+	}
+	
+	/**
+	 * @return ZipFile
+	 * @throws IOException 
+	 */
+	protected ZipFile getZipFile() throws IOException {
+		return zipSource.getZipFile();
+	}
+
+	/**
+	 * @deprecated use getZipFile()
+	 * @return
+	 * @throws IOException 
+	 */
+	public ZipFile getZipParent() throws IOException {
+		return getZipFile();
 	}
 	
 }

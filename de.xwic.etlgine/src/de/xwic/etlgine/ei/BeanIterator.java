@@ -28,6 +28,7 @@ public class BeanIterator<E> implements ResourceIterator<E> {
 	private boolean hasNext;
 	
 	private class PropMap {
+		@SuppressWarnings("unused")
 		String colName;
 		int sqlType;
 		Class<?> propType;
@@ -188,8 +189,11 @@ public class BeanIterator<E> implements ResourceIterator<E> {
 					} else if (pm.propType.equals(Integer.class) || pm.propType.equals(int.class)) {
 						switch (pm.sqlType) {
 						case Types.VARCHAR:
+						case Types.NVARCHAR:
 						case Types.CHAR:
+						case Types.NCHAR:
 						case Types.CLOB:
+						case Types.NCLOB:	
 							String s = rs.getString(colIdx);
 							value = new Integer(s); // convert
 							break;
@@ -203,8 +207,11 @@ public class BeanIterator<E> implements ResourceIterator<E> {
 					} else if (pm.propType.equals(Long.class) || pm.propType.equals(long.class)) {
 						switch (pm.sqlType) {
 						case Types.VARCHAR:
+						case Types.NVARCHAR:
 						case Types.CHAR:
+						case Types.NCHAR:
 						case Types.CLOB:
+						case Types.NCLOB:	
 							String s = rs.getString(colIdx);
 							value = new Long(s); // convert
 							break;
@@ -218,8 +225,11 @@ public class BeanIterator<E> implements ResourceIterator<E> {
 					} else if (pm.propType.equals(Double.class) || pm.propType.equals(double.class)) {
 						switch (pm.sqlType) {
 						case Types.VARCHAR:
+						case Types.NVARCHAR:
 						case Types.CHAR:
+						case Types.NCHAR:
 						case Types.CLOB:
+						case Types.NCLOB:	
 							String s = rs.getString(colIdx);
 							value = new Double(s); // convert
 							break;
@@ -233,8 +243,11 @@ public class BeanIterator<E> implements ResourceIterator<E> {
 					} else if (pm.propType.equals(Date.class)) {
 						switch (pm.sqlType) {
 						case Types.VARCHAR:
+						case Types.NVARCHAR:
 						case Types.CHAR:
+						case Types.NCHAR:
 						case Types.CLOB:
+						case Types.NCLOB:	
 							String s = rs.getString(colIdx);
 							if (s != null) {
 								SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd", Locale.US);
@@ -243,6 +256,44 @@ public class BeanIterator<E> implements ResourceIterator<E> {
 							break;
 						default:
 							value = rs.getDate(colIdx);
+						}
+					// ----------- Boolean
+					} else if (pm.propType.equals(Boolean.class) || pm.propType.equals(boolean.class)) {
+						switch (pm.sqlType) {
+						case Types.VARCHAR:
+						case Types.NVARCHAR:
+						case Types.CHAR:
+						case Types.NCHAR:
+						case Types.CLOB:
+						case Types.NCLOB:	
+							value = rs.getString(colIdx);
+							break;
+						default:
+							value = rs.getObject(colIdx);
+						}
+						if (rs.wasNull()) {
+							value = null;
+						} else {
+							if (value != null) {
+								if (value instanceof Boolean) {
+									// fine
+								} else if (value instanceof Number) {
+									value = ((Number)value).intValue() == 1 ? Boolean.TRUE : Boolean.FALSE;
+								} else {
+									String s = value.toString().trim().toUpperCase();
+									if (s.length() == 0) {
+										value = null;
+									} else {
+										value = value.equals("1") || value.equals("TRUE") ? Boolean.TRUE : Boolean.FALSE;
+									}
+								}
+							}
+						}
+					// ----------- default						
+					} else {
+						value = rs.getObject(colIdx);
+						if (rs.wasNull()) {
+							value = null;
 						}
 					}
 					pm.mWrite.invoke(bean, value);

@@ -1,6 +1,21 @@
 Change Notes
 =============
 
+2012-08-02 jbornema
+	- Committed many ETL future enhancements, bug-fixes, ORACLE support.
+	  As too many files where touch, the tag "before_msaa_commit_2012_08_02" was created before commit.
+	- Major changes:
+		- New server.properties:
+			- initializing.listener.classnames
+				List of IServerInitializingListener classes to hook in the event of the ETL Server initialization
+				
+			- monitor.classname
+				Defines the default IMonitor implementation
+		- Many event had been introduced/re-factored to better support IMonitor logging
+		- JDBCMonitor added (not final, just a first idea, that uses a JDBCLoader to log into a table)
+		  (Might get renamed to LoaderMonitor to use ILoader instead of JDBCLoader)
+		- JDBCLoader many changes (containing ORACLE work-a-round for 30 character dictionary limitations)
+
 2011-09-13 jbornema
 	- Job fixed incorrect setting of activeContext
 

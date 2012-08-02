@@ -211,7 +211,7 @@ public class MappingElementEditorControl extends ControlContainer {
 			createNewElement();
 
 		} catch (Exception e) { 
-			log.error("Error creating elements", e);
+			//log.error("Error creating elements", e);
 			throw new RuntimeException("Error creating elements: " + e, e);
 		}
 		
@@ -408,7 +408,7 @@ public class MappingElementEditorControl extends ControlContainer {
 			IDimensionElement elm = dimension.parsePath(currElement.getElementPath());
 			selElement.setDimensionElement(elm);
 		} catch (Exception e) {
-			log.error("Error loading dimension element");
+			log.error("Error loading dimension element", e);
 		}
 		
 		btUpdate.setTitle("Update");

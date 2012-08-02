@@ -163,7 +163,7 @@ public class CubeHandler {
 							try {
 								dpInit.verify(dataPool);
 							} catch (Exception e) {
-								log.error("Error initializing DataPool: " + e, e);
+								log.error("Error initializing DataPool", e);
 								dpm.releaseDataPool(dataPool); // release
 								throw new ETLException("Error initializing DataPool: " + e, e);
 							}

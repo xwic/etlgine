@@ -54,6 +54,9 @@ public interface IProcess {
 	 */
 	public List<IProcessFinalizer> getProcessFinalizers();
 
-
-	
+	/**
+	 * Returns the process creator information, like the groovy script name.
+	 * @return
+	 */
+	public String getCreatorInfo();
 }

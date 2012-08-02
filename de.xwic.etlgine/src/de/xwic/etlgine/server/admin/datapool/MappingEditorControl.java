@@ -115,7 +115,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		} catch (Exception e) {
 			errInfo.showError(e);
-			log.error("Error loading mapping elements: ", e);
+			log.error("Error loading mapping elements", e);
 		}
 		
 	}

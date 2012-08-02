@@ -51,7 +51,7 @@ public abstract class AbstractConnector implements IConnector {
 				try {
 					stmt.close();
 				} catch (Throwable t) {
-					log.error("Error closing statement: " + t);
+					log.error("Error closing statement", t);
 				}
 			}
 		} catch (SQLException se) {
@@ -67,7 +67,7 @@ public abstract class AbstractConnector implements IConnector {
 			try {
 				stmt.close();
 			} catch (Throwable t) {
-				log.error("Error closing statement: " + t);
+				log.error("Error closing statement", t);
 			}
 		}
 	}

@@ -1,0 +1,247 @@
+Change Notes
+=============
+
+2011-09-13 jbornema
+	- Job fixed incorrect setting of activeContext
+
+2011-09-02 jbornema
+	- JDBCUtil.setSharedConnection(IContext context, String shareName, Connection connection) added to support
+	  custom setting of share connections
+	- NumberTransformer avoidDouble added that tries to use Integer or Long instead of Double
+	  autoColumn added to use all UNKNOWN or numeric columns in avoidDouble mode or otherwise all columns for number transformation 
+
+2011-09-01 jbornema
+	- JDBCSource/JDBCExtractor/JDBCLoader lost time information on DateTime, so it uses now getTimeStamp and created a new java.util.Date object
+	  when new JDBCSource.useJavaDate is true (for compatibility it's by default false, with "losing" time information behavior)
+	  JDBCExtractor.resultSetType and resultSetConcurrency added
+	  JDBCLoader - fixed bugs in auto detect columns types routine and added support for TEXT type
+				 - Added support for sql Types.NCHAR, Types.NUMERIC, Types.OTHER and Types.JAVA_OBJECT
+				 - Added deleteTable behavior that executes a "delete from table_name"
+				 - Fixed strance oracle behavior that returns a PreparedStatement.executeUpdate() of -2 instead of 1
+				 - Changed visibility of getConnection() to pulic	  
+	- XLSExtractor improved message logging
+	- XLSTool added support for cell errors
+	- Context.isStopFlag return true if parent context has set a stop flag
+	- ETLProcess supports now adding IProcessFinalizer while they are processed
+	- BooleanTransformer uses "x" as true
+	- NumberTransformer.numberFormats (of type List<NumberFormat>) added to support custom number formats
+	- ScheduledTrigger.dayOfWeek added to support weekly trigger
+	
+2011-01-13 jbornema
+	- IJob.isStopTriggerAfterError() added to control trigger behavior after job error
+	- Job.stopTriggerAfterError property added
+	- ETLgibeServer.checkTriggers(): jobs with errors are executed when Job.stopTriggerAfterError is false
+	- ScheduledTrigger weekly and monthly supported in early version, alternative setting for after error added
+
+2010-12-09 jbornema
+	- EmptyExtractor using now a FileSource with no data for better compatibility
+	- Job lastDuration property added, so even if the job is running the last duration can be retrieved
+	- DbColumnDef.toString() implemented
+	- JDBCLoader.replaceOnColumnsNullValue property added used on the replaceOnColumn sql join to capture also "null" joined records
+	  Method autoDetectColumnTypes uses boolean autoDetectColumnTypesRunning to fix autoDetect bug that created inconsistent table data
+	  when both features are in use
+	  Auto alter feature support not conversion of long to float
+	- JobTableLabelProvider support TriggerList
+	- ZipEntrySource return now the zip file
+
+2010-10-19 jbornema
+	- XLSExtractor uses Column0..xx for unnamed columns, new XLSFileSource(FilesSource) is used for non XLSFileSource sources
+	- XLSFileSource.otherSource added, overwritten missing interface methods
+	- JDBCUtil.ensureColumn(Connection con, String tableName, String columnName, String sqlTypeDef) added
+	- CubeLoader: fixed NPE in onProcessFinished (using missing columns function)
+	- JDBCLoader: call transformer.postSourceProcessing on all tranformers in autoDetectColumnTypes method
+	- URLFileSource.getFilename() implemented
+	- DateTransformer additional pattern added and opened the parsing for the outside
+	- TriggerList added to have a list of triggers that can be used for a job (first one being due will be used) 
+
+2010-10-08 jbornema
+	- JDBCLoader skips "" columns for table column creation
+	- JDBCLoader treat String for type detection like "002123" now as String instead of Number
+	- URLFileSource.IsAvailable() and getName() implemented
+
+2010-10-02 jbornema
+	- IJobContext / JobContact added
+	- IRecord / Record: hasNext() and setHasNext(boolean) added to support check on following records provided by extractor
+	- ICubeDataMapper.getDimensionMapping(IDimension) added
+	- BaseCubeDataMapper.getDimensionMapping(IDimension) and boolean property skipMissingColumns to skip missing columns
+	- DimensionMapping boolean property skipMissingColumns added
+	- CubeLoader.onProcessFinished(...) clears cache of cubes to ensure during load no cached cells had been created
+	- JDBCLoader.getLastReplaceOnMaxId() added, identity table columns are skipped, minor fixes,
+	  protected boolean onRecordUpdated(IProcessContext processContext, IRecord record) added to support on extensions
+	  additional record updates.
+	- ZipSources fixed missing throw expressions
+	- BooleanTransformer(String...) and default constructor added	
+
+2010-07-22 jbornema
+	- CubeLoader, ICubeDataMapper, BaseCubeDataMapper supports now ICellLoader
+	- FilesSource.isAvailable checks if file.length() > 0
+		
+2010-07-16 FLI
+	- Added integrity check
+	
+2010-07-14 jbornema
+	- IETLProcess.addTransformer(ITransformer transformer, int index) added
+	- ETLProcess property scriptFilename added which is set with the groovy script it was created by,
+	  used by getResourceAsStream and getResourceAsOutputStream to find the folder to access resources in there
+	- ProcessChain sets scriptFilename in ETLProcess
+	- MeasureMapping added support for fixed null values when columnName is null as well
+	- JDBCLoader "replace on" feature added that replaces exiting records user the auto increment PK and a list
+	  of columns used as "replace on". Properties replaceOnColumns and replaceOnAutoIncrementColumn added.
+	  JDBCLoader injects a local transformer at index 0 to call postSourceProcessing early.
+	- ZipSources auto registers as a process finalizer to close the zip.   
+
+2010-06-29 RPF
+	- Fixed a Bug in ZipSource (was opened twice which caused IO file lock)
+
+2010-06-16 RPF
+	- Added 'AutoDirectoryMode' in XLSFileSource. This will make it possible to import any file type (xls, xlsx) if
+	  only a directory is set as a source File
+	- Added directory and file prefix usage in ZipSource. It is possible now to give a directory (first zip found is taken)
+	  and an optional File Prefix, then the first file matching the prefix is taken (first zip, if no matching)
+	- ZipSource throws an ETLException now, if no files can be found to avoid NullPointerException
+	- Fixed ZipSource/MoveFileFinalizer: if only a target path was set, the ZipSource didn't work!
+	  
+2010-05-14 FLI
+	- Added possibility to seal/unseal a dimension
+	
+2010-05-12 FLI
+	- DimensionEditor and MappingEditor now allows "Mass Insert" of dimensions and mappings
+	- Added "Auto Assign" feature during insert, mainly for Mass Insert to automatically find a matching dimension element.
+	
+2010-05-10 FLI
+	- CSVLoader is now able to write the output file directly into a ZIP archive.
+	- Added 'ei' package for further use. Not yet integrated...
+	
+2010-05-07 RPF
+	- CSVLoader uses "Target Column Names" now, if there are some specified
+
+2010-05-05 jbornema
+	- CubeHandler support new property <pool key>.datapool.syncTables.connection.shared for shared connections
+	- JDBCExtractor logs debug of the sql statement
+	- MoveFileFinalizer implements IJobFinalizer so the move can take place if the entire job executed without errors
+	- ETLProcess skips records also for the transformers that have the skipped flag right away from the extractor
+	- Job chainScriptName changed to a List - with addChainScriptName multiple chains can be used in the job script
+	- JDBCUtil property <connection key>.connection.transactionIsolation added to support JDBC transaction isolation levels
+	- DimensionMappingTransformer supports shared connections
+
+2010-04-26 jbornema
+	- XLSExtractor uses now poi 3.6 with support of Excel 2007
+	- ETLProcess supports dynamic adding of Sources during Process execution
+
+2010-04-08 RPF
+	- Added fall back in XLSTool while getting values from numeric formular cells to avoid exception and job stop
+
+2010-03-26 jbornema
+	- DataPoolInitializerUtil.ensureCube(String key, List<String> dimKeys, List<String> measureKeys, IDataPool.CubeType cubeType, List<String> ignoreDimKeys) added
+	  dimension keys in ignoreDimKeys do not trigger a cube replace if missing
+
+2010-03-01 jbornema
+	- CubeLoader.processRecord processes null values as well
+	- DimensionMappingTransformer.createDimensionElement(IDimensionElement, String),
+	  called by doMapping(IProcessContext, IRecord, String) added 
+	- JDBCLoader truncates table now in preSourceProcessing event (and not in initialize anymore)
+	- ETLgineServer.FORCE_LOG4J_INITIALIZATION boolean added to fix missing log4j initialization
+
+2010-01-22 FLI
+	- Added 'lastException' property to ProcessContext
+	
+2010-01-18 FLI
+	- Mapping editor is now able to sort mapping elements by expression or by path
+	- Mapping editor action 'delete all entries' added
+	
+2009-12-16 jbornema
+	- CubeHandler supports new "[datapool key].datapool.zip" property in etlgine server.properties to
+	  enable zip compression of the datapool.
+	- JDBCUtil.openConnection(...) logs JDBC connection open.
+	- DataPoolInitializerUtil.ensureCube(...) recreates the cube if the definition is different.
+	- JDBCLoader.commitOnProcessFinished property added (true by default) that commits shared connections with disabled autoCommit
+	  in the onProcessFinished event. 
+
+2009-11-24 FLI
+	- cleared lastException property if a Job is executed
+	- ZipSources now implements IProcessFinalizer to close the zip archive on finish
+	
+2009-11-12 jbornema
+	- CubeHandler.openDataPool(String) calls init script when de-serialization fails
+	- CSVExtractor.openSource is always checking the encoding (fix when reopen occurs)
+	- JDBCExtractor uses new List<DataType> typeHints field to keep the original DataType from the table
+	  This fixes changed column data types that are used to get the record values
+	- XLSExtractor supports FileSource and can be now be used with ZipSources
+	- DataPoolInitializerUtil removes the cube if the dimensions or measures changed
+	- JDBCLoader supports now boolean in autoDetectColumnTypes
+
+2009-11-06 FLI
+	- You can now disable triggers by setting 'trigger.enabled' to false in the server.properties
+	- Added 'Sort Elements' action to dimension editor
+	- Added notification service
+	- Added validFrom and validTo date ranges to the mapping
+	- Increased content width to 950 (expecting min. 1280px width)
+	- Implemented Stop action in job list
+	
+2009-11-03 FLI
+	- Added StopFlag into process context - needs to be implemented further thought
+	- Added JDBCUtil.executeUpdate(..)
+	- Improved Record.isChanged(..) detection by comparing the current value to the original value
+	
+2009-10-21 FLI
+	- The XLSFileSource now supports the specification of a path instead of a specific file. The source will
+	  search for the first file matching the endsWith string and process this.
+	  
+2009-10-20 FLI
+	- Added "Test" of expressions into mapping editor.
+	
+2009-10-13 jbornema
+	- JDBCLoader keeps in batch mode the records to be able to throw specific exception when
+	  SQLException occurs
+	- ETLgineServer.loadJob(String scriptName) added used by Launch class to dynamic load scripts
+	- ETLgineServer sets system property "etlgine_rootPath" to the root path during initialization,
+	  so this property can be used in jetty configuration xml
+	- DbColumnDef.typeName added
+	- JDBCLoader.autoAlterColumns property added that alters automatically increased column char field length
+	  when required 
+
+2009-10-07 jbornema
+	- DataPoolInitializerUtil.ensureCube(...) converts CubeFlexCalc to CubePreCache if requested.
+
+2009-10-06 jbornema
+	- JdbcLoader SEVERE bug fixed in batch mode: each loop dropped the current record: very bad - this is fixed now.
+	- IJobFinalizer added invoked when job is finished.
+	- EmptyExtractor added useful when no data need to be processed.
+	- SaveDataPoolFinalizer added that saves the data pool when job is finished.
+	- URLFileSource added, useful in test cases to use classpath resource as FileSource.
+	- BooleanTransformer and universal NumberTransformer added.
+	
+2009-08-07 FLI
+	- MoveFileFinalizer no longer sets status to FINISHED_WITH_ERRORS if a file that should get moved does not exist.
+	
+2009-08-03 FLI
+	- CubeLoader prints a warning if data is written into a non-leaf element (splash)
+	- ETLgine Mapping-Admin: non-leaf elements are now printed in blue in the mapping table. 
+	- Added "Delete Cube" action in cube details viewer.
+	- added clear action to cube details view.
+	- now displays measures on the bottom of the datapool detail view
+	
+2009-07-28 FLI
+	- Added auto-create unmapped elements feature
+	- Moved cube-clear back into preSourceProcessing event. The movement caused imports to fail as these determine the
+	  dimensions to be cleared from the source.
+
+2009-07-17 jbornema
+	- JdbcLoader completely implements batchSize for insert and update statements (can improve sql performance up to >100%!)
+	  If no batchSize is set, [connection name].connection.batch_size is used from server.properties, batchSize between 20 and 50 seems to work good
+
+2009-07-15 jbornema
+	- Little restructure in JDBCLoader
+	- DefaultMonitor logging adjusted
+
+2009-07-06 jbornema
+	- Added Java Heap statistics in DefaultMonitor when logging record status every 30 sec.
+	- DataPoolInitializer: added "context" variable to verify(IDataPool) method
+	- DimensionMappingTransformer caches unmatched by adding a temp definition to the cache
+	- Fixed JDBCLoader primary key usage when it is not exported
+
+2009-06-18 kstein
+	- new type "Intervall" in ScheduledTrigger
+	- new Trigger: ScheduledFileChangedTrigger
+	- Method for ETLgineServer start in spring bean
+	- ETLgineServer knows if its is running

@@ -132,5 +132,13 @@ public class JobQueue implements Runnable {
 	public int getSize() {
 		return queue.size();
 	}
+
+	/**
+	 * @return the myThread
+	 */
+	public Thread getThread() {
+		return myThread;
+	}
+	
 	
 }

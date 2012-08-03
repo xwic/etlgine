@@ -22,6 +22,7 @@ import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.server.ETLgineServer;
+import de.xwic.etlgine.server.JobQueue;
 import de.xwic.etlgine.server.admin.BaseContentContainer;
 import de.xwic.etlgine.server.admin.ImageLibrary;
 import de.xwic.etlgine.server.admin.StackedContentContainer;
@@ -165,10 +166,22 @@ public class JobAdminControl extends BaseContentContainer {
 			int idx = Integer.parseInt(selection);
 			IJob job = jobList.get(idx);
 			if (job.isExecuting()) {
-				if (job.stop()) {
-					errInfo.showWarning("Stop-Flag set.");
+				if (job.getProcessChain().getGlobalContext().isStopFlag()) {
+					// force Thread.interrupt() on JobQueue's thread
+					for (JobQueue queue : ETLgineServer.getInstance().getServerContext().getJobQueues()) {
+						if (queue.getActiveJob() == job) {
+							// queue found, trigger interrupt
+							queue.getThread().interrupt();
+							errInfo.showWarning("JobQueue '" + queue.getName() + "' Thread.interrupt() invoked.");
+							break;
+						}
+					}
 				} else {
-					errInfo.showError("Unable to stop job.");
+					if (job.stop()) {
+						errInfo.showWarning("Stop-Flag set.");
+					} else {
+						errInfo.showError("Unable to stop job.");
+					}
 				}
 			} else {
 				errInfo.showError("The selected job is not running at the moment.");

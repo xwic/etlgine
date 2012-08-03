@@ -45,8 +45,6 @@ public class Job implements IJob {
 	private Throwable lastException = null;
 	private IMonitor monitor = new DefaultMonitor();
 	
-	private IContext activeContext = null;
-	
 	private String jobId = null;
 	
 	private String creatorInfo = null;
@@ -88,7 +86,6 @@ public class Job implements IJob {
 					loadChainFromScript(context, name);
 				}
 			}
-			activeContext = processChain.getGlobalContext();
 			processChain.start();
 			state = processChain.getResult() != Result.SUCCESSFULL ? State.FINISHED_WITH_ERROR : State.FINISHED;
 		} catch (ETLException ee) {
@@ -109,7 +106,6 @@ public class Job implements IJob {
 		} finally {
 			try {
 				executing = false;
-				activeContext = null;
 				lastFinished = new Date();
 				lastDuration = lastFinished.getTime() - lastStarted.getTime();
 				if (processChain != null) {
@@ -179,7 +175,8 @@ public class Job implements IJob {
 	 * @return
 	 */
 	public boolean stop() {
-		IContext ctx = activeContext;
+		//IContext ctx = activeContext;
+		IContext ctx = processChain != null ? processChain.getGlobalContext() : null;
 		if (ctx != null) {
 			ctx.setStopFlag(true);
 			return true;

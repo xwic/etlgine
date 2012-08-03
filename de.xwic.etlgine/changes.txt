@@ -1,6 +1,11 @@
 Change Notes
 =============
 
+2012-08-03 jbornema
+	- Removed Job.activeContext and used Job.processChain.getGlobalContext() instead
+	- Added JobQueue.getThread()
+	- Second "Stop Flag" invokes JobQueue.getThread().interrupt() to get out of Thread.sleep() state
+
 2012-08-02 jbornema
 	- Committed many ETL future enhancements, bug-fixes, ORACLE support.
 	  As too many files where touch, the tag "before_msaa_commit_2012_08_02" was created before commit.

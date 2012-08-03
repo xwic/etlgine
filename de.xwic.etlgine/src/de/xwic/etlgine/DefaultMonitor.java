@@ -138,7 +138,7 @@ public class DefaultMonitor implements IMonitor {
 		logToBuffer(prefix, message, null);
 	}
 	
-	protected void logToBuffer(String prefix, String message, Throwable e) {
+	protected synchronized void logToBuffer(String prefix, String message, Throwable e) {
 		if (logBuffer.length() > MAX_LOG_BUFFER) {
 			// cut away first 1024 chars if buffer is to small.
 			logBuffer = new StringBuilder(logBuffer.substring(1024, logBuffer.length()));

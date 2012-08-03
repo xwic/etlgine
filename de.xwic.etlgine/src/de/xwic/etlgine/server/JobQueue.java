@@ -25,6 +25,7 @@ public class JobQueue implements Runnable {
 	private Queue<IJob> queue = new ConcurrentLinkedQueue<IJob>();
 
 	private final String name;
+	private ThreadGroup threadGroup;
 	private Thread myThread;
 	private boolean exitFlag = false;
 	private IJob activeJob = null;
@@ -38,7 +39,8 @@ public class JobQueue implements Runnable {
 		this.context = context;
 		this.name = name;
 		
-		myThread = new Thread(this, "jobQueue-" + name);
+		threadGroup = new ThreadGroup("jobQueue-" + name);
+		myThread = new Thread(threadGroup, this, "jobQueue-" + name);
 		myThread.start();
 	}
 	

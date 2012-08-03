@@ -379,7 +379,7 @@ public class JDBCMonitor extends DefaultMonitor {
 	 * @param message
 	 * @param e
 	 */
-	public void logToTable(String prefix, String message, Throwable e) {
+	public synchronized void logToTable(String prefix, String message, Throwable e) {
 		logging++;
 		try {
 			

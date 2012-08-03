@@ -5,6 +5,8 @@ Change Notes
 	- Removed Job.activeContext and used Job.processChain.getGlobalContext() instead
 	- Added JobQueue.getThread()
 	- Second "Stop Flag" invokes JobQueue.getThread().interrupt() to get out of Thread.sleep() state
+	- Synchronized DefaultMonitor.logToBuffer(String, String, Throwable) and JDBCMonitor.logToTable(String, String, Throwable)
+	- JobQueue's Thread is now running in its own ThreadGroup
 
 2012-08-02 jbornema
 	- Committed many ETL future enhancements, bug-fixes, ORACLE support.

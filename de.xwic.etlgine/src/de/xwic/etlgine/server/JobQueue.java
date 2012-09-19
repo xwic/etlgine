@@ -49,7 +49,7 @@ public class JobQueue implements Runnable {
 	 * @param job
 	 */
 	public void addJob(IJob job) {
-		if (!queue.contains(job)) {
+		if (!isJobEnqueued(job)) {
 			job.notifyEnqueued();
 			log.debug("Adding job " + job.getName() + " to queue " + name);
 			queue.add(job);
@@ -62,6 +62,15 @@ public class JobQueue implements Runnable {
 	}
 	
 	/**
+	 * Checks if job is enqueued.
+	 * @param job
+	 * @return
+	 */
+	public boolean isJobEnqueued(IJob job) {
+		return queue.contains(job);
+	}
+
+	/**
 	 * Returns true if the queue is empty.
 	 * @return
 	 */
@@ -70,7 +79,7 @@ public class JobQueue implements Runnable {
 	}
 
 	/**
-	 * Exits the queue. If a job is currently beeing processed, the
+	 * Exits the queue. If a job is currently being processed, the
 	 * queue is terminated after the job has finished.
 	 */
 	public void stopQueue() {

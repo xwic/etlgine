@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2012-09-19 jbornema
+	- Due to OutOfMemoryException it can happen that the job state is enqueued without being in the queue.
+	  Added isJobEnqueued(IJob) in class JobQueue and ETLgineServer.
+
 2012-08-03 jbornema
 	- Removed Job.activeContext and used Job.processChain.getGlobalContext() instead
 	- Added JobQueue.getThread()

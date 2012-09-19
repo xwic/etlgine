@@ -140,7 +140,9 @@ public class ETLgineServer implements Runnable {
 		if (serverContext.getPropertyBoolean("trigger.enabled", true)) {
 		
 			for (IJob job : serverContext.getJobs()) {
-				if (!job.isDisabled() && !job.isExecuting() && !(job.getState() == IJob.State.ENQUEUED)) {
+				
+				// due to OutOfMemoryException the job state can be ENQUEUED without actually sitting in the queue
+				if (!job.isDisabled() && !job.isExecuting() && (job.getState() != IJob.State.ENQUEUED || !isJobEnqueued(job))) {
 					if ((job.getState() != State.FINISHED_WITH_ERROR && job.getState() != State.ERROR) || !job.isStopTriggerAfterError()) {
 						if (job.getTrigger() != null && job.getTrigger().isDue()) {
 							enqueueJob(job);
@@ -151,6 +153,16 @@ public class ETLgineServer implements Runnable {
 			
 		}
 		
+	}
+
+	
+	/**
+	 * Checks if job is already enqueued.
+	 * @param job
+	 * @return
+	 */
+	public boolean isJobEnqueued(IJob job) {
+		return serverContext.getDefaultJobQueue().isJobEnqueued(job);
 	}
 
 	/**

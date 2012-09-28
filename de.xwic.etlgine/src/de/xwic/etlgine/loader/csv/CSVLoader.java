@@ -135,8 +135,9 @@ public class CSVLoader extends AbstractLoader implements ILoader {
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		try {
 			writer.flush();
-
-			zipOut.closeEntry();
+			if (zipOut != null) {
+				zipOut.closeEntry();
+			}
 			writer.close();
 		} catch (IOException e) {
 			throw new ETLException("Error closing writer: " + e, e);

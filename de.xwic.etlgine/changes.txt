@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2012-09-28 jbornema
+	- Fixed NPE in CSVLoader when export is done into regular/unzipped file.
+
 2012-09-19 jbornema
 	- Due to OutOfMemoryException it can happen that the job state is enqueued without being in the queue.
 	  Added isJobEnqueued(IJob) in class JobQueue and ETLgineServer.

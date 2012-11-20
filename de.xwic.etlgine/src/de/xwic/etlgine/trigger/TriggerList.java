@@ -11,11 +11,33 @@ import de.xwic.etlgine.ITrigger;
 /**
  * @author jbornema
  *
+ * Wraps one or more ITrigger.
+ * 
+ * Also ensures that when a job starts execution the original isDue() state persists till notifyJobFinished(boolean).
+ * This behavior enables during job executing to check for the original isDue() state.
+ * The general use is to implement different behavior when the job was manually enqueued (then isDue() is false).
  */
 public class TriggerList implements ITrigger {
 
 	protected Collection<ITrigger> triggers = new ArrayList<ITrigger>();
 	protected ITrigger dueTrigger = null;
+	protected Boolean due = null;
+
+	/**
+	 * 
+	 */
+	public TriggerList() {
+	}
+
+	/**
+	 * 
+	 * @param triggers
+	 */
+	public TriggerList(ITrigger... triggers) {
+		for (ITrigger trigger : triggers) {
+			this.triggers.add(trigger);
+		}
+	}
 	
 	/**
 	 * Adds trigger to list of triggers checked.
@@ -61,6 +83,9 @@ public class TriggerList implements ITrigger {
 	 */
 	@Override
 	public boolean isDue() {
+		if (due != null) {
+			return due;
+		}
 		for (ITrigger trigger : triggers) {
 			if (trigger.isDue()) {
 				setDueTrigger(trigger);
@@ -77,7 +102,10 @@ public class TriggerList implements ITrigger {
 	public void notifyJobStarted() {
 		ITrigger trigger = getDueTrigger();
 		if (trigger != null) {
+			due = trigger.isDue();
 			trigger.notifyJobStarted();
+		} else {
+			due = null;
 		}
 	}
 
@@ -86,6 +114,7 @@ public class TriggerList implements ITrigger {
 	 */
 	@Override
 	public void notifyJobFinished(boolean withErrors) {
+		due = null;
 		ITrigger trigger = getDueTrigger();
 		if (trigger != null) {
 			trigger.notifyJobFinished(withErrors);

@@ -1730,6 +1730,7 @@ de.xwic.etlgine/src/de/xwic/etlgine/transformer/NumberTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/transformer/TrimTransformer.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/FileLookupTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/JobExecutedTrigger.java -text
+de.xwic.etlgine/src/de/xwic/etlgine/trigger/JobStartedIsDueTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledFileChangedTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/ScheduledTrigger.java -text
 de.xwic.etlgine/src/de/xwic/etlgine/trigger/TriggerList.java -text

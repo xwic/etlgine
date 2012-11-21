@@ -5,6 +5,7 @@ package de.xwic.etlgine.monitor.jdbc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.util.Date;
 import java.util.Stack;
 import java.util.Timer;
@@ -29,6 +30,7 @@ import de.xwic.etlgine.impl.ETLProcess;
 import de.xwic.etlgine.impl.Process;
 import de.xwic.etlgine.impl.ProcessContext;
 import de.xwic.etlgine.loader.jdbc.JDBCLoader;
+import de.xwic.etlgine.server.ETLgineServer;
 
 /**
  * @author JBORNEMA
@@ -116,6 +118,8 @@ public class JDBCMonitor extends DefaultMonitor {
 	protected IColumn colJob;
 	protected IColumn colProcess;
 	protected IColumn colCreatorInfo;
+	protected IColumn colHostname;
+	protected IColumn colETLgineName;
 	
 	protected EventType eventType;
 	protected Object eventSource;
@@ -205,7 +209,12 @@ public class JDBCMonitor extends DefaultMonitor {
 		colCreatorInfo = ds.addColumn("CreatorInfo");
 		colCreatorInfo.setTypeHint(DataType.STRING);
 		colCreatorInfo.setLengthHint(128);
-		
+		colHostname = ds.addColumn("Hostname");
+		colHostname.setTypeHint(DataType.STRING);
+		colHostname.setLengthHint(128);
+		colETLgineName = ds.addColumn("ETLgine Name");
+		colETLgineName.setTypeHint(DataType.STRING);
+		colETLgineName.setLengthHint(128);
 	}
 	
 	protected Object lock(Object lockObject) {
@@ -345,9 +354,11 @@ public class JDBCMonitor extends DefaultMonitor {
 			} else if (eventSource instanceof IProcessChain) {
 				currentProcessChain = (IProcessChain)eventSource;
 				currentCreatorInfo = currentProcessChain.getCreatorInfo();
+				currentProcess = null;
 			} else if (eventSource instanceof IJob) {
 				currentJob = (IJob)eventSource;
 				currentCreatorInfo = currentJob.getCreatorInfo();
+				currentProcess = null;
 			}
 			this.eventSource = eventSource;
 		}
@@ -431,8 +442,10 @@ public class JDBCMonitor extends DefaultMonitor {
 					}
 				}			
 				if (finished != null) {
-					start = startTimes.pop();
-					duration = (int)(finished.getTime() - start.getTime());
+					if (startTimes.size() > 0) {
+						start = startTimes.pop();
+						duration = (int)(finished.getTime() - start.getTime());
+					}
 				}
 			}
 			
@@ -451,6 +464,8 @@ public class JDBCMonitor extends DefaultMonitor {
 			record.setData(colJob, currentJob != null ? currentJob.getName() : null);
 			record.setData(colProcess, currentProcess != null ? currentProcess.getName() : null);
 			record.setData(colCreatorInfo, currentCreatorInfo);
+			record.setData(colHostname, InetAddress.getLocalHost().getCanonicalHostName());
+			record.setData(colETLgineName, ETLgineServer.getInstance().getServerContext().getProperty("name", "Unnamed"));
 			
 			loader.processRecord(processContext, record);
 			

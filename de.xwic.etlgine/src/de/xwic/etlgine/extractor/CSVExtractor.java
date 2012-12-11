@@ -44,6 +44,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	private InputStream input = null;
 	
 	private boolean autoMode = false;
+	private boolean trimColumnName = false;
 	private char initial_separator = separator;
 	private char initial_quoteChar = quoteChar;
 	
@@ -212,6 +213,9 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 					expectedColumns = header.length;
 					int idx = 0;
 					for (String colName : header) {
+						if (trimColumnName) {
+							colName = colName.trim();
+						}
 						int i = 1;
 						for (String name = colName; dataSet.containsColumn(name); i++) {
 							name = colName + i;
@@ -249,12 +253,30 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 		byte[] encoding_tag = new byte[2];
 		// find source encoding
 		if (input.read(encoding_tag, 0, 2) == 2) {
-			if (encoding_tag[0] == -1 && encoding_tag[1] == -2) {
+			if (encoding_tag[0] == (byte)0xFF && encoding_tag[1] == (byte)0xFE) {
 				// used by Cognos CSV reports
 				encoding = "UTF-16LE";
-			} else if (encoding_tag[0] == -2 && encoding_tag[1] == -1) {
+			} else if (encoding_tag[0] == (byte)0xFE && encoding_tag[1] == (byte)0xFF) {
 				// used by SFDC as of 2012-07-26
 				encoding = "UTF-16BE";
+				if (input.read(encoding_tag, 0, 2) == 2 && encoding_tag[0] == (byte)0xFE && encoding_tag[1] == (byte)0xFF) {
+					// 2012-10-10: on 2012-07-26 an incorrect encoding tag (BOM) of -2,-1,-2,-1 instead of -2,-1 was multiple times downloaded, so that get fixed here...
+				} else {
+					input.close();
+					input = fsrc.getInputStream();
+					input.read(encoding_tag, 0, 2);
+				}
+			} else if (encoding_tag[0] == (byte)0xEF && encoding_tag[1] == (byte)0xBB) {
+				// check for UTF-8
+				if (input.read(encoding_tag, 0, 1) == 1 && encoding_tag[0] == (byte)0xBF) {
+					// it's UTF-8, first encountered 2012-12-11 from the eBI answers report download format CSV
+					encoding = "UTF-8";
+				} else {
+					// should never happen
+					input.close();
+					input = fsrc.getInputStream();
+					input.read(encoding_tag, 0, 2);
+				}
 			} else {
 				input.close();
 				input = fsrc.getInputStream();
@@ -350,6 +372,20 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	 */
 	public void setAutoMode(boolean autoMode) {
 		this.autoMode = autoMode;
+	}
+
+	/**
+	 * @return the trimColumnName
+	 */
+	public boolean isTrimColumnName() {
+		return trimColumnName;
+	}
+
+	/**
+	 * @param trimColumnName the trimColumnName to set
+	 */
+	public void setTrimColumnName(boolean trimColumnName) {
+		this.trimColumnName = trimColumnName;
 	}
 
 }

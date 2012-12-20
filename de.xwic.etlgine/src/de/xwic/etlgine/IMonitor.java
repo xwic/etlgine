@@ -75,7 +75,7 @@ public interface IMonitor {
 	
 	/**
 	 * ProcessContext events.
-	 * @deprecated please use onEvent(IContext processContext, EventType eventType, Object... eventSource)
+	 * @deprecated please use onEvent(IContext processContext, EventType eventType, Object eventSource)
 	 * @param processContext
 	 * @param eventType
 	 */

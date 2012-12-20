@@ -5,6 +5,7 @@ package de.xwic.etlgine.notify;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -43,7 +44,6 @@ public class NotificationService implements IServerContextListener {
 	private String mailTo;
 	private Level level;
 	
-
 	/**
 	 * @param serverContext
 	 */
@@ -109,38 +109,69 @@ public class NotificationService implements IServerContextListener {
 	 */
 	private void sendNotification(NotificationEvent nfEvent, IJob job, State result) {
 
-		// initialize mail...
-		IMailManager mailManager = MailFactory.getMailManager();
+		String subject = "finished with result " + result.toString();
 		
-		String subject = "ETLgine [" + serverContext.getProperty("name", "Unnamed") + "]: " +
-				"Job '" + job.getName() + "' finished with result " + result.toString();
+		IProcess process = null;
+		Throwable t = job.getLastException();
 		
-		String content = "<html><body>Job Name: " + job.getName() + "<br>";
-		if (job.getLastException() != null) {
+		if (t instanceof ETLException) {
 			// get process info
-			IProcess process = null;
-			if (job.getLastException() instanceof ETLException) {
-				ETLException ee = (ETLException)job.getLastException();
-				process = ee.getProcess();
-			}
-			content += "Process Name: " + (process != null ? process.getName() : "<i>UNKNOWN</i>") + "<br>";
-			content += "Duration: " + job.getDurationInfo() + "<br>";
-			// get stack trace
-			ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
-			PrintWriter pw = new PrintWriter(stackTrace);
-			job.getLastException().printStackTrace(pw);
-			pw.flush();
-			JWicTools jt = new JWicTools(Locale.getDefault());
-			content += "Last Exception: " + jt.formatHtml(stackTrace.toString());
-		} else {
-			content += "Duration: " + job.getDurationInfo() + "<br>";
-		}
-		content += "</body></html>";
+			ETLException ee = (ETLException)t;
+			process = ee.getProcess();
+		}		
 		
-		mailManager.sendEmail(content, subject, mailTo.split(";"), new String[0], mailFrom);
+		sendNotification(job, process, subject, null, t);
 		
 	}
 
-	
+	/**
+	 * 
+	 * @param job
+	 * @param process
+	 * @param subject
+	 * @param message
+	 * @param t
+	 */
+	public void sendNotification(IJob job, IProcess process, String subject, String message, Throwable t) {
+		// initialize mail...
+		IMailManager mailManager = MailFactory.getMailManager();
+		JWicTools jt = new JWicTools(Locale.getDefault());
+		
+		subject = "ETLgine [" + serverContext.getProperty("name", "Unnamed") + "]: " +
+				"Job '" + job.getName() + (subject != null ? "' " + subject : "");
+		
+		String content = "<html><body>Job Name: " + job.getName() + "<br>";
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM:HH:mm:ss.SSS");
+		if (job.getLastStarted() != null) {
+			content += "Job Start: " + sdf.format(job.getLastStarted()) + "<br>";
+		}
+		if (job.getLastFinished() != null) {
+			content += "Job End: " + sdf.format(job.getLastFinished()) + "<br>";
+		}
+		content += "Duration: " + job.getDurationInfo() + "<br>";
+		
+		// get process info
+		content += "Process Name: " + (process != null ? process.getName() : "<i>UNKNOWN</i>") + "<br>";
+		content += "Process Script: " + (process != null ? process.getCreatorInfo() : "<i>UNKNOWN</i>") + "<br>";
+
+		if (message != null) {
+			content += "<br>";
+			content += "Message:<br>";
+			content += "========<br>";
+			content += jt.formatHtml(message) + "<br><br>";
+		}
+		
+		if (t != null) {
+			// get stack trace
+			ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
+			PrintWriter pw = new PrintWriter(stackTrace);
+			t.printStackTrace(pw);
+			pw.close();
+			content += "Last Exception: " + jt.formatHtml(stackTrace.toString());
+		}		
+		content += "</body></html>";
+		
+		mailManager.sendEmail(content, subject, mailTo.split(";"), new String[0], mailFrom);		
+	}
 	
 }

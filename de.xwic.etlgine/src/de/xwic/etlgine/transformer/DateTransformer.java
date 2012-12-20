@@ -44,6 +44,8 @@ public class DateTransformer extends AbstractTransformer {
 	
 	protected boolean skipMissingColumns = false;
 	
+	protected boolean skipRecordOnError = false;
+	
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
@@ -102,7 +104,10 @@ public class DateTransformer extends AbstractTransformer {
 			
 				record.setData(name, d);
 			} catch (ParseException e) {
-				throw new ETLException("Error parsing date string '" + s + "' in field " + name, e);
+				if (!skipRecordOnError) {
+					throw new ETLException("Error parsing date string '" + s + "' in field " + name, e);
+				}
+				record.setSkip(true);
 			}
 		}
 	}
@@ -279,4 +284,20 @@ public class DateTransformer extends AbstractTransformer {
 	public void setSkipMissingColumns(boolean skipMissingColumns) {
 		this.skipMissingColumns = skipMissingColumns;
 	}
+
+	/**
+	 * @return the skipRecordOnError
+	 */
+	public boolean isSkipRecordOnError() {
+		return skipRecordOnError;
+	}
+
+	/**
+	 * @param skipRecordOnError the skipRecordOnError to set
+	 */
+	public void setSkipRecordOnError(boolean skipRecordOnError) {
+		this.skipRecordOnError = skipRecordOnError;
+	}
+	
+	
 }

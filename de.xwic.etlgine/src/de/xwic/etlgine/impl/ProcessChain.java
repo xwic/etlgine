@@ -172,6 +172,15 @@ public class ProcessChain implements IProcessChain {
 					break;
 				}
 			}
+		} catch (ETLException ee) {
+			if (ee.getProcess() == null) {
+				ee.setProcess(activeProcess);
+			}
+			throw ee;
+		} catch (Throwable t) {
+			ETLException ee = new ETLException("Error executing job: " + t, t);
+			ee.setProcess(activeProcess);
+			throw ee;
 		} finally {
 			activeProcess = null;
 		}

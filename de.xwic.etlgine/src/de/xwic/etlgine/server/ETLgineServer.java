@@ -376,6 +376,7 @@ public class ETLgineServer implements Runnable {
 		if (serverContext.getPropertyBoolean("notifications.enabled", false)) {
 			log.info("Notification Services enabled");
 			NotificationService nfService = new NotificationService(serverContext);
+			serverContext.setData(NotificationService.class.getName(), nfService);
 			serverContext.addServerContextListener(nfService);
 		}
 		

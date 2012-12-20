@@ -102,6 +102,7 @@ public class JDBCLoader extends AbstractLoader {
 	private int batchSize = -1;
 	private int batchCountInsert = 0;
 	private int batchCountUpdate = 0;
+	private int batchRecordsCountOffset = 0;
 	
 	private List<IRecord> batchInsertRecords = new ArrayList<IRecord>();
 	private List<IRecord> batchUpdateRecords = new ArrayList<IRecord>();
@@ -407,6 +408,9 @@ public class JDBCLoader extends AbstractLoader {
 			
 			// build prepared statement.. and Update statement.
 			buildPreparedStatements();
+			
+			// set offset for batch insert/update
+			batchRecordsCountOffset = processContext.getRecordsCount();
 			
 		} catch (SQLException se) {
 			throw new ETLException("Error initializing target database/tables: " + se, se);
@@ -876,7 +880,7 @@ public class JDBCLoader extends AbstractLoader {
 				IColumn column = entry.getKey();
 				ColumnType columnType = entry.getValue();
 				
-				if (column.getTypeHint() != DataType.UNKNOWN && column.getTypeHint() != DataType.STRING || (column.getTypeHint() == DataType.STRING && column.getLengthHint() > 0 && columnType.count == 0)) {
+				if (column.getTypeHint() != DataType.UNKNOWN && column.getTypeHint() != DataType.STRING || (column.getTypeHint() == DataType.STRING && column.getLengthHint() > 0 /*2012-10-08 jbornema: disabled to overrule this mode && columnType.count == 0*/)) {
 					continue;
 				}
 				
@@ -1527,6 +1531,7 @@ public class JDBCLoader extends AbstractLoader {
 				} else {
 					// batched mode
 					psUpdate.addBatch();
+					batchUpdateRecords.add(record);
 					batchCountUpdate++;
 					if (batchCountUpdate >= batchSize) {
 						// execute
@@ -1537,7 +1542,7 @@ public class JDBCLoader extends AbstractLoader {
 			}				
 		} catch (Throwable t) {
 			if (handleException) {
-				handleException(t, record, true);
+				handleException(t, record, processContext.getRecordsCount(), true);
 			} else {
 				throw new ETLException(t);
 			}
@@ -1854,7 +1859,7 @@ public class JDBCLoader extends AbstractLoader {
 	
 	private void doInsert(IProcessContext processContext, IRecord record, Collection<DbColumnDef> columns, PreparedStatement ps, String pkColumn) throws ETLException {
 		boolean handleException = true;
-		boolean defaultInvocation = ps == psInsert;
+		boolean defaultInvocation = ps == psInsert; // if defaultInvocation is false, then batch insert is not used (only used for the "Oracle" dictionary "workaround")
 		try {
 			ps.clearParameters();
 			
@@ -1901,7 +1906,7 @@ public class JDBCLoader extends AbstractLoader {
 			
 		} catch (Throwable t) {
 			if (handleException) {
-				handleException(t, record, true);
+				handleException(t, record, processContext.getRecordsCount(), true);
 			} else {
 				throw new ETLException(t);
 			}
@@ -1915,7 +1920,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @param record
 	 * @throws ETLException 
 	 */
-	protected void handleException(Throwable t, IRecord record, boolean throwException) throws ETLException {
+	protected void handleException(Throwable t, IRecord record, Integer recordsCount, boolean throwException) throws ETLException {
 		if (record != null && (t instanceof DataTruncation || t.getCause() instanceof DataTruncation || t.getMessage().toLowerCase().contains("truncation"))) {
 			//monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, se);
 			// log field value lengths
@@ -1945,13 +1950,14 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			
 			if (hintColDef == null && !throwException) {
-				monitor.logError("A Data Truncation occurred during INSERT or UPDATE on record " + record);
+				monitor.logError("A Data Truncation occurred during INSERT or UPDATE on record " + recordsCount + ": " + record);
 			}
 			if (throwException) {
-				throw new ETLException("A Data Truncation occurred during INSERT or UPDATE on record " + record, t);
+				throw new ETLException("A Data Truncation occurred during INSERT or UPDATE on record " + recordsCount + ": " + record, t);
 			}
 		} else {
-			String msg = "A SQLException occurred during INSERT or UPDATE on record " + record;
+			String msg = record != null ? "A SQLException occurred during INSERT or UPDATE on record " + recordsCount + ": " + record
+										: "A SQLException occurred during INSERT or UPDATE";
 			if (throwException) {
 				throw new ETLException(msg, t);
 			} else {
@@ -2014,17 +2020,18 @@ public class JDBCLoader extends AbstractLoader {
 					for (int i = 0; i < result.length; i++) {
 						if (result[i] != 1) {
 							record = batchRecords.get(i);
-							handleException(bue, record, false);
+							handleException(bue, record, batchRecordsCountOffset + i, false);
 						}
 					}
 				}
-				handleException(bue, null, true);
+				handleException(bue, null, null, true);
 			} catch (SQLException se) {
-				handleException(se, null, true);
+				handleException(se, null, null, true);
 			}
 		} finally {
 			batchInsertRecords.clear();
 			batchUpdateRecords.clear();
+			batchRecordsCountOffset = processContext.getRecordsCount();
 		}
 	}
 

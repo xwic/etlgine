@@ -51,7 +51,7 @@ public class ProcessTest extends TestCase {
 	public void testProcess() throws ETLException {
 		
 		IProcessChain pc = ETLgine.createProcessChain("Test");
-		IETLProcess process = pc.createProcess("testStartChecks");
+		final IETLProcess process = pc.createProcess("testStartChecks");
 		
 		FileSource srcFile = new FileSource("test/source.csv");
 		process.addSource(srcFile);
@@ -71,7 +71,7 @@ public class ProcessTest extends TestCase {
 		process.setMonitor(new DefaultMonitor() {
 			@Override
 			public void onEvent(IProcessContext processContext, EventType eventType) {
-				super.onEvent(processContext, eventType);
+				super.onEvent(processContext, eventType, process);
 				switch (eventType) {
 				case SOURCE_POST_OPEN: {
 					// after the open, check if the data source contains the right columns.

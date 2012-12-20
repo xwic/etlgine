@@ -1,6 +1,13 @@
 Change Notes
 =============
 
+2012-12-20 jbornema
+	- Added DateTransformer.skipRecordOnError when a date couldn't be parsed
+	- ETLgineServer is adding the NotificationTransformer instance to ServerContext's data with name NotificationService.class.getName()
+	- NotificationService.sendNotification(IJob job, IProcess process, String subject, String message, Throwable t) added
+	  and message format improved
+	- JDBCLoader, Job and ProcessChain error handling improved
+
 2012-12-11 jbornema
 	- Added CSVExtractor.trimColumnName to trim the identified column names.
 	  Added UTF-8 encoding support and a buggy SFDC UTF-16BE BOM (generated twice).

@@ -91,31 +91,25 @@ public class Job implements IJob {
 		} catch (ETLException ee) {
 			state = State.ERROR;
 			lastException = ee;
-			if (ee.getProcess() == null && processChain != null) {
-				ee.setProcess(processChain.getActiveProcess());
-			}
 			throw ee;
 		} catch (Throwable t) {
 			state = State.ERROR;
 			lastException = t;
 			ETLException ee = new ETLException("Error executing job: " + t, t);
-			if (processChain != null) {
-				ee.setProcess(processChain.getActiveProcess());
-			}
 			throw ee;
 		} finally {
 			try {
-				executing = false;
 				lastFinished = new Date();
 				lastDuration = lastFinished.getTime() - lastStarted.getTime();
 				if (processChain != null) {
 					processChain.finish(this);
-					processChain = null;
 				}
 				if (trigger != null) {
 					trigger.notifyJobFinished(state == State.ERROR);
 				}
 			} finally {
+				executing = false;
+				processChain = null;
 				monitor.onEvent(context, EventType.JOB_EXECUTION_END, this);
 			}
 		}

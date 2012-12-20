@@ -152,7 +152,7 @@ public class DefaultMonitor implements IMonitor {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			PrintWriter pw = new PrintWriter(bos);
 			e.printStackTrace(pw);
-			pw.flush();
+			pw.close();
 			logBuffer.append(bos);
 		}
 	}

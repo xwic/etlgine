@@ -1,6 +1,9 @@
 Change Notes
 =============
 
+2013-01-02 jbornema
+	- Added SourceHelper class for adding folder content filtered by regular expression in the right order as FileSource to the process.
+
 2012-12-20 jbornema
 	- Added DateTransformer.skipRecordOnError when a date couldn't be parsed
 	- ETLgineServer is adding the NotificationTransformer instance to ServerContext's data with name NotificationService.class.getName()

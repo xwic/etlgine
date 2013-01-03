@@ -22,7 +22,7 @@ import de.xwic.etlgine.server.ServerContextEvent;
 
 /**
  * The notification service can send Email for various server events such as
- * job completion. Usefull to get notified if a job failed.
+ * job completion. Useful to get notified if a job failed.
  * 
  * @author lippisch
  */

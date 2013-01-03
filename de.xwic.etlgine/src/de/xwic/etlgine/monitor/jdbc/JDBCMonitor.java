@@ -116,7 +116,9 @@ public class JDBCMonitor extends DefaultMonitor {
 	protected IColumn colFinished;
 	protected IColumn colDuration;
 	protected IColumn colJob;
+	protected IColumn colState;
 	protected IColumn colProcess;
+	protected IColumn colResult;
 	protected IColumn colCreatorInfo;
 	protected IColumn colHostname;
 	protected IColumn colETLgineName;
@@ -203,9 +205,15 @@ public class JDBCMonitor extends DefaultMonitor {
 		colJob = ds.addColumn("Job");
 		colJob.setTypeHint(DataType.STRING);
 		colJob.setLengthHint(64);
+		colState = ds.addColumn("State");
+		colState.setTypeHint(DataType.STRING);
+		colState.setLengthHint(32);
 		colProcess = ds.addColumn("Process");
 		colProcess.setTypeHint(DataType.STRING);
 		colProcess.setLengthHint(64);
+		colResult = ds.addColumn("Result");
+		colResult.setTypeHint(DataType.STRING);
+		colResult.setLengthHint(32);
 		colCreatorInfo = ds.addColumn("CreatorInfo");
 		colCreatorInfo.setTypeHint(DataType.STRING);
 		colCreatorInfo.setLengthHint(128);
@@ -400,13 +408,6 @@ public class JDBCMonitor extends DefaultMonitor {
 			boolean forceClose = false;
 			
 			String exception = null;
-			if (e != null) {
-				ByteArrayOutputStream bao = new ByteArrayOutputStream();
-				PrintWriter pw = new PrintWriter(bao);
-				e.printStackTrace(pw);
-				pw.flush();
-				exception = bao.toString();
-			}
 			
 			Date start = null;
 			Date finished = null;
@@ -449,6 +450,22 @@ public class JDBCMonitor extends DefaultMonitor {
 				}
 			}
 			
+			if (e == null && currentProcess != null && currentProcess.getContext() != null && currentProcess.getContext().getLastException() != null) {
+				e = currentProcess.getContext().getLastException();
+			}
+			
+			if (e == null && currentJob != null && currentJob.getLastException() != null) {
+				e = currentJob.getLastException();
+			}
+			
+			if (e != null) {
+				ByteArrayOutputStream bao = new ByteArrayOutputStream();
+				PrintWriter pw = new PrintWriter(bao);
+				e.printStackTrace(pw);
+				pw.close();
+				exception = bao.toString();
+			}
+
 			// ensure table is open
 			openTable(null);
 			
@@ -462,7 +479,20 @@ public class JDBCMonitor extends DefaultMonitor {
 			record.setData(colFinished, finished);
 			record.setData(colDuration, duration);
 			record.setData(colJob, currentJob != null ? currentJob.getName() : null);
+			record.setData(colState, currentJob != null && currentJob.getState() != null ? currentJob.getState().name() : null);
 			record.setData(colProcess, currentProcess != null ? currentProcess.getName() : null);
+			if (eventType != null) {
+				switch (eventType) {
+					case PROCESS_FINISHED: {
+						record.setData(colResult, currentProcess != null && currentProcess.getResult() != null ? currentProcess.getResult().name() : null);
+						break;
+					}
+					case PROCESSCHAIN_FINISHED: {
+						record.setData(colResult, currentProcessChain != null && currentProcessChain.getResult() != null ? currentProcessChain.getResult().name() : null);
+						break;
+					}
+				}
+			}
 			record.setData(colCreatorInfo, currentCreatorInfo);
 			record.setData(colHostname, InetAddress.getLocalHost().getCanonicalHostName());
 			record.setData(colETLgineName, ETLgineServer.getInstance().getServerContext().getProperty("name", "Unnamed"));

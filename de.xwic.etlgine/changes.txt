@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2013-01-03 jbornema
+	- Added JDBCMonitor column "State" (Job State) and "Result" (Process or ProcessChain Result).
+	  The ProcessContext or Job last exception is used if the log is not referring one. 
+
 2013-01-02 jbornema
 	- Added SourceHelper class for adding folder content filtered by regular expression in the right order as FileSource to the process.
 

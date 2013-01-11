@@ -360,8 +360,14 @@ public class ETLgineServer implements Runnable {
 			}
 		}
 		
-		// execute run scripts, if specified
+		if (serverContext.getPropertyBoolean("notifications.enabled", false)) {
+			log.info("Notification Services enabled");
+			NotificationService nfService = new NotificationService(serverContext);
+			serverContext.setData(NotificationService.class.getName(), nfService);
+			serverContext.addServerContextListener(nfService);
+		}
 		
+		// execute run scripts, if specified
 		stk = new StringTokenizer(serverContext.getProperty("run", ""), ",; ");
 		while (stk.hasMoreTokens()) {
 			String scriptName = stk.nextToken();
@@ -371,13 +377,6 @@ public class ETLgineServer implements Runnable {
 				log.error("Error running startscript", e);
 				return false;
 			}
-		}
-		
-		if (serverContext.getPropertyBoolean("notifications.enabled", false)) {
-			log.info("Notification Services enabled");
-			NotificationService nfService = new NotificationService(serverContext);
-			serverContext.setData(NotificationService.class.getName(), nfService);
-			serverContext.addServerContextListener(nfService);
 		}
 		
 		//System.setOut(oldPS);

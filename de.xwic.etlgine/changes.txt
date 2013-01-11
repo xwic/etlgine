@@ -1,6 +1,10 @@
 Change Notes
 =============
 
+2013-01-11 jbornema
+	- NotificationServer.sendNotification support now null job and null process.
+	- ETLgineServer: run scripts are now executed after NotificationServer has been initialized.
+
 2013-01-03 jbornema
 	- Added JDBCMonitor column "State" (Job State) and "Result" (Process or ProcessChain Result).
 	  The ProcessContext or Job last exception is used if the log is not referring one. 

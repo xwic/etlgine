@@ -137,23 +137,28 @@ public class NotificationService implements IServerContextListener {
 		IMailManager mailManager = MailFactory.getMailManager();
 		JWicTools jt = new JWicTools(Locale.getDefault());
 		
-		subject = "ETLgine [" + serverContext.getProperty("name", "Unnamed") + "]: " +
-				"Job '" + job.getName() + (subject != null ? "' " + subject : "");
+		subject = "ETLgine [" + serverContext.getProperty("name", "Unnamed") + "]:" +
+				(job != null ? " Job '" + job.getName() + "'" : "") +
+				(subject != null ? " " + subject : "");
 		
-		String content = "<html><body>Job Name: " + job.getName() + "<br>";
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM:HH:mm:ss.SSS");
-		if (job.getLastStarted() != null) {
-			content += "Job Start: " + sdf.format(job.getLastStarted()) + "<br>";
+		String content = "<html><body>";
+		if (job != null) {
+			content += "Job Name: " + job.getName() + "<br>";
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM:HH:mm:ss.SSS");
+			if (job.getLastStarted() != null) {
+				content += "Job Start: " + sdf.format(job.getLastStarted()) + "<br>";
+			}
+			if (job.getLastFinished() != null) {
+				content += "Job End: " + sdf.format(job.getLastFinished()) + "<br>";
+			}
+			content += "Duration: " + job.getDurationInfo() + "<br>";
 		}
-		if (job.getLastFinished() != null) {
-			content += "Job End: " + sdf.format(job.getLastFinished()) + "<br>";
-		}
-		content += "Duration: " + job.getDurationInfo() + "<br>";
 		
-		// get process info
-		content += "Process Name: " + (process != null ? process.getName() : "<i>UNKNOWN</i>") + "<br>";
-		content += "Process Script: " + (process != null ? process.getCreatorInfo() : "<i>UNKNOWN</i>") + "<br>";
-
+		if (process != null) {
+			// get process info
+			content += "Process Name: " + process.getName() + "<br>";
+			content += "Process Script: " + process.getCreatorInfo() + "<br>";
+		}
 		if (message != null) {
 			content += "<br>";
 			content += "Message:<br>";

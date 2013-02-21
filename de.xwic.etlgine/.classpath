@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.commons.logging"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/servlet-api-2.5-6.1.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/jetty-6.1.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="server/jetty/jetty-util-6.1.9.jar"/>
@@ -20,7 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.webui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube.xlsbridge"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.dom4j"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

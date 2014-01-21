@@ -35,7 +35,7 @@ import de.xwic.etlgine.notify.NotificationService;
  * @author Developer
  *
  */
-public class ETLgineServer implements Runnable {
+public class ETLgineServerJetty implements Runnable {
 	
 	private static ETLgineServer instance = null;
 	

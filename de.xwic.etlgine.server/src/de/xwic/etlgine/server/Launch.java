@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import de.xwic.etlgine.IJob;
-import eu.lippisch.jscreen.runner.SwingRunner;
-import eu.lippisch.jscreen.runner.SwtRunner;
+//import eu.lippisch.jscreen.runner.SwingRunner;
+//import eu.lippisch.jscreen.runner.SwtRunner;
 
 /**
  * Starting ETLgine Server.
@@ -68,7 +68,7 @@ public class Launch {
 		} catch (IOException ioe) {}
 		
 		System.setProperty("root", rootPath);
-		ETLgineServer server = ETLgineServer.getInstance();
+		ETLgineServerJetty server = ETLgineServerJetty.getInstance();
 		server.setRootPath(rootPath);
 		if (!server.initialize()) {
 			System.out.println("Server start failed.");
@@ -85,9 +85,9 @@ public class Launch {
 		if (prop.getProperty(PARAM_CONSOLE) != null) {
 			ETLgineConsole console = new ETLgineConsole(server);
 			if ("swing".equals(prop.getProperty(PARAM_CONSOLE))) {
-				SwingRunner.launch(console, true);
+				//SwingRunner.launch(console, true);
 			} else {
-				SwtRunner.launch(console, true);
+				//SwtRunner.launch(console, true);
 			}
 		}
 		

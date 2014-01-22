@@ -7,10 +7,10 @@
         <version>5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>ETLGine::Core</name>
+    <name>ETLGine::Server</name>
 
     <groupId>de.xwic.etlgine</groupId>
-    <artifactId>etlgine-core</artifactId>
+    <artifactId>etlgine-server</artifactId>
     <version>5.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -68,10 +68,25 @@
     <groupId>springframework</groupId>
     <artifactId>spring-context</artifactId>
 </dependency>
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+           
+            </dependency>
 			<dependency>
 				<groupId>net.sf.opencsv</groupId>
 				<artifactId>opencsv</artifactId>
 			</dependency>
+					<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			
+		</dependency>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>start</artifactId>
+			
+		</dependency>			
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
@@ -88,17 +103,18 @@
 				<groupId>de.xwic.cube</groupId>
 				<artifactId>cube-core</artifactId>
 			</dependency>
-			            <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
-           
-            </dependency>
+			
+						<dependency>
+				<groupId>de.xwic.etlgine</groupId>
+				<artifactId>etlgine-core</artifactId>
+				<version>5.2-SNAPSHOT</version>
+			</dependency>
 <dependency>
     <groupId>net.sourceforge.jtds</groupId>
     <artifactId>jtds</artifactId>
                 <scope>test</scope>
 </dependency>
-
+			
         <dependency>
             <!-- Common Public License 1.0 -->
             <groupId>junit</groupId>

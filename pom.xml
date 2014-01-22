@@ -438,6 +438,18 @@
     <version>1.5.7</version>
 </dependency>
 
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<version>6.1.26</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>start</artifactId>
+			<version>6.1.26</version>
+		</dependency>
+		
 <dependency>
     <groupId>net.sourceforge.jtds</groupId>
     <artifactId>jtds</artifactId>
@@ -457,8 +469,7 @@
 
     <modules>
         <module>de.xwic.etlgine.core</module>
-
-        <!--<module>de.xwic.appkit.webbase</module>-->
+        <module>de.xwic.etlgine.server</module>
     </modules>
 
     <profiles>

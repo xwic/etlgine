@@ -1,0 +1,30 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+.logs/
+.target/
+.deploy/
+
+# Project specific
+com.netapp.ngsdb.server/web_root/WEB-INF/prefstore/*
+com.netapp.ngsdb.manager/web_root/WEB-INF/prefstore/*
+*/bin/*
+*_TRY.jrxml
+*.jasper
+*.log*
+*.datapool
+ngsdb_*.cube
+*.datapool.bak
+*server.override.properties
+com.netapp.brp.builder/config.properties

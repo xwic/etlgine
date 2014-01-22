@@ -114,6 +114,8 @@ public class ETLgineServer implements Runnable {
 			queue.stopQueue();
 		}
 		
+		stopEmbededWebServer();
+		
 		running = false;
 		
 	}
@@ -298,6 +300,14 @@ public class ETLgineServer implements Runnable {
 		CubeHandler cubeHandler = CubeHandler.getCubeHandler(serverContext);
 		log.info("Loaded " + cubeHandler.getDataPoolManagerKeys().size() + " DataPool(s).");
 		
+		//check if we need to start the webserver
+		if (serverContext.getPropertyBoolean(ServerContext.PROPERTY_WEBSERVER_START, false)) {
+			boolean serverStarted = startEmbededWebServer(path,pathConfig);
+			
+			if(!serverStarted) {
+				return serverStarted;
+			}
+		}
 		
 		if (serverContext.getPropertyBoolean("notifications.enabled", false)) {
 			log.info("Notification Services enabled");
@@ -420,5 +430,12 @@ public class ETLgineServer implements Runnable {
 			log.error("An error occured during loading of the job " + scriptName, e);
 		}
 		return null;
+	}
+	
+	protected boolean startEmbededWebServer(File path, File pathConfig) {
+		return false;
+	}
+	protected void stopEmbededWebServer() {
+		
 	}
 }

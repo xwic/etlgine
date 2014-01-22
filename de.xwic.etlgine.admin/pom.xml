@@ -7,10 +7,10 @@
 		<version>5.2-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<name>ETLGine::Server</name>
+	<name>ETLGine::Admin</name>
 
 	<groupId>de.xwic.etlgine</groupId>
-	<artifactId>etlgine-server</artifactId>
+	<artifactId>etlgine-admin</artifactId>
 	<version>5.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -103,12 +103,21 @@
 			<groupId>de.xwic.cube</groupId>
 			<artifactId>cube-core</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>de.xwic.cube</groupId>
+			<artifactId>cube-webui</artifactId>
+			<classifier>classes</classifier>
+		</dependency>
 		<dependency>
 			<groupId>de.xwic.etlgine</groupId>
 			<artifactId>etlgine-core</artifactId>
 			<version>5.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>de.xwic.etlgine</groupId>
+			<artifactId>etlgine-admin</artifactId>
+			<version>5.2-SNAPSHOT</version>
+		</dependency>		
 		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>

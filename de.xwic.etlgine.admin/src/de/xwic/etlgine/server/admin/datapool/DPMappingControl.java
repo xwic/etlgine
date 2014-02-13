@@ -10,11 +10,11 @@ import java.util.List;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.Range;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -82,9 +82,15 @@ public class DPMappingControl extends BaseContentContainer {
 			return Integer.toString(lastList.indexOf(object));
 		}
 
-		/* (non-Javadoc)
-		 * @see de.jwic.ecolib.tableviewer.IContentProvider#hasChildren(java.lang.Object)
-		 */
+        @Override
+        public Object getObjectFromKey(String s) {
+            //TODO - on change to jWic 5.2 this needed to be implemented
+            throw new UnsupportedOperationException();
+        }
+
+        /* (non-Javadoc)
+         * @see de.jwic.ecolib.tableviewer.IContentProvider#hasChildren(java.lang.Object)
+         */
 		public boolean hasChildren(Object object) {
 			return false;
 		}

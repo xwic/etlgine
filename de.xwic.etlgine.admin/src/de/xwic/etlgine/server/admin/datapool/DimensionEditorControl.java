@@ -12,10 +12,10 @@ import de.jwic.controls.Button;
 import de.jwic.controls.ButtonControl;
 import de.jwic.controls.InputBoxControl;
 import de.jwic.controls.LabelControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -43,7 +43,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 	private boolean insertMode = false;
 	private boolean insertChild = false;
 
-	private ErrorWarningControl errInfo;
+	private ErrorWarning errInfo;
 	private ButtonControl btSeal;
 	
 	/**
@@ -56,7 +56,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 		
 		setTitle("Dimension Editor (" + dimension.getKey() + ")");
 		
-		errInfo = new ErrorWarningControl(this, "errInfo");
+		errInfo = new ErrorWarning(this, "errInfo");
 				
 		createActionBar();
 		setupTable();

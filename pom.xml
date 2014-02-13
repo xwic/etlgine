@@ -397,32 +397,7 @@
 				<artifactId>spring-context</artifactId>
 				<version>1.2</version>
 			</dependency>
-			<dependency>
-				<groupId>de.xwic.jwic</groupId>
-				<artifactId>jwic-core</artifactId>
-				<version>5.2-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>de.xwic.jwic</groupId>
-				<artifactId>jwic-controls</artifactId>
-				<version>5.2-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>de.xwic.jwic</groupId>
-				<artifactId>jwic-compatibility</artifactId>
-				<version>5.2-SNAPSHOT</version>
-			</dependency>			
-			<dependency>
-				<groupId>de.xwic.cube</groupId>
-				<artifactId>cube-core</artifactId>
-				<version>5.2-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>de.xwic.cube</groupId>
-				<artifactId>cube-webui</artifactId>
-				<version>5.2-SNAPSHOT</version>
-				<classifier>classes</classifier>
-			</dependency>
+
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate</artifactId>
@@ -462,6 +437,40 @@
 				<version>1.2.2</version>
 				<scope>test</scope>
 			</dependency>
+
+            <dependency>
+                <groupId>de.xwic.jwic</groupId>
+                <artifactId>jwic-core</artifactId>
+                <version>5.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>de.xwic.jwic</groupId>
+                <artifactId>jwic-controls</artifactId>
+                <version>5.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>de.xwic.jwic</groupId>
+                <artifactId>jwic-compatibility</artifactId>
+                <version>5.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.xwic.cube</groupId>
+                <artifactId>cube-core</artifactId>
+                <version>5.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>de.xwic.cube</groupId>
+                <artifactId>cube-xlsbridge</artifactId>
+                <version>5.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>de.xwic.cube</groupId>
+                <artifactId>cube-webui</artifactId>
+                <version>5.2-SNAPSHOT</version>
+                <classifier>classes</classifier>
+            </dependency>
+
 			<dependency>
 				<!-- Common Public License 1.0 -->
 				<groupId>junit</groupId>

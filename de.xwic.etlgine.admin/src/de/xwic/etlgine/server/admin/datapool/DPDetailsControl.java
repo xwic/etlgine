@@ -14,7 +14,7 @@ import java.util.Map;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.ErrorWarning;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.ICube;
@@ -46,7 +46,7 @@ public class DPDetailsControl extends BaseContentContainer {
 	private String syncTableConnectionName;
 	private ServerContext context;
 	
-	private ErrorWarningControl errInfo;
+	private ErrorWarning errInfo;
 	private CubeHandler cubeHandler;
 	
 	private CubeDownloadControl cubeDownload;
@@ -64,7 +64,7 @@ public class DPDetailsControl extends BaseContentContainer {
 		
 		setTitle("DataPool Details (" + dataPoolManagerKey + ")");
 		
-		errInfo = new ErrorWarningControl(this, "errInfo");
+		errInfo = new ErrorWarning(this, "errInfo");
 		
 		ActionBarControl abar = new ActionBarControl(this, "actionBar");
 		

@@ -5,8 +5,8 @@ package de.xwic.etlgine.server.admin.datapool;
 
 import java.util.Iterator;
 
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.Range;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
 import de.xwic.cube.IDimension;
 import de.xwic.cube.IDimensionElement;
 
@@ -56,9 +56,15 @@ public class DimensionContentProvider implements IContentProvider {
 		return elm.getPath();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.jwic.ecolib.tableviewer.IContentProvider#hasChildren(java.lang.Object)
-	 */
+    @Override
+    public Object getObjectFromKey(String s) {
+        //TODO - on change to jWic 5.2 this needed to be implemented
+        throw new UnsupportedOperationException();
+    }
+
+    /* (non-Javadoc)
+     * @see de.jwic.ecolib.tableviewer.IContentProvider#hasChildren(java.lang.Object)
+     */
 	public boolean hasChildren(Object object) {
 		IDimensionElement elm = (IDimensionElement)object;
 		return !elm.isLeaf();

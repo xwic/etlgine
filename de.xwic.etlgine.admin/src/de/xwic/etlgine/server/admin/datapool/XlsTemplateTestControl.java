@@ -13,8 +13,8 @@ import java.util.Map;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
-import de.jwic.controls.FileUploadControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.FileUpload;
+import de.jwic.controls.ErrorWarning;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
@@ -31,8 +31,8 @@ import de.xwic.etlgine.server.admin.ImageLibrary;
 public class XlsTemplateTestControl extends BaseContentContainer {
 
 	private final IDataPool dataPool;
-	private FileUploadControl fileUpload;
-	private ErrorWarningControl errInfo;
+	private FileUpload fileUpload;
+	private ErrorWarning errInfo;
 	private XlsDownloadControl downloadCtrl;
 
 	private Map<String, String> dimCtrlMap = new HashMap<String, String>();
@@ -58,9 +58,9 @@ public class XlsTemplateTestControl extends BaseContentContainer {
 			}
 		});
 
-		errInfo = new ErrorWarningControl(this, "errInfo");
+		errInfo = new ErrorWarning(this, "errInfo");
 		
-		fileUpload = new FileUploadControl(this, "fileUpload");
+		fileUpload = new FileUpload(this, "fileUpload");
 		
 		ButtonControl btTest = new ButtonControl(this, "btTest");
 		btTest.setTitle("Process File");

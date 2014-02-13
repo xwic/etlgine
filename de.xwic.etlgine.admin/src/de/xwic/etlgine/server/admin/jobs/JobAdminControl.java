@@ -11,10 +11,10 @@ import java.util.List;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.ecolib.tableviewer.defaults.ListContentProvider;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -38,7 +38,7 @@ public class JobAdminControl extends BaseContentContainer {
 	private ButtonControl btStopJob;
 	private ButtonControl btViewJob;
 	private List<IJob> jobList;
-	private ErrorWarningControl errInfo;
+	private ErrorWarning errInfo;
 	
 	/**
 	 * @param container
@@ -51,7 +51,7 @@ public class JobAdminControl extends BaseContentContainer {
 
 		createActionBar();
 		
-		errInfo = new ErrorWarningControl(this, "errorInfo");
+		errInfo = new ErrorWarning(this, "errorInfo");
 		
 		table = new TableViewer(this, "table");
 		

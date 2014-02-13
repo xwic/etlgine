@@ -6,8 +6,8 @@ package de.xwic.etlgine.server.admin.datapool;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.ButtonControl;
-import de.jwic.controls.FileUploadControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.FileUpload;
+import de.jwic.controls.ErrorWarning;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.ICube;
@@ -21,8 +21,8 @@ import de.xwic.etlgine.server.admin.ImageLibrary;
 public class CubeImportControl extends BaseContentContainer {
 
 	private final ICube cube;
-	private FileUploadControl fileUpload;
-	private ErrorWarningControl errInfo;
+	private FileUpload fileUpload;
+	private ErrorWarning errInfo;
 
 	/**
 	 * @param container
@@ -45,9 +45,9 @@ public class CubeImportControl extends BaseContentContainer {
 			}
 		});
 
-		errInfo = new ErrorWarningControl(this, "errInfo");
+		errInfo = new ErrorWarning(this, "errInfo");
 		
-		fileUpload = new FileUploadControl(this, "fileUpload");
+		fileUpload = new FileUpload(this, "fileUpload");
 		
 		ButtonControl btImport = new ButtonControl(this, "btImport");
 		btImport.setTitle("Import File");

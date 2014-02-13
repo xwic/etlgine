@@ -14,7 +14,7 @@ import de.jwic.controls.InputBoxControl;
 import de.jwic.controls.LabelControl;
 import de.jwic.controls.ListBoxControl;
 import de.jwic.controls.RadioGroupControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.ErrorWarning;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -50,7 +50,7 @@ public class MappingEditorControl extends BaseContentContainer {
 	private RadioGroupControl chkOnUnmapped;
 	private CheckboxControl chkOptions;
 	private DimensionElementSelector elmSelector;
-	private ErrorWarningControl errInfo;
+	private ErrorWarning errInfo;
 
 	private MappingElementEditorControl mapEditor;
 	
@@ -82,7 +82,7 @@ public class MappingEditorControl extends BaseContentContainer {
 		String key = dimMapping.getKey() != null ? dimMapping.getKey() : null;
 		setTitle("Mapping Editor (" + key + ")");
 		
-		errInfo = new ErrorWarningControl(this, "errInfo");
+		errInfo = new ErrorWarning(this, "errInfo");
 		mapEditor = new MappingElementEditorControl(this, "mapEditor");
 
 		setupActionBar();

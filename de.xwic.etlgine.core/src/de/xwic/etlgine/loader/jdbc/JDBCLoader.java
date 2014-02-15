@@ -79,6 +79,10 @@ public class JDBCLoader extends AbstractLoader {
 	private String username = null;
 	private String password = null;
 	private String catalogname = null;
+
+    //RPF: Trying to implement schema definitions in JDBC Loader
+    private String schemaName = null;
+
 	private String tablename = null;
 	private String originalTablename = null;
 	private boolean enableObjectAlias = true;
@@ -529,7 +533,7 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	protected DatabaseMetaData checkTableExists() throws SQLException, ETLException {
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = metaData.getTables(catalogname == null ? connection.getCatalog() : catalogname, null, tablename, null);
+		ResultSet rs = metaData.getTables(catalogname == null ? connection.getCatalog() : catalogname, getSchemaName(), tablename, null);
 		try {
 			if (!rs.next()) {
 				if (!autoCreateTable) {
@@ -665,7 +669,7 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	private Map<String, DbColumnDef> loadColumns(DatabaseMetaData metaData, String tablename) throws SQLException {
 
-		ResultSet rs = metaData.getColumns(catalogname == null ? connection.getCatalog() : catalogname, null, tablename, null);
+		ResultSet rs = metaData.getColumns(catalogname == null ? connection.getCatalog() : catalogname, getSchemaName(), tablename, null);
 		try {
 			//dumpResultSet(rs);
 			Map<String, DbColumnDef> columns = new LinkedHashMap<String, DbColumnDef>();
@@ -1428,9 +1432,15 @@ public class JDBCLoader extends AbstractLoader {
 		StringBuilder sql = new StringBuilder();
 		// TODO missing support for other dialects like ORACLE...
 		if (sqlDialect == SqlDialect.MSSQL && catalogname != null) {
-			sql.append(is).append(catalogname).append(is).append(".").append(is).append("dbo").append(is).append(".");
+            //RPF: added schema support here, if exists it got added, otherwise using "dbo" (was before used directly here)
+            sql.append(is).append(catalogname).append(is).append(".").append(is).append(getSchemaName() == null ? "dbo" : getSchemaName()).append(is).append(".");
 		}
-		sql.append(is).append(tablename).append(is);
+        //RPF: check schema, if exists add on quoted notation
+        if (getSchemaName() != null) {
+            sql.append(is).append(getSchemaName()).append(is).append(".");
+        }
+
+        sql.append(is).append(tablename).append(is);
 		return sql.toString();
 	}
 
@@ -2102,8 +2112,34 @@ public class JDBCLoader extends AbstractLoader {
 	 * @param tablename the tablename to set
 	 */
 	public void setTablename(String tablename) {
-		this.tablename = tablename;
+        //RPF: identifying, if the tablename contains a "." to separate schema and table name!
+        String schema = null;
+        String rawTableName = tablename;
+
+        if (tablename.contains(".")) {
+            schema = tablename.substring(0, tablename.indexOf("."));
+            rawTableName = tablename.substring(tablename.indexOf(".") + 1, tablename.length());
+        }
+
+        this.tablename = rawTableName;
+        setSchemaName(schema);
 	}
+
+    /**
+     * Sets the schema name, can be null (default)
+     *
+     * @param schemaName
+     */
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    /**
+     * @return the schema name, can be null
+     */
+    public String getSchemaName() {
+        return schemaName;
+    }
 
 	/**
 	 * @param catalogName the catalogName to set

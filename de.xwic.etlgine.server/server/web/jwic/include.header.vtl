@@ -1,35 +1,71 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <!-- jWic Application '$context.applicationSetup.name' | http://www.jwic.de -->
 <html>
 <head>
 	<title>#if($page.title)$page.title#else $page.name#end</title>
+	<META http-equiv="x-ua-compatible" content="IE=8">
+	<!-- fix for ie parsing problem -->
+	<script type="text/javascript">
+		var isIE = false;
+		var CKEDITOR_BASEPATH = "$contextPath/jwic/lib/ckeditor/";
+	</script>
+	<!--[if IE]>
+		<script type="text/javascript">
+		    isIE = true;
+		    //any other IE specific stuff here
+		</script>
+	<![endif]-->
 	<META http-equiv="Cache-Control" content="no-cache">
 	<META http-equiv="Pragma" content="no-cache">
 	<META http-equiv="Expires" content="-1">
-	<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	#* CKEditor WYSIWYG HTML Editor library, required by CKEditor control. *#
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/lib/ckeditor/ckeditor.js"></SCRIPT>
+	
+	#* PRODUCTION-MINIFY-START *#
+	#* This part is replaced during the build process with a single CSS and a single JS *#
+
+    <script src="$contextPath/jwic/lib/jQuery/js/jquery-1.8.2.js"></script>
+    <script src="$contextPath/jwic/lib/jQuery/js/jquery-ui-1.9.1.custom.js"></script> 
+    <script src="$contextPath/jwic/lib/jQuery/js/autoNumeric.js"></script>
+    <script src="$contextPath/jwic/lib/jQuery/timepicker/jquery-ui-timepicker-addon.js"></script>
+	<script src="$contextPath/jwic/lib/jQuery/timepicker/jquery-ui-sliderAccess.js"></script>
+    <script src="$contextPath/jwic/lib/jQuery/js/jquery.json-2.4.js"></script>
+    <script src="$contextPath/jwic/lib/noty/jquery.noty.js"></script>
+    <script src="$contextPath/jwic/lib/noty/layouts/top.js"></script>
+    <script src="$contextPath/jwic/lib/noty/themes/default.js"></script>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_core.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_controls.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/balloon/balloon.js"></SCRIPT>	
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/compatibility/jwic_compatibility.js"></SCRIPT>
+	
+	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/jwic.css">
+	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/jwic_tblviewer.css">
+	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/compatibility/jwic_compatibility.css">	
+
+	
+	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/balloon/balloon.css">
+	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/lib/jQuery/timepicker/jquery-ui-timepicker-addon.css">		
+
+	
+	#* PRODUCTION-MINIFY-END *#	
 	
 	<script language="JavaScript">
 		var _contextPath = "$contextPath";
-		var _ajaxMode = $context.applicationSetup.useAjaxRendering;
-	</script>
+		JWic.contextPath = "$contextPath";
 
-#* prototype js library - tool library required by jWic 4.x *#	
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/lib/prototype.js"></SCRIPT>
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/lib/scriptaculous.js"></SCRIPT>
-#* Prototype Window Class Library *#
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/lib/window.js"></SCRIPT>
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/calendar/calendar.js"></SCRIPT>
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_core.js"></SCRIPT>
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_controls.js"></SCRIPT>
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/jwic_compatibility.js"></SCRIPT>
+		//fix for IE7 parse problem
+		//native parsing on IE7 is realy slow
+		//jQuery does a check to see if there is a native parser available
+		//and uses it if its found, but the one on IE7 its very slow
+		jQuery(document).ready(function(){
+			if(isIE){
+				window.JSON = false;
+			}
+		});
 		
-	<!-- <link rel="stylesheet" type="text/css" href="$contextPath/jwic/jwic.css"> -->
-	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/jwic_compatibility.css">	
-	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/jwic_default.css">	
-	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/lib/themes/default.css">
-	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/lib/themes/jwicdefault.css">		
-	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/lib/themes/j-combo.css">		
-	<link rel="stylesheet" type="text/css" href="$contextPath/jwic/lib/themes/alphacube.css">	
+	</script>
 	
-	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/jwic/calendar/calendar_localize_${page.getSessionContext().getLocale().getLanguage().toUpperCase()}.js"></SCRIPT>	
-	
+	<link rel="stylesheet" type="text/css" href="$contextPath/themes/${context.themeName}/jQuery/jquery-ui.css">	
+	<link rel="stylesheet" type="text/css" href="$contextPath/themes/${context.themeName}/jWic/jwic_theme.css">	

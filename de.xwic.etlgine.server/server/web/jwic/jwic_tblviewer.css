@@ -1,0 +1,296 @@
+  
+/**
+ * Column Header
+ */
+	table.tbvColHeader {
+		border: 0px solid green;
+		table-layout: fixed;
+	}
+	table.tblData table.tbvColHeader td.tbvColHeadCell {
+		border: 0px;
+		border-top: 0px;
+		background-color: transparent;
+		overflow: hidden;
+		padding: 0px;
+	}
+
+	table.tbvColHeader img.tblResize {
+		cursor: e-resize;
+		border: 0px;
+	}
+
+	table.tblData table.tbvColHeader td.tbvColHeadCell {
+		margin: 0px;
+		padding: 0px;
+	}
+	table.tblData table.tbvColHeader td.tbvColHeadCellPoint {
+		border: 0px;
+		border-top: 0px;
+		background-color: transparent;
+		padding: 0px;
+	}
+	
+	div.tblViewResizer {
+		display: none;
+		position: absolute;
+		width: 3px;
+		height: 20px;
+		background-color: #000000;
+		opacity: .5;
+		filter: alpha(opacity=50);
+		z-index: 9999;
+	}
+ 
+/**
+ * Column Body
+ */
+	table.tblViewer table.tblData tbody.tblData tr {
+		height: 20px;
+	 	height: expression("16px");
+	}
+	table.tblViewer table.tblData tbody.tblData tr td p {
+	 	margin: 0px;
+	}
+	table.tblViewer table.tblData tbody.tblData tr td img {
+	 	vertical-align: center;
+	}
+
+/*
+ * Default Design
+ */
+
+ table.tblViewer {
+ 	/* background-color: threedlightshadow; */
+ 	font-size: 8pt;
+ }
+
+ table.tblViewer select {
+ 	font-size: 8pt;
+ }
+
+ table.tblViewer div.tblContent {
+ 	border: 1px solid threedshadow; 
+ 	/*background-color: window;*/
+ }
+ table.tblViewer table.tblData {
+ 	background-color: threedlightshadow;
+ 	font-size: 8pt;
+ 	border-collapse: seperate;
+ 	table-layout: fixed;
+ }
+
+ table.tblViewer table.tblData th {
+ 	text-align: left;
+ 	background-color: threedface;
+ 	color: buttontext;
+ 	border-top: 1px solid threedhighlight;
+ 	border-left: 1px solid threedhighlight;
+ 	border-bottom: 1px solid threedshadow;
+ 	border-right: 1px solid threedshadow; 	
+ 	padding: 0px;
+ 	height: 18px;
+ }
+
+ table.tblViewer table.tblData th.pushed {
+ 	border-bottom: 1px solid threedhighlight;
+ 	border-right: 1px solid threedhighlight;
+ 	border-top: 1px solid threedshadow;
+ 	border-left: 1px solid threedshadow; 	
+ }
+
+ table.tblViewer table.tblData td {
+ 	background-color: window;
+ 	color: windowtext;
+ 	font-size: 8pt;
+ 	border-top: 1px solid window;
+ 	border-left: 1px solid window; 	
+ 	border-bottom: 1px solid threedlightshadow;
+ 	border-right: 1px solid threedlightshadow; 	
+ 	white-space: nowrap;
+ 	cursor: default;
+ 	overflow: hidden;
+ 	padding: 1px 0px;
+ } 
+ 
+ table.tblViewer table.tblData table.inner td {
+ 	background-color: transparent;
+ 	border: 0px;
+ 	padding: 0px;
+ 	margin: 0px;
+ }  
+ table.tblViewer table.tblData tr.lastRow td {
+	border-bottom: 1px solid threedlightshadow;
+ } 
+
+ table.tblViewer table.tblData tr.selected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ } 
+ table.tblViewer table.tblData tr.lastRowselected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+	border-bottom: 0px solid threedlightshadow;
+ } 
+
+ /** 
+  * Flat Design
+  */
+  
+ table.tblVFlat table.tblData {
+ 	border: 1px solid threedshadow;
+ 	border-collapse: collapse;
+	table-layout: fixed;
+ }
+
+ table.tblVFlat table.tblData th {
+ 	text-align: left;
+ 	background-color: threedface;
+ 	color: buttontext;
+ 	border: 0px solid threedlightshadow;
+ 	height: 19px; 	
+ }
+ table.tblVFlat table.tblData th.pushed {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ }
+
+ table.tblVFlat table.tblData td {
+ 	background-color: window;
+ 	color: windowtext;
+ 	font-size: 8pt;
+ 	cursor: default;
+ 	overflow: hidden;
+ } 
+ 
+ table.tblVFlat table.tblData table.inner td {
+ 	background-color: transparent;
+ 	border: 0px;
+ 	padding: 0px;
+ 	margin: 0px;
+ }  
+
+table.tblVFlat table.tblData tr.lastRow td {
+	/*border-bottom: 0px solid threedlightshadow; */
+ } 
+ 
+ table.tblVFlat table.tblData tr.selected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ } 
+ table.tblVFlat table.tblData tr.lastRowselected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ } 
+
+  /**
+   * Status line
+   */
+
+  table.tblViewStatusBar {
+  	/*border-top: 1px solid #303030;*/
+  }
+  table.tblViewStatusBar td {
+  	border: 0px;
+  }
+
+  table.tblPageTable td {
+  	font-size: 8pt;
+  	background-color: #ffffff;
+  }
+
+  table.tblPageTableDis td {
+  	font-size: 8pt;
+  	background-color: #ffffff;
+  	color: #808080;
+  }
+
+  img.tblPageButton {
+  	border-top: 1px solid threedhighlight;
+	border-left: 1px solid threedhighlight;
+	border-bottom: 1px solid threedshadow;
+	border-right: 1px solid threedshadow; 	
+ 	background-color: threedface; 
+ 	cursor: pointer;
+  }
+  
+  img.tblPageButtonDown {
+  	border-top: 1px solid threedshadow;
+	border-left: 1px solid threedshadow;
+	border-bottom: 1px solid threedhighlight;
+	border-right: 1px solid threedhighlight; 	
+ 	background-color: threedface; 
+ 	cursor: pointer;
+  }
+  img.tblPageButtonDis {
+	border: 1px solid threedface; 	
+ 	background-color: threedface; 
+  }
+ 
+ 
+  /*
+  * treeSimple layout
+  */
+
+ table.treeSimple {
+ 	background-color: window;
+ 	font-size: 8pt;
+ }
+
+ table.treeSimple select {
+ 	font-size: 8pt;
+ }
+
+ table.treeSimple div.tblContent {
+ 	border: 1px solid threedshadow;
+ }
+ table.treeSimple table.tblData {
+ 	/*background-color: window;*/
+ 	font-size: 8pt;
+ 	border-collapse: seperate;
+ 	table-layout: fixed;
+ }
+
+ table.treeSimple table.tblData th {
+ 	text-align: left;
+ 	background-color: threedface;
+ 	color: buttontext;
+ 	border: 0px;
+ 	height: 18px;
+ }
+
+ table.treeSimple table.tblData th.pushed {
+ 	background-color: highlight;
+ 	color: highlighttext;
+  }
+
+ table.treeSimple table.tblData td {
+ 	background-color: window;
+ 	color: windowtext;
+ 	font-size: 8pt;
+ 	border: 0px solid window;
+ 	white-space: nowrap;
+ 	cursor: default;
+ 	overflow: hidden;
+ 	padding: 1px 0px;
+ } 
+ 
+ table.treeSimple table.tblData table.inner td {
+ 	background-color: transparent;
+ 	border: 0px;
+ 	padding: 0px;
+ 	margin: 0px;
+ }  
+ table.treeSimple table.tblData tr.lastRow td {
+	border-bottom: 0px solid threedlightshadow;
+ } 
+
+ table.treeSimple table.tblData tr.selected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ } 
+ table.treeSimple table.tblData tr.lastRowselected td {
+ 	background-color: highlight;
+ 	color: highlighttext;
+ 	border-bottom: 0px solid threedlightshadow;
+ } 
+ 

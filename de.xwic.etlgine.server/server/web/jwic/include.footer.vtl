@@ -2,6 +2,9 @@
 
 ## Execute script fragments that have been in the update.
 <script language="JavaScript">
+#foreach($statisJs in $renderContext.getRequiredStaticJs())
+	JWic.requiresStaticLibrary("$statisJs");
+#end
 #if($renderContext.scripts.size() > 0)
 #set($comma = 0)
  var scripts = [
@@ -26,7 +29,7 @@
  		scripts[i].afterUpdate(document.body);
  	}
  	if (scripts[i].destroy) {
- 		JWicInternal.destroyList.push( {key :scriptKeys[i], destroy :scripts[i].destroy});
+ 		JWic.destroyList.push( {key :scriptKeys[i], destroy :scripts[i].destroy});
  	}
  }
 #end

@@ -1,285 +1,444 @@
-
- form	{ margin-top: 0; margin-bottom: 0 }
-
- p { margin: 0px 0px; }
-
- .clickBlocker {
- 	background-color: #E0E0E0; 
- 	color: #000000; 
- 	font-size: 12pt; 
- 	font-weight: bold; 
- 	border: 1px solid #000000;
- }
-
-/* WindowControl */ 
-table.e_dsk_win { 
-	border-right: 1px solid #000000; 
-	border-bottom: 1px solid #000000; 
-}
-td.e_dsk_ttl { 
-	background-color: #A0C8F0; color: #FFFFFF; 
-	font-size: 10pt; 
-	font-weight: bold; 
-	background-image: url("window/win_bar.gif"); 
-	background-repeat: repeat-y; 
-	background-position: left top; 
-	border-bottom: 1px solid #000000; 
-	border-top: 1px solid #000000  
-}
-td.e_dsk_ttl_in { 
-	color: #FFFFFF; 
-	font-size: 10pt; 
-	font-weight: bold; 
-}
-td.e_dsk_body { 
-	background-color: #E0DFE3; 
-	border-left: 1px solid #000000 
-}
-td.e_dsk_body2 { 
-	background-color: #E0DFE3; 
-}
-td.e_dsk_top { 
-	background-color: transparent; 
-	background-image: url("window/win_ecke.gif"); 
-	background-repeat: no-repeat; 
-	background-position: left top; 
-	border-bottom: 0px solid #000000; 
-}
-/* ActionBar */
-td.e_dsk_eaction { 
-	background-color: #D0D0D0; 
-	background-image: url("gfx/barline_h.gif");
-}
-td.e_dsk_action { 
-	background-color: #D0D0D0; 
-	border-left: 1px solid #000000; 
-	background-image: url("gfx/barline_h.gif") ;
+/* 
+ * The default styles for all jWic elements.
+ */
+body {
+	font-family: Tahoma, sans-serif, Arial;
+	font-size: 10pt;
+	background-color: transparent;
 }
 
-/* TabStrip/Tabs */ 
-td.e_pan_sla { 
-	background-color: #E0DFE3; 
-	font-size: 10pt; 
-	border-top: 1px solid #000000; 
-	border-right: 1px solid #000000; 
+form {
+	margin-top: 0;
+	margin-bottom: 0
 }
 
-td.e_pan_sla_bottom { 
-	background-color: #E0DFE3; 
-	font-size: 10pt; 
-	border-bottom: 1px solid #000000; 
-	border-right: 1px solid #000000;
-	border-left: 1px solid #000000; 
+.clickBlocker {
+	background-color: #E0E0E0;
+	color: #000000;
+	font-size: 12pt;
+	font-weight: bold;
+	border: 1px solid #000000;
 }
 
-td.e_pan_sli { 
-	background-color: #A0A0A0; 
-	font-size: 10pt; 
-	border-top: 1px solid #404040; 
-	border-right: 1px solid #404040;
-	border-bottom: 1px solid #808080;
+div.ui-dialog .ui-dialog-content {
+    padding: 0;
 }
 
-td.e_pan_sli_bottom { 
-	background-color: #A0A0A0; 
-	font-size: 10pt; 
-	border-right: 1px solid #404040;
-	border-bottom: 1px solid #404040; 
-	border-left: 1px solid #000000; 
+div.ui-tabs .ui-tabs-panel {
+    padding: 0;
 }
 
-td.e_tab_sla { 
-	background-color: #E0DFE3; 
-	font-size: 10pt; 
-	border-bottom: 0px solid #404040; 
-	background-image: url("tabstrip/ecke.gif"); 
-	background-repeat: no-repeat; 
+/*
+  *  Input box field.
+  */
+.j-inputbox-intable {
+	font-size: 8pt;
+	border: 1px solid #FFFFFF;
+	font-family: tahoma, sans-serif, Arial;
+	background: #FFFFFF;
+}
+.j-inputbox {
+	font-size: 10pt;
+	font-family: tahoma, sans-serif, Arial;
+	border: 1px solid #B0B0B0;
+	padding: 2px;
+}
+
+.j-inputbox.x-readonly {
+	background-color: #E0E0E0;
+	background-image: none;
+}
+
+.j-inputbox.x-error {
+	border: 1px solid #FF0000;
+}
+input.j-inputbox.x-error {
+	background-image: url(gfx/inputbg-error-tp.png);
+	background-repeat: repeat-x;;
+}
+
+.j-inputbox.x-focus {
+	border: 1px solid #8080E0;
+}
+
+.j-inputbox.x-empty {
+	color: #D0D0D0;
+}
+
+/*
+ * Checkbox 
+ */
+
+input.j-checkbox {
+	vertical-align: middle;
+	padding: 0px;
+	margin: 0px;
+}
+
+label.j-checkbox {
+	padding-top: 0px;
+}
+
+
+/*GroupControl styles*/
+table.grpDefault td.grpTitle {
+	font-size: 8pt;
+	padding-left: 2px;
+	padding-right: 8px;
+}
+
+table.grpDefault td.grpTL {
+	background-image: url("gfx/grp_tl.png");
+	background-repeat: no-repeat;
 	background-position: left top;
+	width: 8px;
 }
 
-td.e_tab_sla_bottom { 
-	background-color: #E0DFE3; 
-	font-size: 10pt; 
-	border-bottom: 0px solid #404040; 
-	/*background-image: url("tabstrip/ecke.gif"); */
-	background-repeat: no-repeat; 
+table.grpDefault td.grpTR {
+	background-image: url("gfx/grp_tr.png");
+	background-repeat: no-repeat;
 	background-position: left top;
+	width: 8px;
 }
 
-td.e_tab_sli { 
-	background-color: #A0A0A0; 
-	font-size: 10pt; 
-	border-bottom: 0px solid #404040; 
-	background-image: url("tabstrip/ecke_i.gif"); 
-	background-repeat: no-repeat; 
-	background-position: left top;
+table.grpDefault td.grpML {
+	background-image: url("gfx/grp_vl.png");
+	background-repeat: repeat-y;
+	width: 8px;
 }
 
-td.e_tab_sli_bottom { 
-	background-color: #A0A0A0; 
-	font-size: 10pt; 
-	border-bottom: 0px solid #404040; 
-/*	background-image: url("tabstrip/ecke_i.gif"); */
-	background-repeat: no-repeat; 
-	background-position: left top;
+table.grpDefault td.grpMR {
+	background-image: url("gfx/grp_vr.png");
+	background-repeat: repeat-y;
+	width: 8px;
 }
 
-td.e_pan_fre { 
-	border-bottom: 1px solid #808080 
+table.grpDefault td.grpTH {
+	background-image: url("gfx/grp_hor.png");
+	background-repeat: repeat-x;
 }
-a.e_pan_sli { 
-	color: #000000; 
-	text-decoration: none;
+
+table.grpDefault td.grpBH {
+	background-image: url("gfx/grp_hor.png");
+	background-repeat: repeat-x;
 }
-a.e_pan_sli:visited { 
-	color: #000000; 
-	text-decoration: none;
+
+table.grpDefault td.grpBL {
+	background-image: url("gfx/grp_bl.png");
+	background-repeat: no-repeat;
 }
-a.e_pan_sli:hover { 
-	color: #000080; 
-	text-decoration: underline;
-} 
-td.e_pan_title { 
-	background-color: #A0A0A0; 
-	color: #000000; 
-	font-size: 8pt; 
-	font-weight: bold; 
-	font-family:Verdana, Arial ;
+
+table.grpDefault td.grpBR {
+	background-image: url("gfx/grp_br.png");
+	background-repeat: no-repeat;
 }
-  /* ActionBar */
- table.action td.action_left {
- 	border-left: 1px solid #D0D0D0;
- 	border-top: 1px solid #D0D0D0;
- 	border-bottom: 1px solid #D0D0D0;
- }
- table.action td.action_right {
- 	border-right: 1px solid #D0D0D0;
- 	border-top: 1px solid #D0D0D0;
- 	border-bottom: 1px solid #D0D0D0;
- }
- table.action td.action_middle {
- 	border-top: 1px solid #D0D0D0;
- 	border-bottom: 1px solid #D0D0D0;
- 	font-size: 8pt;
- 	font-family: Arial, Sans-Serif;
- }
- table.actionDis td.action_left {
- 	border-left: 1px solid #D0D0D0;
- 	border-top: 1px solid #D0D0D0;
- 	border-bottom: 1px solid #D0D0D0;
- }
- table.actionDis td.action_right {
- 	border-right: 1px solid #D0D0D0;
- 	border-top: 1px solid #D0D0D0;
- 	border-bottom: 1px solid #D0D0D0;
- }
- table.actionDis td.action_middle {
- 	border-top: 1px solid #D0D0D0;
- 	border-bottom: 1px solid #D0D0D0;
- 	font-size: 8pt;
- 	font-family: Arial, Sans-Serif;
- 	color: #606060;
- }
- table.actionSel td.action_left {
- 	border-left: 1px solid #ffffff;
- 	border-top: 1px solid #ffffff;
- 	border-bottom: 1px solid #888888;
- }
- table.actionSel td.action_right {
- 	border-right: 1px solid #888888;
- 	border-top: 1px solid #ffffff;
- 	border-bottom: 1px solid #888888;
- }
- table.actionSel td.action_middle {
- 	border-top: 1px solid #ffffff;
- 	border-bottom: 1px solid #888888;
- 	font-size: 8pt;
- 	font-family: Arial, Sans-Serif;
- }
+
+/**
+ * Combo
+ */
+
+.j-combo {
+	height: 20px;
+	border: 1px solid #B0B0B0;
+	background: #ffffff url(gfx/inputbg.png) repeat-x;
+}
+a.j-combo_open {
+	width: 17px;
+	height: 18px;
+	display: block;
+	background: #F0F0F0 url(gfx/combo.png) no-repeat;
+	background-position: 1px 1px;
+	border-left: 1px solid #FFFFFF;
+	float: right;
+	cursor: pointer;
+	padding: 1px;
+}
+
+a.j-combo_open:hover {
+	background: #F0F0F0 url(gfx/combo_hl.png) no-repeat;
+	background-position: 1px 1px;
+	border-left: 1px solid #8080E0;
+}
+
+.j-combo input {
+	background-color: transparent;
+	font-family: tahoma, sans-serif, Arial;
+	font-size: 10pt;
+	height: 16px;
+	margin: 0px;
+	padding: 1px;
+	border: 0px;
+}
+
+.j-combo.x-readonly {
+	background-color: #E0E0E0;
+	background-image: none;
+}
+
+.j-combo.x-error {
+	border: 1px solid #FF0000;
+}
+.j-combo.x-error {
+	background-image: url(gfx/inputbg-error.png);
+	background-repeat: repeat-x;;
+}
+
+.j-combo.x-focus {
+	border: 1px solid #8080E0;
+}
+
+div.j-combo input.x-empty {
+	color: #D0D0D0;
+}
+
+div.j-combo_element {
+	display: block;
+	font-size: 10pt;
+	padding: 2px;
+	color: #000000;
+	cursor: pointer;
+}
+div.j-combo_element.selected {
+	background-color: #BBD9EE;
+}
+div.j-combo_element.hover {
+	background-color: #CCEAFF;
+}
+
+div.j-combo_element img {
+	margin-right: 3px;
+}
+
+.j-combo_contentBox {
+	display: none;
+}
+
+
+/**
+ * FileUpload control
+ */
+.j-fileupload-filename {
+	height: 23px;
+	width: 200px;
+	display: inline;
+	border: 1px solid #808080;
+}
+.j-fileupload-button {
+	width: 120px;
+	height: 25px; 
+	display: inline;
+	position: absolute;
+	overflow: hidden;
+	margin-left: 2px;
+}
+.j-fileupload-selectfile {
+    background: url(gfx/selectfile_black.png) 0 0 no-repeat; 
+	background-position: right;
+	border: 1px solid #808080;
+	cursor: pointer;
+}
+.j-fileupload-clearfile {
+    background: url(gfx/clear_file.png) 0 0 no-repeat; 
+	background-position: right;
+	border: 1px solid #808080;
+	cursor: pointer;
+}
+
+/**
+ * Group Layouts
+ */
  
- a.actionCaption {
- 	text-decoration: none;
- 	color: #000000;
- } 
- a.actionCaption:visited {
- 	color: #000000;
- } 
-  
- /**
-  * ProgressBar styles
-  */
- div.progressBar {
-   border: 1px solid #404040;
-   background-color: #ffffff;
-   padding: 1px;
- }
- div.progressBar div.progressBarSmooth {
-   background-color: #0000ff;
- }
- div.progressBar td.done {
-   /*border: 1px solid #E0E0E0;*/
-   background-color: #0000ff;
- }
- div.progressBar td.notdone {
-   /*border: 1px solid #E0E0E0;*/
-   background-color: transparent;
- }
+.j-group-header {
+	padding: 4px;
+}
+.j-group-content {
+	padding: 4px;
+}
 
- /**
-  * ListBoxControl styles (for drop-down multiselect mode)
-  */
-  option.selected {
-   color: highlighttext;
-   background-color: highlight;
-  }
-  option.unselected {
-   color: windowtext;
-   background-color: window;
-  } 
-  
-  /*GroupControl styles*/
-  table.grpDefault td.grpTitle {
-  	font-size: 8pt;
-  	padding-left: 2px;
-  	padding-right: 8px;
-  }
-  table.grpDefault td.grpTL {
- 	background-image: url("gfx/grp_tl.png") ;
-	background-repeat: no-repeat; 
-	background-position: left top;
-	width: 8px; 
-  }
-  table.grpDefault td.grpTR {
- 	background-image: url("gfx/grp_tr.png") ;
-	background-repeat: no-repeat; 
-	background-position: left top;
-	width: 8px; 
-  }
-  table.grpDefault td.grpML {
- 	background-image: url("gfx/grp_vl.png") ;
-	background-repeat: repeat-y; 
-	width: 8px; 
-  }
-  table.grpDefault td.grpMR {
- 	background-image: url("gfx/grp_vr.png") ;
-	background-repeat: repeat-y; 
-	width: 8px; 
-  }
-  
-  table.grpDefault td.grpTH {
- 	background-image: url("gfx/grp_hor.png") ;
-	background-repeat: repeat-x; 
-  }
-  table.grpDefault td.grpBH {
- 	background-image: url("gfx/grp_hor.png") ;
-	background-repeat: repeat-x; 
-  }
-  table.grpDefault td.grpBL {
- 	background-image: url("gfx/grp_bl.png") ;
-	background-repeat: no-repeat; 
-  }
-  table.grpDefault td.grpBR {
- 	background-image: url("gfx/grp_br.png") ;
-	background-repeat: no-repeat; 
-  }
-  
+/**
+ * ListBox combo background fix
+ */
+
+select.j-listbox {
+	/** Chrome does not support background images on select tags. It needs to be disabled in order to not break other layouts */
+	background-image: none;
+}
+
+/**
+ * ProgressBar Label
+ */
+/** ProgressInfo Control */
+div.j-process-info {
+	width: 400px;
+	height: 110px;
+}
+div.j-process-info-label {
+	margin-left: 8px;
+	margin-top: 5px;
+	font-size: 10pt;
+	height: 30px;
+}
+div.j-process-info-values {
+	margin-top: 15px;
+	font-size: 8pt;
+	text-align: right;
+	height: 15px;
+	margin-right: 5px;
+}
+div.j-process-info-bar {
+	margin-top: 0px;
+	margin-left: 5px;
+	margin-right: 5px;
+	height: 25px;
+	padding: 1px;
+}
+
+div.j-process-info-bar-label {
+	float: left;
+	margin-left: 4%; 
+	width: 95%;
+	text-align: center;
+	margin-top: 5px;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #fff;
+	font-size: 10pt;
+}
+
+/* CKEditor Layout */
+div.ckEditor {
+	border: 1px solid #808080;
+	background-color: #ffffff;
+}
+	
+/** Toolbar Style */
+div.j-toolbar {
+	overflow: hidden;
+	padding: 2px;
+	font-weight: normal;
+}
+
+div.j-toolbar div.j-toolbar-elm {
+	float: left;
+	height: 35px;
+	padding-left: 3px;
+}
+
+div.j-toolbar div.j-spacer {
+	width: 1px;
+	border-left: 1px solid #AAA;
+	background-color: #fff;
+	margin: 0px 3px;
+	height: 35px;
+}
+
+div.j-toolbar span.j-toolbar-label {
+	font-size: 8pt;
+	float: left;
+	color: #707070;
+	margin-top: 11px;
+}
+div.j-toolbar a.j-toolbar-anchor {
+	display: block;
+	margin-top: 11px;
+	font-size: 8pt;
+}
+div.j-toolbar-grp-left {
+	float: left;
+}
+div.j-toolbar-grp-right {
+	float: right;
+}
+div.j-toolbar button.ui-button {
+	height: 32px;
+	/*font-size: 8pt;*/
+	margin: 2px 0px;
+}
+div.j-toolbar div.j-combo {
+	margin-top: 8px;
+	margin-right: 3px;
+}
+
+
+/**
+ * Buttons 
+ */
+span.ui-button-text img {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+}
+span.j-button-text-wimg {
+	padding-left: 22px;
+}
+
+ 
+ /* Column Selector */
+div.j-listColSel {
+		overflow: scroll;
+		border: 1px solid #A0A0A0;
+		background-color: #F0F0F0;
+		position: relative;
+	}
+div.j-listColSel div.j-colRow {
+		cursor: move;
+		border-bottom: 1px dashed #D0D0D0;
+		padding: 3px;
+		background-color: #ffffff;
+	}
+div.j-listColSel div.j-colRow:hover {
+		background-color: #DBFFF3;
+		background: url(gfx/selhover.png);
+		background-repeat: repeat-x;
+}
+
+div.j-listColSel div.j-colRowTitle {
+		padding-left: 3px;
+		font-weight: bold;
+		user-select: none;
+	}
+div.j-listColSel div.j-colRowDesc {
+		padding-top: 7px;
+		padding-left: 30px;
+		padding-bottom: 2px;
+		font-size: 8pt;
+		color: #808080;
+		user-select: none;
+	}
+
+div.j-listColSel-search {
+	border-left: 1px solid #808080;
+	border-right: 1px solid #808080;
+	border-top: 0px;
+	border-bottom: 0px;
+}
+div.j-listColSel-search input {
+	margin: 2px;
+}
+span.j-listColSel-clearSearch {
+	float: right; 
+	margin-top: 4px;
+	margin-right: 3px;
+	cursor: pointer;
+}
+/**
+ * Menu Styles
+ */
+.j-menu-icon {
+	display:block;
+	float:left;
+	clear:left;
+	background-repeat: no-repeat;
+	background-position: left center;
+	width:20px;
+	height:20px;	
+}
+
+.default-tooltip{
+	background : #ffffff;
+	color: #000000;
+	padding: 3px;
+	border: 1px solid gray;
+	border-radius : 3px;
+}

@@ -9,32 +9,19 @@
 			window.dhtmlHistory.create("$contextPath/ecolib/history/");
 		}
 	</script>
-	<div id="click_blocker" style="position:absolute; z-index: 999; visibility: hidden;">
-	<table width="100%" height="100%">
-		<tr>
-			<td valign="center" align="center">
-			<iframe id="click_blocker_message" name="clickBlockFrame" frameborder="0" style="width:200px; height:65px;" src="$contextPath/jwic/blank.html"></iframe>
-			</td>
-		</tr>
-	</table>
+	<div id="click_blocker" style="position:absolute; z-index: 9000; display: none;">
+	</div>
+	<div id="click_blocker_message" style="overflow: auto;display: none; top: 0px; left: 0px; z-index: 9001; width: 100%;height:100%; position: absolute;">
+		<img src="$contextPath/jwic/gfx/loading3.gif">
 	</div>
 	<script language="javascript">
 
-		var pleaseWaitHTML = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"><html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"$contextPath/jwic/pleaseWait.css\"></head>' +
-			'<body class="pwait"><p class="pwait">Please Wait....<br><img src=\"$contextPath/jwic/gfx/loading.gif\" width=128 height=24></p></body></html>'; 
-		var cbFrame = document.getElementById("click_blocker_message");
-		cbFrame.contentWindow.document.write(pleaseWaitHTML);
-		cbFrame.contentWindow.document.close();
 		if (!parent.doNotForward)
 			history.forward(); 
 		parent.doNotForward = false;
-		// jWicInit();
-		if (jWicCalendar) {
-			jWic().calendar.setImageDir(_contextPath + "/jwic/calendar/");
-			jWic().calendar.init(document);
-		}
+
 		#if($reloaded == "1")
-			alert("The application has been restarted. A possible reason is that you have been inactive for to long so that your session expired.");
+			JWic.ui.Notify.display("The application has been restarted. A possible reason is that you have been inactive for to long so that your session expired.", 'information');
 		#end
 	</script>
 	
@@ -48,4 +35,5 @@
 		<input type="hidden" name="__mouseevent" value="">
 		<input type="hidden" name="layerid" value="$!layerid">		
 
+		<input type="submit" name="preventSubmit" onclick="return false;" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 1px; height: 1px;"/>
 		

@@ -30,7 +30,7 @@
   	var key = trV_getRowKey(element);
   	var ctrlId = trV_getControlID(element);
 
-	jWic().fireAction(ctrlId, "expand", key);
+	JWic.fireAction(ctrlId, "expand", key);
 
 	// prevent the click function from runing as we do not want a selection.  	
 	// tblv_ignoreClick = window.event.X + "." + window.event.Y;
@@ -49,7 +49,7 @@
   	var key = trV_getRowKey(element);
   	var ctrlId = trV_getControlID(element);
 
-	jWic().fireAction(ctrlId, "collapse", key);
+  	JWic.fireAction(ctrlId, "collapse", key);
 
 	// prevent the click function from runing as we do not want a selection.  	
 	e.cancelBubble = true;

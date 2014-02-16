@@ -411,7 +411,7 @@
 			<dependency>
 				<groupId>commons-dbcp</groupId>
 				<artifactId>commons-dbcp</artifactId>
-				<version>1.2.1</version>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -435,7 +435,6 @@
 				<groupId>net.sourceforge.jtds</groupId>
 				<artifactId>jtds</artifactId>
 				<version>1.2.2</version>
-				<scope>test</scope>
 			</dependency>
 
             <dependency>
@@ -484,8 +483,10 @@
 
 	<modules>
 		<module>de.xwic.etlgine.core</module>
-		<module>de.xwic.etlgine.server</module>
+		
 		<module>de.xwic.etlgine.admin</module>
+		
+		<module>de.xwic.etlgine.server</module>
 	</modules>
 
 	<profiles>

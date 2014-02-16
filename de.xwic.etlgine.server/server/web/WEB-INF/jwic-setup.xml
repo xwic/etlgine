@@ -7,22 +7,31 @@
 	<session-swap-time>2</session-swap-time>	
 
     <!-- The path where jWic should store the applications. -->
-	<session-storage-path>${rootPath}WEB-INF/sessions</session-storage-path>
+	<session-storage-path>${rootPath}/WEB-INF/sessions</session-storage-path>
  
     <!-- Setup the default velocity engine. The engine is used by the velocity-type renderer 
        - implementations.
       -->
     <velocity-engine id="default">
 		<properties>
-			<prop key="runtime.log">${rootPath}WEB-INF/velocity.log</prop>
+			<prop key="runtime.log">${rootPath}/WEB-INF/velocity.log</prop>
 			<prop key="resource.loader">file, class</prop>
 			<prop key="file.resource.loader.description">Velocity File Resource Loader</prop>
 			<prop key="file.resource.loader.class">org.apache.velocity.runtime.resource.loader.FileResourceLoader</prop>
-			<prop key="file.resource.loader.path">${rootPath}WEB-INF/jwic/ctrl_vtls</prop>
+			<prop key="file.resource.loader.path">${rootPath}/WEB-INF/jwic/ctrl_vtls</prop>
 			<prop key="file.resource.loader.cache">true</prop>
 			<prop key="file.resource.loader.modificationCheckInterval">2</prop>
 			<prop key="class.resource.loader.description">Velocity Classpath Resource Loader</prop>
 			<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
+			<!-- 
+			  - You may disable the below settings to enable Velocity logging. Otherwise keep it
+			  - turned off as it has a dramatic impact on performance in a production environment.  
+			 -->
+            <prop key="runtime.log.invalid.references">false</prop>
+            <prop key="runtime.log.error.stacktrace">false</prop>
+            <prop key="runtime.log.warn.stacktrace">false</prop>
+            <prop key="runtime.log.info.stacktrace">false</prop>
+            <prop key="runtime.log.logsystem.class">de.jwic.renderer.velocity.NoLogSystem</prop>			
 		</properties>
     </velocity-engine>
     

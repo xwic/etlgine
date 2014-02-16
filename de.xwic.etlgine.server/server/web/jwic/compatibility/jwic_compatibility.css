@@ -1,0 +1,431 @@
+/* WindowControl */ 
+table.e_dsk_win { 
+	border-right: 1px solid #000000; 
+	border-bottom: 1px solid #000000; 
+}
+td.e_dsk_ttl { 
+	background-color: #A0C8F0; color: #FFFFFF; 
+	font-size: 10pt; 
+	font-weight: bold; 
+	background-image: url("window/win_bar.gif"); 
+	background-repeat: repeat-y; 
+	background-position: left top; 
+	border-bottom: 1px solid #000000; 
+	border-top: 1px solid #000000  
+}
+td.e_dsk_ttl_in { 
+	color: #FFFFFF; 
+	font-size: 10pt; 
+	font-weight: bold; 
+}
+td.e_dsk_body { 
+	background-color: #E0DFE3; 
+	border-left: 1px solid #000000 
+}
+td.e_dsk_body2 { 
+	background-color: #E0DFE3; 
+}
+td.e_dsk_top { 
+	background-color: transparent; 
+	background-image: url("window/win_ecke.gif"); 
+	background-repeat: no-repeat; 
+	background-position: left top; 
+	border-bottom: 0px solid #000000; 
+}
+
+
+
+/*
+  * TabStrip
+  */
+.default_tabstrip {
+	empty-cells: show;
+}
+
+.default_tabstrip td.tab_normal_body a {
+	color: #000000;
+}
+
+.default_tabstrip td.tab_spacing {
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_normal_left {
+	width: 3px;
+	background-image: url(tabstrip/normal_l.png);
+	background-repeat: no-repeat;
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_normal_body {
+	width: 3px;
+	background-image: url(tabstrip/normal_body.png);
+	background-repeat: repeat-x;
+	font-size: 8pt;
+	padding-left: 5pt;
+	padding-right: 5pt;
+	padding-top: 2pt;
+	padding-bottom: 2pt;
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_normal_right {
+	width: 3px;
+	background-image: url(tabstrip/normal_r.png);
+	background-repeat: no-repeat;
+	border-bottom: 1px solid #808080;
+}
+
+.default_tabstrip td.tab_active_left {
+	width: 3px;
+	background-image: url(tabstrip/active_l.png);
+	background-repeat: no-repeat;
+}
+
+.default_tabstrip td.tab_active_body {
+	width: 3px;
+	background-image: url(tabstrip/active_body.png);
+	background-repeat: repeat-x;
+	font-size: 8pt;
+	font-weight: bold;
+	padding-left: 5pt;
+	padding-right: 5pt;
+	padding-top: 2pt;
+	padding-bottom: 2pt;
+}
+
+.default_tabstrip td.tab_active_right {
+	width: 3px;
+	background-image: url(tabstrip/active_r.png);
+	background-repeat: no-repeat;
+}
+
+.tabstrip_tab_left {
+	padding: 5px;
+	margin-bottom: 2px;
+	border: 1px solid #202020;
+	background-color: #f0f0f0;
+	background-image: url("tabstrip/leftfade.png");
+	background-repeat: repeat-y;
+	font-size: 8pt;
+}
+
+.default_tabstrip.left td.tabstrip_content {
+	padding-left: 5px;
+}
+
+
+.tabstrip_tab_left:hover {
+	background-color: #E0E0FF;
+	background-image: none;
+}
+
+.tabstrip_tab_left a {
+	color: #000000;
+}
+.tabstrip_tab_left a:visited {
+	color: #000000;
+}
+
+.tabstrip_tab_left.active {
+	background-color: #F0F0F0;
+	font-weight: bold;
+	border-right: 0px;
+}
+
+/*
+   * ListBox
+   */
+.default_listbox {
+	background-image: url(gfx/inputbg.png);
+	background-repeat: repeat-x;;
+	font-size: 10pt;
+	font-family: tahoma, sans-serif, Arial;
+	border: 1px solid #B0B0B0;
+	padding: 2px;
+}
+
+
+/*
+   * Button
+   */
+.default_button td {
+	font-size: 9pt;
+	font-family: tahoma, sans-serif, Arial;
+	padding: 1pt;
+}
+
+/**
+  * ProgressBar styles
+  */
+div.progressBar {
+	border: 1px solid #404040;
+	background-color: #ffffff;
+	padding: 1px;
+}
+
+div.progressBar div.progressBarSmooth {
+	background-color: #0000ff;
+}
+
+div.progressBar td.done { /*border: 1px solid #E0E0E0;*/
+	background-color: #0000ff;
+}
+
+div.progressBar td.notdone { /*border: 1px solid #E0E0E0;*/
+	background-color: transparent;
+}
+
+/*
+  * Simple standard table layout.
+  */
+table.datatable {
+	border-collapse: collapse;
+	border: 1px solid #808080;
+}
+
+table.datatable th {
+	border: 1px solid #808080;
+	background-color: buttonface;
+	color: buttontext;
+	font-size: 8pt;
+}
+
+table.datatable td {
+	background-color: window;
+	color: windowtext;
+	border: 1px solid #808080;
+	padding: 1px;
+	font-size: 8pt;
+}
+
+/*
+   * Window layout.
+   */
+div.j-window {
+	border: 1px solid #C0C0C0;
+	background-color: #f0f0f0;
+}
+
+div.j-window div.title {
+	background: #E0E0E0;
+	background-image: url(window/headerfade4.png);
+	padding: 3px;
+	border-bottom: 1px solid #C0C0C0;
+}
+
+div.j-window div.title .title_text {
+	color: #505050;
+	font-weight: bold;
+	font-size: 10pt;
+}
+
+div.j-window div.content {
+	color: #505050;
+	padding: 0px;
+}
+
+/** BUTTON **/
+
+table.j-button {
+	cursor: pointer;
+}
+table.j-button td.j-button-nw {
+	width: 2px;
+	height: 2px;
+	background: transparent  url(gfx/buttonedge_sm.gif);
+}
+
+table.j-button td.j-button-ne {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -2px 0px no-repeat;
+}
+
+table.j-button td.j-button-sw {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) 0px -2px no-repeat;
+}
+table.j-button td.j-button-se {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -2px -2px no-repeat;
+}
+table.j-button td.j-button-n {
+	height: 2px;
+	background: transparent url(gfx/btn_n.gif) 0px 0px repeat-x;
+}
+table.j-button td.j-button-s {
+	height: 2px;
+	background: transparent url(gfx/btn_s.gif) 0px 0px repeat-x;
+}
+table.j-button td.j-button-e {
+	width: 2px;
+	background: transparent url(gfx/btn_e.gif) 0px 0px repeat-y;
+}
+table.j-button td.j-button-w {
+	width: 2px;
+	background: transparent url(gfx/btn_w.gif) 0px 0px repeat-y;
+}
+table.j-button td.j-button-c {
+	background: transparent url(gfx/btn_cnt.gif) 0px 0px repeat-x;
+}
+
+table.j-button.j-hover td.j-button-nw {
+	width: 2px;
+	height: 2px;
+	background: transparent  url(gfx/buttonedge_sm.gif) -4px 0px no-repeat;
+}
+
+table.j-button.j-hover td.j-button-ne {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -6px 0px no-repeat;
+}
+
+table.j-button.j-hover td.j-button-sw {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -4px -2px no-repeat;
+}
+table.j-button.j-hover td.j-button-se {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -6px -2px no-repeat;
+}
+table.j-button.j-hover td.j-button-n {
+	height: 2px;
+	background: transparent url(gfx/btn_n_hov.gif) 0px 0px repeat-x;
+}
+table.j-button.j-hover td.j-button-s {
+	height: 2px;
+	background: transparent url(gfx/btn_s_hov.gif) 0px 0px repeat-x;
+}
+table.j-button.j-hover td.j-button-e {
+	width: 2px;
+	background: transparent url(gfx/btn_e_hov.gif) 0px 0px repeat-y;
+}
+table.j-button.j-hover td.j-button-w {
+	width: 2px;
+	background: transparent url(gfx/btn_w_hov.gif) 0px 0px repeat-y;
+}
+table.j-button.j-hover td.j-button-c {
+	background: transparent url(gfx/btn_cnt_hov.gif) 0px 0px repeat-x;
+}
+table.j-button button.j-button-btn {
+	border: 0px;
+	background-color: transparent;
+	cursor: pointer;
+	font-style: normal;
+	margin: 0px; 
+	padding:0 .25em;
+	width:auto;
+	overflow:visible;
+}
+
+table.j-button.j-btn-small button.j-button-btn {
+	font-size: 8pt;
+}
+
+table.j-button button.j-button-btn img {
+	padding-right: 3px;
+}
+/** Button Style H */
+table.j-button-h {
+	cursor: pointer;
+}
+table.j-button-h td.j-button-nw {
+	width: 2px;
+	height: 2px;
+}
+
+table.j-button-h td.j-button-ne {
+	width: 2px;
+	height: 2px;
+}
+
+table.j-button-h td.j-button-sw {
+	width: 2px;
+	height: 2px;
+}
+table.j-button-h td.j-button-se {
+	width: 2px;
+	height: 2px;
+}
+table.j-button-h td.j-button-n {
+	height: 2px;
+}
+table.j-button-h td.j-button-s {
+	height: 2px;
+}
+table.j-button-h td.j-button-e {
+	width: 2px;
+}
+table.j-button-h td.j-button-w {
+	width: 2px;
+}
+table.j-button-h td.j-button-c {
+
+}
+
+table.j-button-h.j-hover td.j-button-nw {
+	width: 2px;
+	height: 2px;
+	background: transparent  url(gfx/buttonedge_sm.gif) -4px 0px no-repeat;
+}
+
+table.j-button-h.j-hover td.j-button-ne {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -6px 0px no-repeat;
+}
+
+table.j-button-h.j-hover td.j-button-sw {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -4px -2px no-repeat;
+}
+table.j-button-h.j-hover td.j-button-se {
+	width: 2px;
+	height: 2px;
+	background: transparent url(gfx/buttonedge_sm.gif) -6px -2px no-repeat;
+}
+table.j-button-h.j-hover td.j-button-n {
+	height: 2px;
+	background: transparent url(gfx/btn_n_hov.gif) 0px 0px repeat-x;
+}
+table.j-button-h.j-hover td.j-button-s {
+	height: 2px;
+	background: transparent url(gfx/btn_s_hov.gif) 0px 0px repeat-x;
+}
+table.j-button-h.j-hover td.j-button-e {
+	width: 2px;
+	background: transparent url(gfx/btn_e_hov.gif) 0px 0px repeat-y;
+}
+table.j-button-h.j-hover td.j-button-w {
+	width: 2px;
+	background: transparent url(gfx/btn_w_hov.gif) 0px 0px repeat-y;
+}
+table.j-button-h.j-hover td.j-button-c {
+	background: transparent url(gfx/btn_cnt_hov.gif) 0px 0px repeat-x;
+}
+table.j-button-h button.j-button-btn {
+	border: 0px;
+	background-color: transparent;
+	cursor: pointer;
+	font-style: normal;
+	margin: 0px; 
+	padding:0 .25em;
+	width:auto;
+	overflow:visible;
+}
+
+table.j-button-h.j-btn-small button.j-button-btn {
+	font-size: 8pt;
+}
+
+table.j-button-h button.j-button-btn img {
+	padding-right: 3px;
+}
+

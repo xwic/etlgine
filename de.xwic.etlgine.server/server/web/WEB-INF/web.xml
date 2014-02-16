@@ -3,73 +3,50 @@
 
 <web-app>
 
-	<!-- Define the jWic main servlet -->
-	<servlet>
-		<servlet-name>jwic</servlet-name>
-		<servlet-class>de.jwic.web.DispatcherServlet</servlet-class>
-		<!--
-			Specifies the location of the log4j initialisation file. If you - do
-			not specify this parameter, the servlet assumes that the - a logging
-			system is already setup elsewhere.
-		-->
-		<!--
-			<init-param> <param-name>log4j-init-file</param-name>
-			<param-value>WEB-INF/log4j.properties</param-value> </init-param>
-		-->
-		<init-param>
-			<param-name>setRootDir</param-name>
-			<param-value>jwicweb.root</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+  <!-- Define the jWic main servlet -->
+  <servlet>
+    <servlet-name>jwic</servlet-name>
+    <servlet-class>de.jwic.web.DispatcherServlet</servlet-class>
+    <!-- Specifies the location of the log4j initialisation file. If you
+       - do not specify this parameter, the servlet assumes that the
+       - a logging system is already setup elsewhere.
+      -->
+    <init-param>
+      <param-name>log4j-init-file</param-name>
+      <param-value>/WEB-INF/log4j.properties</param-value>
+    </init-param>
+    <init-param>
+      <param-name>setRootDir</param-name>
+      <param-value>jwicweb.root</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <!-- Define the ClassPathResourceServlet.
+     - This servlet allows jWic application to reference 
+     - images that are stored in the classpath (jar).
+     -->
+  <servlet>
+      <servlet-name>cpres</servlet-name>
+      <servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
+  </servlet>
 
-	<!--
-		Define the ClassPathResourceServlet. - This servlet allows jWic
-		application to reference - images that are stored in the classpath
-		(jar).
-	-->
-	<servlet>
-		<servlet-name>cpres</servlet-name>
-		<servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
-	</servlet>
-
-	<!-- map the servlet to all files ending with .wic -->
-	<servlet-mapping>
-		<servlet-name>jwic</servlet-name>
-		<url-pattern>*.xwic</url-pattern>
-	</servlet-mapping>
+  <!-- map the servlet to all files ending with .wic -->
+  <servlet-mapping>
+    <servlet-name>jwic</servlet-name>
+    <url-pattern>*.xwic</url-pattern>
+  </servlet-mapping>
 
 
-	<servlet-mapping>
-		<servlet-name>cpres</servlet-name>
-		<url-pattern>/cp/*</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>cpres</servlet-name>
+    <url-pattern>/cp/*</url-pattern>
+  </servlet-mapping>
 
-	<welcome-file-list>
-		<welcome-file>
-			index.html
+  <welcome-file-list>
+    <welcome-file>
+      index.html
     </welcome-file>
-	</welcome-file-list>
-
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>XWic</web-resource-name>
-			<url-pattern>/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>etladmin</role-name>
-		</auth-constraint>
-	</security-constraint>
-
-	<login-config>
-		<auth-method>BASIC</auth-method>
-		<realm-name>etlgine</realm-name>
-	</login-config>
-
-	<security-role>
-		<description>ETLgine Access</description>
-		<role-name>etlgine</role-name>
-	</security-role>
-
+  </welcome-file-list>
 
 </web-app>

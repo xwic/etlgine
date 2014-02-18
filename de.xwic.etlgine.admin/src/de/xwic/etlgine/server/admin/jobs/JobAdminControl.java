@@ -9,13 +9,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
-import de.jwic.ecolib.tableviewer.defaults.ListContentProvider;
+import de.jwic.data.ListContentProvider;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -34,9 +35,9 @@ import de.xwic.etlgine.server.admin.StackedContentContainer;
 public class JobAdminControl extends BaseContentContainer {
 
 	private TableViewer table;
-	private ButtonControl btRun;
-	private ButtonControl btStopJob;
-	private ButtonControl btViewJob;
+	private Button btRun;
+	private Button btStopJob;
+	private Button btViewJob;
 	private List<IJob> jobList;
 	private ErrorWarning errInfo;
 	
@@ -102,8 +103,9 @@ public class JobAdminControl extends BaseContentContainer {
 	 * 
 	 */
 	private void createActionBar() {
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -113,7 +115,7 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 
-		btRun = new ButtonControl(abar, "btRun");
+		btRun = group.addButton();
 		btRun.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_GO);
 		btRun.setTitle("Run Job");
 		btRun.addSelectionListener(new SelectionListener() {
@@ -123,7 +125,7 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btRefresh = new ButtonControl(abar);
+		Button btRefresh = group.addButton(); 
 		btRefresh.setIconEnabled(ImageLibrary.IMAGE_REFRESH);
 		btRefresh.setTitle("Refresh");
 		btRefresh.addSelectionListener(new SelectionListener() {
@@ -133,7 +135,7 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 
-		btViewJob = new ButtonControl(abar);
+		btViewJob = group.addButton();
 		btViewJob.setIconEnabled(ImageLibrary.IMAGE_ZOOM);
 		btViewJob.setTitle("View Job");
 		btViewJob.addSelectionListener(new SelectionListener() {
@@ -143,7 +145,7 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 		
-		btStopJob = new ButtonControl(abar);
+		btStopJob = group.addButton();
 		btStopJob.setIconEnabled(ImageLibrary.IMAGE_CANCEL);
 		btStopJob.setTitle("Stop Job");
 		btStopJob.addSelectionListener(new SelectionListener() {

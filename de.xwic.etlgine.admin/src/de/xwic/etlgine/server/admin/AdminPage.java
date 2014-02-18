@@ -5,7 +5,7 @@ package de.xwic.etlgine.server.admin;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.server.ETLgineServer;
@@ -38,7 +38,7 @@ public class AdminPage extends Page {
 		new BreadCrumpControl(this, "breadcrump", content);
 		new MainMenuControl(content, "mm");
 		new StatusControl(this, "status");
-		ButtonControl btGC = new ButtonControl(this, "btGC");
+		Button btGC = new Button(this, "btGC");
 		btGC.setTitle("Run GC");
 		btGC.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {

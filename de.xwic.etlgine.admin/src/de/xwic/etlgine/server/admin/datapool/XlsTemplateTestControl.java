@@ -11,10 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.FileUpload;
+import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.FileUpload;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.IDataPool;
@@ -47,9 +48,9 @@ public class XlsTemplateTestControl extends BaseContentContainer {
 		
 		setTitle("Excel Template Test");
 		
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button  btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -62,7 +63,7 @@ public class XlsTemplateTestControl extends BaseContentContainer {
 		
 		fileUpload = new FileUpload(this, "fileUpload");
 		
-		ButtonControl btTest = new ButtonControl(this, "btTest");
+		Button btTest = group.addButton();
 		btTest.setTitle("Process File");
 		btTest.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)

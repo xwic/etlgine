@@ -13,13 +13,13 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
-import de.jwic.controls.CheckboxControl;
-import de.jwic.controls.DateInputBoxControl;
-import de.jwic.controls.InputBoxControl;
+import de.jwic.controls.CheckBoxGroup;
+import de.jwic.controls.DatePicker;
+import de.jwic.controls.InputBox;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
-import de.jwic.ecolib.tableviewer.defaults.ListContentProvider;
+import de.jwic.data.ListContentProvider;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -41,11 +41,11 @@ public class MappingElementEditorControl extends ControlContainer {
 	private TableViewer table;
 	private TableModel tableModel;
 	
-	private InputBoxControl inpExpression;
+	private InputBox inpExpression;
 	private DimensionElementSelector selElement;
-	private CheckboxControl chkOptions;
-	private DateInputBoxControl inpValidFrom;
-	private DateInputBoxControl inpValidTo;
+	private CheckBoxGroup chkOptions;
+	private DatePicker inpValidFrom;
+	private DatePicker inpValidTo;
 	private Button btUpdate, btMassInsert, btDelete, btMoveUp, btMoveDown, btMoveTop, btMoveBtm;
 	
 	private DimMappingElementDef currElement = null;
@@ -69,17 +69,17 @@ public class MappingElementEditorControl extends ControlContainer {
 	 */
 	private void setupEditor() {
 		
-		inpExpression = new InputBoxControl(this, "inpExpression");
+		inpExpression = new InputBox(this, "inpExpression");
 		inpExpression.setMultiLine(true);
 		inpExpression.setWidth(400);
 		inpExpression.setRows(4);
 		
-		inpValidFrom = new DateInputBoxControl(this, "inpValidFrom");
-		inpValidTo = new DateInputBoxControl(this, "inpValidTo");
+		inpValidFrom = new DatePicker(this, "inpValidFrom");
+		inpValidTo = new DatePicker(this, "inpValidTo");
 		
 		selElement = null; // see setDimension(..)
 		
-		chkOptions = new CheckboxControl(this, "chkOptions");
+		chkOptions = new CheckBoxGroup(this, "chkOptions");
 		chkOptions.setColumns(1);
 		chkOptions.addElement("Is RegExp", "regExp");
 		chkOptions.addElement("Ignore Case", "ignoreCase");
@@ -353,7 +353,7 @@ public class MappingElementEditorControl extends ControlContainer {
 
 		table = new TableViewer(this, "table");
 		
-		table.setContentProvider(new ListContentProvider(mappingList));
+		table.setContentProvider(new ListContentProvider<DimMappingElementDef>(mappingList));
 		labelProvider = new MappingElementTableLabelProvider();
 		
 		table.setTableLabelProvider(labelProvider);
@@ -375,7 +375,8 @@ public class MappingElementEditorControl extends ControlContainer {
 		tableModel.addColumn(new TableColumn("To", 75, "validTo"));
 		tableModel.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
-				onElementSelection((String)event.getElement());
+				if(tableModel.getSelection().size() > 0)
+					onElementSelection((String)event.getElement());
 			}
 		});
 		
@@ -430,7 +431,7 @@ public class MappingElementEditorControl extends ControlContainer {
 	 */
 	public void setMappingList(List<DimMappingElementDef> mappingList) {
 		this.mappingList = mappingList;
-		table.setContentProvider(new ListContentProvider(mappingList));
+		table.setContentProvider(new ListContentProvider<DimMappingElementDef>(mappingList));
 	}
 
 	/**
@@ -524,5 +525,9 @@ public class MappingElementEditorControl extends ControlContainer {
 		mappingList.clear();
 		table.setRequireRedraw(true);
 		createNewElement();
+	}
+	
+	public boolean hasSelectorElement(){
+		return selElement != null;
 	}
 }

@@ -7,8 +7,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.IJob;
@@ -22,7 +23,7 @@ import de.xwic.etlgine.server.admin.ImageLibrary;
 public class JobDetailsControl extends BaseContentContainer {
 
 	private final IJob job;
-	private ButtonControl btDisable;
+	private Button btDisable;
 
 	/**
 	 * @param container
@@ -44,9 +45,10 @@ public class JobDetailsControl extends BaseContentContainer {
 	 */
 	private void createActionBar() {
 
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
 		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -56,7 +58,7 @@ public class JobDetailsControl extends BaseContentContainer {
 			}
 		});
 
-		btDisable = new ButtonControl(abar);
+		btDisable = group.addButton();
 		btDisable.setIconEnabled(ImageLibrary.IMAGE_CONTROL_PAUSE);
 		btDisable.setTitle(job.isDisabled() ? "Enable" : "Disable");
 		btDisable.addSelectionListener(new SelectionListener() {

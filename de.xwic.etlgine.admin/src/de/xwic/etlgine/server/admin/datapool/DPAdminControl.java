@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
@@ -36,9 +37,9 @@ import de.xwic.etlgine.server.admin.StackedContentContainer;
 public class DPAdminControl extends BaseContentContainer {
 
 	private TableViewer table;
-	private ButtonControl btInitialize;
-	private ButtonControl btOpen;
-	private ButtonControl btRelease;
+	private Button btInitialize;
+	private Button btOpen;
+	private Button btRelease;
 	private TableModel tableModel;
 	private CubeHandler cubeHandler;
 	
@@ -97,9 +98,9 @@ public class DPAdminControl extends BaseContentContainer {
 	 */
 	private void setupActionBar() {
 
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group =abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -108,7 +109,7 @@ public class DPAdminControl extends BaseContentContainer {
 			}
 		});
 		
-		btOpen= new ButtonControl(abar, "open");
+		btOpen= group.addButton();
 		btOpen.setIconEnabled(ImageLibrary.IMAGE_DATABASE);
 		btOpen.setTitle("Open");
 		btOpen.addSelectionListener(new SelectionListener() {
@@ -117,7 +118,7 @@ public class DPAdminControl extends BaseContentContainer {
 			}
 		});
 
-		btInitialize = new ButtonControl(abar, "init");
+		btInitialize = group.addButton();
 		btInitialize.setIconEnabled(ImageLibrary.IMAGE_DATABASE_INIT);
 		btInitialize.setTitle("Initialize");
 		btInitialize.addSelectionListener(new SelectionListener() {
@@ -126,7 +127,7 @@ public class DPAdminControl extends BaseContentContainer {
 			}
 		});
 		
-		btRelease = new ButtonControl(abar, "release");
+		btRelease = group.addButton();
 		btRelease.setTitle("Release");
 		btRelease.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)

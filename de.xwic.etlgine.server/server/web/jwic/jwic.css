@@ -348,8 +348,8 @@ div.j-toolbar-grp-left {
 div.j-toolbar-grp-right {
 	float: right;
 }
-div.j-toolbar button.ui-button {
-	height: 32px;
+div.j-toolbar button.j-button {
+	height: 28px;
 	/*font-size: 8pt;*/
 	margin: 2px 0px;
 }
@@ -362,17 +362,105 @@ div.j-toolbar div.j-combo {
 /**
  * Buttons 
  */
-span.ui-button-text img {
-	display: block;
+.j-button  {
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 1px;
+	display: inline;
+	line-height: 15px;
+	padding: 0px;
+	height: 22px;
+	position: relative;
+	cursor: pointer;
+	text-align: center;
+	zoom: 1;
+	overflow: visible;
+}
+.j-icon {
 	position: absolute;
-	top: 0;
-	bottom: 0;
-	margin: auto;
+	top: 50%;
+	margin-top: -8px;	
+	right: 5px;
 }
-span.j-button-text-wimg {
-	padding-left: 22px;
-}
+.j-button  .j-button-text{
+	padding-top: 3px;
+	padding-bottom: 0px;
+	display: inline;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
 
+}
+.j-button-text-only {
+}
+.j-button-text-only .j-button-text {
+	margin-right: 10px;
+	margin-left: 10px;
+	padding-right: 0px;
+	padding-left: 0px;
+	white-space: nowrap;
+}
+.j-button-icon-only {
+	width: 22px;
+}
+.j-button-icon-only .j-button-icon {
+	height: 16px;
+	width: 16px;
+	position: absolute;
+	left: 2px;
+	top: 50%;
+	margin-top: -8px;
+}
+.j-button-icon-only .j-button-text {
+	padding-right: 10px;
+	padding-left: 0px;
+	font-size: 12px;
+	line-height: 14px;
+	width: 4px;
+}
+.j-button-text-icon {
+
+}
+.j-button-text-icon .j-button-icon  {
+	height: 16px;
+	width: 16px;
+	position: absolute;
+	left: 6px;
+	top: 50%;
+	margin-top: -8px;
+}
+.j-button-text-icon .j-button-text {
+	padding-right: 0px;
+	padding-left: 0px;
+	margin-left: 28px;
+	margin-right: 10px;
+}
+.j-button-text-icons {
+}
+.j-button-text-icons .j-button-icon {
+	height: 16px;
+	width: 16px;
+	position: absolute;
+	left: 6px;
+	top: 50%;
+	margin-top: -8px;
+}
+.j-button-text-icons .j-button-text {
+	padding-right: 0px;
+	padding-left: 0px;
+	margin-left: 28px;
+	margin-right: 22px;
+}
+.j-toolbar .j-button .j-button-text {
+	padding: 0px 0px;
+}
+.j-toolbar .j-toolbar-elm {
+	padding-right: 2px;
+	padding-left: 2px;
+
+}
+.j-toolbar .j-button {
+	margin-top: 1px;
+}
  
  /* Column Selector */
 div.j-listColSel {
@@ -441,4 +529,50 @@ span.j-listColSel-clearSearch {
 	padding: 3px;
 	border: 1px solid gray;
 	border-radius : 3px;
+	font-size:11px;
+}
+
+.errorContainer {
+	overflow: visible;
+	position: relative;
+	z-index: 100;
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 0px;
+	border-left-width: 0px;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+.errorBox {
+	position: relative;
+	padding: 0px;
+	width: 100%;
+}
+.errorBox .closeBtn {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	cursor: pointer;
+}
+.errorMessage span {
+	display: block;
+	padding-left: 46px;
+	background-image: url(gfx/error-icon.png);
+	background-repeat: no-repeat;
+	background-position: 8px center;
+	vertical-align: middle;
+	padding-top: 7px;
+	padding-right: 30px;
+	padding-bottom: 7px;
+	margin: 1px;
+}
+.warningMessage span {
+	display: block;
+	padding-left: 5px;
+	padding-top: 7px;
+	padding-right: 30px;
+	padding-bottom: 7px;
+	margin: 1px;
 }

@@ -1,0 +1,11 @@
+/** start theme */
+
+/**
+ * Toolbar Button on hover
+ */
+div.j-toolbar button.ui-state-hover {
+	border: 1px solid #448dae; 
+	background: #79c9ec url(../jQuery/images/ui-bg_glass_75_79c9ec_1x400.png) 50% 50% repeat-x; 
+	font-weight: normal; 
+	color: #026890;
+}

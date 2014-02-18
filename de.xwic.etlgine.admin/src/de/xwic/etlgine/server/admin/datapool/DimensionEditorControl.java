@@ -7,12 +7,12 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
 import de.jwic.controls.Button;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
@@ -35,8 +35,8 @@ public class DimensionEditorControl extends BaseContentContainer {
 	private TableViewer table;
 	private TableModel tableModel;
 	
-	private LabelControl lblParent;
-	private InputBoxControl inpKey, inpTitle, inpWeight, inpMassInput;
+	private Label lblParent;
+	private InputBox inpKey, inpTitle, inpWeight, inpMassInput;
 	private Button btUpdate, btDelete, btMoveUp, btMoveDown, btMassInput;
 	
 	private IDimensionElement editedElement = null;
@@ -44,7 +44,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 	private boolean insertChild = false;
 
 	private ErrorWarning errInfo;
-	private ButtonControl btSeal;
+	private Button btSeal;
 	
 	/**
 	 * @param container
@@ -70,6 +70,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 	 * @param b
 	 */
 	private void setEditorEnabled(boolean enabled) {
+		
 		inpKey.setEnabled(enabled);
 		inpTitle.setEnabled(enabled);
 		inpWeight.setEnabled(enabled);
@@ -86,18 +87,18 @@ public class DimensionEditorControl extends BaseContentContainer {
 	 */
 	private void setupEditor() {
 		
-		lblParent = new LabelControl(this, "lblParent");
+		lblParent = new Label(this, "lblParent");
 				
-		inpKey = new InputBoxControl(this, "inpKey");
+		inpKey = new InputBox(this, "inpKey");
 		inpKey.setWidth(200);
 		
-		inpTitle = new InputBoxControl(this, "inpTitle");
+		inpTitle = new InputBox(this, "inpTitle");
 		inpTitle.setWidth(200);
 		
-		inpWeight = new InputBoxControl(this, "inpWeight");
+		inpWeight = new InputBox(this, "inpWeight");
 		inpWeight.setWidth(60);
 		
-		inpMassInput = new InputBoxControl(this, "inpMassInsert");
+		inpMassInput = new InputBox(this, "inpMassInsert");
 		inpMassInput.setWidth(450);
 		inpMassInput.setHeight(100);
 		inpMassInput.setMultiLine(true);
@@ -300,7 +301,12 @@ public class DimensionEditorControl extends BaseContentContainer {
 		editedElement = element;
 		
 		if (element != null) {
-			lblParent.setText(element.getParent().getPath());
+			IDimensionElement parent = element.getParent();
+			if(parent == null){
+				lblParent.setText("");
+			}else{
+				lblParent.setText(parent.getPath());
+			}
 			inpKey.setText(element.getKey());
 			inpTitle.setText(element.getTitle() != null ? element.getTitle() : "");
 			inpWeight.setText(Double.toString(element.getWeight()));
@@ -340,7 +346,9 @@ public class DimensionEditorControl extends BaseContentContainer {
 		tableModel.addColumn(new TableColumn("Weight", 150, "weight"));
 		tableModel.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
-				onSelection((String)event.getElement());
+				if(tableModel.getSelection().size()>0)
+					onSelection((String)event.getElement());
+			
 			}
 		});
 
@@ -363,9 +371,9 @@ public class DimensionEditorControl extends BaseContentContainer {
 	 */
 	private void createActionBar() {
 		
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -374,7 +382,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 		
-		ButtonControl btAdd = new ButtonControl(abar, "add");
+		Button btAdd = group.addButton();
 		btAdd.setIconEnabled(ImageLibrary.IMAGE_ADD);
 		btAdd.setTitle("Add Element");
 		btAdd.addSelectionListener(new SelectionListener() {
@@ -383,7 +391,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btAddChild = new ButtonControl(abar, "addChild");
+		Button btAddChild = group.addButton();
 		btAddChild.setIconEnabled(ImageLibrary.IMAGE_ADD);	
 		btAddChild.setTitle("Add Child Element");
 		btAddChild.addSelectionListener(new SelectionListener() {
@@ -392,7 +400,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btSort = new ButtonControl(abar, "sortAll");
+		Button btSort = group.addButton();
 		btSort.setIconEnabled(ImageLibrary.IMAGE_REFRESH);	
 		btSort.setTitle("Sort Elements");
 		btSort.addSelectionListener(new SelectionListener() {
@@ -401,7 +409,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btDeleteAll = new ButtonControl(abar, "deleteAll");
+		Button btDeleteAll = group.addButton();
 		btDeleteAll.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);	
 		btDeleteAll.setTitle("Delete All Elements");
 		btDeleteAll.addSelectionListener(new SelectionListener() {
@@ -411,7 +419,7 @@ public class DimensionEditorControl extends BaseContentContainer {
 		});
 		btDeleteAll.setConfirmMsg("Do you really want to delete all elements in that dimension?");
 
-		btSeal = new ButtonControl(abar, "seal");
+		btSeal = group.addButton();
 		btSeal.setIconEnabled(dimension.isSealed() ? ImageLibrary.IMAGE_LOCK : ImageLibrary.IMAGE_LOCK_OPEN);
 		btSeal.setTitle(dimension.isSealed() ? "Unlock Sealed Dimension" : "Seal Dimension");
 		btSeal.addSelectionListener(new SelectionListener() {

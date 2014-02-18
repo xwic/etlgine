@@ -4,8 +4,9 @@
 package de.xwic.etlgine.server.admin.datapool;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.ICube;
@@ -40,9 +41,10 @@ public class CubeDetailsControl extends BaseContentContainer {
 	 */
 	private void createActionBar() {
 
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
 		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -51,7 +53,7 @@ public class CubeDetailsControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl action = new ButtonControl(abar);
+		Button action = group.addButton();
 		//action.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		action.setTitle("Import from CSV");
 		action.addSelectionListener(new SelectionListener() {
@@ -60,7 +62,7 @@ public class CubeDetailsControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl delete = new ButtonControl(abar);
+		Button delete = group.addButton();
 		delete.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);
 		delete.setTitle("Delete Cube");
 		delete.setConfirmMsg("Do you really want to delete this cube from the datapool.");
@@ -70,7 +72,7 @@ public class CubeDetailsControl extends BaseContentContainer {
 			}
 		});
 		
-		ButtonControl btClear = new ButtonControl(abar);
+		Button btClear = group.addButton();
 		btClear.setIconEnabled(ImageLibrary.IMAGE_TABLE_DELETE);
 		btClear.setTitle("Clear Cube");
 		btClear.setConfirmMsg("Do you really want to delete ALL DATA (cells) from this cube.");

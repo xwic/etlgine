@@ -4,10 +4,11 @@
 package de.xwic.etlgine.server.admin.datapool;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.FileUpload;
+import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.FileUpload;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.ICube;
@@ -34,9 +35,9 @@ public class CubeImportControl extends BaseContentContainer {
 		
 		setTitle("Data Import into Cube [" + cube.getKey() + "]");
 		
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -49,7 +50,7 @@ public class CubeImportControl extends BaseContentContainer {
 		
 		fileUpload = new FileUpload(this, "fileUpload");
 		
-		ButtonControl btImport = new ButtonControl(this, "btImport");
+		Button btImport = group.addButton();
 		btImport.setTitle("Import File");
 		btImport.addSelectionListener(new SelectionListener() {
 			/* (non-Javadoc)

@@ -5,7 +5,7 @@ package de.xwic.etlgine.server.admin;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.server.ETLgineServer;
@@ -27,7 +27,7 @@ public class MainMenuControl extends BaseContentContainer {
 		
 		setTitle("Home");
 		
-		ButtonControl btJobs = new ButtonControl(this, "btJobs");
+		Button btJobs = new Button(this, "btJobs");
 		btJobs.setTitle("Jobs");
 		btJobs.setWidth(120);
 		btJobs.setIconEnabled(new ImageRef("img/script.png"));
@@ -36,7 +36,7 @@ public class MainMenuControl extends BaseContentContainer {
 				onJobsSelection();
 			}
 		});
-		ButtonControl btDataPools = new ButtonControl(this, "btDataPools");
+		Button btDataPools = new Button(this, "btDataPools");
 		btDataPools.setTitle("Data Pools");
 		btDataPools.setWidth(120);
 		btDataPools.setIconEnabled(new ImageRef("img/database.png"));
@@ -46,7 +46,7 @@ public class MainMenuControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btShutDown = new ButtonControl(this, "btShutDown");
+		Button btShutDown = new Button(this, "btShutDown");
 		btShutDown.setTitle("Shut Down");
 		btShutDown.setWidth(120);
 		btShutDown.setConfirmMsg("Do you realy want to SHUT DOWN the ETLgine Server?");

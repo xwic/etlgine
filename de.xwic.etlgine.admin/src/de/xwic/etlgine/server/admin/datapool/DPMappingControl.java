@@ -8,13 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.data.IContentProvider;
-import de.jwic.data.Range;
+import de.jwic.controls.Button;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -36,8 +37,8 @@ public class DPMappingControl extends BaseContentContainer {
 	private TableViewer table;
 	private TableModel tableModel;
 	private final String syncTableConnectionName;
-	private ButtonControl btEdit;
-	private ButtonControl btAdd;
+	private Button btEdit;
+	private Button btAdd;
 	private final String dpManagerKey;
 	private MappingContentProvider contentProvider;
 
@@ -165,9 +166,9 @@ public class DPMappingControl extends BaseContentContainer {
 	 * Setup the ActionBar.
 	 */
 	private void setupActionBar() {
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -176,7 +177,7 @@ public class DPMappingControl extends BaseContentContainer {
 			}
 		});
 
-		btAdd = new ButtonControl(abar, "add");
+		btAdd = group.addButton();
 		btAdd.setIconEnabled(ImageLibrary.IMAGE_TABLE_ADD);
 		btAdd.setTitle("Add");
 		btAdd.addSelectionListener(new SelectionListener() {
@@ -185,7 +186,7 @@ public class DPMappingControl extends BaseContentContainer {
 			}
 		});
 
-		btEdit = new ButtonControl(abar, "edit");
+		btEdit = group.addButton();
 		btEdit.setIconEnabled(ImageLibrary.IMAGE_TABLE_EDIT);
 		btEdit.setTitle("Edit");
 		btEdit.addSelectionListener(new SelectionListener() {

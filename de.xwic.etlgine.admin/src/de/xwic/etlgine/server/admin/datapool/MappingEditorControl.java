@@ -7,14 +7,15 @@ import java.sql.Connection;
 import java.util.List;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.CheckboxControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
-import de.jwic.controls.ListBoxControl;
-import de.jwic.controls.RadioGroupControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.CheckBoxGroup;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
+import de.jwic.controls.ListBox;
+import de.jwic.controls.RadioGroup;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -43,18 +44,18 @@ public class MappingEditorControl extends BaseContentContainer {
 
 	private DimMappingDef dimMapping;
 	
-	private InputBoxControl inpKey;
-	private InputBoxControl inpDescription;
-	private InputBoxControl inpTestString;
-	private ListBoxControl lbcDimension;
-	private RadioGroupControl chkOnUnmapped;
-	private CheckboxControl chkOptions;
+	private InputBox inpKey;
+	private InputBox inpDescription;
+	private InputBox inpTestString;
+	private ListBox lbcDimension;
+	private RadioGroup chkOnUnmapped;
+	private CheckBoxGroup chkOptions;
 	private DimensionElementSelector elmSelector;
 	private ErrorWarning errInfo;
 
 	private MappingElementEditorControl mapEditor;
 	
-	private ButtonControl btSave;
+	private Button btSave;
 	
 	private IDataPool dataPool;
 
@@ -124,9 +125,9 @@ public class MappingEditorControl extends BaseContentContainer {
 	 * Setup the ActionBar.
 	 */
 	private void setupActionBar() {
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.setConfirmMsg("Changes will get lost!");
@@ -136,7 +137,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		});
 
-		btSave = new ButtonControl(abar, "save");
+		btSave = group.addButton();
 		btSave.setIconEnabled(ImageLibrary.IMAGE_TABLE_SAVE);
 		btSave.setTitle("Save & Close");
 		btSave.addSelectionListener(new SelectionListener() {
@@ -145,7 +146,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btAdd = new ButtonControl(abar, "insert");
+		Button btAdd = group.addButton();
 		btAdd.setTitle("Create Element");
 		btAdd.setIconEnabled(ImageLibrary.IMAGE_ADD);
 		btAdd.addSelectionListener(new SelectionListener() {
@@ -154,7 +155,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btSortEx = new ButtonControl(abar, "sortEx");
+		Button btSortEx = group.addButton();
 		btSortEx.setTitle("Sort By Expression");
 		btSortEx.setIconEnabled(ImageLibrary.IMAGE_REFRESH);
 		btSortEx.addSelectionListener(new SelectionListener() {
@@ -163,7 +164,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		});
 		
-		ButtonControl btSortPath = new ButtonControl(abar, "sortElm");
+		Button btSortPath = group.addButton();
 		btSortPath.setTitle("Sort By Element");
 		btSortPath.setIconEnabled(ImageLibrary.IMAGE_REFRESH);
 		btSortPath.addSelectionListener(new SelectionListener() {
@@ -172,7 +173,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btDeleteAll = new ButtonControl(abar, "deleteAll");
+		Button btDeleteAll = group.addButton();
 		btDeleteAll.setTitle("Delete All");
 		btDeleteAll.setConfirmMsg("Do you really want to delete ALL mapping entries?");
 		btDeleteAll.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_DELETE);
@@ -298,15 +299,15 @@ public class MappingEditorControl extends BaseContentContainer {
 	 * 
 	 */
 	private void createDimMappingEditor() {
-		inpKey = new InputBoxControl(this, "inpKey");
+		inpKey = new InputBox(this, "inpKey");
 		inpKey.setWidth(300);
 		
-		inpDescription = new InputBoxControl(this, "inpDescription");
+		inpDescription = new InputBox(this, "inpDescription");
 		inpDescription.setMultiLine(true);
 		inpDescription.setRows(3);
 		inpDescription.setWidth(300);
 		
-		lbcDimension = new ListBoxControl(this, "lbcDimension");
+		lbcDimension = new ListBox(this, "lbcDimension");
 		lbcDimension.setChangeNotification(true);
 		lbcDimension.addElementSelectedListener(new ElementSelectedListener() {
 			public void elementSelected(ElementSelectedEvent event) {
@@ -318,17 +319,17 @@ public class MappingEditorControl extends BaseContentContainer {
 			lbcDimension.addElement(title, dim.getKey());
 		}
 		
-		chkOnUnmapped = new RadioGroupControl(this, "chkOnUnmapped");
+		chkOnUnmapped = new RadioGroup(this, "chkOnUnmapped");
 		chkOnUnmapped.setChangeNotification(true);
 		chkOnUnmapped.addElement("Create", "CREATE");
 		chkOnUnmapped.addElement("Skip", "SKIP");
 		chkOnUnmapped.addElement("Assign To", "ASSIGN");
 		chkOnUnmapped.addElement("Fail", "FAIL");
 		
-		chkOptions = new CheckboxControl(this, "chkOptions");
+		chkOptions = new CheckBoxGroup(this, "chkOptions");
 		chkOptions.addElement("Autocreate Mapping", "autocreate");
 		
-		new LabelControl(this, "elmSelector").setText("");
+		new Label(this, "elmSelector").setText("");
 		elmSelector = null;
 		
 		/*
@@ -357,10 +358,10 @@ public class MappingEditorControl extends BaseContentContainer {
 			}
 		}
 		
-		inpTestString = new InputBoxControl(this, "inpTestString");
+		inpTestString = new InputBox(this, "inpTestString");
 		inpTestString.setWidth(600);
 		
-		ButtonControl btTest = new ButtonControl(this, "btTest");
+		Button btTest = new Button(this, "btTest");
 		btTest.setTitle("Test");
 		btTest.addSelectionListener(new SelectionListener() { 
 			/* (non-Javadoc)
@@ -396,7 +397,7 @@ public class MappingEditorControl extends BaseContentContainer {
 			mapEditor.setDimension(dimension);
 		} else {
 			elmSelector = null;
-			new LabelControl(this, "elmSelector").setText("");
+			new Label(this, "elmSelector").setText("");
 		}
 		
 	}
@@ -404,14 +405,14 @@ public class MappingEditorControl extends BaseContentContainer {
 	/**
 	 * @return the inpTestString
 	 */
-	public InputBoxControl getInpTestString() {
+	public InputBox getInpTestString() {
 		return inpTestString;
 	}
 
 	/**
 	 * @param inpTestString the inpTestString to set
 	 */
-	public void setInpTestString(InputBoxControl inpTestString) {
+	public void setInpTestString(InputBox inpTestString) {
 		this.inpTestString = inpTestString;
 	}
 

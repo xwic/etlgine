@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.cube.ICube;
@@ -41,8 +42,8 @@ public class DPDetailsControl extends BaseContentContainer {
 	private IDataPool dataPool;
 
 	private Map<IDimension, DimensionElementSelector> selectorMap = new HashMap<IDimension, DimensionElementSelector>();
-	private ButtonControl btSave;
-	private ButtonControl btMapping;
+	private Button btSave;
+	private Button btMapping;
 	private String syncTableConnectionName;
 	private ServerContext context;
 	
@@ -66,9 +67,9 @@ public class DPDetailsControl extends BaseContentContainer {
 		
 		errInfo = new ErrorWarning(this, "errInfo");
 		
-		ActionBarControl abar = new ActionBarControl(this, "actionBar");
-		
-		ButtonControl btReturn = new ButtonControl(abar, "return");
+		ToolBar abar = new ToolBar(this, "actionBar");
+		ToolBarGroup group = abar.addGroup();
+		Button btReturn = group.addButton();
 		btReturn.setIconEnabled(ImageLibrary.IMAGE_RETURN);
 		btReturn.setTitle("Return");
 		btReturn.addSelectionListener(new SelectionListener() {
@@ -77,7 +78,7 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 
-		btSave = new ButtonControl(abar, "save");
+		btSave = group.addButton();
 		btSave.setIconEnabled(ImageLibrary.IMAGE_DATABASE_SAVE);
 		btSave.setTitle("Save to InitTable");
 		btSave.addSelectionListener(new SelectionListener() {
@@ -86,7 +87,7 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 		
-		btMapping = new ButtonControl(abar, "mapping");
+		btMapping = group.addButton();
 		btMapping.setIconEnabled(ImageLibrary.IMAGE_TABLE_RELATIONSHIP);
 		btMapping.setTitle("Edit Mappings");
 		btMapping.addSelectionListener(new SelectionListener() {
@@ -95,7 +96,7 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btSavePool = new ButtonControl(abar, "savePool");
+		Button btSavePool = group.addButton();
 		btSavePool.setTitle("Save Datapool");
 		btSavePool.setIconEnabled(ImageLibrary.IMAGE_DATABASE_SAVE);
 		btSavePool.addSelectionListener(new SelectionListener() {
@@ -107,7 +108,7 @@ public class DPDetailsControl extends BaseContentContainer {
 			}
 		});
 
-		ButtonControl btXlsTest = new ButtonControl(abar);
+		Button btXlsTest = group.addButton();
 		btXlsTest.setTitle("Test XLS Template");
 		btXlsTest.setIconEnabled(ImageLibrary.IMAGE_PAGE_EXCEL);
 		btXlsTest.addSelectionListener(new SelectionListener() {

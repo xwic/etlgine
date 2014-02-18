@@ -6,11 +6,13 @@ $insert.control("table")
 		<td>$insert.control("inpExpression")</td>
 		<td>$insert.control("chkOptions")</td>
 	</tr>
+	#if($control.hasSelectorElement())
 	<tr>
 		<td width="80">Element</td>
 		<td>$insert.control("selElement")</td>
 		<td>&nbsp;</td>
 	</tr>
+	#end
 	<tr>
 		<td width="80">Valid</td>
 		<td>

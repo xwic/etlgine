@@ -80,10 +80,10 @@
 			<groupId>de.xwic.jwic</groupId>
 			<artifactId>jwic-controls</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>de.xwic.jwic</groupId>
 			<artifactId>jwic-compatibility</artifactId>
-		</dependency>				
+		</dependency>		 -->		
 		<dependency>
 			<groupId>de.xwic.cube</groupId>
 			<artifactId>cube-core</artifactId>

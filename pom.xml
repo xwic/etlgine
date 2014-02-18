@@ -435,11 +435,11 @@
                 <artifactId>jwic-controls</artifactId>
                 <version>5.2.0</version>
             </dependency>
-            <dependency>
+            <!-- <dependency>
                 <groupId>de.xwic.jwic</groupId>
                 <artifactId>jwic-compatibility</artifactId>
                 <version>5.2.0</version>
-            </dependency>
+            </dependency> -->
 
             <dependency>
                 <groupId>de.xwic.cube</groupId>

@@ -3,18 +3,19 @@
  */
 package de.xwic.etlgine.server.admin;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import de.jwic.base.Control;
+import org.json.JSONException;
+import org.json.JSONWriter;
+
 import de.jwic.base.IControlContainer;
-import de.jwic.base.IResourceControl;
+import de.jwic.base.IncludeJsOption;
+import de.jwic.base.JavaScriptSupport;
+import de.jwic.json.JsonResourceControl;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.ISource;
@@ -26,8 +27,9 @@ import de.xwic.etlgine.server.ServerContext;
  * Displays automatically refreshed status informations.
  * @author Developer
  */
-public class StatusControl extends Control implements IResourceControl {
-
+@JavaScriptSupport
+public class StatusControl extends JsonResourceControl{
+	private long refreshInterval = 1000;
 	/**
 	 * @param container
 	 * @param name
@@ -36,97 +38,50 @@ public class StatusControl extends Control implements IResourceControl {
 		super(container, name);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.jwic.base.IResourceControl#attachResource(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
-		
-		PrintWriter pw = res.getWriter();
-		
-		pw.println("<table width=\"100%\">");
-		
-		// time
-		pw.println("<tr><td class=\"caption\">");
-		pw.println("Time:</td><td>");
-		pw.println(DateFormat.getTimeInstance().format(new Date()));
-		pw.println("</td></tr>");
+	@Override
+	public void handleJSONResponse(HttpServletRequest req, JSONWriter res)
+			throws JSONException {
+		res.object();
+		res.key("currentTime").value(DateFormat.getTimeInstance().format(new Date()));
 
 		// Memory
 		Runtime rt = Runtime.getRuntime();
 		NumberFormat nf = NumberFormat.getIntegerInstance();
 
-		pw.println("<tr><td class=\"caption\">");
-		pw.println("Max:</td><td>");
-		pw.println(nf.format(rt.maxMemory() / 1024) + "k");
-		pw.println("</td></tr>");
+		res.key("maxMemory").value(nf.format(rt.maxMemory() / 1024) + "k");
 
 		long total = rt.totalMemory() / 1024;
 		long free = rt.freeMemory() / 1024;
-		
-		pw.println("<tr><td class=\"caption\">");
-		pw.println("Total:</td><td>");
-		pw.println(nf.format(total) + "k");
-		pw.println("</td></tr>");
 
-		pw.println("<tr><td class=\"caption\">");
-		pw.println("Free:</td><td>");
-		pw.println(nf.format(free) + "k");
-		pw.println("</td></tr>");
+		res.key("totalMemory").value(nf.format(total) + "k");
 
-		pw.println("<tr><td class=\"caption\">");
-		pw.println("Used:</td><td>");
-		pw.println(nf.format(total - free) + "k");
-		pw.println("</td></tr>");
+		res.key("freeMemory").value(nf.format(free) + "k");
+
+		res.key("usedMemory").value(nf.format(total-free) + "k");
 
 		
 		// Queue info
 		ETLgineServer server = ETLgineServer.getInstance();
 		ServerContext context = server.getServerContext();
-
+		res.key("queues").array();
 		for (JobQueue queue : context.getJobQueues()) {
-			pw.println("<tr><td>&nbsp;</td><td>&nbsp;</td></tr>");
-			pw.println("<tr><td class=\"caption\">");
-			pw.println("Queue:</td><td>");
-			pw.println(queue.getName());
-			pw.println("</td></tr>");
+			res.object();
+			res.key("name").value(queue.getName());
 
-			pw.println("<tr><td class=\"caption\">");
-			pw.println("Size:</td><td>");
-			pw.println(queue.getSize());
-			pw.println("</td></tr>");
-			
-			pw.println("<tr><td class=\"caption\">");
-			pw.println("Status:</td><td>");
+			res.key("size").value(queue.getSize());
+
 			IJob job = queue.getActiveJob();
 			if (job == null) {
-				pw.println("Empty");
-				pw.println("</td></tr>");
+				res.key("status").value("Empty");
 			} else {
-				pw.println("Executing");
-				pw.println("</td></tr>");
-
-				pw.println("<tr><td class=\"caption\">");
-				pw.println("Job:</td><td>");
-				pw.println(job.getName());
-				pw.println("</td></tr>");
-
-				pw.println("<tr><td class=\"caption\">");
-				pw.println("State:</td><td>");
-				pw.println(job.getState());
-				pw.println("</td></tr>");
-
-				pw.println("<tr><td class=\"caption\">");
-				pw.println("Duration:</td><td>");
-				pw.println(job.getDurationInfo());
-				pw.println("</td></tr>");
+				res.key("status").value("Executing");
+				res.key("jobName").value(job.getName());
+				res.key("state").value(job.getState());
+				res.key("duration").value(job.getDurationInfo());
 
 				IProcess p = job.getProcessChain() != null ? job.getProcessChain().getActiveProcess() : null;
 				if (p != null) {
-					pw.println("<tr><td class=\"caption\">");
-					pw.println("Process:</td><td>");
-					pw.println(p.getName());
-					pw.println("</td></tr>");
-
+					res.key("process").value(p.getName());
 					ISource source = p.getContext().getCurrentSource();
 					if (source != null) {
 						String name = source.getName();
@@ -137,36 +92,32 @@ public class StatusControl extends Control implements IResourceControl {
 							if (name.length() > 30) {
 								name = name.substring(name.length() - 30);
 							}
-							pw.println("<tr><td class=\"caption\">");
-							pw.println("Source:</td><td>");
-							pw.println(name);
-							pw.println("</td></tr>");
+							res.key("source").value(name);
 						}
 					}
 					
-					pw.println("<tr><td class=\"caption\">");
-					pw.println("Record:</td><td>");
-					
 					long count = p.getContext().getRecordsCount();
-					
-					pw.println(nf.format(count));
-					
+					res.key("record").value(nf.format(count));
 					long duration = (System.currentTimeMillis() - job.getLastStarted().getTime()) / 1000;
-					if (duration > 0) {
-						pw.println("(" + nf.format(count / duration) + "/sec)");
-					}
 					
-					pw.println("</td></tr>");
+					res.key("processDuration").value(nf.format(count / duration) + "/sec");
+					
 				}
 				
 			}
+			res.endObject();
 		}
-		
-		pw.println("</table>");
-		
-		
-		pw.close();
-		
+		res.endArray();
+		res.endObject();
 	}
+	
+	@IncludeJsOption
+	public long getRefreshInterval() {
+		return refreshInterval;
+	}
+	
+	public void setRefreshInterval(long refreshInterval) {
+		this.refreshInterval = refreshInterval;
+	};
 
 }

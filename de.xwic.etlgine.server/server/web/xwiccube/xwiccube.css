@@ -134,15 +134,20 @@ table.xcube-leafsel td {
 	font-size: 8pt;
 }
 div.xcube-leafsel-box {
-	border: 1px solid #808080;
-	background-color: #ffffff;
+	color: #000000;
 	position: absolute;
-	width: 200px;
-	height: 300px;
 	overflow: auto;
 	font-size: 8pt;
-	left: 0px;
-	top: 0px;
+	text-align: left;
+	font-weight: normal;
+	z-index: 100;
+	background-color: #FFFFFF;
+	-webkit-box-shadow: 0px 0px 5px #626262;
+	box-shadow: 0px 0px 5px #626262;
+	border-top: 4px solid #006ec8;
+	border-bottom: 4px solid #006ec8;
+	border-right: 1px solid #808080;
+	border-left: 1px solid #808080;
 }
 div.xcube-leafsel-box td {
 	font-size: 8pt;
@@ -157,4 +162,116 @@ div.xcube-leafsel-box a:hover {
 	background-color: #2020A0;
 	color: #ffffff;
 	text-decoration: none;
+}
+
+  
+  
+  .xcube-tree {
+	width: 210px;
+	height: 300px;
+	overflow-x: auto;
+	overflow-y: auto;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+.xcube-tree ul li {
+	position: relative;
+}
+.xcube-tree ul li a {
+	display: block;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	color: #0067C9;
+	text-decoration: none;
+}
+.xcube-tree ul li a:hover {
+	text-decoration: underline;
+}
+
+.xcube-tree ul li a.node-open {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-image: url(../xwiccube/images/expand.png);
+	width: 19px;
+	height: 16px;
+}
+.xcube-tree ul li a.node-close {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-image: url(../xwiccube/images/collapse.png);
+	width: 19px;
+	height: 16px;
+}
+.xcube-tree ul li a.check {
+	position: absolute;
+	top: 0px;
+	left: 20px;
+	background-image: url(../xwiccube/images/unchecked.png);
+	width: 19px;
+	height: 16px;
+	background-repeat: no-repeat;
+	display: none;
+}
+.xcube-tree ul.multiple li a.check {
+	position: absolute;
+	top: 0px;
+	left: 20px;
+	background-image: url(../xwiccube/images/unchecked.png);
+	width: 19px;
+	height: 16px;
+	background-repeat: no-repeat;
+	display: block;
+}
+
+.xcube-tree ul.multiple li a.checked {
+	background-image: url(../xwiccube/images/checked.png);
+}
+.xcube-tree ul.multiple li a.undefined {
+	background-image: url(../xwiccube/images/undefined.png);
+}
+.xcube-tree ul.tree, .xcube-tree ul.tree ul {
+	list-style-type: none;
+	background: url(../xwiccube/images/I.png) repeat-y;
+	margin: 0;
+	padding: 0;
+}
+.xcube-tree ul.tree ul {
+	margin-left: 0px;
+}
+.xcube-tree ul.tree li {
+	margin: 0;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 20px;
+	padding-bottom: 0px;
+	background: url(../xwiccube/images/T.png) no-repeat;
+	color: #369;
+}
+.xcube-tree ul.multiple li {
+	padding-left: 40px;
+}
+
+.xcube-tree ul.tree li.last {
+	background: #fff url(../xwiccube/images/L.png) no-repeat;
+}
+.xcube-tree ul.tree li.root {
+	background: #fff url(none) no-repeat;
+	padding-left: 0px;	
+}
+.xcube-tree ul.multiple li.root {
+	padding-left: 20px;	
+}
+.xcube-tree ul.multiple li.root a.root-check {
+	left: 0px;
+}
+.xcube-button {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-top: 1px solid #C8C9C7;
 }

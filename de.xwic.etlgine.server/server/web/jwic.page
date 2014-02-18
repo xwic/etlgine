@@ -7,6 +7,7 @@
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/xwiccube/xwiccube.js"></SCRIPT>
 
 	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/etladmin.js"></SCRIPT>
+	<SCRIPT LANGUAGE="JavaScript" SRC="$contextPath/libs/jquery.tmpl.min.js"></SCRIPT>
 	
 #parse("jwic/include.body.vtl")
 

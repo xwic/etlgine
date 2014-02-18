@@ -1,3 +1,69 @@
+var Cube = (function(util){
+	var defineProp, defineObservable,tmpl
+		map = util.map,
+		reduce = util.reduce;
+	tmpl = function tmpl(control, templateId, data){
+		var prop,
+			template = control.find(templateId).clone();
+		template.removeAttr("style").removeAttr('id');
+		if(data){
+			for(prop in data){
+				if(data.hasOwnProperty(prop)){
+					template.find('#'+prop).text(data[prop]);
+				}
+			}
+		}
+		return template;
+	};
+	defineProp = function(object, propName){
+		var val;
+		object[propName] = function(value){
+			var oldVal;
+			if(value == null){//its a getter if null
+				return val; 
+			}//else its a setter
+			oldVal = val;
+			val = value;
+			if(value !== oldVal && 'function' === typeof object['firePropertyChanged']){
+				object.firePropertyChanged(propName,val,oldVal);//fire event listeners if applicable
+			}
+			return object;
+		};	
+		return object[propName]; 
+	};
+	defineObservable = function(object,observableName){
+		var listeners = {},
+			eventName = observableName.charAt(0).toUpperCase() + observableName.substr(1); //capitalize
+		
+		object['fire'+eventName] = function(){
+			var args = arguments,
+				l =listeners[observableName] || []; 
+			map(l,function(o){
+				o.apply(object,args);
+			});
+			return object;
+		};
+		object.on = object.on || function(what,listener){
+			listeners[what] = listeners[what] || [];
+			listeners[what].push(listener);
+			return object;
+		}
+		object.unbind = object.unbind || function(what,listener){
+			if(listener == null){
+				listeners[what] = null;
+				return object;
+			}
+			var index = listeners[what].indexOf(listener);
+			listeners[what].splice(index,1);
+			return object;
+		};
+	};
+	return {
+		defineObservable : defineObservable,
+		defineProp : defineProp,
+		tmpl : tmpl
+	};
+}(JWic.util));
 
 	var currentOpenCtrlId = null;
 	var xcube_TreeReq = null;
@@ -7,58 +73,16 @@
 	 * @param ctrlId
 	 * @return
 	 */
-	function xcube_showTree(ctrlId) {
-
-		if (currentOpenCtrlId != null) {
-			xcube_closeTree();
-		}
-		
-		var elm = document.getElementById("xcubeLeafselBox_" + ctrlId);
-		var elmTbl = document.getElementById("xcubeLeafselTbl_" + ctrlId);
-		if (elm && elmTbl) {
-			insideClick = true; // prevents immidiate closing
-			currentOpenCtrlId = null;
-			xcube_alignElement(elm, elmTbl);
-			elm.style.display = "inline";
-			elm.innerHTML = "Loading......";
-			
-			if (!elm.xwc_expanded) {
-				elm.xwc_expanded = new Array();
-			}
-		
-			// install "close" hook
-			document.onclick = function () {
-				//debugger;
-				if (!insideClick) {
-					xcube_closeTree();
-				}
-				insideClick = false;
-			}
-			elm.onclick = function innerClick() {
-				insideClick = true;
-			}
-			currentOpenCtrlId = ctrlId;
-			
-			// load the data...
-			if (!elm.xwc_data) {
-				xcube_TreeReq = jWic_sendResourceRequest(ctrlId, xcube_processResponse);
-			} else {
-				xcube_renderTree(elm);
-			}
-			
-		} else {
-			alert("selbox element for " + ctrlId + " not found on page.");
-		}
-	}
 	
 	/**
 	 * Process server response.
 	 * @return
 	 */
-	function xcube_processResponse() {
-		if (currentOpenCtrlId != null && xcube_TreeReq != null) {
-			if (xcube_TreeReq.readyState == 4 && xcube_TreeReq.status == 200) {
-				var resultString = xcube_TreeReq.responseText;
+	function xcube_processResponse(response) {
+		
+		if (currentOpenCtrlId != null) {
+			console.warn('process response')
+				var resultString = response.responseText;
 				try {
 					var result = JSON.parse(resultString);
 					var elm = document.getElementById("xcubeLeafselBox_" + currentOpenCtrlId);
@@ -74,9 +98,9 @@
 					elm.xwc_expanded["/" + result.dimension] = "+"; // initialy expand root
 					xcube_renderTree(elm);
 				} catch (e) {
-					alert("Error parsing data:" + e);
+//					alert("Error parsing data:" + e);
 				}
-			}
+			
 		}
 	}
 	
@@ -178,7 +202,7 @@
 	 * @return
 	 */
 	function xcube_selectElement(elmId) {
-		jWic().fireAction(currentOpenCtrlId, 'selection', elmId.substring(1));
+		JWic.fireAction(currentOpenCtrlId, 'selection', elmId.substring(1));
 		xcube_closeTree();
 	}
 	

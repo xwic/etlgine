@@ -1,9 +1,83 @@
 <div class="srvStatus">
  <div class="srcStatusHeader">Server-Status</div>
  <div id="srvStatus_$control.controlID" class="srvStatusContent">
+  	
  </div>
 </div>
-
-<script>
-	xetl_StartRefresh("$control.controlID");
+<script id="${control.controlID}_template" type="text/html">
+	<table>
+		<tr>
+			<td class="caption">Time:</td>
+			<td>${currentTime}</td>
+		</tr>
+		<tr>
+			<td class="caption">Max:</td>
+			<td>${maxMemory}</td>
+		</tr>
+		<tr>
+			<td class="caption">Total:</td>
+			<td>${totalMemory}</td>
+		</tr>
+		<tr>
+			<td class="caption">Free:</td>
+			<td >${freeMemory}</td>
+		</tr>
+		
+		<tr>
+			<td class="caption">Used:</td>
+			<td>${usedMemory}</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+	</table>
+	<table>
+		{{each queues}}
+			<tr>
+				<td class="caption">Queue</td>
+				<td>${name}</td>
+			</tr>
+			<tr>
+				<td class="caption">Size:</td>
+				<td>${size}</td>
+			</tr>
+			<tr>
+   				<td class="caption">Status:</td>
+   			 	<td>${status}</td>
+   			</tr>
+			{{if status!=='Empty'}}
+			 	<tr>
+   				 	<td class="caption">Job:</td>
+   				 	<td>${jobName}</td>
+   			 	</tr>
+				<tr>
+					<td class="caption">State:</td>
+   			 		<td>${state}</td>
+   			 	</tr>
+				<tr>
+					<td class="caption">Duration:</td>
+   			 		<td>${duration}</td>
+   			 	</tr>
+				{{if process}}
+				<tr>
+					<td class="caption">Process:</td>
+					<td>${process}</td>
+				</tr>
+				<tr>
+					<td class="caption">Source:</td>
+					<td>${source}</td>
+				</tr>
+				<tr>
+					<td class="caption">Record:</td>
+					<td>${record}</td>
+				</tr>
+				<tr>
+					<td class="caption">Process Duration:</td>
+					<td>${processDuration}</td>
+				</tr>
+				{{/if}}
+			{{/if}}
+		{{/each}}
+	</table>
 </script>
+
+
+

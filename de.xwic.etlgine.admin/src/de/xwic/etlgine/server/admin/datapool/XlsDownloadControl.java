@@ -15,6 +15,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
+import de.jwic.base.IncludeJsOption;
+import de.jwic.base.JavaScriptSupport;
 import de.xwic.cube.IDataPool;
 import de.xwic.cube.IDimensionElement;
 import de.xwic.cube.xlsbridge.CubeToExcel;
@@ -23,6 +25,7 @@ import de.xwic.cube.xlsbridge.CubeToExcel;
  * @author lippisch
  *
  */
+@JavaScriptSupport
 public class XlsDownloadControl extends Control implements IResourceControl {
 
 	private boolean showDownload = false;
@@ -89,6 +92,7 @@ public class XlsDownloadControl extends Control implements IResourceControl {
 	 * 
 	 * @return
 	 */
+	@IncludeJsOption
 	public String getDownloadURL() {
 		return getSessionContext().getCallBackURL() + "&"
 			+ URL_RESOURCE_PARAM + "=1&"
@@ -99,6 +103,7 @@ public class XlsDownloadControl extends Control implements IResourceControl {
 	/**
 	 * @return the showDownload
 	 */
+	@IncludeJsOption
 	public boolean isShowDownload() {
 		return showDownload;
 	}
@@ -113,6 +118,7 @@ public class XlsDownloadControl extends Control implements IResourceControl {
 	/**
 	 * @return the logInfo
 	 */
+	@IncludeJsOption
 	public String getLogInfo() {
 		return logInfo;
 	}

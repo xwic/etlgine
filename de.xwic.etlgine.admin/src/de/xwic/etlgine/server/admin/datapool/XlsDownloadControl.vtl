@@ -1,14 +1,3 @@
 <iframe id="iframe_$control.controlID" src="blank.html" style="visibility: hidden; position:absolute; left: 0px; top: 0px;"></iframe>
-#if($control.showDownload) 
-	$control.setShowDownload(false)
-	<script language="JavaScript">
-		var IF = document.getElementById("iframe_$control.controlID");
-		IF.src = "$control.downloadURL";
-	</script>
-#end
-
-#if($control.logInfo != "")
-<textarea style="width: 100%; height: 200px;">$control.logInfo</textarea>
-#else
-<button onClick="jWic().fireAction('$control.controlID', 'refresh', '')">Show Log</button>
-#end
+<button id="btn_$control.controlID">Show Log</button>
+<textarea id="log_$control.controlID" style="width: 100%; height: 200px; display: none;">$control.logInfo</textarea>

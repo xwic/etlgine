@@ -269,7 +269,7 @@ var JWic = {
 			return;
 		}
 
-		var elem = jQuery("#click_blocker");
+		var elem = jQuery("#click_blocker").css('background-image', "none");
 		var msg = jQuery("#click_blocker_message");
 		if (elem) {
 			if (showBlocker) {
@@ -293,7 +293,10 @@ var JWic = {
 			}
 			if (showBlocker) {
 				elem.show();
-				elem.css('height',docHeight-4);
+				elem.css({
+					'height': docHeight-4,
+					'width' : '100%'
+				});
 				if (msg) msg.show();
 				window.setTimeout("JWic.showLongDelay(" + JWic.cbSeq + ")", 1000);
 			} else {
@@ -305,10 +308,10 @@ var JWic = {
 	},
 	
 	showLongDelay : function(seqNum) {
-		if (JWic.isProcessing && JWic.cbSeq == seqNum) {
+		if (JWic.isProcessing && JWic.cbSeq === seqNum) {
 			var elem = jQuery("#click_blocker");
 			JWic.log("show long delay blocker")
-			elem.css('background', "url('jwic/gfx/overlay.png') repeat");
+			elem.css('background', "url('"+JWic.contextPath+"/jwic/gfx/overlay.png') repeat");
 		}
 	},
 
@@ -694,6 +697,7 @@ JWic.util = {
 			for(i=0,l = array.length;i<l;i++){
 				result.push(callback(array[i],i));
 			}
+			return result;
 		}
 }
 

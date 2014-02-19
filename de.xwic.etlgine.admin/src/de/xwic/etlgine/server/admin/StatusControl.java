@@ -5,6 +5,7 @@ package de.xwic.etlgine.server.admin;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +43,11 @@ public class StatusControl extends JsonResourceControl{
 	public void handleJSONResponse(HttpServletRequest req, JSONWriter res)
 			throws JSONException {
 		res.object();
-		res.key("currentTime").value(DateFormat.getTimeInstance().format(new Date()));
+        SimpleDateFormat format =
+                new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        res.key("currentDate").value(format.format(new Date()));
+
+        res.key("currentUpTime").value(getServerUptime());
 
 		// Memory
 		Runtime rt = Runtime.getRuntime();
@@ -120,4 +125,44 @@ public class StatusControl extends JsonResourceControl{
 		this.refreshInterval = refreshInterval;
 	};
 
+    private String getServerUptime() {
+        String uptime = "-";
+
+        long serverStartedAt = ETLgineServer.getInstance().getIntializedTimeInMilis();
+
+        if(serverStartedAt > 0) {
+            long duration = System.currentTimeMillis() - serverStartedAt;
+            uptime = convertTimeMsIntoString(duration, false);
+        }
+
+        return uptime;
+    }
+
+    private static String convertTimeMsIntoString(long timeMs, boolean includeMs) {
+        int ms = (int) (timeMs % 1000);
+        timeMs = timeMs / 1000;
+        int sec = (int) (timeMs % 60);
+        timeMs = timeMs / 60;
+        int min = (int) (timeMs % 60);
+        timeMs = timeMs / 60;
+        int hour = (int) (timeMs % 24);
+        timeMs = timeMs / 24;
+        int days = (int) timeMs;
+
+        StringBuilder sb = new StringBuilder();
+        if (days != 0) {
+            sb.append(days).append("d ");
+        }
+        if (days != 0 || hour != 0) {
+            sb.append(hour).append("h ");
+        }
+        if (days != 0 || hour != 0 || min != 0) {
+            sb.append(min).append("m ");
+        }
+        sb.append(sec).append("s ");
+        if (includeMs) {
+            sb.append(ms).append("ms ");
+        }
+        return sb.toString();
+    }
 }

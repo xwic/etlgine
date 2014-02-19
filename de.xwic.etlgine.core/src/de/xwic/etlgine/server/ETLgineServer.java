@@ -9,6 +9,7 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -47,7 +48,9 @@ public class ETLgineServer implements Runnable {
 	private boolean doExit = false;
 	private boolean running = false;
 	private boolean exitAfterFinish = false;
-	
+
+    private long intializedTimeInMilis = 0;
+
 	public static boolean FORCE_LOG4J_INITIALIZATION = false;
 
 	/**
@@ -173,6 +176,7 @@ public class ETLgineServer implements Runnable {
 		try {
 			initializing = true;
 			initialized = initializeServer();
+            setIntializedTimeInMilis(System.currentTimeMillis());
 			return initialized;
 		} finally {
 			initializing = false;
@@ -438,4 +442,12 @@ public class ETLgineServer implements Runnable {
 	protected void stopEmbededWebServer() {
 		
 	}
+
+    public long getIntializedTimeInMilis() {
+        return intializedTimeInMilis;
+    }
+
+    public void setIntializedTimeInMilis(long intializedTimeInMilis) {
+        this.intializedTimeInMilis = intializedTimeInMilis;
+    }
 }

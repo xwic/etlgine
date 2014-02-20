@@ -3,6 +3,7 @@
  */
 package de.xwic.etlgine.server;
 
+import de.xwic.etlgine.demo.DemoDatabaseUtil;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
@@ -14,6 +15,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
@@ -331,7 +333,19 @@ public class ETLgineServer implements Runnable {
 				return false;
 			}
 		}
-		
+
+
+        // check if we need to initialize the demo database
+        if(serverContext.getPropertyBoolean(ServerContext.PROPERTY_DEMODB_CREATE_IF_MISSING, false)) {
+            String conUrl = serverContext.getProperty(ServerContext.PROPERTY_DEMODB_URL, "NOT_FOUND");
+            String conDriver = serverContext.getProperty(ServerContext.PROPERTY_DEMODB_DRIVER, "NOT_FOUND");
+
+            if (!StringUtils.isEmpty(conUrl) && !StringUtils.isEmpty(conDriver) &&
+                    conUrl.contains(":sqlite:") && conDriver.contains(".sqlite.")) {
+                DemoDatabaseUtil.prepareDB(conDriver,conUrl);
+            }
+        }
+
 		//System.setOut(oldPS);
 		return true;
 		

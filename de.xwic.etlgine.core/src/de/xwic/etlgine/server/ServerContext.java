@@ -39,7 +39,11 @@ public class ServerContext extends Context {
 	public static final String PROPERTY_INITIALIZING_LISTENER = "initializing.listener.classnames";
 	public final static String PROPERTY_WEBSERVER_START = "webserver.start";
 	public final static String PROPERTY_MONITOR_CLASSNAME = "monitor.classname";
-	
+
+    public final static String PROPERTY_DEMODB_CREATE_IF_MISSING = "demodb.create.if.missing";
+    public final static String PROPERTY_DEMODB_URL = "default.connection.url";
+    public final static String PROPERTY_DEMODB_DRIVER = "default.connection.driver";
+
 	protected final Log log = LogFactory.getLog(getClass());
 	
 	private Map<String, IJob> jobs = new HashMap<String, IJob>();

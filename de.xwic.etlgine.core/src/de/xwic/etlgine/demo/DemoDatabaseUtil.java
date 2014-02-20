@@ -10,12 +10,12 @@ import java.sql.Statement;
  */
 public class DemoDatabaseUtil {
 
-    public static void prepareDB(String databasePath) {
+    public static void prepareDB(String conDriver, String conUrl) {
         Connection c = null;
         Statement stmt = null;
         try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:" + databasePath);
+            Class.forName(conDriver);
+            c = DriverManager.getConnection(conUrl);
             System.out.println("Opened database successfully");
 
             createDimensionsTable(c);

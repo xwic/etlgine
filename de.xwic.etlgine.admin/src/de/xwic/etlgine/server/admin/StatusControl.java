@@ -43,9 +43,7 @@ public class StatusControl extends JsonResourceControl{
 	public void handleJSONResponse(HttpServletRequest req, JSONWriter res)
 			throws JSONException {
 		res.object();
-        SimpleDateFormat format =
-                new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        res.key("currentDate").value(format.format(new Date()));
+        res.key("currentDate").value((new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")).format(new Date()));
 
         res.key("currentUpTime").value(getServerUptime());
 

@@ -1,5 +1,8 @@
 package de.xwic.etlgine.demo;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,6 +12,7 @@ import java.sql.Statement;
  *
  */
 public class DemoDatabaseUtil {
+    private static final Log log = LogFactory.getLog(DemoDatabaseUtil.class);
 
     public static void prepareDB(String conDriver, String conUrl) {
         Connection c = null;
@@ -16,7 +20,7 @@ public class DemoDatabaseUtil {
         try {
             Class.forName(conDriver);
             c = DriverManager.getConnection(conUrl);
-            System.out.println("Opened database successfully");
+            log.info("Opened DEMO database successfully");
 
             createDimensionsTable(c);
             createDimensionElementsTable(c);
@@ -24,18 +28,20 @@ public class DemoDatabaseUtil {
             createDimMapTable(c);
             createDimMapElementsTable(c);
 
+            createLoadTestTable(c);
             c.close();
+
+            log.info("DEMO Tables created successfully");
+
         } catch ( Exception e ) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            System.exit(0);
+            log.error(e);
         }
-        System.out.println("Table created successfully");
     }
 
     private static void createDimensionsTable(Connection con) throws SQLException {
         Statement stmt = null;
         stmt = con.createStatement();
-        String sql = "CREATE TABLE [XCUBE_DIMENSIONS](" +
+        String sql = "CREATE TABLE IF NOT EXISTS [XCUBE_DIMENSIONS](" +
                 "[Key]      [varchar](255)  NOT NULL PRIMARY KEY," +
                 "[Title]    [varchar](255)  NULL," +
                 "[Sealed]   [bit]           NOT NULL" +
@@ -47,7 +53,7 @@ public class DemoDatabaseUtil {
     private static void createDimensionElementsTable(Connection con) throws SQLException {
         Statement stmt = null;
         stmt = con.createStatement();
-        String sql = "CREATE TABLE [XCUBE_DIMENSION_ELEMENTS](" +
+        String sql = "CREATE TABLE IF NOT EXISTS [XCUBE_DIMENSION_ELEMENTS](" +
                 "[dbid]             [integer]       NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 "[ID]               [varchar](900)  NOT NULL," +
                 "[ParentID]         [varchar](900)  NOT NULL," +
@@ -64,7 +70,7 @@ public class DemoDatabaseUtil {
     private static void createMeasuresTable(Connection con) throws SQLException {
         Statement stmt = null;
         stmt = con.createStatement();
-        String sql = "CREATE TABLE [XCUBE_MEASURES] (" +
+        String sql = "CREATE TABLE IF NOT EXISTS [XCUBE_MEASURES] (" +
                 "[Key]                  [varchar](255) NOT NULL PRIMARY KEY," +
                 "[Title]                [varchar](255) NULL," +
                 "[FunctionClass]        [varchar](300) NULL," +
@@ -77,12 +83,13 @@ public class DemoDatabaseUtil {
     private static void createDimMapTable(Connection con) throws SQLException {
         Statement stmt = null;
         stmt = con.createStatement();
-        String sql = "CREATE TABLE [XCUBE_DIMMAP](" +
+        String sql = "CREATE TABLE IF NOT EXISTS [XCUBE_DIMMAP](" +
                 "[DimMapKey]        [varchar](255)  NOT NULL PRIMARY KEY ," +
                 "[Description]      [text]          NULL," +
                 "[DimensionKey]     [varchar](255)  NOT NULL," +
                 "[UnmappedPath]     [varchar](900)  NULL," +
-                "[OnUnmapped]       [varchar](50)   NOT NULL CONSTRAINT [DF_XCUBE_DIMMAP_OnUnmapped]  DEFAULT ('CREATE')" +
+                "[OnUnmapped]       [varchar](50)   NOT NULL CONSTRAINT [DF_XCUBE_DIMMAP_OnUnmapped]  DEFAULT ('CREATE')," +
+                "[AutoCreate]       [bit]           NOT NULL" +
                 ")";
         stmt.executeUpdate(sql);
         stmt.close();
@@ -91,7 +98,7 @@ public class DemoDatabaseUtil {
     private static void createDimMapElementsTable(Connection con) throws SQLException {
         Statement stmt = null;
         stmt = con.createStatement();
-        String sql = "CREATE TABLE [XCUBE_DIMMAP_ELEMENTS](" +
+        String sql = "CREATE TABLE IF NOT EXISTS [XCUBE_DIMMAP_ELEMENTS](" +
                 "[ID]           [integer]       NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 "[DimMapKey]    [varchar](255)  NOT NULL," +
                 "[Expression]   [text]          NOT NULL," +
@@ -106,4 +113,17 @@ public class DemoDatabaseUtil {
         stmt.executeUpdate(sql);
         stmt.close();
     }
+
+    private static void createLoadTestTable(Connection con) throws SQLException {
+        Statement stmt = null;
+        stmt = con.createStatement();
+        String sql =
+                "DROP TABLE IF EXISTS [LOAD_TEST_RND];" +
+                "CREATE TABLE IF NOT EXISTS [LOAD_TEST_RND](" +
+                "[ID]           [integer]       NOT NULL PRIMARY KEY AUTOINCREMENT" +
+                ")";
+        stmt.executeUpdate(sql);
+        stmt.close();
+    }
+
 }

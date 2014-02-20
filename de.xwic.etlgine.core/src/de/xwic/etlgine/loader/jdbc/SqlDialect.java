@@ -8,6 +8,7 @@ package de.xwic.etlgine.loader.jdbc;
  *
  */
 public enum SqlDialect {
-	MSSQL,
+    SQLITE,
+    MSSQL,
 	ORACLE
 }

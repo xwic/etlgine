@@ -49,8 +49,8 @@ public class DemoRndExtractor  extends AbstractExtractor {
      */
     public void openSource(ISource source, IDataSet dataSet) throws ETLException {
 
-        if (!(source instanceof TestRndSource)) {
-            throw new ETLException("The source must be of type TestRndSource");
+        if (!(source instanceof DemoRndSource)) {
+            throw new ETLException("The source must be of type DemoRndSource");
         }
         DemoRndSource trs = (DemoRndSource)source;
         entries = trs.getEntries();

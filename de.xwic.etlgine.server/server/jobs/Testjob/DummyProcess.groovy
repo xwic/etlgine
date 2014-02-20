@@ -3,21 +3,26 @@
  */
  
 import de.xwic.etlgine.*
+import de.xwic.etlgine.demo.DemoRndExtractor
+import de.xwic.etlgine.demo.DemoRndSource
 import de.xwic.etlgine.loader.jdbc.JDBCLoader
+import de.xwic.etlgine.loader.jdbc.SqlDialect
+import org.apache.commons.lang.StringUtils
 
-def source = new TestRndSource(6000);
+import java.text.SimpleDateFormat
+
+def source = new DemoRndSource(6000);
 
 process.addSource(source);
 
-process.setExtractor(new TestRndExtractor());
+process.setExtractor(new DemoRndExtractor());
 
 def jdbcLoader = new JDBCLoader();
-jdbcLoader.setCatalogName("etlgine_test");
-jdbcLoader.setConnectionUrl("jdbc:jtds:sqlserver://localhost/etlgine_test");
-jdbcLoader.setUsername("etlgine");
-jdbcLoader.setPassword("etl");
+jdbcLoader.setSharedConnectionName("defaultshare");
+jdbcLoader.setConnectionName("default");
 jdbcLoader.setTablename("LOAD_TEST_RND");
 jdbcLoader.setAutoCreateColumns(true);
+jdbcLoader.setSqlDialect(SqlDialect.SQLITE);
 
 jdbcLoader.addIgnoreableColumns("ID");
 
@@ -27,11 +32,12 @@ process.addLoader(jdbcLoader);
 // add a test transformer
 class MyTransformer extends AbstractTransformer {
 	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
-		def obj = record.getDataAsDouble("Bookings");
-		if (obj != null) {
-			record.setData("Bookings", -obj);
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		def obj = record.getData("Date");
+		if (obj!= null) {
+            record.setData("Date", dt.format(obj));
 		}
 	}
 }
-//process.addTransformer(new MyTransformer());
+process.addTransformer(new MyTransformer());
 

@@ -1372,11 +1372,13 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException 
 	 */
 	private void createColumns(List<IColumn> missingCols, Map<String, DbColumnDef> columns) throws SQLException {
+        StringBuilder alterCommand = new StringBuilder();
+        alterCommand.append("ALTER TABLE ");
+        alterCommand.append(getTablenameQuoted());
+        alterCommand.append(" ADD ");
 
 		StringBuilder sql = new StringBuilder();
-		sql.append("ALTER TABLE ");
-		sql.append(getTablenameQuoted());
-		sql.append(" ADD ");
+        sql.append(alterCommand);
 		if (sqlDialect == SqlDialect.ORACLE) {
 			sql.append("(");
 		}
@@ -1395,12 +1397,16 @@ public class JDBCLoader extends AbstractLoader {
 				
 				if (first) {
 					first = false;
-				} else {
+                } else if (SqlDialect.SQLITE.equals(sqlDialect)) {
+                    sql.append(";");
+                    sql.append(alterCommand);
+				} else  {
 					sql.append(", ");
 				}
-				
-				sql.append(is).append(dbcd.getName()).append(is).append(" ").append(dbcd.getTypeNameDetails());
-				
+
+
+			    sql.append(is).append(dbcd.getName()).append(is).append(" ").append(dbcd.getTypeNameDetails());
+
 				columns.put(dbcd.getName(), dbcd);
 			}
 			
@@ -1410,9 +1416,17 @@ public class JDBCLoader extends AbstractLoader {
 		}		
 		processContext.getMonitor().logInfo("Creating missing columns: \n" + sql.toString());
 
-		Statement stmt = connection.createStatement();
-		stmt.execute(sql.toString());
-		
+        if (SqlDialect.SQLITE.equals(sqlDialect)) {
+            String[] sqls = sql.toString().split(";");
+            for(String sqlLite: sqls){
+                Statement stmt = connection.createStatement();
+                stmt.execute(sqlLite);
+                stmt.close();
+            }
+        } else {
+            Statement stmt = connection.createStatement();
+            stmt.execute(sql.toString());
+        }
 	}
 
 	/**

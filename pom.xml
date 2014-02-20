@@ -426,6 +426,12 @@
 			</dependency>
 
             <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+                <version>3.7.15-M1</version>
+            </dependency>
+
+            <dependency>
                 <groupId>de.xwic.jwic</groupId>
                 <artifactId>jwic-core</artifactId>
                 <version>5.2.0</version>

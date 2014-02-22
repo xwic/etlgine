@@ -264,7 +264,6 @@ public class ETLgineServer implements Runnable {
 			}
 		}
 
-		
 		// copy properties to server context
 		for (Object key : props.keySet()) {
 			String sKey = (String)key;
@@ -273,6 +272,18 @@ public class ETLgineServer implements Runnable {
 				serverContext.setProperty(sKey, props.getProperty(sKey));
 			}
 		}
+
+        // check if we need to initialize the demo database
+        if(serverContext.getPropertyBoolean(ServerContext.PROPERTY_SQLITE_DATABASE_INIT, false) &&
+                !StringUtils.isEmpty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, ""))) {
+            String conUrl = serverContext.getProperty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, "")+".connection.driver", "NOT_FOUND");
+            String conDriver = serverContext.getProperty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, ".connection.url")+"", "NOT_FOUND");
+
+            if (!StringUtils.isEmpty(conUrl) && !StringUtils.isEmpty(conDriver) &&
+                    conUrl.contains(":sqlite:") && conDriver.contains(".sqlite.")) {
+                DemoDatabaseUtil.prepareDB(conDriver,conUrl);
+            }
+        }
 
 		// invoke server initializing listener
 		String serverInitializingListener = serverContext.getProperty(ServerContext.PROPERTY_INITIALIZING_LISTENER);
@@ -335,16 +346,6 @@ public class ETLgineServer implements Runnable {
 		}
 
 
-        // check if we need to initialize the demo database
-        if(serverContext.getPropertyBoolean(ServerContext.PROPERTY_DEMODB_CREATE_IF_MISSING, false)) {
-            String conUrl = serverContext.getProperty(ServerContext.PROPERTY_DEMODB_URL, "NOT_FOUND");
-            String conDriver = serverContext.getProperty(ServerContext.PROPERTY_DEMODB_DRIVER, "NOT_FOUND");
-
-            if (!StringUtils.isEmpty(conUrl) && !StringUtils.isEmpty(conDriver) &&
-                    conUrl.contains(":sqlite:") && conDriver.contains(".sqlite.")) {
-                DemoDatabaseUtil.prepareDB(conDriver,conUrl);
-            }
-        }
 
 		//System.setOut(oldPS);
 		return true;

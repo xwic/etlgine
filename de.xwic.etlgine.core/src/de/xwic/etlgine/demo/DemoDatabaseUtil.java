@@ -29,11 +29,14 @@ public class DemoDatabaseUtil {
             createDimMapElementsTable(c);
 
             createLoadTestTable(c);
+
+            createJdbcMonitorTable(c);
+
             c.close();
 
             log.info("DEMO Tables created successfully");
 
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             log.error(e);
         }
     }
@@ -119,9 +122,36 @@ public class DemoDatabaseUtil {
         stmt = con.createStatement();
         String sql =
                 "DROP TABLE IF EXISTS [LOAD_TEST_RND];" +
-                "CREATE TABLE IF NOT EXISTS [LOAD_TEST_RND](" +
-                "[ID]           [integer]       NOT NULL PRIMARY KEY AUTOINCREMENT" +
-                ")";
+                        "CREATE TABLE IF NOT EXISTS [LOAD_TEST_RND](" +
+                        "[ID]   [integer]   NOT NULL PRIMARY KEY AUTOINCREMENT" +
+                        ")";
+        stmt.executeUpdate(sql);
+        stmt.close();
+    }
+
+    private static void createJdbcMonitorTable(Connection con) throws SQLException {
+        Statement stmt = null;
+        stmt = con.createStatement();
+        String sql =
+                        "CREATE TABLE IF NOT EXISTS [JDBC_MONITOR](" +
+                        "[ID]           [integer]       NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        "[Level]        [varchar](16)   NULL," +
+                        "[Event]        [varchar](64)   NULL," +
+                        "[Message]      [varchar](1024) NULL," +
+                        "[Exception]    [varchar](4000) NULL," +
+                        "[Created]      [varchar](64)   NULL," +
+                        "[Start]        [varchar](64)   NULL," +
+                        "[Finished]     [varchar](64)   NULL," +
+                        "[Duration]     [int]           NULL," +
+                        "[Job]          [varchar](64)   NULL," +
+                        "[State]        [varchar](32)   NULL," +
+                        "[Process]      [varchar](64)   NULL," +
+                        "[Result]       [varchar](32)   NULL," +
+                        "[CreatorInfo]  [varchar](128)  NULL," +
+                        "[Hostname]     [varchar](128)  NULL," +
+                        "[ETLgineName]  [varchar](128)  NULL," +
+                        "[ETLgineId]    [varchar](128)  NULL" +
+                        ")";
         stmt.executeUpdate(sql);
         stmt.close();
     }

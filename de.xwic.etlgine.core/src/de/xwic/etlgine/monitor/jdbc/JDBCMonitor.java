@@ -122,7 +122,8 @@ public class JDBCMonitor extends DefaultMonitor {
 	protected IColumn colCreatorInfo;
 	protected IColumn colHostname;
 	protected IColumn colETLgineName;
-	
+    protected IColumn colETLgineId;
+
 	protected EventType eventType;
 	protected Object eventSource;
 	protected String eventKey;
@@ -220,9 +221,12 @@ public class JDBCMonitor extends DefaultMonitor {
 		colHostname = ds.addColumn("Hostname");
 		colHostname.setTypeHint(DataType.STRING);
 		colHostname.setLengthHint(128);
-		colETLgineName = ds.addColumn("ETLgine Name");
+		colETLgineName = ds.addColumn("ETLgineName");
 		colETLgineName.setTypeHint(DataType.STRING);
 		colETLgineName.setLengthHint(128);
+        colETLgineId = ds.addColumn("ETLgineId");
+        colETLgineId.setTypeHint(DataType.STRING);
+        colETLgineId.setLengthHint(128);
 	}
 	
 	protected Object lock(Object lockObject) {
@@ -496,7 +500,8 @@ public class JDBCMonitor extends DefaultMonitor {
 			record.setData(colCreatorInfo, currentCreatorInfo);
 			record.setData(colHostname, InetAddress.getLocalHost().getCanonicalHostName());
 			record.setData(colETLgineName, ETLgineServer.getInstance().getServerContext().getProperty("name", "Unnamed"));
-			
+            record.setData(colETLgineId, ETLgineServer.getInstance().getServerContext().getProperty("instance.id", "NOID"));
+
 			loader.processRecord(processContext, record);
 			
 			if (duration != null || e != null) {

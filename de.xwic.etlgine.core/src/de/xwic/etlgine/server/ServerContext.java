@@ -40,9 +40,9 @@ public class ServerContext extends Context {
 	public final static String PROPERTY_WEBSERVER_START = "webserver.start";
 	public final static String PROPERTY_MONITOR_CLASSNAME = "monitor.classname";
 
-    public final static String PROPERTY_DEMODB_CREATE_IF_MISSING = "demodb.create.if.missing";
-    public final static String PROPERTY_DEMODB_URL = "default.connection.url";
-    public final static String PROPERTY_DEMODB_DRIVER = "default.connection.driver";
+    public final static String PROPERTY_SQLITE_DATABASE_INIT = "sqlite.database.init";
+    public final static String PROPERTY_SQLITE_DATABSE_CONNECTION = "sqlite.database.connection";
+
 
 	protected final Log log = LogFactory.getLog(getClass());
 	

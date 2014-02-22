@@ -6,6 +6,12 @@
 </div>
 <script id="${control.controlID}_template" type="text/html">
 	<table>
+        {{if instanceId!==''}}
+		<tr>
+			<td class="caption">Instance ID:</td>
+			<td>${instanceId}</td>
+		</tr>
+		{{/if}}
 		<tr>
 			<td class="caption">Date:</td>
 			<td>${currentDate}</td>

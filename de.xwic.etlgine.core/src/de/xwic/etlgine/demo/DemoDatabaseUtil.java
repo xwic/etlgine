@@ -29,6 +29,7 @@ public class DemoDatabaseUtil {
             createDimMapElementsTable(c);
 
             createLoadTestTable(c);
+            createLoadTestRndTable(c);
 
             createJdbcMonitorTable(c);
 
@@ -117,13 +118,25 @@ public class DemoDatabaseUtil {
         stmt.close();
     }
 
-    private static void createLoadTestTable(Connection con) throws SQLException {
+    private static void createLoadTestRndTable(Connection con) throws SQLException {
         Statement stmt = null;
         stmt = con.createStatement();
         String sql =
                 "DROP TABLE IF EXISTS [LOAD_TEST_RND];" +
                         "CREATE TABLE IF NOT EXISTS [LOAD_TEST_RND](" +
                         "[ID]   [integer]   NOT NULL PRIMARY KEY AUTOINCREMENT" +
+                        ")";
+        stmt.executeUpdate(sql);
+        stmt.close();
+    }
+
+    private static void createLoadTestTable(Connection con) throws SQLException {
+        Statement stmt = null;
+        stmt = con.createStatement();
+        String sql =
+                "DROP TABLE IF EXISTS [LOAD_TEST];" +
+                        "CREATE TABLE IF NOT EXISTS [LOAD_TEST](" +
+                        "[SV_ID]   [integer]   NOT NULL PRIMARY KEY AUTOINCREMENT" +
                         ")";
         stmt.executeUpdate(sql);
         stmt.close();

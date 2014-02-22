@@ -3,6 +3,8 @@
  */
 package de.xwic.etlgine;
 
+import de.xwic.etlgine.demo.DemoDatabaseUtil;
+import de.xwic.etlgine.loader.jdbc.SqlDialect;
 import junit.framework.TestCase;
 
 import org.apache.log4j.BasicConfigurator;
@@ -11,6 +13,8 @@ import de.xwic.etlgine.extractor.jdbc.JDBCExtractor;
 import de.xwic.etlgine.extractor.jdbc.JDBCSource;
 import de.xwic.etlgine.loader.csv.CSVLoader;
 import de.xwic.etlgine.loader.jdbc.JDBCLoader;
+
+import java.sql.ResultSet;
 
 /**
  * @author Developer
@@ -24,6 +28,7 @@ public class TestRndExtractor2JDBCTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		BasicConfigurator.configure();
+        DemoDatabaseUtil.prepareDB("org.sqlite.JDBC","jdbc:sqlite:test/etlgine_test.db3");
 	}
 	
 	/**
@@ -41,13 +46,13 @@ public class TestRndExtractor2JDBCTest extends TestCase {
 		
 		
 		JDBCLoader jdbcLoader = new JDBCLoader();
-		jdbcLoader.setCatalogName("etlgine_test");
-		jdbcLoader.setConnectionUrl("jdbc:jtds:sqlserver://localhost/etlgine_test");
-		jdbcLoader.setUsername("etlgine");
-		jdbcLoader.setPassword("etl");
+        jdbcLoader.setDriverName("org.sqlite.JDBC");
+		jdbcLoader.setConnectionUrl("jdbc:sqlite:test/etlgine_test.db3");
+        jdbcLoader.setUsername("");
+        jdbcLoader.setPassword("");
 		jdbcLoader.setTablename("LOAD_TEST_RND");
 		jdbcLoader.setAutoCreateColumns(true);
-		
+		jdbcLoader.setSqlDialect(SqlDialect.SQLITE);
 		jdbcLoader.addIgnoreableColumns("ID");
 		
 		process.addLoader(jdbcLoader);
@@ -66,13 +71,16 @@ public class TestRndExtractor2JDBCTest extends TestCase {
 		IETLProcess process = pc.createProcess("jdbcExtract");
 		
 		JDBCSource source = new JDBCSource();
-		source.setConnectionUrl("jdbc:jtds:sqlserver://localhost/etlgine_test");
-		source.setUsername("etlgine");
-		source.setPassword("etl");
+        source.setDriverName("org.sqlite.JDBC");
+        source.setConnectionUrl("jdbc:sqlite:test/etlgine_test.db3");
+        source.setUsername("");
+        source.setPassword("");
 		source.setSqlSelectString("SELECT * FROM LOAD_TEST_RND");
 		process.addSource(source);
-		
-		process.setExtractor(new JDBCExtractor());
+
+        JDBCExtractor processExtractor = new JDBCExtractor();
+        processExtractor.setResultSetType(ResultSet.TYPE_FORWARD_ONLY);
+		process.setExtractor(processExtractor);
 		
 		CSVLoader csvLoader = new CSVLoader();
 		csvLoader.setFilename("test/jdbc_extract.csv");

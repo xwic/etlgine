@@ -71,7 +71,8 @@ public class ProcessTest extends TestCase {
 		process.setMonitor(new DefaultMonitor() {
 			@Override
 			public void onEvent(IProcessContext processContext, EventType eventType) {
-				super.onEvent(processContext, eventType, process);
+                // Remove super call - else will end in a infinite loop
+				//super.onEvent(processContext, eventType, process);
 				switch (eventType) {
 				case SOURCE_POST_OPEN: {
 					// after the open, check if the data source contains the right columns.

@@ -6,12 +6,6 @@
 </div>
 <script id="${control.controlID}_template" type="text/html">
 	<table>
-        {{if instanceId!==''}}
-		<tr>
-			<td class="caption">Instance ID:</td>
-			<td>${instanceId}</td>
-		</tr>
-		{{/if}}
 		<tr>
 			<td class="caption">Date:</td>
 			<td>${currentDate}</td>
@@ -20,6 +14,12 @@
 			<td class="caption">Uptime:</td>
 			<td>${currentUpTime}</td>
 		</tr>
+        {{if instanceId!==''}}
+		<tr>
+			<td class="caption">Instance ID:</td>
+			<td>${instanceId}</td>
+		</tr>
+		{{/if}}
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td class="caption">Max:</td>

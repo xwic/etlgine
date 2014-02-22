@@ -105,9 +105,10 @@ public class StatusControl extends JsonResourceControl{
 					long count = p.getContext().getRecordsCount();
 					res.key("record").value(nf.format(count));
 					long duration = (System.currentTimeMillis() - job.getLastStarted().getTime()) / 1000;
-					
-					res.key("processDuration").value(nf.format(count / duration) + "/sec");
-					
+					if(duration > 0) {
+                        res.key("processDuration").value(nf.format(count / duration) + "/sec");
+                    }
+
 				}
 				
 			}

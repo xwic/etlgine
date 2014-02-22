@@ -108,9 +108,7 @@ public class Job implements IJob {
 					trigger.notifyJobFinished(state == State.ERROR);
 				}
 			} finally {
-                if (state == State.ERROR || state == State.FINISHED_WITH_ERROR) {
-                    stopTriggerAfterError = true;
-                }
+                stopTriggerAfterError = true;
 				executing = false;
 				processChain = null;
 				monitor.onEvent(context, EventType.JOB_EXECUTION_END, this);

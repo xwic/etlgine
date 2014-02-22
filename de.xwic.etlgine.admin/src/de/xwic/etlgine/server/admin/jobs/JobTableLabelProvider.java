@@ -70,7 +70,16 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 			} else if (state == IJob.State.FINISHED || state == IJob.State.FINISHED_WITH_ERROR) {
 				cell.text = cell.text + " (" + job.getDurationInfo() + ")";
 			}
-		
+
+            if(state == IJob.State.FINISHED_WITH_ERROR || state == IJob.State.ERROR) {
+                if(job.isStopTriggerAfterError()) {
+                    cell.text = cell.text + " [TRIGGER OFF]";
+                } else {
+                    cell.text = cell.text + " [TRIGGER ON]";
+                }
+
+            }
+
 		} else if ("nextRun".equals(column.getUserObject())) {
 			cell.text = "-";
 			if (job.getTrigger() != null) {

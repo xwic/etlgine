@@ -154,6 +154,12 @@ public interface IJob {
 	 */
 	public boolean isStopTriggerAfterError();
 
+    /**
+     * Override default behaviour of job not being executed by trigger again after error
+     * @param stopTriggerAfterError boolean value
+     */
+    public void setStopTriggerAfterError(boolean stopTriggerAfterError);
+
 	/**
 	 * Returns the job creator information, like the groovy script name.
 	 * @return

@@ -38,6 +38,7 @@ public class JobAdminControl extends BaseContentContainer {
 	private Button btRun;
 	private Button btStopJob;
 	private Button btViewJob;
+    private Button btReactivateJobTrigger;
 	private List<IJob> jobList;
 	private ErrorWarning errInfo;
 	
@@ -155,7 +156,16 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 
-		
+        btReactivateJobTrigger = group.addButton();
+        btReactivateJobTrigger.setIconEnabled(ImageLibrary.IMAGE_APP_GO);
+        btReactivateJobTrigger.setTitle("Reactivate Job Trigger");
+        btReactivateJobTrigger.addSelectionListener(new SelectionListener() {
+            private static final long serialVersionUID = 1L;
+            public void objectSelected(SelectionEvent event) {
+                onReactivateJobTrigger();
+            }
+        });
+
 	}
 
 	/**
@@ -244,4 +254,22 @@ public class JobAdminControl extends BaseContentContainer {
 		destroy();
 	}
 
+    /**
+     *
+     */
+    protected void onReactivateJobTrigger() {
+        String selection = table.getModel().getFirstSelectedKey();
+        if (selection != null) {
+            int idx = Integer.parseInt(selection);
+            IJob job = jobList.get(idx);
+            if (job.isExecuting()) {
+                errInfo.showError("The selected job is currently executing.");
+            } else {
+                job.setStopTriggerAfterError(false);
+
+                errInfo.showWarning("The job trigger has been activated");
+                table.setRequireRedraw(true);
+            }
+        }
+    }
 }

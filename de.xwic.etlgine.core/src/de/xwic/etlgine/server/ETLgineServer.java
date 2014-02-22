@@ -276,8 +276,8 @@ public class ETLgineServer implements Runnable {
         // check if we need to initialize the demo database
         if(serverContext.getPropertyBoolean(ServerContext.PROPERTY_SQLITE_DATABASE_INIT, false) &&
                 !StringUtils.isEmpty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, ""))) {
-            String conUrl = serverContext.getProperty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, "")+".connection.driver", "NOT_FOUND");
-            String conDriver = serverContext.getProperty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, ".connection.url")+"", "NOT_FOUND");
+            String conUrl = serverContext.getProperty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, "")+".connection.url", "NOT_FOUND");
+            String conDriver = serverContext.getProperty(serverContext.getProperty(ServerContext.PROPERTY_SQLITE_DATABSE_CONNECTION, "")+".connection.driver", "NOT_FOUND");
 
             if (!StringUtils.isEmpty(conUrl) && !StringUtils.isEmpty(conDriver) &&
                     conUrl.contains(":sqlite:") && conDriver.contains(".sqlite.")) {

@@ -157,12 +157,12 @@ public class JobAdminControl extends BaseContentContainer {
 		});
 
         btReactivateJobTrigger = group.addButton();
-        btReactivateJobTrigger.setIconEnabled(ImageLibrary.IMAGE_APP_GO);
-        btReactivateJobTrigger.setTitle("Reactivate Job Trigger");
+        btReactivateJobTrigger.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_GEAR);
+        btReactivateJobTrigger.setTitle("Activate Job Trigger");
         btReactivateJobTrigger.addSelectionListener(new SelectionListener() {
             private static final long serialVersionUID = 1L;
             public void objectSelected(SelectionEvent event) {
-                onReactivateJobTrigger();
+                onActivateJobTrigger();
             }
         });
 
@@ -257,7 +257,7 @@ public class JobAdminControl extends BaseContentContainer {
     /**
      *
      */
-    protected void onReactivateJobTrigger() {
+    protected void onActivateJobTrigger() {
         String selection = table.getModel().getFirstSelectedKey();
         if (selection != null) {
             int idx = Integer.parseInt(selection);

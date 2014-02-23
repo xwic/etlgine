@@ -13,7 +13,30 @@
 	<artifactId>etlgine-server</artifactId>
 	<version>5.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
+	
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>server-zip.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
 	<dependencies>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -77,10 +100,6 @@
 			<groupId>net.sf.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-        </dependency>
 		<dependency>
 			<groupId>de.xwic.jwic</groupId>
 			<artifactId>jwic-core</artifactId>
@@ -126,6 +145,11 @@
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+        </dependency>
 
 		<dependency>
 			<!-- Common Public License 1.0 -->

@@ -25,5 +25,5 @@ target-ide/
 *.log*
 *.datapool
 *server.override.properties
-de.xwic.etlgine.server/server/data/etlgine_demo.db3
-de.xwic.etlgine.core/test/etlgine_test.db3
+de.xwic.etlgine.server/data/etlgine_demo.db3*
+de.xwic.etlgine.core/test/etlgine_test.db3*

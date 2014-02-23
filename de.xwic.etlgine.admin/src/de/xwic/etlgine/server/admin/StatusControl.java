@@ -46,7 +46,8 @@ public class StatusControl extends JsonResourceControl{
 
         res.key("instanceId").value(ETLgineServer.getInstance().getServerContext().getProperty("instance.id", ""));
 
-        res.key("currentDate").value((new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")).format(new Date()));
+        res.key("currentDate").value((new SimpleDateFormat("EEE MMM dd yyyy")).format(new Date()));
+        res.key("currentTime").value((new SimpleDateFormat("HH:mm:ss zzz")).format(new Date()));
 
         res.key("currentUpTime").value(getServerUptime());
 

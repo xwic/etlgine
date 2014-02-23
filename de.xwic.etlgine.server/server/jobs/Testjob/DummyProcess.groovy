@@ -18,8 +18,8 @@ process.addSource(source);
 process.setExtractor(new DemoRndExtractor());
 
 def jdbcLoader = new JDBCLoader();
-jdbcLoader.setSharedConnectionName("defaultshare");
-jdbcLoader.setConnectionName("default");
+jdbcLoader.setSharedConnectionName("defaultsqliteshare");
+jdbcLoader.setConnectionName("defaultsqlite");
 jdbcLoader.setTablename("LOAD_TEST_RND");
 jdbcLoader.setAutoCreateColumns(true);
 jdbcLoader.setSqlDialect(SqlDialect.SQLITE);

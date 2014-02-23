@@ -27,6 +27,7 @@ import de.xwic.etlgine.server.JobQueue;
 import de.xwic.etlgine.server.admin.BaseContentContainer;
 import de.xwic.etlgine.server.admin.ImageLibrary;
 import de.xwic.etlgine.server.admin.StackedContentContainer;
+import de.xwic.etlgine.trigger.ScheduledTrigger;
 
 /**
  * @author Developer
@@ -266,6 +267,11 @@ public class JobAdminControl extends BaseContentContainer {
                 errInfo.showError("The selected job is currently executing.");
             } else {
                 job.setStopTriggerAfterError(false);
+
+                // Hack so that the job next run time is calculated and the job is not started immediately
+                if(null != job.getTrigger()) {
+                    job.getTrigger().notifyJobFinished(true);
+                }
 
                 errInfo.showWarning("The job trigger has been activated");
                 table.setRequireRedraw(true);

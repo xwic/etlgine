@@ -2,7 +2,7 @@
  * Ensure that the specified dimensions exist.
  */
 
-util.initFromDatabase "default"
+util.initFromDatabase "etlpooldb"
  
 util.ensureDimension "Name"
 util.ensureDimension "Area"

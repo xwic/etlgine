@@ -66,7 +66,9 @@ public class StatusControl extends JsonResourceControl{
 
 		res.key("usedMemory").value(nf.format(total-free) + "k");
 
-		
+
+        res.key("triggerStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true)?"Enabled":"Disabled");
+
 		// Queue info
 		ETLgineServer server = ETLgineServer.getInstance();
 		ServerContext context = server.getServerContext();

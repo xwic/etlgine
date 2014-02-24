@@ -20,7 +20,7 @@
 		</tr>
         {{if instanceId!==''}}
 		<tr>
-			<td class="caption">Instance ID:</td>
+			<td class="caption">Instance:</td>
 			<td>${instanceId}</td>
 		</tr>
 		{{/if}}
@@ -43,11 +43,13 @@
 			<td>${usedMemory}</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
-	</table>
-	<table>
+        <tr>
+            <td class="caption">Trigger:</td>
+            <td>${triggerStatus}</td>
+        </tr>
 		{{each queues}}
 			<tr>
-				<td class="caption">Queue</td>
+				<td class="caption">Queue:</td>
 				<td>${name}</td>
 			</tr>
 			<tr>

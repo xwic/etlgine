@@ -8,7 +8,14 @@
 	<br>
 	$insert.control("status")
 	<br>
-	$insert.control("btGC")
+	$insert.control("btGC") <br/> <br/>
+
+	#if ($control.showEnable())
+        $insert.control("btDisableTRG")
+	#else
+	    $insert.control("btEnableTRG")
+    #end
+
 </div></td>
 <td valign="top">
 $insert.control("breadcrump")

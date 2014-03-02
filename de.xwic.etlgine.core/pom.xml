@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>de.xwic.etlgine</groupId>
 		<artifactId>etlgine</artifactId>
-		<version>5.2-SNAPSHOT</version>
+		<version>5.2.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<name>ETLGine::Core</name>
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine-core</artifactId>
-	<version>5.2-SNAPSHOT</version>
+	<version>5.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<dependencies>

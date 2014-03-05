@@ -22,6 +22,7 @@ public class CubePublisherHelper {
 	private static final String PUBLISH_PATH_SUFFIX = ".publish.path";
 	private static final String PUBLISH_URL_CACHE_SUFFIX = ".publish.url.cachestat";
 	private static final String PUBLISH_URL_REFRESH_SUFFIX = ".publish.url.refreshapp";
+	private static final String PUBLISH_KEEP_VERSIONS_SUFFIX = ".publish.keep.versions";
 	
 	private static List<CubePublishDestination> publishTargets = null;
 	
@@ -72,6 +73,7 @@ public class CubePublisherHelper {
 		String publishPath = context.getProperty(destinationKey + PUBLISH_PATH_SUFFIX, null);
 		String publishUrlCacheStat = context.getProperty(destinationKey + PUBLISH_URL_CACHE_SUFFIX, null);
 		String publishUrlRefreshApp = context.getProperty(destinationKey + PUBLISH_URL_REFRESH_SUFFIX, null);
+		int publishKeepVersions = context.getPropertyInt(destinationKey + PUBLISH_KEEP_VERSIONS_SUFFIX, 10);
 		
 		if (!StringUtils.isEmpty(publishPath)) {
 			File destinationFile = new File(publishPath);
@@ -89,6 +91,7 @@ public class CubePublisherHelper {
 			destination.setPath(publishPath);
 			destination.setUrlCacheStat(publishUrlCacheStat);
 			destination.setUrlRefreshApp(publishUrlRefreshApp);
+			destination.setKeepVersions(publishKeepVersions);
 			log.info("Valid destination settings for key [" + destinationKey + "]");
 		} else {
 			log.warn("Invalid destination settings for key [" + destinationKey + "]");

@@ -6,6 +6,7 @@ public class CubePublishDestination {
 	private String path;
 	private String urlCacheStat;
 	private String urlRefreshApp;
+	private int keepVersions;
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -36,6 +37,12 @@ public class CubePublishDestination {
 	}
 	public void setKey(String key) {
 		this.key = key;
+	}
+	public int getKeepVersions() {
+		return keepVersions;
+	}
+	public void setKeepVersions(int keepVersions) {
+		this.keepVersions = keepVersions;
 	}
 	
 	

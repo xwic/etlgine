@@ -441,27 +441,21 @@
                 <artifactId>jwic-controls</artifactId>
                 <version>5.2.0</version>
             </dependency>
-            <!-- <dependency>
-                <groupId>de.xwic.jwic</groupId>
-                <artifactId>jwic-compatibility</artifactId>
-                <version>5.2.0</version>
-            </dependency> -->
 
             <dependency>
                 <groupId>de.xwic.cube</groupId>
                 <artifactId>cube-core</artifactId>
-                <version>5.2-SNAPSHOT</version>
+                <version>5.2.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.xwic.cube</groupId>
                 <artifactId>cube-xlsbridge</artifactId>
-                <version>5.2-SNAPSHOT</version>
+                <version>5.2.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-webui</artifactId>
-                <version>5.2-SNAPSHOT</version>
-                <classifier>classes</classifier>
+                <artifactId>cube-webui-core</artifactId>
+                <version>5.2.0-SNAPSHOT</version>
             </dependency>
 
 			<dependency>

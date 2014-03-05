@@ -43,10 +43,6 @@
 			<td>${usedMemory}</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
-        <tr>
-            <td class="caption">Trigger:</td>
-            <td>${triggerStatus}</td>
-        </tr>
 		{{each queues}}
 			<tr>
 				<td class="caption">Queue:</td>
@@ -89,6 +85,21 @@
 				{{/if}}
 			{{/if}}
 		{{/each}}
+		<tr><td>&nbsp;</td></tr>
+        <tr>
+            <td class="caption">Trigger:</td>
+            <td class="enabledDisabled"><span class="${triggerStatus}">${triggerStatus}</span></td>
+        </tr>
+
+        <tr>
+            <td class="caption">Publish:</td>
+            <td class="enabledDisabled">
+            {{each publishers}}
+            <span class="${publishStatus}">${publishKey} - ${publishStatus}</span><br/>
+            {{/each}}
+            </td>
+        </tr>
+		
 	</table>
 </script>
 

@@ -28,6 +28,7 @@ import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.notify.NotificationService;
+import de.xwic.etlgine.publish.CubePublisherHelper;
 
 /**
  * @author Developer
@@ -285,6 +286,9 @@ public class ETLgineServer implements Runnable {
             }
         }
 
+        // check publisher settings and set them
+        CubePublisherHelper.getInstance().fillPublishTargets(serverContext);
+        
 		// invoke server initializing listener
 		String serverInitializingListener = serverContext.getProperty(ServerContext.PROPERTY_INITIALIZING_LISTENER);
 		if (serverInitializingListener != null) {

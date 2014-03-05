@@ -3,10 +3,10 @@
  */
 package de.xwic.etlgine.server.admin;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +20,8 @@ import de.jwic.json.JsonResourceControl;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.ISource;
+import de.xwic.etlgine.publish.CubePublishDestination;
+import de.xwic.etlgine.publish.CubePublisherHelper;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.JobQueue;
 import de.xwic.etlgine.server.ServerContext;
@@ -66,9 +68,22 @@ public class StatusControl extends JsonResourceControl{
 
 		res.key("usedMemory").value(nf.format(total-free) + "k");
 
-
+		
+		// trigger and publishing
         res.key("triggerStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true)?"Enabled":"Disabled");
+        
+        List<CubePublishDestination> publishDestinations = CubePublisherHelper.getInstance().getPublishTargets();
 
+    	res.key("publishers").array(); // [
+        for (CubePublishDestination cubePublishDestination : publishDestinations) {
+        	res.object();
+        	res.key("publishKey").value(cubePublishDestination.getKey());
+        	res.key("publishStatus").value(cubePublishDestination.isEnabled()?"Enabled":"Disabled");
+        	res.endObject();
+        	
+		}
+        res.endArray();
+        
 		// Queue info
 		ETLgineServer server = ETLgineServer.getInstance();
 		ServerContext context = server.getServerContext();
@@ -117,6 +132,7 @@ public class StatusControl extends JsonResourceControl{
 			}
 			res.endObject();
 		}
+       
 		res.endArray();
 		res.endObject();
 	}

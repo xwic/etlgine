@@ -205,6 +205,15 @@
  	font-size: 10pt;
  }
  
+.enabledDisabled .Enabled {
+	font-weight: bold;
+	color: #228b22;
+}
  
+.enabledDisabled .Disabled {
+	font-weight: bold;
+	color: #ff4500;
+}
+
  
  

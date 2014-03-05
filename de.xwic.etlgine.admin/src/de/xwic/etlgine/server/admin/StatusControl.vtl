@@ -24,6 +24,31 @@
 			<td>${instanceId}</td>
 		</tr>
 		{{/if}}
+		
+		<tr><td>&nbsp;</td></tr>
+        <tr>
+            <td class="caption">Jobs:</td>
+            <td>
+            	${jobsLoaded}
+            </td>
+        </tr>
+	 	{{if jobsDisabled>0}}
+        <tr>
+            <td class="caption">Disabled:</td>
+            <td>
+            	 ${jobsDisabled} 
+            </td>
+        </tr>
+        {{/if}}
+    	{{if jobsFailed>0}}
+        <tr>
+            <td class="caption enabledDisabled"><span class="Disabled">Failed:</span></td>
+            <td class="enabledDisabled">
+            	<span class="Disabled">${jobsFailed}</span>
+            </td>
+        </tr>
+		{{/if}}
+
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<td class="caption">Max:</td>
@@ -85,6 +110,7 @@
 				{{/if}}
 			{{/if}}
 		{{/each}}
+		
 		<tr><td>&nbsp;</td></tr>
         <tr>
             <td class="caption">Trigger:</td>

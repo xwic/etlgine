@@ -3,11 +3,15 @@
  */
 package de.xwic.etlgine.server.admin;
 
+import java.util.List;
+
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
 import de.jwic.controls.Button;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.etlgine.publish.CubePublishDestination;
+import de.xwic.etlgine.publish.CubePublisherHelper;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
 
@@ -81,5 +85,9 @@ public class AdminPage extends Page {
 
     public boolean showEnable() {
         return ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true);
+    }
+    
+    public List<CubePublishDestination> getPublishDestinations() {
+    	return CubePublisherHelper.getInstance().getPublishTargets();
     }
 }

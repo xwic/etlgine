@@ -5,6 +5,7 @@ package de.xwic.etlgine.server.admin;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import de.jwic.base.IncludeJsOption;
 import de.jwic.base.JavaScriptSupport;
 import de.jwic.json.JsonResourceControl;
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.publish.CubePublishDestination;
@@ -70,6 +72,25 @@ public class StatusControl extends JsonResourceControl{
 
 		
 		// trigger and publishing
+		int totalLoadedJobs = 0;
+		int totalErrorJobs = 0;
+		int totalInactiveJobs = 0;
+		
+		Collection<IJob> currentJobs =ETLgineServer.getInstance().getServerContext().getJobs();
+		for (IJob iJob : currentJobs) {
+			if (iJob.isDisabled()) {
+				totalInactiveJobs ++;
+			}
+			if(State.ERROR.equals(iJob.getState()) || State.FINISHED_WITH_ERROR.equals(iJob.getState())) {
+				totalErrorJobs++;
+			}
+			totalLoadedJobs++;
+		}
+		
+		res.key("jobsLoaded").value(totalLoadedJobs);
+		res.key("jobsDisabled").value(totalInactiveJobs);
+		res.key("jobsFailed").value(totalErrorJobs);
+		
         res.key("triggerStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true)?"Enabled":"Disabled");
         
         List<CubePublishDestination> publishDestinations = CubePublisherHelper.getInstance().getPublishTargets();

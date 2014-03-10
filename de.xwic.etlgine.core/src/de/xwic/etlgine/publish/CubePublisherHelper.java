@@ -56,7 +56,6 @@ public class CubePublisherHelper {
 				if(destination != null) {
 					result.add(destination);					
 				}
-				
 			}
 		} else {
 			log.warn("No publish destinations set!");
@@ -106,6 +105,15 @@ public class CubePublisherHelper {
 
 	public static void setPublishTargets(List<CubePublishDestination> pPublishTargets) {
 		publishTargets = pPublishTargets;
+	}
+	
+	public static void setTargetEnabled(String publishTargetKey, boolean enabled) {
+		for (int i = 0; i < publishTargets.size(); i++) {
+			CubePublishDestination publishTarget = publishTargets.get(i);
+			if(publishTarget.getKey().equals(publishTargetKey)) {
+				publishTargets.get(i).setEnabled(enabled);
+			}
+		}
 	}
 	
 }

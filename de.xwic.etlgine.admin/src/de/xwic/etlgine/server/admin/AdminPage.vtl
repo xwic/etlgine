@@ -4,17 +4,27 @@
 </div>
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
- <td valign="top" width="210"><div id="statusBar">
+ <td valign="top" width="210">
+ <div id="statusBar">
 	<br>
 	$insert.control("status")
 	<br>
 	$insert.control("btGC") <br/> <br/>
 
-	#if ($control.showEnable())
-        $insert.control("btDisableTRG")
-	#else
-	    $insert.control("btEnableTRG")
-    #end
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr>
+<td>Trigger: </td>
+<td>$insert.control("btEnableTRG")</td>
+<td>$insert.control("btDisableTRG")</td>
+</tr>
+	#foreach( $cubePublishDestination in $control.getPublishDestinations() )
+<tr>
+<td>$cubePublishDestination.getKey(): </td>
+<td>$insert.control("btPublishEnable_$cubePublishDestination.getKey()")</td>
+<td>$insert.control("btPublishDisable_$cubePublishDestination.getKey()")</td>
+</tr>
+	#end
+</table>
 
 </div></td>
 <td valign="top">

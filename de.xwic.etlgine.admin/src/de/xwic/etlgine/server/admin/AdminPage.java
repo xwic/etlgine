@@ -56,7 +56,7 @@ public class AdminPage extends Page {
 
         // Activate trigger
         Button btEnableTRG = new Button(this, "btEnableTRG");
-        btEnableTRG.setTitle("Enable Trigger");
+        btEnableTRG.setTitle("On");
         btEnableTRG.addSelectionListener(new SelectionListener() {
             public void objectSelected(SelectionEvent event) {
                 ServerContext serverContext = ETLgineServer.getInstance().getServerContext();
@@ -65,7 +65,7 @@ public class AdminPage extends Page {
         });
 
         Button btDisableTRG = new Button(this, "btDisableTRG");
-        btDisableTRG.setTitle("Disable Trigger");
+        btDisableTRG.setTitle("Off");
         btDisableTRG.addSelectionListener(new SelectionListener() {
             public void objectSelected(SelectionEvent event) {
                 ServerContext serverContext = ETLgineServer.getInstance().getServerContext();
@@ -73,6 +73,25 @@ public class AdminPage extends Page {
             }
         });
 
+        for (final CubePublishDestination cubePublishDestination : getPublishDestinations()) {
+            Button btPublishEnable = new Button(this, "btPublishEnable_"+cubePublishDestination.getKey());
+            btPublishEnable.setTitle("On");
+            btPublishEnable.addSelectionListener(new SelectionListener() {
+                public void objectSelected(SelectionEvent event) {
+                	setPublishStatus(cubePublishDestination.getKey(), true);
+                }
+            });
+        		
+            Button btPublishDisable = new Button(this, "btPublishDisable_"+cubePublishDestination.getKey());
+            btPublishDisable.setTitle("Off");
+            btPublishDisable.addSelectionListener(new SelectionListener() {
+                public void objectSelected(SelectionEvent event) {
+                	setPublishStatus(cubePublishDestination.getKey(), false);
+                }
+            });
+        	
+			
+		}
 	}
 	
 	/**
@@ -89,5 +108,10 @@ public class AdminPage extends Page {
     
     public List<CubePublishDestination> getPublishDestinations() {
     	return CubePublisherHelper.getInstance().getPublishTargets();
+    }
+    
+    public void setPublishStatus(String targetKey, boolean publishEnabled) {
+    	System.out.println(""+targetKey+publishEnabled);
+    	CubePublisherHelper.getInstance().setTargetEnabled(targetKey, publishEnabled);
     }
 }

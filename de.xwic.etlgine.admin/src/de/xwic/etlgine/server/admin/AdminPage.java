@@ -53,45 +53,7 @@ public class AdminPage extends Page {
 			}
 		});
 
-
-        // Activate trigger
-        Button btEnableTRG = new Button(this, "btEnableTRG");
-        btEnableTRG.setTitle("On");
-        btEnableTRG.addSelectionListener(new SelectionListener() {
-            public void objectSelected(SelectionEvent event) {
-                ServerContext serverContext = ETLgineServer.getInstance().getServerContext();
-                serverContext.setProperty("trigger.enabled", "true");
-            }
-        });
-
-        Button btDisableTRG = new Button(this, "btDisableTRG");
-        btDisableTRG.setTitle("Off");
-        btDisableTRG.addSelectionListener(new SelectionListener() {
-            public void objectSelected(SelectionEvent event) {
-                ServerContext serverContext = ETLgineServer.getInstance().getServerContext();
-                serverContext.setProperty("trigger.enabled", "false");
-            }
-        });
-
-        for (final CubePublishDestination cubePublishDestination : getPublishDestinations()) {
-            Button btPublishEnable = new Button(this, "btPublishEnable_"+cubePublishDestination.getKey());
-            btPublishEnable.setTitle("On");
-            btPublishEnable.addSelectionListener(new SelectionListener() {
-                public void objectSelected(SelectionEvent event) {
-                	setPublishStatus(cubePublishDestination.getKey(), true);
-                }
-            });
-        		
-            Button btPublishDisable = new Button(this, "btPublishDisable_"+cubePublishDestination.getKey());
-            btPublishDisable.setTitle("Off");
-            btPublishDisable.addSelectionListener(new SelectionListener() {
-                public void objectSelected(SelectionEvent event) {
-                	setPublishStatus(cubePublishDestination.getKey(), false);
-                }
-            });
-        	
-			
-		}
+		new OnOffControl(this, "on_off");
 	}
 	
 	/**
@@ -101,17 +63,4 @@ public class AdminPage extends Page {
 	public String getServerName() {
 		return ETLgineServer.getInstance().getServerContext().getProperty("name", "unnamed");
 	}
-
-    public boolean showEnable() {
-        return ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true);
-    }
-    
-    public List<CubePublishDestination> getPublishDestinations() {
-    	return CubePublisherHelper.getInstance().getPublishTargets();
-    }
-    
-    public void setPublishStatus(String targetKey, boolean publishEnabled) {
-    	System.out.println(""+targetKey+publishEnabled);
-    	CubePublisherHelper.getInstance().setTargetEnabled(targetKey, publishEnabled);
-    }
 }

@@ -49,6 +49,9 @@ public class Job implements IJob {
 	
 	private String creatorInfo = null;
 
+	private String serverInstanceId = null;
+	private String serverInstanceName = null;
+	
 	/**
 	 * @param name
 	 */
@@ -422,4 +425,22 @@ public class Job implements IJob {
 	public void setCreatorInfo(String creatorInfo) {
 		this.creatorInfo = creatorInfo;
 	}
+
+	public String getServerInstanceId() {
+		return serverInstanceId;
+	}
+
+	public void setServerInstanceId(String serverInstanceId) {
+		this.serverInstanceId = serverInstanceId;
+	}
+
+	public String getServerInstanceName() {
+		return serverInstanceName;
+	}
+
+	public void setServerInstanceName(String serverInstanceName) {
+		this.serverInstanceName = serverInstanceName;
+	}
+	
+	
 }

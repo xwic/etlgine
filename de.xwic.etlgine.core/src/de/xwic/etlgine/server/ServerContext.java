@@ -40,6 +40,9 @@ public class ServerContext extends Context {
 	public final static String PROPERTY_WEBSERVER_START = "webserver.start";
 	public final static String PROPERTY_MONITOR_CLASSNAME = "monitor.classname";
 
+	public final static String PROPERTY_SERVER_INSTANCEID = "instance.id";
+	public final static String PROPERTY_SERVER_INSTANCENAME = "name";
+
     public final static String PROPERTY_SQLITE_DATABASE_INIT = "sqlite.database.init";
     public final static String PROPERTY_SQLITE_DATABSE_CONNECTION = "sqlite.database.connection";
 
@@ -119,6 +122,9 @@ public class ServerContext extends Context {
 		Job job = new Job(name);
 		job.setMonitor(createDefaultMonitor());
 		job.setCreatorInfo(scriptFile);
+		
+		job.setServerInstanceId(getProperty(PROPERTY_SERVER_INSTANCEID, "NDF"));
+		job.setServerInstanceName(getProperty(PROPERTY_SERVER_INSTANCENAME, "NotDefined"));
 		
 		job.getMonitor().onEvent(this, de.xwic.etlgine.IMonitor.EventType.JOB_LOAD_FROM_SCRIPT, job);
 		

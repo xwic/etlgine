@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.lang.StringUtils;
+
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IProcessContext;
@@ -148,7 +150,7 @@ public class ZipSources /*implements IProcessFinalizer*/ {
 					File locZFile = files[i];
 					
 					//take first zip file in any case!!
-					if (i == 0) {
+					if (i == 0 && StringUtils.isEmpty(filePrefix)) {
 						file = locZFile;
 					}
 					//check file prefix, if found get out!

@@ -93,6 +93,8 @@ public class StatusControl extends JsonResourceControl{
 		
         res.key("triggerStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true)?"Enabled":"Disabled");
         
+        res.key("notificationStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("notifications.enabled", false)?"Enabled":"Disabled");
+        
         List<CubePublishDestination> publishDestinations = CubePublisherHelper.getInstance().getPublishTargets();
 
     	res.key("publishers").array(); // [

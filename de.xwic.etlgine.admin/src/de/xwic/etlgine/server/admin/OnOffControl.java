@@ -24,6 +24,26 @@ public class OnOffControl extends ControlContainer {
 		table.setColWidth(1, 150);
 		table.setColWidth(2, 150);
 		
+		new Label(table).setText("Notifications:");
+        // Activate trigger
+        Button btEnableNOTF = new Button(table, "btEnableNOTF");
+        btEnableNOTF.setTitle("On");
+        btEnableNOTF.addSelectionListener(new SelectionListener() {
+            public void objectSelected(SelectionEvent event) {
+                ServerContext serverContext = ETLgineServer.getInstance().getServerContext();
+                serverContext.setProperty("notifications.enabled", "true");
+            }
+        });
+
+        Button btDisableNOTF = new Button(table, "btDisableNOTF");
+        btDisableNOTF.setTitle("Off");
+        btDisableNOTF.addSelectionListener(new SelectionListener() {
+            public void objectSelected(SelectionEvent event) {
+                ServerContext serverContext = ETLgineServer.getInstance().getServerContext();
+                serverContext.setProperty("notifications.enabled", "false");
+            }
+        });
+
 		new Label(table).setText("Trigger:");
         // Activate trigger
         Button btEnableTRG = new Button(table, "btEnableTRG");
@@ -62,6 +82,9 @@ public class OnOffControl extends ControlContainer {
                 }
             });
 		}
+        
+        
+        
 	}
 	
 

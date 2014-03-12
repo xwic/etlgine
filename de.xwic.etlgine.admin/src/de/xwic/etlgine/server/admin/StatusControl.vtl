@@ -120,7 +120,7 @@
             <td class="caption">Trigger:</td>
             <td class="enabledDisabled"><span class="${triggerStatus}">${triggerStatus}</span></td>
         </tr>
-
+{{if publishers.length}}
         <tr>
             <td class="caption">Publish:</td>
             <td class="enabledDisabled">
@@ -129,7 +129,7 @@
             {{/each}}
             </td>
         </tr>
-		
+{{/if}}		
 	</table>
 </script>
 

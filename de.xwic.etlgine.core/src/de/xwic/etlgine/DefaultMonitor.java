@@ -86,6 +86,12 @@ public class DefaultMonitor implements IMonitor {
 				logInfo("Records skipped:        " + processContext.getSkippedCount());
 				logInfo("Records invalid:        " + processContext.getInvalidCount());
 				break;
+			case CUBE_LOADED:
+				logInfo(eventSource.toString());
+				break;
+			case DATAPOOL_SAVED:
+				logInfo(eventSource.toString());
+				break;
 			}
 			
 		} else {

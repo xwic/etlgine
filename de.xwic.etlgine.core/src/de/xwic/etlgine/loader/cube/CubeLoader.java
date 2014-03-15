@@ -16,6 +16,7 @@ import de.xwic.cube.Key;
 import de.xwic.cube.StorageException;
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IMonitor.EventType;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
@@ -193,11 +194,12 @@ public class CubeLoader extends AbstractLoader {
 			}
 		}
 		
-		
+		processContext.getMonitor().onEvent(processContext, EventType.CUBE_LOADED, cube.getKey());
 		if (isSaveDataPoolOnFinish()) {
 			try {
 				processContext.getMonitor().logInfo("Storing DataPool...");
 				dataPool.save();
+				processContext.getMonitor().onEvent(processContext, EventType.DATAPOOL_SAVED, dataPool.getKey());
 				processContext.getMonitor().logInfo("Storing DataPool finished...");
 			} catch (StorageException e) {
 				processContext.getMonitor().logError("Error saving dataPool " + e, e);

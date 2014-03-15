@@ -100,7 +100,7 @@ public class StatusControl extends JsonResourceControl{
     	res.key("publishers").array(); // [
         for (CubePublishDestination cubePublishDestination : publishDestinations) {
         	res.object();
-        	res.key("publishKey").value(cubePublishDestination.getKey());
+        	res.key("publishKey").value(cubePublishDestination.getFullKey());
         	res.key("publishStatus").value(cubePublishDestination.isEnabled()?"Enabled":"Disabled");
         	res.endObject();
         	

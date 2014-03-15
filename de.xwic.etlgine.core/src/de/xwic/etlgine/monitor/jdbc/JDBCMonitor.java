@@ -31,6 +31,7 @@ import de.xwic.etlgine.impl.Process;
 import de.xwic.etlgine.impl.ProcessContext;
 import de.xwic.etlgine.loader.jdbc.JDBCLoader;
 import de.xwic.etlgine.server.ETLgineServer;
+import de.xwic.etlgine.server.ServerContext;
 
 /**
  * @author JBORNEMA
@@ -499,8 +500,8 @@ public class JDBCMonitor extends DefaultMonitor {
 			}
 			record.setData(colCreatorInfo, currentCreatorInfo);
 			record.setData(colHostname, InetAddress.getLocalHost().getCanonicalHostName());
-			record.setData(colETLgineName, ETLgineServer.getInstance().getServerContext().getProperty("name", "Unnamed"));
-            record.setData(colETLgineId, ETLgineServer.getInstance().getServerContext().getProperty("instance.id", "NOID"));
+			record.setData(colETLgineName, ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_INSTANCENAME, ServerContext.PROPERTY_SERVER_INSTANCENAME_DEFAULT));
+            record.setData(colETLgineId, ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_INSTANCEID, ServerContext.PROPERTY_SERVER_INSTANCEID_DEFAULT));
 
 			loader.processRecord(processContext, record);
 			

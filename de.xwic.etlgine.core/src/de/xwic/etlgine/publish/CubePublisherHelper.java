@@ -17,7 +17,7 @@ public class CubePublisherHelper {
 	
 	private static CubePublisherHelper instance = null;
 	
-	private static final String PUBLISH_DESTINATIONS_KEY = "datapools.publish";
+	private static final String PUBLISH_DESTINATIONS_KEY = ".datapool.publish";
 	private static final String PUBLISH_ENABLED_SUFFIX = ".publish.enabled";
 	private static final String PUBLISH_PATH_SUFFIX = ".publish.path";
 	private static final String PUBLISH_URL_CACHE_SUFFIX = ".publish.url.cachestat";
@@ -44,15 +44,15 @@ public class CubePublisherHelper {
 		return instance;
 	}	
 	
-	public void fillPublishTargets(IContext context) {
+	public void fillPublishTargets(IContext context, String datapoolKey) {
 		List<CubePublishDestination> result = new ArrayList<CubePublishDestination>();
 		
-		String publishDestinations = context.getProperty(PUBLISH_DESTINATIONS_KEY, null);
+		String publishDestinations = context.getProperty(datapoolKey + PUBLISH_DESTINATIONS_KEY, null);
 		if(publishDestinations != null)  {
 			StringTokenizer stk = new StringTokenizer(publishDestinations, ",; ");
 			while (stk.hasMoreTokens()) {
 				String destinationKey = stk.nextToken();
-				CubePublishDestination destination = validateDestination(destinationKey, context);
+				CubePublishDestination destination = validateDestination(destinationKey, context, datapoolKey);
 				if(destination != null) {
 					result.add(destination);					
 				}
@@ -64,9 +64,8 @@ public class CubePublisherHelper {
 		setPublishTargets(result);
 	}
 	
-	private static CubePublishDestination validateDestination(String destinationKey, IContext context) {
+	private static CubePublishDestination validateDestination(String destinationKey, IContext context, String datapoolKey) {
 		CubePublishDestination destination = null;
-		boolean destinationSettingsValid = false;
 		
 		boolean publishEnabled = context.getPropertyBoolean(destinationKey + PUBLISH_ENABLED_SUFFIX, false);
 		String publishPath = context.getProperty(destinationKey + PUBLISH_PATH_SUFFIX, null);
@@ -75,25 +74,27 @@ public class CubePublisherHelper {
 		int publishKeepVersions = context.getPropertyInt(destinationKey + PUBLISH_KEEP_VERSIONS_SUFFIX, 10);
 		
 		if (!StringUtils.isEmpty(publishPath)) {
-			File destinationFile = new File(publishPath);
+			String parent = null;
+			if(publishPath.startsWith("{ROOT_PATH}")) {
+				parent = context.getProperty(IContext.PROPERTY_ROOTPATH, ".");
+				publishPath = publishPath.replace("{ROOT_PATH}", "");
+			}
+			File destinationFile = new File(parent,publishPath);
 			if(destinationFile.isDirectory()) {
-				destinationSettingsValid = true;
+				
+				destination = new CubePublishDestination();
+				destination.setDatapoolKey(datapoolKey);
+				destination.setKey(destinationKey);
+				destination.setEnabled(publishEnabled);
+				destination.setPath(destinationFile);
+				destination.setUrlCacheStat(publishUrlCacheStat);
+				destination.setUrlRefreshApp(publishUrlRefreshApp);
+				destination.setKeepVersions(publishKeepVersions);
+				
+				log.info("Valid destination settings for key [" + destinationKey + "]");
 			} else {
 				log.warn("Path does not exist [" + destinationFile.getAbsolutePath() + "]");
 			}
-		}
-		
-		if(destinationSettingsValid) {
-			destination = new CubePublishDestination();
-			destination.setKey(destinationKey);
-			destination.setEnabled(publishEnabled);
-			destination.setPath(publishPath);
-			destination.setUrlCacheStat(publishUrlCacheStat);
-			destination.setUrlRefreshApp(publishUrlRefreshApp);
-			destination.setKeepVersions(publishKeepVersions);
-			log.info("Valid destination settings for key [" + destinationKey + "]");
-		} else {
-			log.warn("Invalid destination settings for key [" + destinationKey + "]");
 		}
 		
 		return destination;
@@ -110,7 +111,7 @@ public class CubePublisherHelper {
 	public static void setTargetEnabled(String publishTargetKey, boolean enabled) {
 		for (int i = 0; i < publishTargets.size(); i++) {
 			CubePublishDestination publishTarget = publishTargets.get(i);
-			if(publishTarget.getKey().equals(publishTargetKey)) {
+			if(publishTarget.getFullKey().equals(publishTargetKey)) {
 				publishTargets.get(i).setEnabled(enabled);
 			}
 		}

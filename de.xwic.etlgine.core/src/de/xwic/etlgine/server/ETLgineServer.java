@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -285,9 +286,6 @@ public class ETLgineServer implements Runnable {
                 DemoDatabaseUtil.prepareDB(conDriver,conUrl);
             }
         }
-
-        // check publisher settings and set them
-        CubePublisherHelper.getInstance().fillPublishTargets(serverContext);
         
 		// invoke server initializing listener
 		String serverInitializingListener = serverContext.getProperty(ServerContext.PROPERTY_INITIALIZING_LISTENER);
@@ -320,6 +318,12 @@ public class ETLgineServer implements Runnable {
 		// load DataPool(s)
 		CubeHandler cubeHandler = CubeHandler.getCubeHandler(serverContext);
 		log.info("Loaded " + cubeHandler.getDataPoolManagerKeys().size() + " DataPool(s).");
+		
+		for (Iterator iterator = cubeHandler.getDataPoolManagerKeys().iterator(); iterator.hasNext();) {
+			String datapoolKey = (String) iterator.next();
+	        // check publisher settings and set them
+	        CubePublisherHelper.getInstance().fillPublishTargets(serverContext,datapoolKey);
+		}
 		
 		//check if we need to start the webserver
 		if (serverContext.getPropertyBoolean(ServerContext.PROPERTY_WEBSERVER_START, false)) {

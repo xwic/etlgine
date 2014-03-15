@@ -65,20 +65,20 @@ public class OnOffControl extends ControlContainer {
         });
 
         for (final CubePublishDestination cubePublishDestination : getPublishDestinations()) {
-    		new Label(table).setText(cubePublishDestination.getKey()+":");
-            Button btPublishEnable = new Button(table, "btPublishEnable_"+cubePublishDestination.getKey());
+    		new Label(table).setText(cubePublishDestination.getFullKey()+":");
+            Button btPublishEnable = new Button(table, "btPublishEnable_"+cubePublishDestination.getFullKey());
             btPublishEnable.setTitle("On");
             btPublishEnable.addSelectionListener(new SelectionListener() {
                 public void objectSelected(SelectionEvent event) {
-                	setPublishStatus(cubePublishDestination.getKey(), true);
+                	setPublishStatus(cubePublishDestination.getFullKey(), true);
                 }
             });
         		
-            Button btPublishDisable = new Button(table, "btPublishDisable_"+cubePublishDestination.getKey());
+            Button btPublishDisable = new Button(table, "btPublishDisable_"+cubePublishDestination.getFullKey());
             btPublishDisable.setTitle("Off");
             btPublishDisable.addSelectionListener(new SelectionListener() {
                 public void objectSelected(SelectionEvent event) {
-                	setPublishStatus(cubePublishDestination.getKey(), false);
+                	setPublishStatus(cubePublishDestination.getFullKey(), false);
                 }
             });
 		}
@@ -97,7 +97,6 @@ public class OnOffControl extends ControlContainer {
     }
     
     public void setPublishStatus(String targetKey, boolean publishEnabled) {
-    	System.out.println(""+targetKey+publishEnabled);
     	CubePublisherHelper.getInstance().setTargetEnabled(targetKey, publishEnabled);
     }
 

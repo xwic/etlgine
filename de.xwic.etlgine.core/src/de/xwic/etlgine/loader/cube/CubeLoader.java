@@ -194,12 +194,12 @@ public class CubeLoader extends AbstractLoader {
 			}
 		}
 		
-		processContext.getMonitor().onEvent(processContext, EventType.CUBE_LOADED, cube.getKey());
+		processContext.getMonitor().onEvent(processContext, EventType.CUBE_POST_LOAD, cube.getKey());
 		if (isSaveDataPoolOnFinish()) {
 			try {
 				processContext.getMonitor().logInfo("Storing DataPool...");
 				dataPool.save();
-				processContext.getMonitor().onEvent(processContext, EventType.DATAPOOL_SAVED, dataPool.getKey());
+				processContext.getMonitor().onEvent(processContext, EventType.DATAPOOL_POST_SAVE, dataPool.getKey());
 				processContext.getMonitor().logInfo("Storing DataPool finished...");
 			} catch (StorageException e) {
 				processContext.getMonitor().logError("Error saving dataPool " + e, e);

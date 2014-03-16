@@ -298,7 +298,7 @@ public class DimensionMappingTransformer extends AbstractTransformer {
 			if (elmDef.isSkipRecord()) {
 				if (!skippedKeys.contains(value)) {
 					skippedKeys.add(value);
-					processContext.getMonitor().logInfo("Skipping value '" + value + "' due to mapping '" + getMappingName() + "'");
+					processContext.getMonitor().logTrace("Skipping value '" + value + "' due to mapping '" + getMappingName() + "'");
 				}
 				record.setSkip(true);
 			} else {

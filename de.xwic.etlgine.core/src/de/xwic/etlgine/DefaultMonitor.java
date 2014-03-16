@@ -12,6 +12,8 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.etlgine.IMonitor.EventType;
+
 /**
  * @author lippisch
  */
@@ -56,7 +58,11 @@ public class DefaultMonitor implements IMonitor {
 			//call onEvent for backwards compatibility
 			onEvent(processContext, eventType);
 			if (eventType != EventType.RECORD_PROCESSED) {
-				logDebug("[EVENT] " + eventType);
+				if(EventType.CUBE_POST_LOAD.equals(eventType) || EventType.DATAPOOL_POST_SAVE.equals(eventType)) {
+					logInfo(eventSource.toString());
+				} else {
+					logDebug("[EVENT] " + eventType);
+				}
 			} else {
 				if (System.currentTimeMillis() > nextStatus) {
 					nextStatus = System.currentTimeMillis() + STATUS_INTERVALL;
@@ -85,12 +91,6 @@ public class DefaultMonitor implements IMonitor {
 				logInfo("Records processed:      " + processContext.getRecordsCount());
 				logInfo("Records skipped:        " + processContext.getSkippedCount());
 				logInfo("Records invalid:        " + processContext.getInvalidCount());
-				break;
-			case CUBE_POST_LOAD:
-				logInfo(eventSource.toString());
-				break;
-			case DATAPOOL_POST_SAVE:
-				logInfo(eventSource.toString());
 				break;
 			}
 			
@@ -140,6 +140,12 @@ public class DefaultMonitor implements IMonitor {
 		logToBuffer("DEBUG", message);
 	}
 	
+	@Override
+	public void logTrace(String message) {
+		log.trace(message);
+		logToBuffer("TRACE", message);
+	}
+
 	protected void logToBuffer(String prefix, String message) {
 		logToBuffer(prefix, message, null);
 	}

@@ -35,6 +35,9 @@ public interface IMonitor {
 		public void logDebug(String string) {
 		}
 		@Override
+		public void logTrace(String string) {
+		}
+		@Override
 		public String getLogBuffer() {
 			return null;
 		}
@@ -121,6 +124,12 @@ public interface IMonitor {
 	 * @param string
 	 */
 	public void logDebug(String string);
+	
+	/**
+	 * Log a trace message.
+	 * @param string
+	 */
+	public void logTrace(String string);
 	
 	/**
 	 * Returns the content of the log buffer. The log buffer contains up to 4M of the

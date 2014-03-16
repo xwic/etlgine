@@ -9,8 +9,13 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.groovy.ast.stmt.IfStatement;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
@@ -58,8 +63,12 @@ public class PublishDataPoolsFinalizer implements IProcessFinalizer {
 						if (datapoolForKey.exists()) {
 							try {
 								copyDatapoolToDestination(context, datapoolForKey, target);
-								context.getMonitor().logDebug("Datapool published! Source["+datapoolForKey.getAbsolutePath()+"] Destination["+target.getAbsolutePath()+"]");
+								
 								refreshApplicationCubes(context, cubePublishDestination.getUrlRefreshApp());
+								
+								if(cubePublishDestination.getKeepVersions() >0 ) {
+									cleanupPublishTarget(context, target, cubePublishDestination.getKeepVersions());
+								}
 								context.getMonitor().onEvent(context, EventType.DATAPOOL_POST_PUBLISH, cubePublishDestination.getFullKey());
 							} catch (ETLException e) {
 								context.getMonitor().logError("Publish Failed! Source["+datapoolForKey.getAbsolutePath()+"] Destination["+target.getAbsolutePath()+"]", e);
@@ -77,6 +86,61 @@ public class PublishDataPoolsFinalizer implements IProcessFinalizer {
 		}
 	}
 
+	private void cleanupPublishTarget(IProcessContext context, File target,
+			int keepVersions) {
+		try {
+			File[] publishFolders = target.getParentFile().listFiles(new FileFilter() {
+				@Override
+				public boolean accept(File file) {
+					return file.getName().endsWith(".datapool");
+				}
+			});
+			
+			if(!ArrayUtils.isEmpty(publishFolders)) {
+		        Arrays.sort(publishFolders);
+		        //System.out.println(Arrays.deepToString(publishFolders));
+		        if(publishFolders.length > keepVersions) {
+		        	int removeTargets = publishFolders.length - keepVersions;
+			        for (File file : publishFolders) {
+			        	if(removeTargets != 0) {
+			        		removeNotEmpty(file);
+				        	removeTargets--;
+				        	context.getMonitor().logDebug("Removed ["+file.getAbsolutePath()+"]! ");
+			        	}
+					}
+		        }
+			}
+		} catch(IOException e) {
+			context.getMonitor().logError("Folder cleanup failed!", e);
+		}
+	}
+	
+	private static void removeNotEmpty(File file)
+	    	throws IOException{
+	    	if(file.isDirectory()){
+	    		//directory is empty, then delete it
+	    		if(file.list().length==0){
+	    		   file.delete();
+	    		}else{
+	    		   //list all the directory contents
+	        	   String files[] = file.list();
+	        	   for (String temp : files) {
+	        	      //construct the file structure
+	        	      File fileDelete = new File(file, temp);
+	        	      //recursive delete
+	        	      removeNotEmpty(fileDelete);
+	        	   }
+	        	   //check the directory again, if empty then delete it
+	        	   if(file.list().length==0){
+	           	     file.delete();
+	        	   }
+	    		}
+	    	}else{
+	    		//if file, then delete it
+	    		file.delete();
+	    	}
+	    }
+	
 	private void copyDatapoolToDestination(IProcessContext context, File sourceFile, File target)
 			throws ETLException {
 		// copy DataPool
@@ -105,7 +169,9 @@ public class PublishDataPoolsFinalizer implements IProcessFinalizer {
 				context.getMonitor().logInfo("Copy file " + f.getName() + " to " + target.getName() + " (" + (f.length() / 1024) + "kByte)");
 				FileUtils.copyFile(f, target);
 			}
-			
+
+			context.getMonitor().logDebug("Datapool published! Source["+sourceFile.getAbsolutePath()+"] Destination["+target.getAbsolutePath()+"]");
+
 		} catch (IOException e) {
 			throw new ETLException("Error copying data pool", e);
 		}

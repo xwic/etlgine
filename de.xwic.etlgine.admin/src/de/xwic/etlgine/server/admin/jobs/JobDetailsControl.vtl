@@ -1,4 +1,5 @@
 $insert.control("actionBar")
+$insert.control("errorInfo")
 #set($job = $control.job)
 #set($stackTrace = $control.lastExceptionStackTrace)
 <div class="detailView">
@@ -7,7 +8,10 @@ $insert.control("actionBar")
 <table width="100%">
 	<tr>
 		<td width="120">State</td>
-		<td>$job.state</td>
+		<td>
+		$control.getJobState($job)
+			
+		</td>
 	</tr>
 	<tr>
 		<td>Last Started</td>

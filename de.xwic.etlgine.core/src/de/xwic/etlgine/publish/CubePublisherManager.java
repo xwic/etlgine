@@ -12,10 +12,10 @@ import org.apache.commons.logging.LogFactory;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.server.ETLgineServer;
 
-public class CubePublisherHelper {
-	private static final Log log = LogFactory.getLog(CubePublisherHelper.class);
+public class CubePublisherManager {
+	private static final Log log = LogFactory.getLog(CubePublisherManager.class);
 	
-	private static CubePublisherHelper instance = null;
+	private static CubePublisherManager instance = null;
 	
 	private static final String PUBLISH_DESTINATIONS_KEY = ".datapool.publish";
 	private static final String PUBLISH_ENABLED_SUFFIX = ".publish.enabled";
@@ -29,7 +29,7 @@ public class CubePublisherHelper {
 	/**
 	 * 
 	 */
-	private CubePublisherHelper() {
+	private CubePublisherManager() {
 		instance = this;
 	}
 	
@@ -37,9 +37,9 @@ public class CubePublisherHelper {
 	 * Returns the instance.
 	 * @return
 	 */
-	public static CubePublisherHelper getInstance() {
+	public static CubePublisherManager getInstance() {
 		if (instance == null) {
-			instance = new CubePublisherHelper();
+			instance = new CubePublisherManager();
 		}
 		return instance;
 	}	

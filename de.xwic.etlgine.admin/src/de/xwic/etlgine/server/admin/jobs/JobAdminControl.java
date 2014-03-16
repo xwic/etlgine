@@ -21,6 +21,7 @@ import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.JobQueue;
@@ -39,7 +40,8 @@ public class JobAdminControl extends BaseContentContainer {
 	private Button btRun;
 	private Button btStopJob;
 	private Button btViewJob;
-    private Button btReactivateJobTrigger;
+    private Button btRemoveJob;
+    private Button btReloadJob;
 	private List<IJob> jobList;
 	private ErrorWarning errInfo;
 	
@@ -58,17 +60,8 @@ public class JobAdminControl extends BaseContentContainer {
 		
 		table = new TableViewer(this, "table");
 		
-		jobList = new ArrayList<IJob>();
-		jobList.addAll(ETLgineServer.getInstance().getServerContext().getJobs());
+		loadJobsList();
 		
-		Collections.sort(jobList, new Comparator<IJob>() {
-			public int compare(IJob o1, IJob o2) {
-				return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-			}
-		});
-		
-		
-		table.setContentProvider(new ListContentProvider<IJob>(jobList));
 		table.setTableLabelProvider(new JobTableLabelProvider());
 		table.setWidth(949);
 		table.setHeight(500);
@@ -157,13 +150,23 @@ public class JobAdminControl extends BaseContentContainer {
 			}
 		});
 
-        btReactivateJobTrigger = group.addButton();
-        btReactivateJobTrigger.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_RED);
-        btReactivateJobTrigger.setTitle("Activate Trigger for Failed Job");
-        btReactivateJobTrigger.addSelectionListener(new SelectionListener() {
+        btReloadJob = group.addButton();
+        btReloadJob.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_GEAR);
+        btReloadJob.setTitle("Reload Job");
+        btReloadJob.addSelectionListener(new SelectionListener() {
             private static final long serialVersionUID = 1L;
             public void objectSelected(SelectionEvent event) {
-                onActivateJobTrigger();
+                onReloadJob();
+            }
+        });
+
+        btRemoveJob = group.addButton();
+        btRemoveJob.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_DELETE);
+        btRemoveJob.setTitle("Remove Job");
+        btRemoveJob.addSelectionListener(new SelectionListener() {
+            private static final long serialVersionUID = 1L;
+            public void objectSelected(SelectionEvent event) {
+                onRemoveJob();
             }
         });
 
@@ -254,11 +257,8 @@ public class JobAdminControl extends BaseContentContainer {
 	protected void close() {
 		destroy();
 	}
-
-    /**
-     *
-     */
-    protected void onActivateJobTrigger() {
+   
+    protected void onRemoveJob() {
         String selection = table.getModel().getFirstSelectedKey();
         if (selection != null) {
             int idx = Integer.parseInt(selection);
@@ -266,16 +266,61 @@ public class JobAdminControl extends BaseContentContainer {
             if (job.isExecuting()) {
                 errInfo.showError("The selected job is currently executing.");
             } else {
-                job.setStopTriggerAfterError(false);
-
-                // Hack so that the job next run time is calculated and the job is not started immediately
-                if(null != job.getTrigger()) {
-                    job.getTrigger().notifyJobFinished(true);
-                }
-
-                errInfo.showWarning("The job trigger has been activated");
+            	try {
+            		String jobName = job.getCreatorInfo();
+            		if (jobName.toLowerCase().endsWith(".groovy")) {
+            			jobName = jobName.substring(0, jobName.length() - ".groovy".length());
+            		}
+					ETLgineServer.getInstance().getServerContext().removeJob(jobName);
+				} catch (ETLException e) {
+					errInfo.showError("The selected job can not be removed", e.getMessage());
+				}
+            	loadJobsList();
+                errInfo.showWarning("The job has been removed");
                 table.setRequireRedraw(true);
             }
         }
+    	
+    }
+    
+    protected void onReloadJob() {
+        String selection = table.getModel().getFirstSelectedKey();
+        if (selection != null) {
+            int idx = Integer.parseInt(selection);
+            IJob job = jobList.get(idx);
+            if (job.isExecuting()) {
+                errInfo.showError("The selected job is currently executing.");
+            } else {
+            	try {
+            		String jobName = job.getCreatorInfo();
+            		if (jobName.toLowerCase().endsWith(".groovy")) {
+            			jobName = jobName.substring(0, jobName.length() - ".groovy".length());
+            		}
+            		
+					ETLgineServer.getInstance().getServerContext().removeJob(jobName);
+					ETLgineServer.getInstance().getServerContext().loadJob(jobName, job.getCreatorInfo());
+				} catch (ETLException e) {
+					errInfo.showError("The selected job can not be reloaded", e.getMessage());
+				}
+            	loadJobsList();
+                errInfo.showWarning("The job has been reloaded");
+                table.setRequireRedraw(true);
+            }
+        }
+    	
+    }
+    
+    protected void loadJobsList() {
+		jobList = new ArrayList<IJob>();
+		jobList.addAll(ETLgineServer.getInstance().getServerContext().getJobs());
+		
+		Collections.sort(jobList, new Comparator<IJob>() {
+			public int compare(IJob o1, IJob o2) {
+				return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+			}
+		});
+		table.setContentProvider(new ListContentProvider<IJob>(jobList));
+
+
     }
 }

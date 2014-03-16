@@ -29,7 +29,7 @@ import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.notify.NotificationService;
-import de.xwic.etlgine.publish.CubePublisherHelper;
+import de.xwic.etlgine.publish.CubePublisherManager;
 
 /**
  * @author Developer
@@ -321,8 +321,9 @@ public class ETLgineServer implements Runnable {
 		
 		for (Iterator iterator = cubeHandler.getDataPoolManagerKeys().iterator(); iterator.hasNext();) {
 			String datapoolKey = (String) iterator.next();
+	
 	        // check publisher settings and set them
-	        CubePublisherHelper.getInstance().fillPublishTargets(serverContext,datapoolKey);
+	        CubePublisherManager.getInstance().fillPublishTargets(serverContext,datapoolKey);
 		}
 		
 		//check if we need to start the webserver

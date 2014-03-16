@@ -23,7 +23,7 @@ import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.IProcess;
 import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.publish.CubePublishDestination;
-import de.xwic.etlgine.publish.CubePublisherHelper;
+import de.xwic.etlgine.publish.CubePublisherManager;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.JobQueue;
 import de.xwic.etlgine.server.ServerContext;
@@ -95,7 +95,7 @@ public class StatusControl extends JsonResourceControl{
         
         res.key("notificationStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("notifications.enabled", false)?"Enabled":"Disabled");
         
-        List<CubePublishDestination> publishDestinations = CubePublisherHelper.getInstance().getPublishTargets();
+        List<CubePublishDestination> publishDestinations = CubePublisherManager.getInstance().getPublishTargets();
 
     	res.key("publishers").array(); // [
         for (CubePublishDestination cubePublishDestination : publishDestinations) {

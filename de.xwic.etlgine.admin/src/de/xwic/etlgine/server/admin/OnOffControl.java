@@ -10,7 +10,7 @@ import de.jwic.controls.layout.TableLayoutContainer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.publish.CubePublishDestination;
-import de.xwic.etlgine.publish.CubePublisherHelper;
+import de.xwic.etlgine.publish.CubePublisherManager;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
 
@@ -93,11 +93,11 @@ public class OnOffControl extends ControlContainer {
     }
     
     public List<CubePublishDestination> getPublishDestinations() {
-    	return CubePublisherHelper.getInstance().getPublishTargets();
+    	return CubePublisherManager.getInstance().getPublishTargets();
     }
     
     public void setPublishStatus(String targetKey, boolean publishEnabled) {
-    	CubePublisherHelper.getInstance().setTargetEnabled(targetKey, publishEnabled);
+    	CubePublisherManager.getInstance().setTargetEnabled(targetKey, publishEnabled);
     }
 
 

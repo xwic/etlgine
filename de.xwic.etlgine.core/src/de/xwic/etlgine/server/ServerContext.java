@@ -183,6 +183,18 @@ public class ServerContext extends Context {
 		}
 		jobs.put(job.getName(), job);
 	}
+
+	/**
+	 * Remove a ProcessChain.
+	 * @param chain
+	 * @throws ETLException
+	 */
+	public void removeJob(String jobName) throws ETLException {
+		if (!jobs.containsKey(jobName)) {
+			throw new ETLException("A job with this name does not exists. (" + jobName + ")");
+		}
+		jobs.remove(jobName);
+	}
 	
 	/**
 	 * Returns the ProcessChain with the specified name.

@@ -10,8 +10,9 @@ import de.jwic.base.Page;
 import de.jwic.controls.Button;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.etlgine.impl.Context;
 import de.xwic.etlgine.publish.CubePublishDestination;
-import de.xwic.etlgine.publish.CubePublisherHelper;
+import de.xwic.etlgine.publish.CubePublisherManager;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.ServerContext;
 
@@ -36,7 +37,7 @@ public class AdminPage extends Page {
 	 */
 	public AdminPage(IControlContainer container, String name) {
 		super(container, name);
-		setTitle("ETLgine Administration");
+		setTitle("ETLgine (" + getServerInstance() +")");
 		
 		content = new StackedContentContainer(this, "content");
 		
@@ -61,6 +62,10 @@ public class AdminPage extends Page {
 	 * @return
 	 */
 	public String getServerName() {
-		return ETLgineServer.getInstance().getServerContext().getProperty("name", "unnamed");
+		return ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_INSTANCENAME, ServerContext.PROPERTY_SERVER_INSTANCENAME_DEFAULT);
 	}
+	public String getServerInstance() {
+		return ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_INSTANCEID, ServerContext.PROPERTY_SERVER_INSTANCEID_DEFAULT);
+	}
+	
 }

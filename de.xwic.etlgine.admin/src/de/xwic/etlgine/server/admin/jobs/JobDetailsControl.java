@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
+import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
@@ -24,6 +25,8 @@ public class JobDetailsControl extends BaseContentContainer {
 
 	private final IJob job;
 	private Button btDisable;
+    private Button btReactivateJobTrigger;
+	private ErrorWarning errInfo;
 
 	/**
 	 * @param container
@@ -37,7 +40,8 @@ public class JobDetailsControl extends BaseContentContainer {
 		
 		
 		createActionBar();
-		
+		errInfo = new ErrorWarning(this, "errorInfo");
+
 	}
 
 	/**
@@ -68,6 +72,16 @@ public class JobDetailsControl extends BaseContentContainer {
 			}
 		});
 
+        btReactivateJobTrigger = group.addButton();
+        btReactivateJobTrigger.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_RED);
+        btReactivateJobTrigger.setTitle("Activate Trigger for Failed Job");
+        btReactivateJobTrigger.addSelectionListener(new SelectionListener() {
+            private static final long serialVersionUID = 1L;
+            public void objectSelected(SelectionEvent event) {
+                onActivateJobTrigger();
+            }
+        });
+
 		
 	}
 
@@ -78,6 +92,24 @@ public class JobDetailsControl extends BaseContentContainer {
 		job.setDisabled(!job.isDisabled());
 		btDisable.setTitle(job.isDisabled() ? "Enable" : "Disable");
 	}
+    /**
+    *
+    */
+   protected void onActivateJobTrigger() {
+       if (job.isExecuting()) {
+           errInfo.showError("The selected job is currently executing.");
+       } else {
+           job.setStopTriggerAfterError(false);
+
+           // Hack so that the job next run time is calculated and the job is not started immediately
+           if(null != job.getTrigger()) {
+               job.getTrigger().notifyJobFinished(true);
+           }
+
+           errInfo.showWarning("The job trigger has been activated");
+           this.setRequireRedraw(true);
+       }
+   }
 
 	/**
 	 * 
@@ -106,5 +138,18 @@ public class JobDetailsControl extends BaseContentContainer {
 		pw.flush();
 		
 		return stackTrace.toString();
+	}
+	
+	public String getJobState(IJob job) {
+		String jobState = job.getState().name();
+		if(IJob.State.FINISHED_WITH_ERROR.equals(job.getState()) || IJob.State.ERROR.equals(job.getState())) {
+            if(job.isStopTriggerAfterError()) {
+            	jobState = jobState + " [TRIGGER OFF]";
+            } else {
+            	jobState = jobState + " [TRIGGER ON]";
+            }
+
+        }	
+		return jobState;
 	}
 }

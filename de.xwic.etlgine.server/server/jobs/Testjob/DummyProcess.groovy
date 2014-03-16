@@ -11,7 +11,9 @@ import org.apache.commons.lang.StringUtils
 
 import java.text.SimpleDateFormat
 
-def source = new DemoRndSource(6000);
+import de.xwic.etlgine.finalizer.PublishDataPoolsFinalizer
+
+def source = new DemoRndSource(5);
 
 process.addSource(source);
 
@@ -41,3 +43,4 @@ class MyTransformer extends AbstractTransformer {
 }
 process.addTransformer(new MyTransformer());
 
+process.addProcessFinalizer(new PublishDataPoolsFinalizer());

@@ -58,7 +58,7 @@ public class DefaultMonitor implements IMonitor {
 			//call onEvent for backwards compatibility
 			onEvent(processContext, eventType);
 			if (eventType != EventType.RECORD_PROCESSED) {
-				if(EventType.CUBE_POST_LOAD.equals(eventType) || EventType.DATAPOOL_POST_SAVE.equals(eventType)) {
+				if(EventType.CUBE_POST_LOAD.equals(eventType) || EventType.DATAPOOL_POST_SAVE.equals(eventType) || eventType.DATAPOOL_POST_PUBLISH.equals(eventType)) {
 					logInfo(eventSource.toString());
 				} else {
 					logDebug("[EVENT] " + eventType);

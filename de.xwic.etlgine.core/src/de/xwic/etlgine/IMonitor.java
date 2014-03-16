@@ -64,6 +64,7 @@ public interface IMonitor {
 		RECORD_PROCESSED, // ProcessContext
 		CUBE_POST_LOAD, // ProcessContext
 		DATAPOOL_POST_SAVE, // ProcessContext
+		DATAPOOL_POST_PUBLISH, // ProcessContext
 		SOURCE_FINISHED, // ProcessContext
 		PROCESS_FINISHED, // ProcessContext
 		// Job finished

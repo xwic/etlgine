@@ -87,6 +87,10 @@ public class NotificationService implements IServerContextListener {
 			break;
 		}
 		
+		if (!serverContext.getPropertyBoolean("notifications.enabled", false)) {
+			doSend = false;
+		}
+		
 		if (doSend) {
 			sendNotification(NotificationEvent.JOB_EXECUTION_FINISHED, event.getJob(), event.getResult());
 		}

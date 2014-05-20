@@ -452,7 +452,8 @@ public class JDBCLoader extends AbstractLoader {
 			if (colDef.getColumn() != null || (simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn))) {
 				
 				// ignore identity columns for insert and update (identity is not support on ORACLE)
-				if (colDef.getTypeName().toLowerCase().indexOf("identity") != -1 || (!simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn))) {
+				// eugen - SQL server supports identity so the last part of the check is not needed - || (!simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn) ) 
+				if (colDef.getTypeName().toLowerCase().indexOf("identity") != -1) {
 					continue;
 				}
 				

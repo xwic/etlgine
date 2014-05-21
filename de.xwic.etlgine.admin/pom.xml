@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>de.xwic.etlgine</groupId>
 		<artifactId>etlgine</artifactId>
-		<version>5.2.3-SNAPSHOT</version>
+		<version>5.2.3</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<name>ETLGine::Admin</name>
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine-admin</artifactId>
-	<version>5.2.3-SNAPSHOT</version>
+	<version>5.2.3</version>
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -102,7 +102,7 @@
 		<dependency>
 			<groupId>de.xwic.etlgine</groupId>
 			<artifactId>etlgine-core</artifactId>
-			<version>5.2.3-SNAPSHOT</version>
+			<version>5.2.3</version>
 		</dependency>
 
 		<dependency>

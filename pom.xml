@@ -304,8 +304,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<serverId>sonatype-nexus-staging</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<serverId>common-releases</serverId>
+					<nexusUrl>http://vmwplsapp03-dev.corp.netapp.com:8081/nexus/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 					<autoDropAfterRelease>true</autoDropAfterRelease>					
 				</configuration>

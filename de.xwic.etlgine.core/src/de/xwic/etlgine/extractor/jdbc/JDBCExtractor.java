@@ -265,6 +265,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				case Types.BIGINT:
 					dt = DataType.LONG;
 					break;
+				case Types.DECIMAL:
 				case Types.FLOAT:
 				case Types.DOUBLE:
 					dt = DataType.DOUBLE;

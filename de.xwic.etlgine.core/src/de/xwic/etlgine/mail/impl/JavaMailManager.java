@@ -4,6 +4,8 @@
 package de.xwic.etlgine.mail.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -166,7 +171,7 @@ public class JavaMailManager implements IMailManager {
 		if(mail.getCcAddresses() != null) {
 			msg.setRecipients(Message.RecipientType.CC, convertToAddresses(mail.getCcAddresses()));
 		}
-
+/*
 		List<IAttachment> attachments = mail.getAttachments();
 		if(attachments == null || attachments.size() == 0) {
 			msg.setContent(mail.getContent(), "text/html");
@@ -185,7 +190,36 @@ public class JavaMailManager implements IMailManager {
 			}
 			msg.setContent(multipart);
 		}
-		
+*/		
+		List<IAttachment> attachments = mail.getAttachments();
+		if(attachments == null || attachments.size() == 0) {
+			msg.setContent(mail.getContent(), "text/html; charset=\"UTF-8\"");
+		}else {
+			MimeMultipart multipart = new MimeMultipart();
+			MimeBodyPart part = new MimeBodyPart(new InternetHeaders(), mail.getContent().getBytes());
+			part.addHeader(IMail.CONTENT_TYPE, "text/html; charset=\"UTF-8\"");
+			multipart.addBodyPart(part);
+			
+			for(IAttachment att: attachments) {
+				
+				if (true) { // wired bug with 
+					// try with temp file.
+					File tempFile = File.createTempFile("javamailattm", ".tmp");
+					FileOutputStream fos = new FileOutputStream(tempFile);
+					fos.write(att.getData()); // writ eit
+					fos.close();
+					
+					DataSource dsAttm = new FileDataSource(tempFile);
+
+					part = new MimeBodyPart();
+					part.setDataHandler(new DataHandler(dsAttm));
+					part.setFileName(att.getFileName());
+					multipart.addBodyPart(part);
+					tempFile.deleteOnExit();
+				}
+			}
+			msg.setContent(multipart);
+		}
 		Transport.send(msg);
 	}
 	

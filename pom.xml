@@ -87,8 +87,8 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />		
-		<mvnDependencyVersionxWicjWic>5.2.2</mvnDependencyVersionxWicjWic>
-		<mvnDependencyVersionxWicCube>5.2.0</mvnDependencyVersionxWicCube>
+		<mvnDependencyVersionxWicjWic>5.2.4</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicCube>5.2.2</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 	</properties>
 

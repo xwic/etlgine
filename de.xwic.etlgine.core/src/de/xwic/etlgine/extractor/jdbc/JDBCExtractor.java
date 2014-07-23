@@ -251,7 +251,8 @@ public class JDBCExtractor extends AbstractExtractor {
 					dt = DataType.STRING;
 					break;
 				case Types.NUMERIC: // Oracle NUMBER is handled here
-					if (scale > 0) {
+					//ORACLE 11 - if no scale set then it will return -127
+					if (scale > 0 || scale == -127) {
 						dt = DataType.DOUBLE;
 					} else if (lengthHint > 10) {
 						dt = DataType.LONG;

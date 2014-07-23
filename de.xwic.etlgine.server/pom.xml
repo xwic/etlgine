@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>de.xwic.etlgine</groupId>
 		<artifactId>etlgine</artifactId>
-		<version>5.2.14-SNAPSHOT</version>
+		<version>5.2.15</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<name>ETLGINE::SERVER</name>
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine-server</artifactId>
-	<version>5.2.14-SNAPSHOT</version>
+	<version>5.2.15</version>
 	<packaging>jar</packaging>
 	
   <build>
@@ -132,12 +132,12 @@
 		<dependency>
 			<groupId>de.xwic.etlgine</groupId>
 			<artifactId>etlgine-core</artifactId>
-			<version>5.2.14-SNAPSHOT</version>
+			<version>5.2.15</version>
 		</dependency>
         <dependency>
             <groupId>de.xwic.etlgine</groupId>
             <artifactId>etlgine-admin</artifactId>
-            <version>5.2.14-SNAPSHOT</version>
+            <version>5.2.15</version>
         </dependency>
 
 		<dependency>

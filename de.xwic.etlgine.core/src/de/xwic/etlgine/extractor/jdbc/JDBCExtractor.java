@@ -251,7 +251,7 @@ public class JDBCExtractor extends AbstractExtractor {
 					dt = DataType.STRING;
 					break;
 				case Types.NUMERIC: // Oracle NUMBER is handled here
-					if (scale > 0) {
+					if (scale > 0 || (scale == -127 && currSource.getDriverName().contains("OracleDriver"))) {
 						dt = DataType.DOUBLE;
 					} else if (lengthHint > 10) {
 						dt = DataType.LONG;

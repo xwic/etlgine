@@ -74,6 +74,9 @@ public class AdminPage extends Page {
 		
 		String implementationVersion = ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_VERSION, ServerContext.PROPERTY_SERVER_VERSION_DEFAULT);
 
+		if (StringUtils.isEmpty(implementationVersion)) {
+			implementationVersion = ServerContext.PROPERTY_SERVER_VERSION_DEFAULT;
+		}
 		verInfo.setText(getServerInstance() 
 				+ " | v"
 				+ implementationVersion );

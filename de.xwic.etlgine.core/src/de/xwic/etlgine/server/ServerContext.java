@@ -49,6 +49,9 @@ public class ServerContext extends Context {
     public final static String PROPERTY_SQLITE_DATABASE_INIT = "sqlite.database.init";
     public final static String PROPERTY_SQLITE_DATABSE_CONNECTION = "sqlite.database.connection";
 
+    public final static String PROPERTY_SERVER_VERSION = "property.server.deployed.version";
+    public final static String PROPERTY_SERVER_VERSION_DEFAULT = "5.0.0.0.x";
+    
 
 	protected final Log log = LogFactory.getLog(getClass());
 	

@@ -71,28 +71,9 @@ public class AdminPage extends Page {
 	protected void createVersionInfoControl(IControlContainer container) {
 		// set the version label
 		Label verInfo = new Label(container, "lblVersionInfo");
-        log.info( "  Implementation Title:" + this.getClass().getPackage().getImplementationTitle() );
-        log.info( " Implementation Vendor:" + this.getClass().getPackage().getImplementationVendor() );
-        log.info( "Implementation Version:" + this.getClass().getPackage().getImplementationVersion() );
-        log.info( "    Specification Tile:" + this.getClass().getPackage().getSpecificationTitle() );
-        log.info( "  Specification Vendor:" + this.getClass().getPackage().getSpecificationVendor() );
-        log.info( " Specification Version:" + this.getClass().getPackage().getSpecificationVersion() );
+		
+		String implementationVersion = ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_VERSION, ServerContext.PROPERTY_SERVER_VERSION_DEFAULT);
 
-		String implementationVersion =this.getClass().getPackage().getSpecificationVersion();
-		log.info("Got data - " + implementationVersion);
-		if (!StringUtils.isEmpty(implementationVersion)) {
-			log.info("Not EMPTY!");
-			if(implementationVersion.contains("SNAPSHOT")) {
-				log.info("SNAPSHOT!");
-				implementationVersion = implementationVersion +  "(#" + this.getClass().getPackage().getImplementationVersion()+")";
-			} else {
-				log.info("NO SNAPSHOT!");
-				implementationVersion =  implementationVersion + "." + this.getClass().getPackage().getImplementationVersion();
-			}
-		} else {
-			log.info("EMPTY!");
-			implementationVersion = "5.0.0.0-SNAPSHOT";
-		}
 		verInfo.setText(getServerInstance() 
 				+ " | v"
 				+ implementationVersion );

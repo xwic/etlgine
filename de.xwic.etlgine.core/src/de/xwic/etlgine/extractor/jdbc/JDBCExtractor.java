@@ -250,9 +250,10 @@ public class JDBCExtractor extends AbstractExtractor {
 				case Types.CLOB:
 					dt = DataType.STRING;
 					break;
+				case Types.DECIMAL:
 				case Types.NUMERIC: // Oracle NUMBER is handled here
-					//if (scale > 0 || (scale == -127 && connection.getMetaData().getURL().contains("oracle"))) {
-					if (scale > 0) {
+					if (scale > 0 || (scale == -127 && connection.getMetaData().getURL().contains("oracle"))) {
+					//if (scale > 0) {
 						dt = DataType.DOUBLE;
 					} else if (lengthHint > 10) {
 						dt = DataType.LONG;
@@ -266,7 +267,6 @@ public class JDBCExtractor extends AbstractExtractor {
 				case Types.BIGINT:
 					dt = DataType.LONG;
 					break;
-				case Types.DECIMAL:
 				case Types.FLOAT:
 				case Types.DOUBLE:
 					dt = DataType.DOUBLE;

@@ -151,6 +151,11 @@
         </dependency>
 
 		<dependency>
+		    <groupId>com.google.code.gson</groupId>
+		    <artifactId>gson</artifactId>
+		</dependency>		
+
+		<dependency>
 			<!-- Common Public License 1.0 -->
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

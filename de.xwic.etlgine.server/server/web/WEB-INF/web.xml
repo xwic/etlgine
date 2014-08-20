@@ -30,7 +30,12 @@
       <servlet-name>cpres</servlet-name>
       <servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
   </servlet>
-
+  
+  <servlet>
+  	<servlet-name>applicationStatusListener</servlet-name>
+  	<servlet-class>de.xwic.etlgine.server.ApplicationStatusListener</servlet-class>
+  </servlet>
+  
   <!-- map the servlet to all files ending with .wic -->
   <servlet-mapping>
     <servlet-name>jwic</servlet-name>
@@ -41,6 +46,11 @@
   <servlet-mapping>
     <servlet-name>cpres</servlet-name>
     <url-pattern>/cp/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+  	<servlet-name>applicationStatusListener</servlet-name>
+  	<url-pattern>/applicationStatus</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>

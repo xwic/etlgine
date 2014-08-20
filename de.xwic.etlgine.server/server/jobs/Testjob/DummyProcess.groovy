@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 
 import de.xwic.etlgine.finalizer.PublishDataPoolsFinalizer
 
-def source = new DemoRndSource(5);
+def source = new DemoRndSource(500);
 
 process.addSource(source);
 

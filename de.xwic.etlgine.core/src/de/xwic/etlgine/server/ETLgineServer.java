@@ -188,8 +188,8 @@ public class ETLgineServer implements Runnable {
 		}
 		try {
 			initializing = true;
-			initialized = initializeServer();
 			setIntializedTimeInMilis(System.currentTimeMillis());
+			initialized = initializeServer();
 			return initialized;
 		} finally {
 			initializing = false;

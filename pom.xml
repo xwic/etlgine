@@ -469,7 +469,13 @@
                 <artifactId>sqlite-jdbc</artifactId>
                 <version>3.7.15-M1</version>
             </dependency>
-
+            
+			<dependency>
+			    <groupId>com.google.code.gson</groupId>
+			    <artifactId>gson</artifactId>
+			    <version>2.3</version>
+			</dependency>
+			
             <dependency>
                 <groupId>de.xwic.jwic</groupId>
                 <artifactId>jwic-core</artifactId>

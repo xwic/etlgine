@@ -78,6 +78,12 @@ public class ApplicationStatusListener extends HttpServlet {
 			}
 		}
 		
+		String notificationsStatus = ETLgineServer.getInstance().getServerContext().getPropertyBoolean("notifications.enabled", false)?"ON":"OFF";
+		String triggerStatus = ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true)?"ON":"OFF";
+		
+		response.put("notificationStatus",notificationsStatus);
+		response.put("triggerStatus",triggerStatus);
+				
 		// prepare JSON
 		Gson gson = new Gson();
 		String json = gson.toJson(response);

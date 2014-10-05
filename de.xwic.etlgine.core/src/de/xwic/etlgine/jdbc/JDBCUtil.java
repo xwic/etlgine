@@ -43,6 +43,9 @@ public class JDBCUtil {
 		
 		Connection con = (Connection) context.getData(SHARE_PREFIX + shareName);
 		if (con == null || con.isClosed()) {
+			if(log.isDebugEnabled()) {
+				log.debug("Shared connection with name: " + SHARE_PREFIX + shareName + " was not found, or already closed. Opening a new connection...");
+			}
 			con = openConnection(context, connectName);
 			setSharedConnection(context, shareName, con);
 		}
@@ -59,6 +62,9 @@ public class JDBCUtil {
 	 */
 	public static void setSharedConnection(IContext context, String shareName, Connection connection) {
 		context.setData(SHARE_PREFIX + shareName, connection);
+		if(log.isDebugEnabled()) {
+			log.debug("Stored shared connection with name: " + SHARE_PREFIX + shareName + " into the context.");
+		}
 	}
 	
 	/**

@@ -1,9 +1,5 @@
 package de.xwic.etlgine.loader.database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -71,18 +67,18 @@ public class DatabaseLoader extends AbstractLoader {
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
 	// Connection properties
-	private String sharedConnectionName;
-	private String connectionName;
-	private String driverName = "net.sourceforge.jtds.jdbc.Driver";
+	// private String sharedConnectionName;//TODO
+	// private String connectionName;//TODO Bogdan - maybe we can share the datasource?
+	private String driverClassName = "net.sourceforge.jtds.jdbc.Driver";
 	private String connectionUrl;
 	private String username;
 	private String password;
-	private String catalogname;
+	// private String catalogname;//TODO
 	//RPF: Trying to implement schema definitions in JDBC Loader
-	//	private String schemaName = null;
+	//	private String schemaName = null;//TODO
 
-	/** The target connection. */
-	private Connection connection;
+	/** The database-dependent identity manager */
+	private IdentityManager identityManager;
 
 	/** The target table name. */
 	private String tablename;
@@ -103,15 +99,14 @@ public class DatabaseLoader extends AbstractLoader {
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
 
-		// Validate parameters
+		// Validate parameters based on mode
 		DatabaseLoaderValidators.validateMode(mode, pkColumns);
 
-		// Establish target connection
-				connection = ConnectionUtil.getConnection(processContext, monitor, sharedConnectionName, connectionName, driverName, connectionUrl,
-						username, password);
+		// Some modes require an identityManager
+		DatabaseLoaderValidators.validateIdentityManager(mode, identityManager);
 
 		// Initialize the dataSource
-		// initDataSource();
+		initDataSource();
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -152,7 +147,7 @@ public class DatabaseLoader extends AbstractLoader {
 				// - select ID from TARGET_TABLE where (pkColumns.get(0) = record.getData(pkColumns.get(0)), pkColumns.get(1) =
 				// record.getData(pkColumns.get(1)), ...)
 				// COLUMN_NAME = value for COLUMN_NAME
-				if (recordExistsInTargetTable(processContext, record)) {
+				if (identityManager.recordExistsInTargetTable(jdbcTemplate, processContext, record, pkColumns, tablename)) {
 					System.out.println("-------------------- performing update");
 					//					doUpdate(processContext, record);
 				} else {
@@ -180,48 +175,84 @@ public class DatabaseLoader extends AbstractLoader {
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 	}
 
-//	private void initDataSource() {
-//		BasicDataSource basicDataSource = new BasicDataSource();
-//		basicDataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-//		basicDataSource.setUrl("jdbc:sqlserver://localhost:1433;databaseName=option4");
-//		basicDataSource.setUsername("option4");
-//		basicDataSource.setPassword("option4");
-//		// basicDataSource.setMaxActive(100);
-//		// basicDataSource.setMaxIdle(30);
-//		// basicDataSource.setMaxWait(10000);
-//
-//		this.dataSource = basicDataSource;
-//	}
+	private void initDataSource() {
+		BasicDataSource basicDataSource = new BasicDataSource();
+		basicDataSource.setDriverClassName(getDriverClassName());
+		basicDataSource.setUrl(getConnectionUrl());
+		basicDataSource.setUsername(getUsername());
+		basicDataSource.setPassword(getPassword());
+		// basicDataSource.setMaxActive(100);
+		// basicDataSource.setMaxIdle(30);
+		// basicDataSource.setMaxWait(10000);
 
-	private boolean recordExistsInTargetTable(final IProcessContext processContext, final IRecord record) throws ETLException {
-		boolean recordExists = Boolean.FALSE;
+		monitor.logInfo("Built a new dataSource: [driverClassName=" + basicDataSource.getDriverClassName() + ", url="
+				+ basicDataSource.getUrl() + ", username=" + basicDataSource.getUsername() + "]");
 
-		// check that the record is not null
-		if (record == null) {
-			throw new ETLException("Found null record while trying to find if the record exists in the table '" + tablename + "'.");
-		}
+		this.dataSource = basicDataSource;
+	}
 
-		// build the query that checks if record exists based on all the pkColumns
-		String existsQuery = null;//buildRecordExistsQuery(processContext, record);
-		System.out.println("existsQuery: " + existsQuery);
+	public Mode getMode() {
+		return mode;
+	}
 
-		// execute the query and check the output
-		try {
-			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(existsQuery);
+	public void setMode(Mode mode) {
+		this.mode = mode;
+	}
 
-			// if there are rows in the ResultSet, the isBeforeFirst() returns true
-			if (rs.isBeforeFirst()) {
-				recordExists = Boolean.TRUE;
-			}
+	public String getTablename() {
+		return tablename;
+	}
 
-			// processContext.getMonitor().logInfo("TRUNCATED TABLE " + getTablenameQuoted() + " - " + rows +
-			// " rows have been deleted.");
-		} catch (SQLException e) {
-			throw new ETLException("Error executing the exists query: " + existsQuery, e);
-		}
+	public void setTablename(String tablename) {
+		this.tablename = tablename;
+	}
 
-		return recordExists;
+	public List<String> getPkColumns() {
+		return pkColumns;
+	}
+
+	public void setPkColumns(List<String> pkColumns) {
+		this.pkColumns = pkColumns;
+	}
+
+	public String getDriverClassName() {
+		return driverClassName;
+	}
+
+	public void setDriverClassName(String driverClassName) {
+		this.driverClassName = driverClassName;
+	}
+
+	public String getConnectionUrl() {
+		return connectionUrl;
+	}
+
+	public void setConnectionUrl(String connectionUrl) {
+		this.connectionUrl = connectionUrl;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public IdentityManager getIdentityManager() {
+		return identityManager;
+	}
+
+	public void setIdentityManager(IdentityManager identityManager) {
+		this.identityManager = identityManager;
 	}
 
 }

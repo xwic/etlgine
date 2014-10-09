@@ -14,7 +14,7 @@ import de.xwic.etlgine.IRecord;
  * @author mbogdan
  * @see de.xwic.etlgine.loader.database.sqlserver.SqlServerIdentityManager
  */
-public interface IdentityManager {
+public interface IIdentityManager {
 
 	/**
 	 * <p>

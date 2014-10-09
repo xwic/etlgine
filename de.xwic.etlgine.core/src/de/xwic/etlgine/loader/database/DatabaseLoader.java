@@ -11,6 +11,9 @@ import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
+import de.xwic.etlgine.loader.database.operation.IDatabaseOperation;
+import de.xwic.etlgine.loader.database.operation.InsertDatabaseOperation;
+import de.xwic.etlgine.loader.database.operation.UpdateDatabaseOperation;
 
 /**
  * Loader that inserts or updates rows in a database table.
@@ -64,11 +67,11 @@ public class DatabaseLoader extends AbstractLoader {
 
 	private DataSource dataSource;
 
+	// TODO
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
 	// Connection properties
-	// private String sharedConnectionName;//TODO
-	// private String connectionName;//TODO Bogdan - maybe we can share the datasource?
+	// TODO - When is the connection committed?
 	private String driverClassName = "net.sourceforge.jtds.jdbc.Driver";
 	private String connectionUrl;
 	private String username;
@@ -78,7 +81,10 @@ public class DatabaseLoader extends AbstractLoader {
 	//	private String schemaName = null;//TODO
 
 	/** The database-dependent identity manager */
-	private IdentityManager identityManager;
+	private IIdentityManager identityManager;
+
+	private IDatabaseOperation insert;
+	private IDatabaseOperation update;
 
 	/** The target table name. */
 	private String tablename;
@@ -93,23 +99,29 @@ public class DatabaseLoader extends AbstractLoader {
 	private List<String> pkColumns;
 
 	/**
-	 * Initializes or reuses the shared connection to where the target table resides.
+	 * Initializes all the components.
 	 */
 	@Override
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
 
-		// Validate parameters based on mode
-		DatabaseLoaderValidators.validateMode(mode, pkColumns);
+		// Validate dataSource parameters
+		// TODO
 
-		// Some modes require an identityManager
-		DatabaseLoaderValidators.validateIdentityManager(mode, identityManager);
+		// Validate parameters based on mode
+		DatabaseLoaderValidators.validateParameters(mode, pkColumns, identityManager, tablename);
 
 		// Initialize the dataSource
 		initDataSource();
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+
+		// Initialize the insert
+		this.insert = new InsertDatabaseOperation(dataSource, tablename);
+
+		// Initialize the update mode
+		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns);
 	}
 
 	@Override
@@ -121,20 +133,12 @@ public class DatabaseLoader extends AbstractLoader {
 		try {
 			switch (mode) {
 			case INSERT:
-				//				doInsert(processContext, record, columns.values(), psInsert, pkColumn != null ? pkColumn : "Id");
+				// doInsert(processContext, record, columns.values(), psInsert, pkColumn != null ? pkColumn : "Id");
 				break;
 
 			case UPDATE:
-				//				doUpdate(processContext, record);
+				// doUpdate(processContext, record);
 				break;
-
-			//			case INSERT_OR_UPDATE:
-			//				if (Validate.equals(newIdentifierValue, record.getData(newIdentifierColumn))) {
-			//					doInsert(processContext, record, columns.values(), psInsert, pkColumn);
-			//				} else {
-			//					doUpdate(processContext, record);
-			//				}
-			//				break;
 
 			case INSERT_OR_UPDATE:
 				// TODO Bogdan - this approach performs a select for each record, in order to determine if
@@ -143,16 +147,17 @@ public class DatabaseLoader extends AbstractLoader {
 				// if performance is severely impacted by this approach, consider using SQL's MERGE command,
 				// but with caution - http://www.mssqltips.com/sqlservertip/3074/use-caution-with-sql-servers-merge-statement/
 
-				// Determine if the record (source) exists in the target DB, based on the provided composite PK: pkColumns
-				// - select ID from TARGET_TABLE where (pkColumns.get(0) = record.getData(pkColumns.get(0)), pkColumns.get(1) =
-				// record.getData(pkColumns.get(1)), ...)
-				// COLUMN_NAME = value for COLUMN_NAME
+				// another solution would be to check all against the database, create a Map<Boolean, IRecord> specifying if it exists
+				// or not, and later determine based on this map if it's an insert or an update
+
 				if (identityManager.recordExistsInTargetTable(jdbcTemplate, processContext, record, pkColumns, tablename)) {
 					System.out.println("-------------------- performing update");
-					//					doUpdate(processContext, record);
+
+					update.execute(processContext, record);
 				} else {
 					System.out.println("-------------------- performing insert");
-					//					doInsert(processContext, record, columns.values(), psInsert, pkColumn);
+
+					insert.execute(processContext, record);
 				}
 				break;
 
@@ -166,7 +171,7 @@ public class DatabaseLoader extends AbstractLoader {
 			//			if (skipError) {
 			//				processContext.getMonitor().logError(msg, t);
 			//			} else {
-			//				throw new ETLException(msg, t);
+			throw new ETLException(msg, t);
 			//			}
 		}
 	}
@@ -185,8 +190,8 @@ public class DatabaseLoader extends AbstractLoader {
 		// basicDataSource.setMaxIdle(30);
 		// basicDataSource.setMaxWait(10000);
 
-		monitor.logInfo("Built a new dataSource: [driverClassName=" + basicDataSource.getDriverClassName() + ", url="
-				+ basicDataSource.getUrl() + ", username=" + basicDataSource.getUsername() + "]");
+		monitor.logInfo("Built a new dataSource for the DatabaseLoader: [driverClassName=" + basicDataSource.getDriverClassName()
+				+ ", url=" + basicDataSource.getUrl() + ", username=" + basicDataSource.getUsername() + "]");
 
 		this.dataSource = basicDataSource;
 	}
@@ -247,11 +252,11 @@ public class DatabaseLoader extends AbstractLoader {
 		this.password = password;
 	}
 
-	public IdentityManager getIdentityManager() {
+	public IIdentityManager getIdentityManager() {
 		return identityManager;
 	}
 
-	public void setIdentityManager(IdentityManager identityManager) {
+	public void setIdentityManager(IIdentityManager identityManager) {
 		this.identityManager = identityManager;
 	}
 

@@ -12,8 +12,8 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
+import de.xwic.etlgine.loader.database.AbstractIdentityManager;
 import de.xwic.etlgine.loader.database.DatabaseQuery;
-import de.xwic.etlgine.loader.database.IdentityManager;
 
 /**
  * Provides queries adapted for the Microsoft SQL Server grammar for identity-related queries.
@@ -21,7 +21,7 @@ import de.xwic.etlgine.loader.database.IdentityManager;
  * @author mbogdan
  *
  */
-public class SqlServerIdentityManager implements IdentityManager {
+public class SqlServerIdentityManager extends AbstractIdentityManager {
 
 	/**
 	 * <p>
@@ -87,6 +87,7 @@ public class SqlServerIdentityManager implements IdentityManager {
 		// transform the column names list provided in pkColumns into actual IColumns
 		// if a column name is wrong, an exception will be thrown
 		for (String columnName : pkColumns) {
+			// Throws an exception if a column with this name does not exist
 			IColumn column = processContext.getDataSet().getColumn(columnName);
 			validatedPkColumns.add(column);
 		}

@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.xwic.etlgine.AbstractLoader;
@@ -66,25 +65,23 @@ public class DatabaseLoader extends AbstractLoader {
 	/** The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data. */
 	private Mode mode = Mode.INSERT_OR_UPDATE;
 
+	/** The data source providing connections inside the Spring framework. */
 	private DataSource dataSource;
 
-	// TODO
+	/** A template used to execute DB queries with named parameters. */
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
-	// Connection properties
 	// TODO - When is the connection committed?
-	private String driverClassName = "net.sourceforge.jtds.jdbc.Driver";
-	private String connectionUrl;
-	private String username;
-	private String password;
-	// private String catalogname;//TODO
-	//RPF: Trying to implement schema definitions in JDBC Loader
-	//	private String schemaName = null;//TODO
+	/** The name of the connection, used to take the connection configuration form the server.properties file. */
+	private String connectionName;
 
 	/** The database-dependent identity manager */
 	private IIdentityManager identityManager;
 
+	/** The component that handles database insertions. */
 	private IDatabaseOperation insert;
+
+	/** The component that handles database updates. */
 	private IDatabaseOperation update;
 
 	/** The target table name. */
@@ -109,14 +106,11 @@ public class DatabaseLoader extends AbstractLoader {
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
 
-		// Validate dataSource parameters
-		// TODO
-
 		// Validate parameters based on mode
-		DatabaseLoaderValidators.validateParameters(mode, pkColumns, identityManager, tablename);
+		DatabaseLoaderValidators.validateParameters(connectionName, mode, pkColumns, identityManager, tablename);
 
 		// Initialize the dataSource
-		initDataSource();
+		this.dataSource = ConnectionUtil.initDataSource(connectionName, processContext);
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -201,21 +195,7 @@ public class DatabaseLoader extends AbstractLoader {
 		update.execute(processContext, record);
 	}
 
-	private void initDataSource() {
-		BasicDataSource basicDataSource = new BasicDataSource();
-		basicDataSource.setDriverClassName(getDriverClassName());
-		basicDataSource.setUrl(getConnectionUrl());
-		basicDataSource.setUsername(getUsername());
-		basicDataSource.setPassword(getPassword());
-		// basicDataSource.setMaxActive(100);
-		// basicDataSource.setMaxIdle(30);
-		// basicDataSource.setMaxWait(10000);
-
-		monitor.logInfo("Built a new dataSource for the DatabaseLoader: [driverClassName=" + basicDataSource.getDriverClassName()
-				+ ", url=" + basicDataSource.getUrl() + ", username=" + basicDataSource.getUsername() + "]");
-
-		this.dataSource = basicDataSource;
-	}
+	// Getters and setters
 
 	public Mode getMode() {
 		return mode;
@@ -241,38 +221,6 @@ public class DatabaseLoader extends AbstractLoader {
 		this.pkColumns = pkColumns;
 	}
 
-	public String getDriverClassName() {
-		return driverClassName;
-	}
-
-	public void setDriverClassName(final String driverClassName) {
-		this.driverClassName = driverClassName;
-	}
-
-	public String getConnectionUrl() {
-		return connectionUrl;
-	}
-
-	public void setConnectionUrl(final String connectionUrl) {
-		this.connectionUrl = connectionUrl;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(final String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(final String password) {
-		this.password = password;
-	}
-
 	public IIdentityManager getIdentityManager() {
 		return identityManager;
 	}
@@ -287,6 +235,14 @@ public class DatabaseLoader extends AbstractLoader {
 
 	public void setBatchSize(final Integer batchSize) {
 		this.batchSize = batchSize;
+	}
+
+	public String getConnectionName() {
+		return connectionName;
+	}
+
+	public void setConnectionName(final String connectionName) {
+		this.connectionName = connectionName;
 	}
 
 }

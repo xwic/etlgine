@@ -5,15 +5,72 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 
+/**
+ * 
+ * @author mbogdan
+ *
+ */
 public class ConnectionUtil {
+
+	private final static Log LOGGER = LogFactory.getLog(ConnectionUtil.class);
 
 	private ConnectionUtil() {
 		// Utility class
+	}
+
+	/**
+	 * Builds a dataSource from a connection configuration pattern.
+	 * 
+	 * A bit weird naming, because connections are usually obtained from dataSources, but to keep backwards compatibility we stick to this
+	 * naming.
+	 * 
+	 * @param connectionName
+	 * @param context
+	 * @return
+	 */
+	public static DataSource initDataSource(final String connectionName, final IContext context) throws ETLException {
+		String driverClassName = context.getProperty(connectionName + ".connection.driver", "net.sourceforge.jtds.jdbc.Driver");
+		String url = context.getProperty(connectionName + ".connection.url");
+		String username = context.getProperty(connectionName + ".connection.username");
+		String password = context.getProperty(connectionName + ".connection.password");
+
+		if (url == null) {
+			throw new ETLException("The URL is not specified for the connectionName: '" + connectionName + "'");
+		}
+		if (username == null) {
+			throw new ETLException("The username is not specified for the connectionName: '" + connectionName + "'");
+		}
+		if (password == null) {
+			throw new ETLException("The password is not specified for the connectionName: '" + connectionName + "'");
+		}
+
+		BasicDataSource basicDataSource = new BasicDataSource();
+		basicDataSource.setDriverClassName(driverClassName);
+		basicDataSource.setUrl(url);
+		basicDataSource.setUsername(username);
+		basicDataSource.setPassword(password);
+		// basicDataSource.setMaxActive(100);
+		// basicDataSource.setMaxIdle(30);
+		// basicDataSource.setMaxWait(10000);
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Built a new dataSource: [driverClassName=" + basicDataSource.getDriverClassName() + ", url="
+					+ basicDataSource.getUrl() + ", username=" + basicDataSource.getUsername() + "]");
+		}
+
+		return basicDataSource;
 	}
 
 	/**

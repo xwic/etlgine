@@ -14,6 +14,7 @@ import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.loader.database.operation.IDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.InsertDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.UpdateDatabaseOperation;
+import de.xwic.etlgine.util.RecordUtil;
 
 /**
  * Loader that inserts or updates rows in a database table.
@@ -89,6 +90,9 @@ public class DatabaseLoader extends AbstractLoader {
 	/** The target table name. */
 	private String tablename;
 
+	/** Defines how many insert or update operations should be included in one batch. If 'null', batch mode is deactivated. */
+	private Integer batchSize;
+
 	/**
 	 * Holds the list of columns that are forming the composite PK on target side.
 	 * 
@@ -118,10 +122,10 @@ public class DatabaseLoader extends AbstractLoader {
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
 		// Initialize the insert
-		this.insert = new InsertDatabaseOperation(dataSource, tablename);
+		this.insert = new InsertDatabaseOperation(dataSource, tablename, batchSize);
 
 		// Initialize the update mode
-		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns);
+		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns, batchSize);
 	}
 
 	@Override
@@ -133,11 +137,11 @@ public class DatabaseLoader extends AbstractLoader {
 		try {
 			switch (mode) {
 			case INSERT:
-				// doInsert(processContext, record, columns.values(), psInsert, pkColumn != null ? pkColumn : "Id");
+				insert(processContext, record);
 				break;
 
 			case UPDATE:
-				// doUpdate(processContext, record);
+				update(processContext, record);
 				break;
 
 			case INSERT_OR_UPDATE:
@@ -149,15 +153,10 @@ public class DatabaseLoader extends AbstractLoader {
 
 				// another solution would be to check all against the database, create a Map<Boolean, IRecord> specifying if it exists
 				// or not, and later determine based on this map if it's an insert or an update
-
 				if (identityManager.recordExistsInTargetTable(jdbcTemplate, processContext, record, pkColumns, tablename)) {
-					System.out.println("-------------------- performing update");
-
-					update.execute(processContext, record);
+					update(processContext, record);
 				} else {
-					System.out.println("-------------------- performing insert");
-
-					insert.execute(processContext, record);
+					insert(processContext, record);
 				}
 				break;
 
@@ -168,16 +167,38 @@ public class DatabaseLoader extends AbstractLoader {
 		} catch (Throwable t) {
 			record.markInvalid(t.getLocalizedMessage());
 			String msg = "Cannot process record " + processContext.getRecordsCount();
-			//			if (skipError) {
-			//				processContext.getMonitor().logError(msg, t);
-			//			} else {
 			throw new ETLException(msg, t);
-			//			}
 		}
 	}
 
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
+	}
+
+	/**
+	 * Inserts the record into the target database.
+	 * 
+	 * @param processContext
+	 * @param record
+	 * @throws ETLException
+	 */
+	private void insert(final IProcessContext processContext, final IRecord record) throws ETLException {
+		monitor.logInfo("Inserting record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+
+		insert.execute(processContext, record);
+	}
+
+	/**
+	 * Updates the record into the target database, based on the pkColumns.
+	 * 
+	 * @param processContext
+	 * @param record
+	 * @throws ETLException
+	 */
+	private void update(final IProcessContext processContext, final IRecord record) throws ETLException {
+		monitor.logInfo("Updating record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+
+		update.execute(processContext, record);
 	}
 
 	private void initDataSource() {
@@ -200,7 +221,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return mode;
 	}
 
-	public void setMode(Mode mode) {
+	public void setMode(final Mode mode) {
 		this.mode = mode;
 	}
 
@@ -208,7 +229,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return tablename;
 	}
 
-	public void setTablename(String tablename) {
+	public void setTablename(final String tablename) {
 		this.tablename = tablename;
 	}
 
@@ -216,7 +237,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return pkColumns;
 	}
 
-	public void setPkColumns(List<String> pkColumns) {
+	public void setPkColumns(final List<String> pkColumns) {
 		this.pkColumns = pkColumns;
 	}
 
@@ -224,7 +245,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return driverClassName;
 	}
 
-	public void setDriverClassName(String driverClassName) {
+	public void setDriverClassName(final String driverClassName) {
 		this.driverClassName = driverClassName;
 	}
 
@@ -232,7 +253,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return connectionUrl;
 	}
 
-	public void setConnectionUrl(String connectionUrl) {
+	public void setConnectionUrl(final String connectionUrl) {
 		this.connectionUrl = connectionUrl;
 	}
 
@@ -240,7 +261,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return username;
 	}
 
-	public void setUsername(String username) {
+	public void setUsername(final String username) {
 		this.username = username;
 	}
 
@@ -248,7 +269,7 @@ public class DatabaseLoader extends AbstractLoader {
 		return password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
 	}
 
@@ -256,8 +277,16 @@ public class DatabaseLoader extends AbstractLoader {
 		return identityManager;
 	}
 
-	public void setIdentityManager(IIdentityManager identityManager) {
+	public void setIdentityManager(final IIdentityManager identityManager) {
 		this.identityManager = identityManager;
+	}
+
+	public Integer getBatchSize() {
+		return batchSize;
+	}
+
+	public void setBatchSize(final Integer batchSize) {
+		this.batchSize = batchSize;
 	}
 
 }

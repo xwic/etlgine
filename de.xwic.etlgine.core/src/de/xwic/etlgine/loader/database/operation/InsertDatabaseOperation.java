@@ -1,5 +1,6 @@
 package de.xwic.etlgine.loader.database.operation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,13 @@ public class InsertDatabaseOperation implements IDatabaseOperation {
 	 */
 	protected List<Map<String, Object>> batchParameters;
 
-	public InsertDatabaseOperation(final DataSource dataSource, final String tablename) {
-		jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(tablename);
+	public InsertDatabaseOperation(final DataSource dataSource, final String tablename, final Integer batchSize) {
+		this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(tablename);
+		this.batchSize = batchSize;
+
+		if (batchModeActive()) {
+			batchParameters = new ArrayList<Map<String, Object>>();
+		}
 	}
 
 	/**

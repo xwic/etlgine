@@ -18,11 +18,15 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 	private SimpleJdbcUpdate jdbcUpdate;
 
 	private List<String> whereColumnNames;
+	
+	/** Specifies the maximum batch size for update operations. If 'null', batch processing is not used. */
+	protected Integer batchSize;
 
-	public UpdateDatabaseOperation(final DataSource dataSource, final String tablename, final List<String> whereColumnNames) {
+	public UpdateDatabaseOperation(final DataSource dataSource, final String tablename, final List<String> whereColumnNames, final Integer batchSize) {
 		jdbcUpdate = new SimpleJdbcUpdate(dataSource).withTableName(tablename);
 		jdbcUpdate.setRestrictingColumns(whereColumnNames);
 		this.whereColumnNames = whereColumnNames;
+		this.batchSize = batchSize;
 	}
 
 	/**
@@ -62,8 +66,8 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 		// Additionally to the parameters that we need to set during the UPDATE command, that are prepared by the prepareParameters()
 		// method, we also need the parameters for the WHERE clause. These parameters are already incorporated in the 'parameters' map,
 		// so we just need an extract.
-
 		Map<String, Object> whereParameters = extractWhereParameters(parameters);
+		
 		//		if (batchModeActive()) {
 		//			// Running in batch mode - execute only when batch limit has been reached
 		//			batchParameters.add(parameters);
@@ -88,7 +92,7 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 	private Map<String, Object> extractWhereParameters(final Map<String, Object> allParameters) {
 		Map<String, Object> whereParameters = new HashMap<String, Object>(whereColumnNames.size());
 
-		for (Map.Entry<String, Object> parameter : whereParameters.entrySet()) {
+		for (Map.Entry<String, Object> parameter : allParameters.entrySet()) {
 			if (whereColumnNames.contains(parameter.getKey())) {
 				// This is a column used in the WHERE clause, most probably part of the PK
 				whereParameters.put(parameter.getKey(), parameter.getValue());
@@ -98,8 +102,8 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 		return whereParameters;
 	}
 
-	//	private boolean batchModeActive() {
-	//		return batchSize != null;
-	//	}
+	private boolean batchModeActive() {
+		return batchSize != null;
+	}
 
 }

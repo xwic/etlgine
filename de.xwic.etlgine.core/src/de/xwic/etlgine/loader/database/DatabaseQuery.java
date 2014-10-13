@@ -4,16 +4,19 @@ import java.util.Map;
 
 /**
  * Class holding an SQL query string and all the named parameters that need to be applied when executing.
- * 
- * @author mbogdan
  *
+ * @author mbogdan
  */
 public class DatabaseQuery {
 
-	/** The SQL query string, passed as StringBuilder because some other operations could be done before executing */
+	/**
+	 * The SQL query string, passed as StringBuilder because some other operations could be done before executing
+	 */
 	private StringBuilder queryString;
 
-	/** The parameters used in the queryString, key is parameter name as in ":TRANSACTION_param" and value is the value to set */
+	/**
+	 * The parameters used in the queryString, key is parameter name as in ":TRANSACTION_param" and value is the value to set
+	 */
 	private Map<String, Object> parameters;
 
 	public StringBuilder getQueryString() {

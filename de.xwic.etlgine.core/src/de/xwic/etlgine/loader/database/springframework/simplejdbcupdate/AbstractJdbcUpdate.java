@@ -35,10 +35,9 @@ import org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor;
 import org.springframework.util.Assert;
 
 /**
- * Abstract class to provide base functionality for easy updates based on
- * configuration options and database metadata. This class provides the base SPI
- * for {@link SimpleJdbcUpdate}.
- * 
+ * Abstract class to provide base functionality for easy updates based on configuration options and database metadata. This class provides
+ * the base SPI for {@link SimpleJdbcUpdate}.
+ *
  * @author Thomas Risberg
  * @author Juergen Hoeller
  * @author Florent Paillard
@@ -65,9 +64,8 @@ public abstract class AbstractJdbcUpdate {
 	private final Map<String, Operator> restrictingColumns = new HashMap<String, Operator>();
 
 	/**
-	 * Has this operation been compiled? Compilation means at least checking
-	 * that a DataSource or JdbcTemplate has been provided, but subclasses may
-	 * also implement their own custom validation.
+	 * Has this operation been compiled? Compilation means at least checking that a DataSource or JdbcTemplate has been provided, but
+	 * subclasses may also implement their own custom validation.
 	 */
 	private boolean compiled = false;
 
@@ -171,39 +169,36 @@ public abstract class AbstractJdbcUpdate {
 	public void setRestrictingColumns(List<String> whereNames) {
 		Map<String, Operator> columns = new HashMap<String, Operator>();
 		for (String columnName : whereNames) {
-		    columns.put(columnName, Operator.EQUALS);
+			columns.put(columnName, Operator.EQUALS);
 		}
 		setRestrictingColumns(columns);
 	}
-	
-	   /**
-     * Set the names of any where columns
-     */
-    public void setRestrictingColumns(Map<String, Operator> whereNames) {
-        checkIfConfigurationModificationIsAllowed();
-        this.restrictingColumns.clear();
-        this.restrictingColumns.putAll(whereNames);
-    }
 
 	/**
-	 * Specify whether the parameter metadata for the call should be used. The
-	 * default is true.
+	 * Set the names of any where columns
+	 */
+	public void setRestrictingColumns(Map<String, Operator> whereNames) {
+		checkIfConfigurationModificationIsAllowed();
+		this.restrictingColumns.clear();
+		this.restrictingColumns.putAll(whereNames);
+	}
+
+	/**
+	 * Specify whether the parameter metadata for the call should be used. The default is true.
 	 */
 	public void setAccessTableColumnMetaData(boolean accessTableColumnMetaData) {
 		this.tableMetaDataContext.setAccessTableColumnMetaData(accessTableColumnMetaData);
 	}
 
 	/**
-	 * Specify whether the default for including synonyms should be changed. The
-	 * default is false.
+	 * Specify whether the default for including synonyms should be changed. The default is false.
 	 */
 	public void setOverrideIncludeSynonymsDefault(boolean override) {
 		this.tableMetaDataContext.setOverrideIncludeSynonymsDefault(override);
 	}
 
 	/**
-	 * Set the {@link NativeJdbcExtractor} to use to retrieve the native
-	 * connection if necessary
+	 * Set the {@link NativeJdbcExtractor} to use to retrieve the native connection if necessary
 	 */
 	public void setNativeJdbcExtractor(NativeJdbcExtractor nativeJdbcExtractor) {
 		this.tableMetaDataContext.setNativeJdbcExtractor(nativeJdbcExtractor);
@@ -235,14 +230,11 @@ public abstract class AbstractJdbcUpdate {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Compile this JdbcUpdate using provided parameters and meta data plus
-	 * other settings. This finalizes the configuration for this object and
-	 * subsequent attempts to compile are ignored. This will be implicitly
-	 * called the first time an un-compiled update is executed.
-	 * 
+	 * Compile this JdbcUpdate using provided parameters and meta data plus other settings. This finalizes the configuration for this object
+	 * and subsequent attempts to compile are ignored. This will be implicitly called the first time an un-compiled update is executed.
+	 *
 	 * @throws org.springframework.dao.InvalidDataAccessApiUsageException
-	 *             if the object hasn't been correctly initialized, for example
-	 *             if no DataSource has been provided
+	 *             if the object hasn't been correctly initialized, for example if no DataSource has been provided
 	 */
 	public synchronized final void compile() throws InvalidDataAccessApiUsageException {
 		if (!isCompiled()) {
@@ -252,8 +244,7 @@ public abstract class AbstractJdbcUpdate {
 
 			try {
 				this.jdbcTemplate.afterPropertiesSet();
-			}
-			catch (IllegalArgumentException ex) {
+			} catch (IllegalArgumentException ex) {
 				throw new InvalidDataAccessApiUsageException(ex.getMessage());
 			}
 
@@ -267,9 +258,8 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Method to perform the actual compilation. Subclasses can override this
-	 * template method to perform their own compilation. Invoked after this base
-	 * class's compilation is complete.
+	 * Method to perform the actual compilation. Subclasses can override this template method to perform their own compilation. Invoked
+	 * after this base class's compilation is complete.
 	 */
 	protected void compileInternal() {
 
@@ -292,15 +282,14 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Hook method that subclasses may override to react to compilation. This
-	 * implementation does nothing.
+	 * Hook method that subclasses may override to react to compilation. This implementation does nothing.
 	 */
 	protected void onCompileInternal() {
 	}
 
 	/**
 	 * Is this operation "compiled"?
-	 * 
+	 *
 	 * @return whether this operation is compiled, and ready to use.
 	 */
 	public boolean isCompiled() {
@@ -308,8 +297,7 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Check whether this operation has been compiled already; lazily compile it
-	 * if not already compiled.
+	 * Check whether this operation has been compiled already; lazily compile it if not already compiled.
 	 * <p>
 	 * Automatically called by <code>validateParameters</code>.
 	 */
@@ -321,9 +309,8 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Method to check whether we are allowd to make any configuration changes
-	 * at this time. If the class has been compiled, then no further changes to
-	 * the configuration are allowed.
+	 * Method to check whether we are allowd to make any configuration changes at this time. If the class has been compiled, then no further
+	 * changes to the configuration are allowed.
 	 */
 	protected void checkIfConfigurationModificationIsAllowed() {
 		if (isCompiled()) {
@@ -336,9 +323,8 @@ public abstract class AbstractJdbcUpdate {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Method that provides execution of the update using the passed in
-	 * {@link SqlParameterSource}
-	 * 
+	 * Method that provides execution of the update using the passed in {@link SqlParameterSource}
+	 *
 	 * @param parameterSource
 	 *            parameter names and values to be used in update
 	 * @param pkValues
@@ -354,9 +340,8 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Method that provides execution of the update using the passed in Map of
-	 * parameters
-	 * 
+	 * Method that provides execution of the update using the passed in Map of parameters
+	 *
 	 * @param args
 	 *            Map with parameter names and values to be used in update
 	 * @param pkValues
@@ -383,9 +368,8 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Match the provided in parameter values with regitered parameters and
-	 * parameters defined via metedata processing.
-	 * 
+	 * Match the provided in parameter values with regitered parameters and parameters defined via metedata processing.
+	 *
 	 * @param args
 	 *            the parameter values provided in a Map
 	 * @return Map with parameter names and values
@@ -395,9 +379,8 @@ public abstract class AbstractJdbcUpdate {
 	}
 
 	/**
-	 * Match the provided in parameter values with regitered parameters and
-	 * parameters defined via metedata processing.
-	 * 
+	 * Match the provided in parameter values with regitered parameters and parameters defined via metedata processing.
+	 *
 	 * @param parameterSource
 	 *            the parameter vakues provided as a {@link SqlParameterSource}
 	 * @return Map with parameter names and values
@@ -408,7 +391,7 @@ public abstract class AbstractJdbcUpdate {
 
 	/**
 	 * Build the update string based on configuration and metadata information
-	 * 
+	 *
 	 * @return the update string to be used
 	 */
 	protected String createUpdateString() {
@@ -450,8 +433,7 @@ public abstract class AbstractJdbcUpdate {
 		if (declaredUpdatingColumns.size() > 0) {
 			reconciledUpdatingColumns.clear();
 			reconciledUpdatingColumns.addAll(declaredUpdatingColumns);
-		}
-		else {
+		} else {
 			reconciledUpdatingColumns.clear();
 			reconciledUpdatingColumns.addAll(tableMetaDataContext.createColumns());
 		}

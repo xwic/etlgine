@@ -133,16 +133,15 @@ class TableMetaDataContext {
 	}
 
 	/**
-	 * Does this database support the JDBC 3.0 feature of retrieving generated
-	 * keys {@link java.sql.DatabaseMetaData#supportsGetGeneratedKeys()}?
+	 * Does this database support the JDBC 3.0 feature of retrieving generated keys
+	 * {@link java.sql.DatabaseMetaData#supportsGetGeneratedKeys()}?
 	 */
 	public boolean isGetGeneratedKeysSupported() {
 		return this.metaDataProvider.isGetGeneratedKeysSupported();
 	}
 
 	/**
-	 * Does this database support simple query to retrieve generated keys when
-	 * the JDBC 3.0 feature is not supported.
+	 * Does this database support simple query to retrieve generated keys when the JDBC 3.0 feature is not supported.
 	 * {@link java.sql.DatabaseMetaData#supportsGetGeneratedKeys()}?
 	 */
 	public boolean isGetGeneratedKeysSimulated() {
@@ -150,8 +149,7 @@ class TableMetaDataContext {
 	}
 
 	/**
-	 * Does this database support simple query to retrieve generated keys when
-	 * the JDBC 3.0 feature is not supported.
+	 * Does this database support simple query to retrieve generated keys when the JDBC 3.0 feature is not supported.
 	 * {@link java.sql.DatabaseMetaData#supportsGetGeneratedKeys()}?
 	 */
 	public String getSimulationQueryForGetGeneratedKey(String tableName, String keyColumnName) {
@@ -159,16 +157,14 @@ class TableMetaDataContext {
 	}
 
 	/**
-	 * Is a column name String array for retrieving generated keys supported?
-	 * {@link java.sql.Connection#createStruct(String, Object[])}?
+	 * Is a column name String array for retrieving generated keys supported? {@link java.sql.Connection#createStruct(String, Object[])}?
 	 */
 	public boolean isGeneratedKeysColumnNameArraySupported() {
 		return this.metaDataProvider.isGeneratedKeysColumnNameArraySupported();
 	}
 
 	/**
-	 * Set {@link NativeJdbcExtractor} to be used to retrieve the native
-	 * connection.
+	 * Set {@link NativeJdbcExtractor} to be used to retrieve the native connection.
 	 */
 	public void setNativeJdbcExtractor(NativeJdbcExtractor nativeJdbcExtractor) {
 		this.nativeJdbcExtractor = nativeJdbcExtractor;
@@ -176,7 +172,7 @@ class TableMetaDataContext {
 
 	/**
 	 * Process the current meta data with the provided configuration options.
-	 * 
+	 *
 	 * @param dataSource
 	 *            the DataSource being used
 	 * @param declaredColumns
@@ -194,13 +190,13 @@ class TableMetaDataContext {
 		underlyingTableMetaDataContext.setSchemaName(schemaName);
 		underlyingTableMetaDataContext.setTableName(tableName);
 
-		this.metaDataProvider = TableMetaDataProviderFactory.createMetaDataProvider(dataSource, underlyingTableMetaDataContext, nativeJdbcExtractor);
+		this.metaDataProvider = TableMetaDataProviderFactory.createMetaDataProvider(dataSource, underlyingTableMetaDataContext,
+				nativeJdbcExtractor);
 	}
 
 	/**
-	 * Compare columns created from metadata with declared columns and return a
-	 * reconciled list.
-	 * 
+	 * Compare columns created from metadata with declared columns and return a reconciled list.
+	 *
 	 * @param declaredColumns
 	 *            declared column names
 	 * @param generatedKeyNames
@@ -225,7 +221,7 @@ class TableMetaDataContext {
 
 	/**
 	 * Match the provided column names and values with the list of columns used.
-	 * 
+	 *
 	 * @param sqlParameterSource
 	 *            the parameter names and values
 	 * @param reconciledUpdatingColumns
@@ -240,22 +236,19 @@ class TableMetaDataContext {
 		for (String column : reconciledUpdatingColumns) {
 			if (sqlParameterSource.hasValue(column)) {
 				values.add(SqlParameterSourceUtils.getTypedValue(sqlParameterSource, column));
-			}
-			else {
+			} else {
 				String lowerCaseName = column.toLowerCase();
 				if (sqlParameterSource.hasValue(lowerCaseName)) {
 					values.add(SqlParameterSourceUtils.getTypedValue(sqlParameterSource, lowerCaseName));
-				}
-				else {
+				} else {
 					String propertyName = JdbcUtils.convertUnderscoreNameToPropertyName(column);
 					if (sqlParameterSource.hasValue(propertyName)) {
 						values.add(SqlParameterSourceUtils.getTypedValue(sqlParameterSource, propertyName));
-					}
-					else {
+					} else {
 						if (caseInsensitiveParameterNames.containsKey(lowerCaseName)) {
-							values.add(SqlParameterSourceUtils.getTypedValue(sqlParameterSource, (String) caseInsensitiveParameterNames.get(lowerCaseName)));
-						}
-						else {
+							values.add(SqlParameterSourceUtils.getTypedValue(sqlParameterSource,
+									(String) caseInsensitiveParameterNames.get(lowerCaseName)));
+						} else {
 							values.add(null);
 						}
 					}
@@ -267,7 +260,7 @@ class TableMetaDataContext {
 
 	/**
 	 * Match the provided column names and values with the list of columns used.
-	 * 
+	 *
 	 * @param inParameters
 	 *            the parameter names and values
 	 */
@@ -293,9 +286,8 @@ class TableMetaDataContext {
 	}
 
 	/**
-	 * Build the array of {@link java.sql.Types} based on configuration and
-	 * metadata information
-	 * 
+	 * Build the array of {@link java.sql.Types} based on configuration and metadata information
+	 *
 	 * @return the array of types to be used
 	 */
 	public int[] createColumnTypes(List<String> columns) {
@@ -309,13 +301,11 @@ class TableMetaDataContext {
 		for (String column : columns) {
 			if (column == null) {
 				types[typeIndx] = SqlTypeValue.TYPE_UNKNOWN;
-			}
-			else {
+			} else {
 				TableParameterMetaData tpmd = parameterMap.get(column.toUpperCase());
 				if (tpmd != null) {
 					types[typeIndx] = tpmd.getSqlType();
-				}
-				else {
+				} else {
 					types[typeIndx] = SqlTypeValue.TYPE_UNKNOWN;
 				}
 			}

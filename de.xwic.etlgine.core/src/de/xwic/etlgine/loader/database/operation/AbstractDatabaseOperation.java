@@ -1,33 +1,37 @@
 package de.xwic.etlgine.loader.database.operation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 
-	/** Specifies the maximum batch size for insert operations. If 'null', batch processing is not used. */
+	/**
+	 * Specifies the maximum batch size for this database operations. If 'null', batch processing is not used.
+	 */
 	protected Integer batchSize;
 
 	/**
-	 * A list of SQL parameters (key=column name, value=value) to be set within the batch operation. When the size of this list
-	 * reaches the TODO, the batch insert is executed.
+	 * A list of SQL parameters (key=column name, value=value) to be set within the batch operation. When the size of this list reaches the
+	 * batchSize, the batch insert is executed.
 	 */
 	protected List<Map<String, Object>> batchParameters;
 
 	/**
-	 * TODO - enhance docs...
-	 * 
-	 * This only works if the processContext.dataSet.columns uses the EXACT same column names as the target table.
-	 * 
+	 * Performs the DB operation (insert or update) for the record.
+	 *
+	 * It uses the table metadata returned by the DB engine. This only works if the processContext.dataSet.columns uses the EXACT same
+	 * column names as the target table.
+	 *
 	 * @param processContext
+	 *            the processContext holding the target dataSet
 	 * @param record
-	 * @param pkColumns
+	 *            the record being inserted or updated
 	 * @throws ETLException
 	 */
 	@Override
@@ -38,7 +42,20 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 		executeDatabaseOperation(parameters);
 	}
 
-	private Map<String, Object> prepareParameters(final IProcessContext processContext, final IRecord record) throws ETLException {
+	/**
+	 * Based on the target columns found on the processContext.dataSet, it returns a list of SQL parameters (key=column name, value=value)
+	 * to be set within the batch operation.
+	 *
+	 * The key of this map should contain EXACTLY the same names as the target column names!
+	 *
+	 * @param processContext
+	 *            the processContext holding the target dataSet
+	 * @param record
+	 *            the record being inserted or updated
+	 * @return all the parameters needed to insert or update a single row, with column name as key and value to set as value
+	 * @throws ETLException
+	 */
+	protected Map<String, Object> prepareParameters(final IProcessContext processContext, final IRecord record) throws ETLException {
 		List<IColumn> columns = processContext.getDataSet().getColumns();
 
 		// Map containing the target column names as key, and the value to be inserted as value
@@ -51,6 +68,10 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 		}
 
 		return parameters;
+	}
+
+	protected boolean batchModeActive() {
+		return batchSize != null;
 	}
 
 	protected abstract void executeDatabaseOperation(Map<String, Object> parameters);

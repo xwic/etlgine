@@ -1,16 +1,15 @@
 package de.xwic.etlgine.loader.database;
 
-import java.util.List;
-
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.loader.database.DatabaseLoader.Mode;
 import de.xwic.etlgine.util.Validate;
 
+import java.util.List;
+
 /**
  * Utility class to perform various validations.
- * 
- * @author mbogdan
  *
+ * @author mbogdan
  */
 public class DatabaseLoaderValidators {
 

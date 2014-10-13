@@ -1,28 +1,26 @@
 package de.xwic.etlgine.loader.database.operation;
 
+import de.xwic.etlgine.loader.database.springframework.simplejdbcupdate.SimpleJdbcUpdate;
+
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
+public class UpdateDatabaseOperation extends AbstractDatabaseOperation implements IDatabaseOperation {
 
-import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IColumn;
-import de.xwic.etlgine.IProcessContext;
-import de.xwic.etlgine.IRecord;
-import de.xwic.etlgine.loader.database.springframework.simplejdbcupdate.SimpleJdbcUpdate;
-
-public class UpdateDatabaseOperation implements IDatabaseOperation {
-
-	// TODO
+	/**
+	 * The Spring component used to insert DB entries.
+	 */
 	private SimpleJdbcUpdate jdbcUpdate;
 
+	/**
+	 * A list of column names forming the WHERE constraint for this update. They are usually taken from the PK column list.
+	 */
 	private List<String> whereColumnNames;
-	
-	/** Specifies the maximum batch size for update operations. If 'null', batch processing is not used. */
-	protected Integer batchSize;
 
-	public UpdateDatabaseOperation(final DataSource dataSource, final String tablename, final List<String> whereColumnNames, final Integer batchSize) {
+	public UpdateDatabaseOperation(final DataSource dataSource, final String tablename, final List<String> whereColumnNames,
+			final Integer batchSize) {
 		jdbcUpdate = new SimpleJdbcUpdate(dataSource).withTableName(tablename);
 		jdbcUpdate.setRestrictingColumns(whereColumnNames);
 		this.whereColumnNames = whereColumnNames;
@@ -30,44 +28,22 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 	}
 
 	/**
-	 * TODO - enhance docs...
-	 * 
-	 * This only works if the processContext.dataSet.columns uses the EXACT same column names as the target table.
-	 * 
-	 * @param processContext
-	 * @param record
-	 * @param pkColumns
-	 * @throws ETLException
+	 * If batch mode is active, it adds the parameters of this row to the list. If the batchSize has been reached, it also executes the
+	 * batch update.
+	 *
+	 * If batch mode is inactive, it executes the update.
+	 *
+	 * TODO Bogdan - reactivate the batch update after finding a solution to the SimpleJdbcUpdate
+	 *
+	 * @param parameters
+	 *            all the parameters needed to update a single row, with column name as key and value to set as value
 	 */
-	@Override
-	public void execute(final IProcessContext processContext, final IRecord record) throws ETLException {
-		// Map containing the target column names as key, and the value to be inserted as value
-		Map<String, Object> parameters = prepareParameters(processContext, record);
-
-		executeDatabaseOperation(parameters);
-	}
-
-	private Map<String, Object> prepareParameters(final IProcessContext processContext, final IRecord record) throws ETLException {
-		List<IColumn> columns = processContext.getDataSet().getColumns();
-
-		// Map containing the target column names as key, and the value to be inserted as value
-		Map<String, Object> parameters = new HashMap<String, Object>(columns.size());
-
-		// Prepare the parameters for insert / update
-		for (IColumn column : columns) {
-			// The key of this map should contain EXACTLY the same names as the target column names
-			parameters.put(column.getName(), record.getData(column));
-		}
-
-		return parameters;
-	}
-
-	private void executeDatabaseOperation(final Map<String, Object> parameters) {
+	protected void executeDatabaseOperation(final Map<String, Object> parameters) {
 		// Additionally to the parameters that we need to set during the UPDATE command, that are prepared by the prepareParameters()
 		// method, we also need the parameters for the WHERE clause. These parameters are already incorporated in the 'parameters' map,
 		// so we just need an extract.
 		Map<String, Object> whereParameters = extractWhereParameters(parameters);
-		
+
 		//		if (batchModeActive()) {
 		//			// Running in batch mode - execute only when batch limit has been reached
 		//			batchParameters.add(parameters);
@@ -75,7 +51,7 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 		//			if (batchParameters.size() >= batchSize) {
 		//				// The batch limit has been reached, so execute the insert
 		//				@SuppressWarnings("unchecked")
-		//				HashMap<String, Object>[] inserBatchParametersArray = (HashMap<String, Object>[]) new HashMap[batchParameters.size()];
+		//				Map<String, Object>[] inserBatchParametersArray = (HashMap<String, Object>[]) new HashMap[batchParameters.size()];
 		//
 		//				// Send the insert statement along with all the computed parameters of this batch to the database
 		//				jdbcUpdate.executeBatch(batchParameters.toArray(inserBatchParametersArray));
@@ -84,11 +60,18 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 		//				batchParameters.clear();
 		//			}
 		//		} else {
-		// Running in non-batch mode - execute insert after each record processing
+		//			// Running in non-batch mode - execute insert after each record processing
 		jdbcUpdate.execute(parameters, whereParameters);
 		//		}
 	}
 
+	/**
+	 * Extracts a map with the parameters of the WHERE clause.
+	 *
+	 * @param allParameters
+	 *            the entire parameter list
+	 * @return parameters of the WHERE clause.
+	 */
 	private Map<String, Object> extractWhereParameters(final Map<String, Object> allParameters) {
 		Map<String, Object> whereParameters = new HashMap<String, Object>(whereColumnNames.size());
 
@@ -100,10 +83,6 @@ public class UpdateDatabaseOperation implements IDatabaseOperation {
 		}
 
 		return whereParameters;
-	}
-
-	private boolean batchModeActive() {
-		return batchSize != null;
 	}
 
 }

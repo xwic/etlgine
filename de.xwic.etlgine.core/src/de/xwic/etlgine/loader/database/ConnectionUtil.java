@@ -18,7 +18,7 @@ import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
- * 
+ *
  * @author mbogdan
  *
  */
@@ -32,10 +32,10 @@ public class ConnectionUtil {
 
 	/**
 	 * Builds a dataSource from a connection configuration pattern.
-	 * 
+	 *
 	 * A bit weird naming, because connections are usually obtained from dataSources, but to keep backwards compatibility we stick to this
 	 * naming.
-	 * 
+	 *
 	 * @param connectionName
 	 * @param context
 	 * @return
@@ -76,7 +76,7 @@ public class ConnectionUtil {
 	/**
 	 * Tries to get a shared connection, then a pre-configured connection, then builds a connection if none of the previous were found by
 	 * the given names.
-	 * 
+	 *
 	 * @param processContext
 	 * @param monitor
 	 * @param connectionName

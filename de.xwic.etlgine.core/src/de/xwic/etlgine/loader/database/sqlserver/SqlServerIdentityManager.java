@@ -1,36 +1,28 @@
 package de.xwic.etlgine.loader.database.sqlserver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.loader.database.AbstractIdentityManager;
 import de.xwic.etlgine.loader.database.DatabaseQuery;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import java.util.*;
 
 /**
  * Provides queries adapted for the Microsoft SQL Server grammar for identity-related queries.
- * 
- * @author mbogdan
  *
+ * @author mbogdan
  */
 public class SqlServerIdentityManager extends AbstractIdentityManager {
 
 	/**
-	 * <p>
 	 * Based on the composite identity specified in pkColumns, returns true if the record exists in the target table, false otherwise.
-	 * 
-	 * <p>
+	 *
 	 * For this it selects the first row of the target table matches the (composite) PK. All the columns of the pkColumns array are used to
 	 * build the WHERE clause.
-	 * 
+	 *
 	 * @param jdbcTemplate
 	 * @param processContext
 	 * @param record
@@ -58,29 +50,31 @@ public class SqlServerIdentityManager extends AbstractIdentityManager {
 	}
 
 	/**
-	 * <p>
+	 *
 	 * Builds an SQL query that searches if a row already exists, based on all the columns involved in the PK.
-	 * 
-	 * <p>
+	 *
 	 * It uses named parameters for the PK values. The pattern for these parameters is: ":" + "COLUMN_NAME" + "_param"
-	 * 
+	 *
 	 * Example:
-	 * 
+	 *
 	 * <pre>
-	 * select top 1 t.[CASEID], t.[ITEM_NO], t.[TRANSACTION_ID] from [dbo].[SAP_EXCEPTION_MANAGEMENT] t 
+	 * select top 1 t.[CASEID], t.[ITEM_NO], t.[TRANSACTION_ID] from [dbo].[SAP_EXCEPTION_MANAGEMENT] t
 	 * where t.[CASEID] = :CASEID_param and t.[ITEM_NO] = :ITEM_NO_param and t.[TRANSACTION_ID] = :TRANSACTION_ID_param;
 	 * </pre>
-	 * 
+	 *
 	 * @param processContext
+	 *            the processContext holding the target dataSet
 	 * @param record
+	 *            the record being being checked
 	 * @return
 	 * @throws ETLException
+	 *             if a column name is not found in the target table
 	 */
 	private DatabaseQuery buildRecordExistsQuery(final IProcessContext processContext, final IRecord record, final List<String> pkColumns,
 			final String tablename) throws ETLException {
-		DatabaseQuery result = null;
-		StringBuilder sqlQuery = null;
-		Map<String, Object> parameters = null;
+		DatabaseQuery result;
+		StringBuilder sqlQuery;
+		Map<String, Object> parameters;
 
 		List<IColumn> validatedPkColumns = new ArrayList<IColumn>();
 

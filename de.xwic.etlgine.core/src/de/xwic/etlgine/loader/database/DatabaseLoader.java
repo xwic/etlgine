@@ -1,11 +1,5 @@
 package de.xwic.etlgine.loader.database;
 
-import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
@@ -14,13 +8,18 @@ import de.xwic.etlgine.loader.database.operation.IDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.InsertDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.UpdateDatabaseOperation;
 import de.xwic.etlgine.util.RecordUtil;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * Loader that inserts or updates rows in a database table.
- * 
- * It is an alternative to the {@link de.xwic.etlgine.loader.jdbc.JDBCLoader.JDBCLoader}, with some enhancements and some stripped
- * capabilities, as follows:
- * 
+ *
+ * It is an alternative to the {@link de.xwic.etlgine.loader.jdbc.JDBCLoader}, with some enhancements and some stripped capabilities, as
+ * follows:
+ *
+ *
  * <pre>
  * Enhancements:
  * - supports composite PKs when updating rows,
@@ -30,22 +29,20 @@ import de.xwic.etlgine.util.RecordUtil;
  * - all the auto-create features (tables, columns, etc.),
  * - all the features that are changing data structure (alter columns).
  * </pre>
- * 
- * @author mbogdan
  *
+ * @author mbogdan
  */
 public class DatabaseLoader extends AbstractLoader {
 
 	/**
 	 * The modes in which this loader could operate.
-	 * 
-	 * @author mbogdan
 	 *
+	 * @author mbogdan
 	 */
 	public enum Mode {
 		/**
 		 * In this mode, the loader determines if the processed record exists or not, based on the specified primary key column(s). If it
-		 * exists performs an UPDATE, otherwise it INSERTs a new record.
+		 * exists performs an UPDATE, otherwise it INSERT a new record.
 		 */
 		INSERT_OR_UPDATE,
 
@@ -62,39 +59,51 @@ public class DatabaseLoader extends AbstractLoader {
 		UPDATE
 	}
 
-	/** The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data. */
+	/**
+	 * The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data.
+	 */
 	private Mode mode = Mode.INSERT_OR_UPDATE;
 
-	/** The data source providing connections inside the Spring framework. */
-	private DataSource dataSource;
-
-	/** A template used to execute DB queries with named parameters. */
+	/**
+	 * A template used to execute DB queries with named parameters.
+	 */
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
-	// TODO - When is the connection committed?
-	/** The name of the connection, used to take the connection configuration form the server.properties file. */
+	/**
+	 * The name of the connection, used to take the connection configuration form the server.properties file.
+	 */
 	private String connectionName;
 
-	/** The database-dependent identity manager */
+	/**
+	 * The database-dependent identity manager
+	 */
 	private IIdentityManager identityManager;
 
-	/** The component that handles database insertions. */
+	/**
+	 * The component that handles database insertions.
+	 */
 	private IDatabaseOperation insert;
 
-	/** The component that handles database updates. */
+	/**
+	 * The component that handles database updates.
+	 */
 	private IDatabaseOperation update;
 
-	/** The target table name. */
+	/**
+	 * The target table name.
+	 */
 	private String tablename;
 
-	/** Defines how many insert or update operations should be included in one batch. If 'null', batch mode is deactivated. */
+	/**
+	 * Defines how many insert or update operations should be included in one batch. If 'null', batch mode is deactivated.
+	 */
 	private Integer batchSize;
 
 	/**
 	 * Holds the list of columns that are forming the composite PK on target side.
-	 * 
+	 *
 	 * It's primarily used to determine whether this operation is an INSERT or an UPDATE when running in the INSERT_OR_UPDATE mode.
-	 * 
+	 *
 	 * The order of the columns in this list has to be the same as in the definition of the target database.
 	 */
 	private List<String> pkColumns;
@@ -103,14 +112,15 @@ public class DatabaseLoader extends AbstractLoader {
 	 * Initializes all the components.
 	 */
 	@Override
-	public void initialize(IProcessContext processContext) throws ETLException {
+	public void initialize(final IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
 
 		// Validate parameters based on mode
 		DatabaseLoaderValidators.validateParameters(connectionName, mode, pkColumns, identityManager, tablename);
 
-		// Initialize the dataSource
-		this.dataSource = ConnectionUtil.initDataSource(connectionName, processContext);
+		// Initialize the dataSource which will provide connections inside the Spring framework
+		// TODO Bogdan - When is the connection committed?
+		DataSource dataSource = ConnectionUtil.initDataSource(connectionName, processContext);
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -123,11 +133,11 @@ public class DatabaseLoader extends AbstractLoader {
 	}
 
 	@Override
-	public void preSourceProcessing(IProcessContext processContext) throws ETLException {
+	public void preSourceProcessing(final IProcessContext processContext) throws ETLException {
 	}
 
 	@Override
-	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
+	public void processRecord(final IProcessContext processContext, final IRecord record) throws ETLException {
 		try {
 			switch (mode) {
 			case INSERT:
@@ -171,9 +181,11 @@ public class DatabaseLoader extends AbstractLoader {
 
 	/**
 	 * Inserts the record into the target database.
-	 * 
+	 *
 	 * @param processContext
+	 *            the processContext holding the target dataSet
 	 * @param record
+	 *            the record being inserted
 	 * @throws ETLException
 	 */
 	private void insert(final IProcessContext processContext, final IRecord record) throws ETLException {
@@ -184,9 +196,11 @@ public class DatabaseLoader extends AbstractLoader {
 
 	/**
 	 * Updates the record into the target database, based on the pkColumns.
-	 * 
+	 *
 	 * @param processContext
+	 *            the processContext holding the target dataSet
 	 * @param record
+	 *            the record being updated
 	 * @throws ETLException
 	 */
 	private void update(final IProcessContext processContext, final IRecord record) throws ETLException {
@@ -196,7 +210,6 @@ public class DatabaseLoader extends AbstractLoader {
 	}
 
 	// Getters and setters
-
 	public Mode getMode() {
 		return mode;
 	}
@@ -213,32 +226,16 @@ public class DatabaseLoader extends AbstractLoader {
 		this.tablename = tablename;
 	}
 
-	public List<String> getPkColumns() {
-		return pkColumns;
-	}
-
 	public void setPkColumns(final List<String> pkColumns) {
 		this.pkColumns = pkColumns;
-	}
-
-	public IIdentityManager getIdentityManager() {
-		return identityManager;
 	}
 
 	public void setIdentityManager(final IIdentityManager identityManager) {
 		this.identityManager = identityManager;
 	}
 
-	public Integer getBatchSize() {
-		return batchSize;
-	}
-
 	public void setBatchSize(final Integer batchSize) {
 		this.batchSize = batchSize;
-	}
-
-	public String getConnectionName() {
-		return connectionName;
 	}
 
 	public void setConnectionName(final String connectionName) {

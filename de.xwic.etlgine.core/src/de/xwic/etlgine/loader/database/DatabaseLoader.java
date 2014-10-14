@@ -24,7 +24,7 @@ import java.util.List;
  * Enhancements:
  * - supports composite PKs when updating rows,
  * - the INSERT_OR_UPDATE is working,
- * 
+ *
  * Missing features:
  * - all the auto-create features (tables, columns, etc.),
  * - all the features that are changing data structure (alter columns).
@@ -59,44 +59,28 @@ public class DatabaseLoader extends AbstractLoader {
 		UPDATE
 	}
 
-	/**
-	 * The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data.
-	 */
+	/** The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data. */
 	private Mode mode = Mode.INSERT_OR_UPDATE;
 
-	/**
-	 * A template used to execute DB queries with named parameters.
-	 */
+	/** A template used to execute DB queries with named parameters. */
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
-	/**
-	 * The name of the connection, used to take the connection configuration form the server.properties file.
-	 */
+	/** The name of the connection, used to take the connection configuration form the server.properties file. */
 	private String connectionName;
 
-	/**
-	 * The database-dependent identity manager
-	 */
+	/** The database-dependent identity manager */
 	private IIdentityManager identityManager;
 
-	/**
-	 * The component that handles database insertions.
-	 */
+	/** The component that handles database insertions. */
 	private IDatabaseOperation insert;
 
-	/**
-	 * The component that handles database updates.
-	 */
+	/** The component that handles database updates. */
 	private IDatabaseOperation update;
 
-	/**
-	 * The target table name.
-	 */
+	/** The target table name. */
 	private String tablename;
 
-	/**
-	 * Defines how many insert or update operations should be included in one batch. If 'null', batch mode is deactivated.
-	 */
+	/** Defines how many insert or update operations should be included in one batch. If 'null', batch mode is deactivated. */
 	private Integer batchSize;
 
 	/**
@@ -108,9 +92,6 @@ public class DatabaseLoader extends AbstractLoader {
 	 */
 	private List<String> pkColumns;
 
-	/**
-	 * Initializes all the components.
-	 */
 	@Override
 	public void initialize(final IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
@@ -120,7 +101,8 @@ public class DatabaseLoader extends AbstractLoader {
 
 		// Initialize the dataSource which will provide connections inside the Spring framework
 		// TODO Bogdan - When is the connection committed?
-		DataSource dataSource = ConnectionUtil.initDataSource(connectionName, processContext);
+		// TODO Bogdan - each DatabaseLoader is currently building a new dataSource. Find a way to reuse the dataSource to the same database.
+		DataSource dataSource = DataSourceFactory.buildDataSource(connectionName, processContext);
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);

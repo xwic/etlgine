@@ -35,12 +35,6 @@ public class ProcessContext extends Context implements IProcessContext {
 	protected IProcess process = null;
 	protected Result result = null;
 	protected Throwable lastException = null;
-	
-	/** A map containing all the transactionManagers for this process, with the connectionName as key. */
-	protected Map<String, PlatformTransactionManager> transactionManagers = null;
-	
-	/** A map containing all the dataSources for this process, with the connectionName as key. */
-	protected Map<String, DataSource> dataSources = null;
 
 	/**
 	 * 
@@ -204,70 +198,4 @@ public class ProcessContext extends Context implements IProcessContext {
 		this.lastException = lastException;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.xwic.etlgine.IProcessContext#addTransactionManager(java.lang.String,
-	 * org.springframework.transaction.PlatformTransactionManager)
-	 */
-	public void addTransactionManager(String connectionName, PlatformTransactionManager transactionManager) throws ETLException {
-		if (connectionName == null) {
-			throw new ETLException("Trying to cache a transactionManager with a null connectionName key.");
-		}
-
-		if (transactionManager == null) {
-			throw new ETLException("Trying to cache a null transactionManager.");
-		}
-
-		if (transactionManagers == null) {
-			// Lazy init
-			transactionManagers = new HashMap<String, PlatformTransactionManager>();
-		}
-
-		transactionManagers.put(connectionName, transactionManager);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.xwic.etlgine.IProcessContext#getTransactionManager(java.lang.String)
-	 */
-	public PlatformTransactionManager getTransactionManager(String connectionName) {
-		if (transactionManagers != null) {
-			return transactionManagers.get(connectionName);
-		}
-		return null;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.xwic.etlgine.IProcessContext#addDataSource(java.lang.String, javax.sql.DataSource)
-	 */
-	public void addDataSource(String connectionName, DataSource dataSource) throws ETLException {
-		if (connectionName == null) {
-			throw new ETLException("Trying to cache a dataSource with a null connectionName key.");
-		}
-
-		if (dataSource == null) {
-			throw new ETLException("Trying to cache a null dataSource.");
-		}
-
-		if (dataSources == null) {
-			// Lazy init
-			dataSources = new HashMap<String, DataSource>();
-		}
-
-		dataSources.put(connectionName, dataSource);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see de.xwic.etlgine.IProcessContext#getDataSource(java.lang.String)
-	 */
-	public DataSource getDataSource(String connectionName) {
-		if (dataSources != null) {
-			return dataSources.get(connectionName);
-		}
-		return null;
-	}
 }

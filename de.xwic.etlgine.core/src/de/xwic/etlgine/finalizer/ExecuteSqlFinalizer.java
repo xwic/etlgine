@@ -1,26 +1,19 @@
 package de.xwic.etlgine.finalizer;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.Result;
-import de.xwic.etlgine.loader.database.transaction.TransactionUtil;
+import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
  * Process finalizer allows the execution of an insert, update or delete sql statement on a given shared connection. The finalizer can
@@ -56,19 +49,15 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 	protected boolean commitOnFinish;
 
 	/**
+	 * An existing sql connection to use if needed
+	 */
+	protected Connection connection;
+
+	/**
 	 * A list of sql statements that must be executed. If one statement fails the other ones won't be executed and the transaction would be
 	 * rolled back
 	 */
 	protected List<String> sqlStatements;
-
-	//TODO
-	private PlatformTransactionManager transactionManager;
-
-	//TODO
-	private TransactionStatus transaction;
-
-	/** A transaction-aware template used to execute DB queries. */
-	private JdbcTemplate jdbcTemplate;
 
 	/**
 	 * 
@@ -140,6 +129,20 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 		this.commitOnFinish = commitOnFinish;
 	}
 
+	/**
+	 * 
+	 * @param connection
+	 * @param sql
+	 * @param successMessage
+	 * @param commitOnFinish
+	 */
+	public ExecuteSqlFinalizer(Connection connection, String sql, String successMessage, boolean commitOnFinish) {
+		this.connection = connection;
+		this.sql = sql;
+		this.successMessage = successMessage;
+		this.commitOnFinish = commitOnFinish;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -147,86 +150,98 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 	 */
 	@Override
 	public void onFinish(IProcessContext context) throws ETLException {
-		initTransactionManager(context);
-		initJdbcTemplate(context);
-		joinTransaction();
-
+		Connection con = connection;
+		Statement stmt = null;
 		try {
-			if (context.getResult() == Result.SUCCESSFULL) {
-				//execute the statement only if the current process result is successful
 
-				if (sql != null) {
-					if (sqlStatements == null) {
+			if (null == con) {
+				//use the shared connection in order to commit the entire transaction 
+				con = JDBCUtil.getSharedConnection(context, connectionId, connectionId);
+			}
+			//execute the statement only if the current process result is successful
+			if (context.getResult() == Result.SUCCESSFULL) {
+				if (null != sql) {
+					if (null == sqlStatements) {
 						sqlStatements = new ArrayList<String>();
 					}
 					sqlStatements.clear();
 					sqlStatements.add(sql);
 				}
-				if (sqlStatements != null) {
+				if (null != sqlStatements) {
 					for (String sqlStatement : sqlStatements) {
-						// Execute the database statement
-						this.jdbcTemplate.execute(sqlStatement);
-						
+						stmt = con.createStatement();
+						int cnt = stmt.executeUpdate(sqlStatement);
+						String message = "Processed " + cnt + " records";
+						if (null != successMessage) {
+							message = String.format(successMessage, cnt);
+							successMessage = message;
+						}
 						context.getMonitor().logInfo("Executed: " + sqlStatement);
+						context.getMonitor().logInfo(message);
+						stmt.close();
 					}
 				}
+
 			}
-		} catch (DataAccessException e) {
-			transactionManager.rollback(transaction);
 
-			context.getMonitor().logError("ROLLBACK because of unsuccessfull process!");
+		} catch (Exception e) {
 			context.getMonitor().logError("Exception", e);
-
 			context.setResult(Result.FAILED);
 			throw new ETLException(e);
-		}
-
-		if (commitOnFinish) {
-			transactionManager.commit(transaction);
+		} finally {
 			try {
-				DataSourceUtils.getConnection(this.jdbcTemplate.getDataSource()).commit();
-				DataSourceUtils.getConnection(this.jdbcTemplate.getDataSource()).close();
-			} catch (CannotGetJdbcConnectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//commit or roll back the entire job transaction
+				if (commitOnFinish && null != con) {
+
+					if (context.getResult() == Result.SUCCESSFULL) {
+						if (!con.isClosed()) {
+							con.commit();
+						}
+					} else {
+						if (!con.isClosed()) {
+							con.rollback();
+							context.getMonitor().logError("ROLLBACK because of unsuccessfull process!");
+						}
+					}
+
+					if (null != stmt) {
+						stmt.close();
+					}
+
+					if (!con.isClosed()) {
+						con.close();
+					}
+				}
+			} catch (SQLException ex) {
+				context.getMonitor().logError("Exception", ex);
+				throw new ETLException(ex);
+			} finally {
+				try {
+					if (commitOnFinish && null != con && !con.isClosed()) {
+						con.close();
+					}
+				} catch (SQLException e) {
+					log.error("exception on process finalizer when closing the connection", e);
+				}
 			}
 		}
+
 	}
 
-	private void initTransactionManager(IProcessContext context) throws ETLException {
-		if (connectionId == null) {
-			throw new ETLException("This finalizer needs a 'connectionId'.");
-		}
-
-		// TransactionManagers are cached by the DatabaseLoader into the context, during initialization
-		PlatformTransactionManager transactionManager = context.getTransactionManager(connectionId);
-
-		if (transactionManager == null) {
-			throw new ETLException("No transactionManager could be found for the connectionId: " + connectionId);
-		}
-
-		this.transactionManager = transactionManager;
+	/**
+	 * @return the connection
+	 */
+	public Connection getConnection() {
+		return connection;
 	}
 
-	private void initJdbcTemplate(IProcessContext context) throws ETLException {
-		if (connectionId == null) {
-			throw new ETLException("This finalizer needs a 'connectionId'.");
-		}
-
-		// DataSources are cached by the DatabaseLoader into the context, during initialization
-		DataSource dataSource = context.getDataSource(connectionId);
-
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
-
-	private void joinTransaction() {
-		DefaultTransactionDefinition transactionDefinition = TransactionUtil.getDefaultTransactionDefinition();
-		TransactionStatus transaction = transactionManager.getTransaction(transactionDefinition);
-
-		this.transaction = transaction;
+	/**
+	 * Set an existing connection to use
+	 * 
+	 * @param connection
+	 */
+	public void setConnection(Connection connection) {
+		this.connection = connection;
 	}
 
 	/**

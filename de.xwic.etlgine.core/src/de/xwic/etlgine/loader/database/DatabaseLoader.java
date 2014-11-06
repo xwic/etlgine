@@ -1,23 +1,21 @@
 package de.xwic.etlgine.loader.database;
 
+import java.sql.Connection;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
+import de.xwic.etlgine.jdbc.JDBCUtil;
 import de.xwic.etlgine.loader.database.operation.IDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.InsertDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.UpdateDatabaseOperation;
-import de.xwic.etlgine.loader.database.transaction.TransactionUtil;
 import de.xwic.etlgine.util.RecordUtil;
 
 /**
@@ -69,25 +67,17 @@ public class DatabaseLoader extends AbstractLoader {
 	/** The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data. */
 	private Mode mode = Mode.INSERT_OR_UPDATE;
 
-	//TODO
-	private PlatformTransactionManager transactionManager;
+	/** The dataSource that provides connections. */
+	private DataSource dataSource;
 
-	/**
-	 * Used to begin a transaction.
-	 */
-	private DefaultTransactionDefinition transactionDefinition;
-
-	//TODO
-	private TransactionStatus transaction;
-
-	//TODO
+	/** If true, it commits and closes the connection onProcessFinished. Set it to false to be able to commit in the finalizers. */
 	private boolean commitOnProcessFinished;
 
 	/** A template used to execute DB queries with named parameters. */
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
 	/** The name of the connection, used to take the connection configuration form the server.properties file. */
-	private String connectionName;
+	private String connectionId;
 
 	/** The database-dependent identity manager */
 	private IIdentityManager identityManager;
@@ -118,23 +108,14 @@ public class DatabaseLoader extends AbstractLoader {
 		super.initialize(processContext);
 
 		// Validate parameters based on mode
-		DatabaseLoaderValidators.validateParameters(connectionName, mode, pkColumns, identityManager, tablename);
+		DatabaseLoaderValidators.validateParameters(connectionId, mode, pkColumns, identityManager, tablename);
 
 		// Initialize the dataSource which will provide connections inside the Spring framework
-		DataSource dataSource = DataSourceFactory.buildDataSource(connectionName, processContext);
-		
-		// Cache the dataSource for this connection (to be reused within the finalizers)
-		processContext.addDataSource(connectionName, dataSource);
+		this.dataSource = DataSourceFactory.buildDataSource(connectionId, processContext);
 
-		// Initialize the transaction manager
-		this.transactionManager = new DataSourceTransactionManager(dataSource);
-
-		// Cache the transactionManager for this connection (to be reused within the finalizers)
-		processContext.addTransactionManager(connectionName, transactionManager);
-
-		// Initialize the main transaction - this will be started during the preSourceOpening, and it will be committed either during
-		// the onProcessFinished, or by the last finalizer that takes part in the current process
-		transactionDefinition = TransactionUtil.getDefaultTransactionDefinition();
+		// Share the connection (to be reused within the finalizers)
+		Connection connection = DataSourceUtils.getConnection(dataSource);
+		JDBCUtil.setSharedConnection(processContext, connectionId, connection);
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -148,8 +129,6 @@ public class DatabaseLoader extends AbstractLoader {
 
 	@Override
 	public void preSourceProcessing(final IProcessContext processContext) throws ETLException {
-		// Begin transaction
-		transaction = transactionManager.getTransaction(transactionDefinition);
 	}
 
 	@Override
@@ -181,8 +160,10 @@ public class DatabaseLoader extends AbstractLoader {
 				throw new ETLException("Invalid DatabaseLoader.mode specified. Available modes: 'INSERT', 'UPDATE', 'INSERT_OR_UPDATE'");
 			}
 		} catch (Throwable t) {
-			transactionManager.rollback(transaction);
 			record.markInvalid(t.getLocalizedMessage());
+
+			ConnectionUtils.rollbackConnection(DataSourceUtils.getConnection(dataSource));
+
 			String msg = "Cannot process record " + processContext.getRecordsCount();
 			throw new ETLException(msg, t);
 		}
@@ -191,7 +172,7 @@ public class DatabaseLoader extends AbstractLoader {
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
 		if (commitOnProcessFinished) {
-			transactionManager.commit(transaction);
+			ConnectionUtils.commitConnection(DataSourceUtils.getConnection(dataSource));
 		}
 	}
 
@@ -254,8 +235,8 @@ public class DatabaseLoader extends AbstractLoader {
 		this.batchSize = batchSize;
 	}
 
-	public void setConnectionName(final String connectionName) {
-		this.connectionName = connectionName;
+	public void setConnectionId(final String connectionId) {
+		this.connectionId = connectionId;
 	}
 
 	public boolean isCommitOnProcessFinished() {

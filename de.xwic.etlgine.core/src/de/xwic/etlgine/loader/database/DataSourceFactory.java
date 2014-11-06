@@ -2,15 +2,14 @@ package de.xwic.etlgine.loader.database;
 
 import java.sql.Connection;
 
-import de.xwic.etlgine.ETLException;
-import de.xwic.etlgine.IContext;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
-import javax.sql.DataSource;
+import de.xwic.etlgine.ETLException;
+import de.xwic.etlgine.IContext;
 
 /**
  * Utility class that builds DB dataSources, and stored them in the context.
@@ -56,25 +55,24 @@ public class DataSourceFactory {
 			throw new ETLException("The password is not specified for the connectionName: '" + connectionName + "'");
 		}
 
-		BasicDataSource basicDataSource = new BasicDataSource();
-		basicDataSource.setDriverClassName(driverClassName);
-		basicDataSource.setUrl(url);
-		basicDataSource.setUsername(username);
-		basicDataSource.setPassword(password);
-		basicDataSource.setDefaultAutoCommit(false);
+		SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource();
+
+		singleConnectionDataSource.setDriverClassName(driverClassName);
+		singleConnectionDataSource.setUrl(url);
+		singleConnectionDataSource.setUsername(username);
+		singleConnectionDataSource.setPassword(password);
+		singleConnectionDataSource.setAutoCommit(false);
 
 		// TODO Bogdan - basicDataSource.setMaxActive(100);
 		// TODO Bogdan - basicDataSource.setMaxIdle(30);
 		// TODO Bogdan - basicDataSource.setMaxWait(10000);
 
 		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Built a new dataSource: [driverClassName=" + basicDataSource.getDriverClassName() + ", url="
-					+ basicDataSource.getUrl() + ", username=" + basicDataSource.getUsername() + "]");
+			LOGGER.info("Built a new dataSource: [url=" + singleConnectionDataSource.getUrl() + ", username="
+					+ singleConnectionDataSource.getUsername() + "]");
 		}
 
-		//TODO - setSharedConnection(connection);
-
-		return basicDataSource;
+		return singleConnectionDataSource;
 	}
 
 	/**

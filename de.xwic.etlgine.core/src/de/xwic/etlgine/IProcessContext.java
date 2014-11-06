@@ -107,45 +107,4 @@ public interface IProcessContext extends IContext {
 	 */
 	public Throwable getLastException();
 
-	/**
-	 * Caches the transactionManager for the current connectionName.
-	 * 
-	 * The connectionName string should be the identifier of the connection, from the properties files.
-	 * 
-	 * @param connectionName
-	 *            the key of the cache
-	 * @param transactionManager
-	 *            the value of the cache
-	 * @throws ETLException
-	 *             if one of the parameters is null
-	 */
-	public void addTransactionManager(String connectionName, PlatformTransactionManager transactionManager) throws ETLException;
-	
-	/**
-	 * Returns the transactionManager for the given connection, or null if none found.
-	 * 
-	 * @param connectionName
-	 * @return
-	 */
-	public PlatformTransactionManager getTransactionManager(String connectionName);
-	
-	/**
-	 * Caches the dataSource for the current connectionName.
-	 * 
-	 * The connectionName string should be the identifier of the connection, from the properties files.
-	 * 
-	 * @param connectionName
-	 * @param dataSource
-	 * @throws ETLException
-	 */
-	public void addDataSource(String connectionName, DataSource dataSource) throws ETLException;	
-	
-	/**
-	 * Returns the dataSource for the given connection, or null if none found.
-	 * 
-	 * @param connectionName
-	 * @return
-	 */
-	public DataSource getDataSource(String connectionName);
-
 }

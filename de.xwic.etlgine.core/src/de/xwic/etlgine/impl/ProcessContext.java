@@ -3,6 +3,14 @@
  */
 package de.xwic.etlgine.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.springframework.transaction.PlatformTransactionManager;
+
+import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IMonitor;
@@ -28,6 +36,12 @@ public class ProcessContext extends Context implements IProcessContext {
 	protected Result result = null;
 	protected Throwable lastException = null;
 	
+	/** A map containing all the transactionManagers for this process, with the connectionName as key. */
+	protected Map<String, PlatformTransactionManager> transactionManagers = null;
+	
+	/** A map containing all the dataSources for this process, with the connectionName as key. */
+	protected Map<String, DataSource> dataSources = null;
+
 	/**
 	 * 
 	 */
@@ -52,7 +66,8 @@ public class ProcessContext extends Context implements IProcessContext {
 	}
 
 	/**
-	 * @param dataSet the dataSet to set
+	 * @param dataSet
+	 *            the dataSet to set
 	 */
 	public void setDataSet(IDataSet dataSet) {
 		this.dataSet = dataSet;
@@ -62,7 +77,7 @@ public class ProcessContext extends Context implements IProcessContext {
 		currentRecord = new Record(dataSet);
 		return currentRecord;
 	}
-	
+
 	/**
 	 * @return the currentRecord
 	 */
@@ -71,32 +86,35 @@ public class ProcessContext extends Context implements IProcessContext {
 	}
 
 	/**
-	 * A record has been processed. 
-	 * NOTE: this method is invoked by the process itself.
+	 * A record has been processed. NOTE: this method is invoked by the process itself.
 	 */
 	public void recordProcessed(IRecord record) {
 		recordsCount++;
-		if (record.isInvalid()) invalidCount ++;
-		if (record.isSkip()) skippedCount++;
+		if (record.isInvalid())
+			invalidCount++;
+		if (record.isSkip())
+			skippedCount++;
 	}
-	
+
 	/**
 	 * @return the recordsProcessed
 	 */
 	public int getRecordsCount() {
 		return recordsCount;
 	}
-	
+
 	/**
 	 * Returns the number of records skipped.
+	 * 
 	 * @return
 	 */
 	public int getSkippedCount() {
 		return skippedCount;
 	}
-	
+
 	/**
 	 * Returns the number of records that have become invalid.
+	 * 
 	 * @return
 	 */
 	public int getInvalidCount() {
@@ -111,7 +129,8 @@ public class ProcessContext extends Context implements IProcessContext {
 	}
 
 	/**
-	 * @param monitor the monitor to set
+	 * @param monitor
+	 *            the monitor to set
 	 */
 	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
@@ -125,7 +144,8 @@ public class ProcessContext extends Context implements IProcessContext {
 	}
 
 	/**
-	 * @param currentSource the currentSource to set
+	 * @param currentSource
+	 *            the currentSource to set
 	 */
 	public void setCurrentSource(ISource currentSource) {
 		this.currentSource = currentSource;
@@ -146,7 +166,8 @@ public class ProcessContext extends Context implements IProcessContext {
 	}
 
 	/**
-	 * @param result the result to set
+	 * @param result
+	 *            the result to set
 	 */
 	public void setResult(Result result) {
 		this.result = result;
@@ -161,14 +182,14 @@ public class ProcessContext extends Context implements IProcessContext {
 		} else if (parentContext != null) {
 			return parentContext.isStopFlag();
 		}
-		
+
 		return false;
 	}
 
 	/**
-	 * Returns the Exception that has interrupted the Process. Can be used
-	 * by finalizers to evaluate the cause of a failed process.
-	 * Returns null if no exception was raised.  
+	 * Returns the Exception that has interrupted the Process. Can be used by finalizers to evaluate the cause of a failed process. Returns
+	 * null if no exception was raised.
+	 * 
 	 * @return the lastException
 	 */
 	public Throwable getLastException() {
@@ -176,10 +197,77 @@ public class ProcessContext extends Context implements IProcessContext {
 	}
 
 	/**
-	 * @param lastException the lastException to set
+	 * @param lastException
+	 *            the lastException to set
 	 */
 	public void setLastException(Throwable lastException) {
 		this.lastException = lastException;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.etlgine.IProcessContext#addTransactionManager(java.lang.String,
+	 * org.springframework.transaction.PlatformTransactionManager)
+	 */
+	public void addTransactionManager(String connectionName, PlatformTransactionManager transactionManager) throws ETLException {
+		if (connectionName == null) {
+			throw new ETLException("Trying to cache a transactionManager with a null connectionName key.");
+		}
+
+		if (transactionManager == null) {
+			throw new ETLException("Trying to cache a null transactionManager.");
+		}
+
+		if (transactionManagers == null) {
+			// Lazy init
+			transactionManagers = new HashMap<String, PlatformTransactionManager>();
+		}
+
+		transactionManagers.put(connectionName, transactionManager);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.etlgine.IProcessContext#getTransactionManager(java.lang.String)
+	 */
+	public PlatformTransactionManager getTransactionManager(String connectionName) {
+		if (transactionManagers != null) {
+			return transactionManagers.get(connectionName);
+		}
+		return null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessContext#addDataSource(java.lang.String, javax.sql.DataSource)
+	 */
+	public void addDataSource(String connectionName, DataSource dataSource) throws ETLException {
+		if (connectionName == null) {
+			throw new ETLException("Trying to cache a dataSource with a null connectionName key.");
+		}
+
+		if (dataSource == null) {
+			throw new ETLException("Trying to cache a null dataSource.");
+		}
+
+		if (dataSources == null) {
+			// Lazy init
+			dataSources = new HashMap<String, DataSource>();
+		}
+
+		dataSources.put(connectionName, dataSource);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessContext#getDataSource(java.lang.String)
+	 */
+	public DataSource getDataSource(String connectionName) {
+		if (dataSources != null) {
+			return dataSources.get(connectionName);
+		}
+		return null;
+	}
 }

@@ -1,5 +1,15 @@
 package de.xwic.etlgine.loader.database;
 
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+
 import de.xwic.etlgine.AbstractLoader;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IProcessContext;
@@ -7,11 +17,8 @@ import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.loader.database.operation.IDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.InsertDatabaseOperation;
 import de.xwic.etlgine.loader.database.operation.UpdateDatabaseOperation;
+import de.xwic.etlgine.loader.database.transaction.TransactionUtil;
 import de.xwic.etlgine.util.RecordUtil;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * Loader that inserts or updates rows in a database table.
@@ -24,7 +31,7 @@ import java.util.List;
  * Enhancements:
  * - supports composite PKs when updating rows,
  * - the INSERT_OR_UPDATE is working,
- *
+ * 
  * Missing features:
  * - all the auto-create features (tables, columns, etc.),
  * - all the features that are changing data structure (alter columns).
@@ -61,6 +68,20 @@ public class DatabaseLoader extends AbstractLoader {
 
 	/** The mode in which the loader operates. Defaults to INSERT_OR_UPDATE, as it is the safest into getting data. */
 	private Mode mode = Mode.INSERT_OR_UPDATE;
+
+	//TODO
+	private PlatformTransactionManager transactionManager;
+
+	/**
+	 * Used to begin a transaction.
+	 */
+	private DefaultTransactionDefinition transactionDefinition;
+
+	//TODO
+	private TransactionStatus transaction;
+
+	//TODO
+	private boolean commitOnProcessFinished;
 
 	/** A template used to execute DB queries with named parameters. */
 	private NamedParameterJdbcTemplate jdbcTemplate;
@@ -100,9 +121,20 @@ public class DatabaseLoader extends AbstractLoader {
 		DatabaseLoaderValidators.validateParameters(connectionName, mode, pkColumns, identityManager, tablename);
 
 		// Initialize the dataSource which will provide connections inside the Spring framework
-		// TODO Bogdan - When is the connection committed?
-		// TODO Bogdan - each DatabaseLoader is currently building a new dataSource. Find a way to reuse the dataSource to the same database.
 		DataSource dataSource = DataSourceFactory.buildDataSource(connectionName, processContext);
+		
+		// Cache the dataSource for this connection (to be reused within the finalizers)
+		processContext.addDataSource(connectionName, dataSource);
+
+		// Initialize the transaction manager
+		this.transactionManager = new DataSourceTransactionManager(dataSource);
+
+		// Cache the transactionManager for this connection (to be reused within the finalizers)
+		processContext.addTransactionManager(connectionName, transactionManager);
+
+		// Initialize the main transaction - this will be started during the preSourceOpening, and it will be committed either during
+		// the onProcessFinished, or by the last finalizer that takes part in the current process
+		transactionDefinition = TransactionUtil.getDefaultTransactionDefinition();
 
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
@@ -116,6 +148,8 @@ public class DatabaseLoader extends AbstractLoader {
 
 	@Override
 	public void preSourceProcessing(final IProcessContext processContext) throws ETLException {
+		// Begin transaction
+		transaction = transactionManager.getTransaction(transactionDefinition);
 	}
 
 	@Override
@@ -131,14 +165,11 @@ public class DatabaseLoader extends AbstractLoader {
 				break;
 
 			case INSERT_OR_UPDATE:
-				// TODO Bogdan - this approach performs a select for each record, in order to determine if
-				// it should perform an update or an insert
+				// TODO Bogdan - this approach performs a select for each record, in order to determine if it should perform an update 
+				// or an insert
 
-				// if performance is severely impacted by this approach, consider using SQL's MERGE command,
-				// but with caution - http://www.mssqltips.com/sqlservertip/3074/use-caution-with-sql-servers-merge-statement/
-
-				// another solution would be to check all against the database, create a Map<Boolean, IRecord> specifying if it exists
-				// or not, and later determine based on this map if it's an insert or an update
+				// to speed thing up, select all existing records into a Set<existing PKs> and later determine based on this set
+				// if it's an insert or an update
 				if (identityManager.recordExistsInTargetTable(jdbcTemplate, processContext, record, pkColumns, tablename)) {
 					update(processContext, record);
 				} else {
@@ -147,10 +178,10 @@ public class DatabaseLoader extends AbstractLoader {
 				break;
 
 			default:
-				throw new ETLException(
-						"Invalid JDBCLoader.mode specified. Available modes: 'INSERT', 'UPDATE', 'INSERT_OR_UPDATE (deprecated)', 'INSERT_OR_UPDATE_COMPOSITE_PK.'");
+				throw new ETLException("Invalid DatabaseLoader.mode specified. Available modes: 'INSERT', 'UPDATE', 'INSERT_OR_UPDATE'");
 			}
 		} catch (Throwable t) {
+			transactionManager.rollback(transaction);
 			record.markInvalid(t.getLocalizedMessage());
 			String msg = "Cannot process record " + processContext.getRecordsCount();
 			throw new ETLException(msg, t);
@@ -159,6 +190,9 @@ public class DatabaseLoader extends AbstractLoader {
 
 	@Override
 	public void onProcessFinished(IProcessContext processContext) throws ETLException {
+		if (commitOnProcessFinished) {
+			transactionManager.commit(transaction);
+		}
 	}
 
 	/**
@@ -171,7 +205,7 @@ public class DatabaseLoader extends AbstractLoader {
 	 * @throws ETLException
 	 */
 	private void insert(final IProcessContext processContext, final IRecord record) throws ETLException {
-		monitor.logInfo("Inserting record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+		monitor.logDebug("Inserting record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
 
 		insert.execute(processContext, record);
 	}
@@ -186,7 +220,7 @@ public class DatabaseLoader extends AbstractLoader {
 	 * @throws ETLException
 	 */
 	private void update(final IProcessContext processContext, final IRecord record) throws ETLException {
-		monitor.logInfo("Updating record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+		monitor.logDebug("Updating record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
 
 		update.execute(processContext, record);
 	}
@@ -222,6 +256,14 @@ public class DatabaseLoader extends AbstractLoader {
 
 	public void setConnectionName(final String connectionName) {
 		this.connectionName = connectionName;
+	}
+
+	public boolean isCommitOnProcessFinished() {
+		return commitOnProcessFinished;
+	}
+
+	public void setCommitOnProcessFinished(boolean commitOnProcessFinished) {
+		this.commitOnProcessFinished = commitOnProcessFinished;
 	}
 
 }

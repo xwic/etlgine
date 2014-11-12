@@ -1,6 +1,7 @@
 package de.xwic.etlgine.loader.database;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -161,9 +162,9 @@ public class DatabaseLoader extends AbstractLoader {
 			}
 		} catch (Throwable t) {
 			record.markInvalid(t.getLocalizedMessage());
-
-			ConnectionUtils.rollbackConnection(DataSourceUtils.getConnection(dataSource));
-
+			if (commitOnProcessFinished){
+				ConnectionUtils.rollbackConnection(DataSourceUtils.getConnection(dataSource));
+			}
 			String msg = "Cannot process record " + processContext.getRecordsCount();
 			throw new ETLException(msg, t);
 		}

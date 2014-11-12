@@ -114,7 +114,7 @@ public class SqlServerIdentityManager extends AbstractIdentityManager {
 			IColumn column = it.next();
 
 			String columnName = column.computeTargetName();
-			String parameterName = columnName + "_param";
+			String parameterName = columnName.replaceAll(" ", "_") + "_param";
 
 			sqlQuery.append("t.[").append(columnName).append("] = :").append(parameterName);
 			parameters.put(parameterName, record.getData(column));

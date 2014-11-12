@@ -1,11 +1,13 @@
 package de.xwic.etlgine.loader.database.operation;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 public class InsertDatabaseOperation extends AbstractDatabaseOperation implements IDatabaseOperation {
 
@@ -49,8 +51,20 @@ public class InsertDatabaseOperation extends AbstractDatabaseOperation implement
 				batchParameters.clear();
 			}
 		} else {
+			List<String> columnNames = new ArrayList<String>();
+			for(String key : parameters.keySet()){
+				String columnName = key;
+				if (columnName.indexOf(" ") > 0 && !columnName.startsWith("[")){
+					columnName = '['+columnName+']';
+				}
+				columnNames.add(columnName);
+			}
+			if (!jdbcInsert.isCompiled()){
+				jdbcInsert.usingColumns(columnNames.toArray(new String[0]));
+			}
 			// Running in non-batch mode - execute insert after each record processing
 			jdbcInsert.execute(parameters);
+			
 		}
 	}
 

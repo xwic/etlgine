@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) NetApp Inc. - All Rights Reserved
+ * 
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ * 
+ *  
+ */
 package de.xwic.etlgine.finalizer;
 
 import java.sql.Connection;
@@ -198,7 +206,7 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 							con.commit();
 						}
 					} else {
-						if (!con.isClosed()) {
+						if (!con.isClosed() && !con.getAutoCommit()) {
 							con.rollback();
 							context.getMonitor().logError("ROLLBACK because of unsuccessfull process!");
 						}

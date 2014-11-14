@@ -103,6 +103,11 @@ public class DatabaseLoader extends AbstractLoader {
 	 * The order of the columns in this list has to be the same as in the definition of the target database.
 	 */
 	private List<String> pkColumns;
+	
+	/**
+	 * List of columns to exclude from the insert or update
+	 */
+	private List<String> excludedColumns;
 
 	@Override
 	public void initialize(final IProcessContext processContext) throws ETLException {
@@ -122,10 +127,10 @@ public class DatabaseLoader extends AbstractLoader {
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
 		// Initialize the insert
-		this.insert = new InsertDatabaseOperation(dataSource, tablename, batchSize);
+		this.insert = new InsertDatabaseOperation(dataSource, tablename, batchSize, excludedColumns);
 
 		// Initialize the update mode
-		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns, batchSize);
+		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns, batchSize, excludedColumns);
 	}
 
 	@Override
@@ -246,6 +251,14 @@ public class DatabaseLoader extends AbstractLoader {
 
 	public void setCommitOnProcessFinished(boolean commitOnProcessFinished) {
 		this.commitOnProcessFinished = commitOnProcessFinished;
+	}
+
+	
+	/**
+	 * @param excludedColumns the excludedColumns to set
+	 */
+	public void setExcludedColumns(List<String> excludedColumns) {
+		this.excludedColumns = excludedColumns;
 	}
 
 }

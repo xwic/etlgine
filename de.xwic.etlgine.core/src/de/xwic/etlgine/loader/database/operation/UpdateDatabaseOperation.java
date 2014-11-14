@@ -3,6 +3,7 @@ package de.xwic.etlgine.loader.database.operation;
 import de.xwic.etlgine.loader.database.springframework.simplejdbcupdate.SimpleJdbcUpdate;
 
 import javax.sql.DataSource;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,15 @@ public class UpdateDatabaseOperation extends AbstractDatabaseOperation implement
 		jdbcUpdate.setRestrictingColumns(whereColumnNames);
 		this.whereColumnNames = whereColumnNames;
 		this.batchSize = batchSize;
+	}
+	
+	public UpdateDatabaseOperation(final DataSource dataSource, final String tablename, final List<String> whereColumnNames,
+			final Integer batchSize, final List<String> excludedColumns) {
+		jdbcUpdate = new SimpleJdbcUpdate(dataSource).withTableName(tablename);
+		jdbcUpdate.setRestrictingColumns(whereColumnNames);
+		this.whereColumnNames = whereColumnNames;
+		this.batchSize = batchSize;
+		this.excludedColumns = excludedColumns;
 	}
 
 	/**

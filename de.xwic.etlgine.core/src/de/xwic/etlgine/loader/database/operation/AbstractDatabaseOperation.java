@@ -21,6 +21,11 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 	 * batchSize, the batch insert is executed.
 	 */
 	protected List<Map<String, Object>> batchParameters;
+	
+	/**
+	 * List of columns that needs to be excluded in the statement
+	 */
+	protected List<String> excludedColumns; 
 
 	/**
 	 * Performs the DB operation (insert or update) for the record.
@@ -63,6 +68,9 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 
 		// Prepare the parameters for insert / update
 		for (IColumn column : columns) {
+			if (null !=excludedColumns && excludedColumns.contains(column.getName())){
+				continue;
+			}
 			// The key of this map should contain EXACTLY the same names as the target column names
 			parameters.put(column.getName(), record.getData(column));
 		}
@@ -75,5 +83,21 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 	}
 
 	protected abstract void executeDatabaseOperation(Map<String, Object> parameters);
+
+	
+	/**
+	 * @return the excludedColumns
+	 */
+	protected List<String> getExcludedColumns() {
+		return excludedColumns;
+	}
+
+	
+	/**
+	 * @param excludedColumns the excludedColumns to set
+	 */
+	protected void setExcludedColumns(List<String> excludedColumns) {
+		this.excludedColumns = excludedColumns;
+	}
 
 }

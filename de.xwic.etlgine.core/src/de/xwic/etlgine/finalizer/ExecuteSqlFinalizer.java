@@ -178,13 +178,13 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 				if (null != sqlStatements) {
 					for (String sqlStatement : sqlStatements) {
 						stmt = con.createStatement();
+						context.getMonitor().logInfo("Executing: " + sqlStatement);
 						int cnt = stmt.executeUpdate(sqlStatement);
 						String message = "Processed " + cnt + " records";
 						if (null != successMessage) {
 							message = String.format(successMessage, cnt);
 							successMessage = message;
 						}
-						context.getMonitor().logInfo("Executed: " + sqlStatement);
 						context.getMonitor().logInfo(message);
 						stmt.close();
 					}

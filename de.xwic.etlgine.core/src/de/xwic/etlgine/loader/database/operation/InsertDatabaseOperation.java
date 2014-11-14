@@ -24,6 +24,15 @@ public class InsertDatabaseOperation extends AbstractDatabaseOperation implement
 			batchParameters = new ArrayList<Map<String, Object>>();
 		}
 	}
+	
+	public InsertDatabaseOperation(final DataSource dataSource, final String tablename, final Integer batchSize, final List<String> excludedColumns) {
+		this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(tablename);
+		this.batchSize = batchSize;
+		this.excludedColumns = excludedColumns;
+		if (batchModeActive()) {
+			batchParameters = new ArrayList<Map<String, Object>>();
+		}
+	}
 
 	/**
 	 * If batch mode is active, it adds the parameters of this row to the list. If the batchSize has been reached, it also executes the

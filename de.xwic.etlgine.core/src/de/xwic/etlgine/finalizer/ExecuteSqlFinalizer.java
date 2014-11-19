@@ -202,7 +202,7 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 				if (commitOnFinish && null != con) {
 
 					if (context.getResult() == Result.SUCCESSFULL) {
-						if (!con.isClosed()) {
+						if (!con.isClosed() && !con.getAutoCommit()) {
 							con.commit();
 						}
 					} else {

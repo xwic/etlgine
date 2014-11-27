@@ -1,11 +1,15 @@
 package de.xwic.etlgine.loader.database;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
@@ -37,8 +41,11 @@ import de.xwic.etlgine.util.RecordUtil;
  * </pre>
  *
  * @author mbogdan
+ * @author Ionut
  */
 public class DatabaseLoader extends AbstractLoader {
+
+	private static final Log log = LogFactory.getLog(DatabaseLoader.class);
 
 	/**
 	 * The modes in which this loader could operate.
@@ -103,11 +110,26 @@ public class DatabaseLoader extends AbstractLoader {
 	 * The order of the columns in this list has to be the same as in the definition of the target database.
 	 */
 	private List<String> pkColumns;
-	
+
 	/**
 	 * List of columns to exclude from the insert or update
 	 */
 	private List<String> excludedColumns;
+
+	/**
+	 * Character used to quote table or column names
+	 */
+	private String quoteChar = null;
+
+	/**
+	 * Flag used to truncate the table. This flag must be used with the insert mode.
+	 */
+	private boolean truncateTable = false;
+
+	/**
+	 * Indicates if the table content purged either by truncate or by delete
+	 */
+	private boolean tablePurged = false;
 
 	@Override
 	public void initialize(final IProcessContext processContext) throws ETLException {
@@ -123,6 +145,11 @@ public class DatabaseLoader extends AbstractLoader {
 		Connection connection = DataSourceUtils.getConnection(dataSource);
 		JDBCUtil.setSharedConnection(processContext, connectionId, connection);
 
+		if (quoteChar == null) {
+			quoteChar = JDBCUtil.getIdentifierSeparator(connection);
+		}
+		tablePurged = false;
+
 		// Initialize the jdbcTemplate
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
@@ -135,6 +162,11 @@ public class DatabaseLoader extends AbstractLoader {
 
 	@Override
 	public void preSourceProcessing(final IProcessContext processContext) throws ETLException {
+		super.preSourceProcessing(processContext);
+		if (truncateTable && !tablePurged) {
+			// truncate table only once for source processing, set to false in method initialize
+			truncateTable(DataSourceUtils.getConnection(dataSource));
+		}
 	}
 
 	@Override
@@ -167,7 +199,7 @@ public class DatabaseLoader extends AbstractLoader {
 			}
 		} catch (Throwable t) {
 			record.markInvalid(t.getLocalizedMessage());
-			if (commitOnProcessFinished){
+			if (commitOnProcessFinished) {
 				ConnectionUtils.rollbackConnection(DataSourceUtils.getConnection(dataSource));
 			}
 			String msg = "Cannot process record " + processContext.getRecordsCount();
@@ -212,6 +244,65 @@ public class DatabaseLoader extends AbstractLoader {
 		update.execute(processContext, record);
 	}
 
+	/**
+	 * Truncate table
+	 * 
+	 * @throws ETLException
+	 */
+	protected void truncateTable(Connection conn) throws ETLException {
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			int rows;
+			try {
+				// try TRUNCATE TABLE
+				ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + getTablenameQuoted());
+				rs.next();
+				rows = rs.getInt(1);
+				stmt.executeUpdate("TRUNCATE TABLE " + getTablenameQuoted());
+			} catch (SQLException e) {
+				// try DELETE FROM
+				rows = stmt.executeUpdate("DELETE FROM " + getTablenameQuoted());
+			}
+			tablePurged = true;
+			processContext.getMonitor().logInfo("TRUNCATED TABLE " + getTablenameQuoted() + " - " + rows + " rows have been deleted.");
+		} catch (SQLException e) {
+			throw new ETLException("Error truncating table: " + e, e);
+		} finally {
+			if (null != stmt) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					log.warn("Ignore an exception that was thrown when closing the truncate/delete statement", e);
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Returns the JDBC identifier separator. On SQLException " is used as fallback.
+	 * 
+	 * @param connection
+	 * @return
+	 */
+	public static String getIdentifierSeparator(Connection connection) {
+		String identifierSeparator = null;
+		try {
+			identifierSeparator = connection.getMetaData().getIdentifierQuoteString();
+		} catch (SQLException e) {
+			identifierSeparator = "\""; // use this
+			log.warn("Error reading identifierQuoteString", e);
+		}
+		return identifierSeparator;
+	}
+
+	protected String getTablenameQuoted() {
+		StringBuilder sql = new StringBuilder();
+		sql.append(quoteChar).append(tablename).append(quoteChar);
+		return sql.toString();
+	}
+
 	// Getters and setters
 	public Mode getMode() {
 		return mode;
@@ -253,12 +344,27 @@ public class DatabaseLoader extends AbstractLoader {
 		this.commitOnProcessFinished = commitOnProcessFinished;
 	}
 
-	
 	/**
-	 * @param excludedColumns the excludedColumns to set
+	 * @param excludedColumns
+	 *            the excludedColumns to set
 	 */
 	public void setExcludedColumns(List<String> excludedColumns) {
 		this.excludedColumns = excludedColumns;
+	}
+
+	/**
+	 * @return the truncateTable
+	 */
+	public boolean isTruncateTable() {
+		return truncateTable;
+	}
+
+	/**
+	 * @param truncateTable
+	 *            the truncateTable to set
+	 */
+	public void setTruncateTable(boolean truncateTable) {
+		this.truncateTable = truncateTable;
 	}
 
 }

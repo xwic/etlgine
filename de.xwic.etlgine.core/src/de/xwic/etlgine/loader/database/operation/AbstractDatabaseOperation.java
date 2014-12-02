@@ -28,6 +28,11 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 	protected List<String> excludedColumns; 
 
 	/**
+	 * Flag used to indicate if the column names are escaped in the insert/update statements
+	 */
+	protected boolean escapeColumns = false;
+	
+	/**
 	 * Performs the DB operation (insert or update) for the record.
 	 *
 	 * It uses the table metadata returned by the DB engine. This only works if the processContext.dataSet.columns uses the EXACT same
@@ -98,6 +103,22 @@ public abstract class AbstractDatabaseOperation implements IDatabaseOperation {
 	 */
 	protected void setExcludedColumns(List<String> excludedColumns) {
 		this.excludedColumns = excludedColumns;
+	}
+
+	
+	/**
+	 * @return the escapeColumns
+	 */
+	protected boolean isEscapeColumns() {
+		return escapeColumns;
+	}
+
+	
+	/**
+	 * @param escapeColumns the escapeColumns to set
+	 */
+	protected void setEscapeColumns(boolean escapeColumns) {
+		this.escapeColumns = escapeColumns;
 	}
 
 }

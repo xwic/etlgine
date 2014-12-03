@@ -75,7 +75,7 @@ public class InsertDatabaseOperation extends AbstractDatabaseOperation implement
 			paramColumnsEscaped.putAll(parameters);
 			for(String key : parameters.keySet()){
 				String columnName = key;
-				if ((columnName.indexOf(" ") > 0 || escapeColumns) && !columnName.startsWith("[")){
+				if ((columnName.indexOf(" ") > 0 || columnName.indexOf("/") > 0 ||  escapeColumns) && !columnName.startsWith("[")){
 					columnName = '['+columnName+']';
 					paramColumnsEscaped.put(columnName, parameters.get(key));
 				}

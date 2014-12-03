@@ -4,6 +4,7 @@ import de.xwic.etlgine.loader.database.springframework.simplejdbcupdate.SimpleJd
 
 import javax.sql.DataSource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,23 @@ public class UpdateDatabaseOperation extends AbstractDatabaseOperation implement
 		//			}
 		//		} else {
 		//			// Running in non-batch mode - execute insert after each record processing
-		jdbcUpdate.execute(parameters, whereParameters);
+		
+		List<String> columnNames = new ArrayList<String>();
+		Map<String, Object> paramColumnsEscaped = new HashMap<String, Object>();
+		paramColumnsEscaped.putAll(parameters);
+		for(String key : parameters.keySet()){
+			String columnName = key;
+			if ((columnName.indexOf(" ") > 0 || columnName.indexOf("/") > 0 || escapeColumns) && !columnName.startsWith("[")){
+				columnName = '['+columnName+']';
+				paramColumnsEscaped.put(columnName, parameters.get(key));
+			}
+			columnNames.add(columnName);
+			
+		}
+		if (!jdbcUpdate.isCompiled()){
+			jdbcUpdate.updatingColumns(columnNames.toArray(new String[0]));
+		}
+		jdbcUpdate.execute(paramColumnsEscaped, whereParameters);
 		//		}
 	}
 

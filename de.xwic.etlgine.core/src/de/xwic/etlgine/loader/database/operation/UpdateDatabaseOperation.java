@@ -36,6 +36,16 @@ public class UpdateDatabaseOperation extends AbstractDatabaseOperation implement
 		this.batchSize = batchSize;
 		this.excludedColumns = excludedColumns;
 	}
+	
+	public UpdateDatabaseOperation(final DataSource dataSource, final String tablename, final List<String> whereColumnNames,
+			final Integer batchSize, final List<String> excludedColumns, boolean escapeColumns) {
+		jdbcUpdate = new SimpleJdbcUpdate(dataSource).withTableName(tablename);
+		jdbcUpdate.setRestrictingColumns(whereColumnNames);
+		this.whereColumnNames = whereColumnNames;
+		this.batchSize = batchSize;
+		this.excludedColumns = excludedColumns;
+		this.escapeColumns = escapeColumns;
+	}
 
 	/**
 	 * If batch mode is active, it adds the parameters of this row to the list. If the batchSize has been reached, it also executes the

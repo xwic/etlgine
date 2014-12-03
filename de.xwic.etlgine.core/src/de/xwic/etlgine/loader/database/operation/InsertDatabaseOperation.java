@@ -33,6 +33,16 @@ public class InsertDatabaseOperation extends AbstractDatabaseOperation implement
 			batchParameters = new ArrayList<Map<String, Object>>();
 		}
 	}
+	
+	public InsertDatabaseOperation(final DataSource dataSource, final String tablename, final Integer batchSize, final List<String> excludedColumns, boolean escapeColumns) {
+		this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(tablename);
+		this.batchSize = batchSize;
+		this.excludedColumns = excludedColumns;
+		this.escapeColumns = escapeColumns;
+		if (batchModeActive()) {
+			batchParameters = new ArrayList<Map<String, Object>>();
+		}
+	}
 
 	/**
 	 * If batch mode is active, it adds the parameters of this row to the list. If the batchSize has been reached, it also executes the
@@ -61,18 +71,22 @@ public class InsertDatabaseOperation extends AbstractDatabaseOperation implement
 			}
 		} else {
 			List<String> columnNames = new ArrayList<String>();
+			Map<String, Object> paramColumnsEscaped = new HashMap<String, Object>();
+			paramColumnsEscaped.putAll(parameters);
 			for(String key : parameters.keySet()){
 				String columnName = key;
-				if (columnName.indexOf(" ") > 0 && !columnName.startsWith("[")){
+				if ((columnName.indexOf(" ") > 0 || escapeColumns) && !columnName.startsWith("[")){
 					columnName = '['+columnName+']';
+					paramColumnsEscaped.put(columnName, parameters.get(key));
 				}
 				columnNames.add(columnName);
+				
 			}
 			if (!jdbcInsert.isCompiled()){
 				jdbcInsert.usingColumns(columnNames.toArray(new String[0]));
 			}
 			// Running in non-batch mode - execute insert after each record processing
-			jdbcInsert.execute(parameters);
+			jdbcInsert.execute(paramColumnsEscaped);
 			
 		}
 	}

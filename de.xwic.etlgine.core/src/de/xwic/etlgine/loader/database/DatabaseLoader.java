@@ -130,6 +130,11 @@ public class DatabaseLoader extends AbstractLoader {
 	 * Indicates if the table content purged either by truncate or by delete
 	 */
 	private boolean tablePurged = false;
+	
+	/**
+	 * Flag used to indicate if the column names are escaped in the insert/update statements
+	 */
+	private boolean escapeColumns = false;
 
 	@Override
 	public void initialize(final IProcessContext processContext) throws ETLException {
@@ -154,10 +159,10 @@ public class DatabaseLoader extends AbstractLoader {
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
 		// Initialize the insert
-		this.insert = new InsertDatabaseOperation(dataSource, tablename, batchSize, excludedColumns);
+		this.insert = new InsertDatabaseOperation(dataSource, tablename, batchSize, excludedColumns, escapeColumns);
 
 		// Initialize the update mode
-		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns, batchSize, excludedColumns);
+		this.update = new UpdateDatabaseOperation(dataSource, tablename, pkColumns, batchSize, excludedColumns, escapeColumns);
 	}
 
 	@Override
@@ -365,6 +370,22 @@ public class DatabaseLoader extends AbstractLoader {
 	 */
 	public void setTruncateTable(boolean truncateTable) {
 		this.truncateTable = truncateTable;
+	}
+
+	
+	/**
+	 * @return the escapeColumns
+	 */
+	public boolean isEscapeColumns() {
+		return escapeColumns;
+	}
+
+	
+	/**
+	 * @param escapeColumns the escapeColumns to set
+	 */
+	public void setEscapeColumns(boolean escapeColumns) {
+		this.escapeColumns = escapeColumns;
 	}
 
 }

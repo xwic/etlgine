@@ -229,8 +229,9 @@ public class DatabaseLoader extends AbstractLoader {
 	 * @throws ETLException
 	 */
 	private void insert(final IProcessContext processContext, final IRecord record) throws ETLException {
-		monitor.logDebug("Inserting record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
-
+		if (log.isDebugEnabled()){
+			monitor.logDebug("Inserting record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+		}
 		insert.execute(processContext, record);
 	}
 
@@ -244,7 +245,9 @@ public class DatabaseLoader extends AbstractLoader {
 	 * @throws ETLException
 	 */
 	private void update(final IProcessContext processContext, final IRecord record) throws ETLException {
-		monitor.logDebug("Updating record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+		if (log.isDebugEnabled()){
+			monitor.logDebug("Updating record with PK: " + RecordUtil.buildPKString(record, pkColumns) + " into target table: " + tablename);
+		}
 
 		update.execute(processContext, record);
 	}

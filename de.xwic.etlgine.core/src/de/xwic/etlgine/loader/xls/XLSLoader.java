@@ -9,9 +9,11 @@
 package de.xwic.etlgine.loader.xls;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -87,6 +89,11 @@ public class XLSLoader extends AbstractLoader {
 	protected String sheetName = "Sheet1";
 
 	/**
+	 * If we should override existing file or if we should load it and add the new sheet to it
+	 */
+	protected boolean overrideExistingFile = true;
+
+	/**
 	 * Holds the number of rows
 	 */
 	protected int rowCount = 0;
@@ -134,6 +141,12 @@ public class XLSLoader extends AbstractLoader {
 		this.sheetName = sheetName;
 	}
 
+	public XLSLoader(String fileName, String sheetName, boolean overrideExistingFile) {
+		this.fileName = fileName;
+		this.sheetName = sheetName;
+		this.overrideExistingFile = overrideExistingFile;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -141,12 +154,28 @@ public class XLSLoader extends AbstractLoader {
 	 */
 	public void initialize(IProcessContext processContext) throws ETLException {
 		super.initialize(processContext);
+		
+		File file = new File(fileName);
+		
 		workbook = new XSSFWorkbook();
+		if(!overrideExistingFile) {
+			if(file.exists()) {
+				try {
+					InputStream st = new FileInputStream(file);
+					workbook = new XSSFWorkbook(st);
+					st.close();
+				} catch (FileNotFoundException e) {
+					throw new ETLException("Error loading file:" + fileName, e);
+				} catch (IOException e) {
+					throw new ETLException("Error loading file:" + fileName, e);
+				}
+			}
+		}
 		sheet = workbook.createSheet(sheetName);
 		formatter = new DataFormatter(true);
 		createCellStyles();
 		try {
-			fileOutStream = new FileOutputStream(new File(fileName));
+			fileOutStream = new FileOutputStream(file);
 		} catch (FileNotFoundException e) {
 			throw new ETLException("Error creating file:" + fileName, e);
 		}

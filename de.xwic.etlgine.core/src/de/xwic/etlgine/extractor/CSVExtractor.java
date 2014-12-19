@@ -28,6 +28,8 @@ import de.xwic.etlgine.sources.FileSource;
  */
 public class CSVExtractor extends AbstractExtractor implements IExtractor {
 
+	private static final String COLUMN_PREFIX = "column";
+
 	private CSVReader reader = null;
 
 	private boolean containsHeader = true;
@@ -37,6 +39,7 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	private int skipLines = 0;
 	private int recordNumber = 0;
 
+	private String[] header;
 	private int expectedColumns = -1;
 	
 	private IDataSet dataSet;
@@ -95,14 +98,26 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 	 */
 	public IRecord getNextRecord() throws ETLException {
 		if (!reachedEnd) {
+			
 			recordNumber++;
 			try {
 				IRecord record = context.newRecord();
-				String[] data = reader.readNext();
+				String[] data = null;
+				
+				//the first row from the file was read to check if there is a header present and to count the number of columns
+				if (!containsHeader && 1 == recordNumber && null !=header){
+					data = header;
+				}else{
+					data= reader.readNext();
+				}
+
 				if (data == null) {
 					reachedEnd = true;
 				} else { 
-					if (containsHeader && data.length != expectedColumns) {
+					//if the columns are not initialized
+					
+					
+					if (data.length != expectedColumns) {
 						record.markInvalid("Expected " + expectedColumns + " but record contained " + data.length + " columns. (row=" + recordNumber + ")");
 					}
 					
@@ -204,12 +219,14 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 			
 			context.getMonitor().logInfo("CSVExtractor uses separator " + separator + " (0x" + Integer.toHexString(separator) + ") and quoteChar " + quoteChar + " (0x" + Integer.toHexString(quoteChar) + ")");
 			reader = new CSVReader(rawReader, separator, quoteChar, 0);
+			header = reader.readNext();
+			if (header == null) {
+				// file is empty!
+				reachedEnd = true;
+			}
 			if (containsHeader) {
-				String[] header = reader.readNext();
-				if (header == null) {
-					// file is empty!
-					reachedEnd = true;
-				} else {
+				
+				if (!reachedEnd){
 					expectedColumns = header.length;
 					int idx = 0;
 					for (String colName : header) {
@@ -225,6 +242,13 @@ public class CSVExtractor extends AbstractExtractor implements IExtractor {
 							colName = colName + i;
 						}
 						dataSet.addColumn(colName, idx++);
+					}
+				}
+			}else{
+				if (!reachedEnd){
+					expectedColumns = header.length;
+					for(int i=0;i<expectedColumns; i++){
+						dataSet.addColumn(COLUMN_PREFIX+i, i);
 					}
 				}
 			}

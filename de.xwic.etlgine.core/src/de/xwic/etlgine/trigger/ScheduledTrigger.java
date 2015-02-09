@@ -71,6 +71,22 @@ public class ScheduledTrigger implements ITrigger {
 	}
 	
 	/**
+	 * 
+	 * @param triggerType
+	 * @param dayOfWeek
+	 * @param hourOfDay
+	 * @param minuteOfDay
+	 */
+	public ScheduledTrigger(Type triggerType, int dayOfPeriod, int hourOfDay, int minuteOfDay) {
+		super();
+		this.dayOfWeek = dayOfPeriod;
+		this.hourOfDay = hourOfDay;
+		this.minuteOfDay = minuteOfDay;
+		this.type = triggerType;
+		calculateNextStart();
+	}
+	
+	/**
 	 * @param hourOfDay
 	 * @param minuteOfDay
 	 * @param hourOfDayAfterError
@@ -154,12 +170,17 @@ public class ScheduledTrigger implements ITrigger {
 						cal.add(Calendar.DATE, 7 - diff);
 					}
 				}
+			}else if (type == Type.MONTLY) {
+				cal.set(Calendar.DAY_OF_MONTH, dayOfWeek);
 			}
+
 			
 			if (cal.getTime().before(last)) {
 				switch (type) {
 				case MONTLY:
-					cal.add(Calendar.MONTH, 1);
+					if (cal.before(Calendar.getInstance())) {
+						cal.add(Calendar.MONTH, 1);
+					}
 					break;
 				case WEEKLY:
 					cal.add(Calendar.WEEK_OF_MONTH, 1);

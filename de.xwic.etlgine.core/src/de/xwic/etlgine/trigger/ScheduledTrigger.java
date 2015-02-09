@@ -178,9 +178,7 @@ public class ScheduledTrigger implements ITrigger {
 			if (cal.getTime().before(last)) {
 				switch (type) {
 				case MONTLY:
-					if (cal.before(Calendar.getInstance())) {
-						cal.add(Calendar.MONTH, 1);
-					}
+					cal.add(Calendar.MONTH, 1);
 					break;
 				case WEEKLY:
 					cal.add(Calendar.WEEK_OF_MONTH, 1);

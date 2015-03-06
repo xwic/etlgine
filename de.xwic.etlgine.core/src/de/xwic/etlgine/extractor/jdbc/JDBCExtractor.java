@@ -113,6 +113,9 @@ public class JDBCExtractor extends AbstractExtractor {
 					case STRING: 
 						value = rs.getString(i);
 						break;
+					case BYTE:
+						value = rs.getByte(i);
+						break;
 					case INT:
 						value = rs.getInt(i);
 						break;
@@ -262,6 +265,8 @@ public class JDBCExtractor extends AbstractExtractor {
 					}
 					break;
 				case Types.TINYINT:
+					dt = DataType.BYTE;
+					break;
 				case Types.INTEGER:
 					dt = DataType.INT;
 					break;

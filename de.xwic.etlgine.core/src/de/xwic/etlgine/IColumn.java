@@ -17,7 +17,8 @@ public interface IColumn {
 		DOUBLE,
 		DATE,
 		DATETIME,
-		BOOLEAN
+		BOOLEAN,
+		BYTE
 	}
 	
 	

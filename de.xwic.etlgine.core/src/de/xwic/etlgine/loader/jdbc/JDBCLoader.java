@@ -1737,6 +1737,9 @@ public class JDBCLoader extends AbstractLoader {
 				if (value instanceof Boolean) {
 					Boolean b = (Boolean)value;
 					ps.setBoolean(idx, b.booleanValue());
+				} else if (value instanceof Byte) {
+					Byte valByte = (Byte) value;
+					ps.setByte(idx, valByte);
 				} else if (value instanceof Number) {
 					Number valNum = (Number) value;
 					ps.setBoolean(idx, valNum.intValue() == 0 ? false : true);

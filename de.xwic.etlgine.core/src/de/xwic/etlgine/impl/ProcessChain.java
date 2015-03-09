@@ -163,7 +163,12 @@ public class ProcessChain implements IProcessChain {
 
 		try {
 			result = Result.SUCCESSFULL;
-			for (IProcess process : processList) {
+			
+			/*for (IProcess process : processList)
+			  changed to this iteration form to support adding new processes dynamically 	
+			*/
+			for (int iCnt = 0; iCnt < processList.size(); iCnt++) {
+				IProcess process = processList.get(iCnt);
 				activeProcess = process;
 				Result pResult = process.start();
 				if (pResult == Result.FAILED || pResult == Result.FINISHED_WITH_ERRORS) {

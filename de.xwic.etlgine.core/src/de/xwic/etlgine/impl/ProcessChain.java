@@ -73,6 +73,17 @@ public class ProcessChain implements IProcessChain {
 		processList.add(process);
 	}
 	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#addCustomProcess(int, de.xwic.etlgine.IProcess)
+	 */
+	public void addCustomProcess(int index, IProcess process) {
+		process.setMonitor(monitor);
+		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_ADD_CUSTOM_PROCESS, process);
+		processList.add(index, process);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#addProcess(de.xwic.etlgine.IProcess)
 	 */

@@ -34,6 +34,16 @@ public interface IProcessChain {
 	public void addCustomProcess(IProcess process);
 	
 	/**
+	 * Add a custom process at the specified index. This is useful when adding processes dynamically.
+	 * It is important that the current running process to add a new process only after it in the list of processes.
+	 * Adding a new process before it will not work since the index passed that value.
+	 *  
+	 * @param index 
+	 * @param process
+	 */
+	public void addCustomProcess(int index, IProcess process);
+	
+	/**
 	 * Add a process. 
 	 * @param process
 	 */

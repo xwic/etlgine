@@ -1639,6 +1639,7 @@ public class JDBCLoader extends AbstractLoader {
 				}
 			case Types.INTEGER:
 			case Types.SMALLINT:
+			case Types.TINYINT:
 				try {
 					if (value instanceof Integer) {
 						ps.setInt(idx, (Integer)value);
@@ -1733,13 +1734,9 @@ public class JDBCLoader extends AbstractLoader {
 				break;
 			case Types.BIT:
 			case Types.BOOLEAN:
-			case Types.TINYINT:
 				if (value instanceof Boolean) {
 					Boolean b = (Boolean)value;
 					ps.setBoolean(idx, b.booleanValue());
-				} else if (value instanceof Byte) {
-					Byte valByte = (Byte) value;
-					ps.setByte(idx, valByte);
 				} else if (value instanceof Number) {
 					Number valNum = (Number) value;
 					ps.setBoolean(idx, valNum.intValue() == 0 ? false : true);

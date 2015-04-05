@@ -597,18 +597,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-<distributionManagement>
-  <repository>
-   <id>common-releases</id>
-   <name>NetApp common</name>
-   <url>http://sesbuild.corp.netapp.com/nexus/content/repositories/common-releases/</url>
-  </repository>
-  <snapshotRepository>
-   <id>common-snapshot</id>
-   <name>NetApp common SNAPSHOT</name>
-   <url>http://sesbuild.corp.netapp.com/nexus/content/repositories/common-snapshot/</url>
-  </snapshotRepository>
- </distributionManagement>
-
 </project>

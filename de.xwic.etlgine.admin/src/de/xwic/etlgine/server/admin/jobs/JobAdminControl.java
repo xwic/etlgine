@@ -25,6 +25,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.JobQueue;
+import de.xwic.etlgine.server.ServerContext;
 import de.xwic.etlgine.server.admin.BaseContentContainer;
 import de.xwic.etlgine.server.admin.ImageLibrary;
 import de.xwic.etlgine.server.admin.StackedContentContainer;
@@ -297,8 +298,9 @@ public class JobAdminControl extends BaseContentContainer {
             			jobName = jobName.substring(0, jobName.length() - ".groovy".length());
             		}
             		
+            		JobQueue jobQueueForJob = ETLgineServer.getInstance().getServerContext().getJobQueueForJob(jobName);
 					ETLgineServer.getInstance().getServerContext().removeJob(jobName);
-					ETLgineServer.getInstance().getServerContext().loadJob(jobName, job.getCreatorInfo());
+					ETLgineServer.getInstance().getServerContext().loadJob(jobName, job.getCreatorInfo(), null != jobQueueForJob ? jobQueueForJob.getName():ServerContext.DEFAULT_QUEUE);
 				} catch (ETLException e) {
 					errInfo.showError("The selected job can not be reloaded", e.getMessage());
 				}

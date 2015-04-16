@@ -3,17 +3,17 @@
  */
 package de.xwic.etlgine.server;
 
-import de.xwic.etlgine.demo.DemoDatabaseUtil;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
@@ -28,10 +28,22 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.cube.CubeHandler;
+import de.xwic.etlgine.demo.DemoDatabaseUtil;
 import de.xwic.etlgine.notify.NotificationService;
 import de.xwic.etlgine.publish.CubePublisherManager;
 
 /**
+ * The server supports parallel queue by adding in the server properties new keys prefixed by loadJobs.
+ *
+ * For instance to add two new queues named q1 and parallel:
+ * loadJobs_q1=jobscript1.groovy
+ * loadJobs_parallel=jobscript2.groovy
+ * 
+ * Limitations:
+ *  Each job can be assigned to one single queue by its name. To add same job to multiple queues use multiple job files and change the job name. 
+ *  The jobs running in different queues must use different shared connection names. Each queue must have its own unique shared connection name. 
+ * 
+ * 
  * @author Developer
  *
  */
@@ -164,7 +176,7 @@ public class ETLgineServer implements Runnable {
 	 * @return
 	 */
 	public boolean isJobEnqueued(IJob job) {
-		return serverContext.getDefaultJobQueue().isJobEnqueued(job);
+		return serverContext.getJobQueueForJob(job.getName()).isJobEnqueued(job);
 	}
 
 	/**
@@ -173,7 +185,7 @@ public class ETLgineServer implements Runnable {
 	 * @param job
 	 */
 	public void enqueueJob(IJob job) {
-		serverContext.getDefaultJobQueue().addJob(job);
+		serverContext.getJobQueueForJob(job.getName()).addJob(job);
 	}
 
 	/**
@@ -344,12 +356,37 @@ public class ETLgineServer implements Runnable {
 		}
 		serverContext.setProperty(ServerContext.PROPERTY_SCRIPTPATH,
 				jobPath.getAbsolutePath());
-
-		StringTokenizer stk = new StringTokenizer(serverContext.getProperty(
-				"loadJobs", ""), ",; ");
-		while (stk.hasMoreTokens()) {
-			String scriptName = stk.nextToken();
-			loadJob(scriptName);
+		
+		Set<String> queueNames  = new LinkedHashSet<String>();
+		queueNames.add(ServerContext.DEFAULT_QUEUE);
+		// build a list of queue names
+		for (String key : serverContext.getPropertyKeys()) {
+			if (key.startsWith("loadJobs_") && !"".equals(serverContext.getProperty(key,"").trim())) {
+				queueNames.add(key.substring(9));
+			}
+		}
+		StringTokenizer stk = null;
+		String queueProp = "loadJobs";
+		for(String qName: queueNames){
+			
+			if (!ServerContext.DEFAULT_QUEUE.equals(qName)){
+				queueProp = "loadJobs_"+qName;
+			}
+			
+			stk = new StringTokenizer(serverContext.getProperty(
+					queueProp, ""), ",; ");
+			if (stk.hasMoreTokens() && !ServerContext.DEFAULT_QUEUE.equals(qName)){
+				try {
+					serverContext.addJobQueue(qName, new JobQueue(serverContext, qName));
+				} catch (ETLException exc) {
+					log.error("Error initializing the etl server ", exc);
+					return false;
+				}
+			}
+			while (stk.hasMoreTokens()) {
+				String scriptName = stk.nextToken();
+				IJob job = loadJob(scriptName, qName);
+			}
 		}
 
 		// load DataPool(s)
@@ -516,17 +553,18 @@ public class ETLgineServer implements Runnable {
 	 * Loads a job from groovy script and returns it.
 	 * 
 	 * @param scriptName
+	 * @param queueName 
 	 * @return
 	 */
-	public IJob loadJob(String scriptName) {
+	public IJob loadJob(String scriptName, String queueName) {
 		String jobName = scriptName;
 		if (jobName.toLowerCase().endsWith(".groovy")) {
 			jobName = jobName.substring(0,
 					jobName.length() - ".groovy".length());
 		}
 		try {
-			log.info("Loading Job " + jobName + " from file " + scriptName);
-			return serverContext.loadJob(jobName, scriptName);
+			log.info("Loading Job " + jobName + " from file " + scriptName + " to queue "+queueName);
+			return serverContext.loadJob(jobName, scriptName, queueName);
 		} catch (Throwable e) {
 			log.error("An error occured during loading of the job "
 					+ scriptName, e);

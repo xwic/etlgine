@@ -76,6 +76,7 @@ public class JobAdminControl extends BaseContentContainer {
 		model.addColumn(new TableColumn("State", 150, "state"));
 		model.addColumn(new TableColumn("Finished", 130, "lastFinish"));
 		model.addColumn(new TableColumn("Next Run", 130, "nextRun"));
+		model.addColumn(new TableColumn("Queue", 130, "queue"));
 		
 		model.addElementSelectedListener(new ElementSelectedListener() {
 			private static final long serialVersionUID = 1L;

@@ -41,6 +41,11 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 	 * The connection key from properties file
 	 */
 	protected String connectionId;
+	
+	/**
+	 * The key used to store a shared connection in the context
+	 */
+	protected String sharedConnectionKey;
 	/**
 	 * The dml statement to execute
 	 */
@@ -98,7 +103,20 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 		this.sql = sql;
 		this.commitOnFinish = commitOnFinish;
 	}
-
+	
+	/**
+	 * 
+	 * @param connectionId
+	 * @param sharedConnectionKey
+	 * @param sqlStatements
+	 * @param commitOnFinish
+	 */
+	public ExecuteSqlFinalizer(String connectionId, String sharedConnectionKey, List<String> sqlStatements, boolean commitOnFinish) {
+		this.connectionId = connectionId;
+		this.sharedConnectionKey = sharedConnectionKey;
+		this.sqlStatements = sqlStatements;
+		this.commitOnFinish = commitOnFinish;
+	}
 	/**
 	 * 
 	 * @param connectionId
@@ -163,8 +181,11 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 		try {
 
 			if (null == con) {
+				if (null == sharedConnectionKey){
+					sharedConnectionKey = connectionId;
+				}
 				//use the shared connection in order to commit the entire transaction 
-				con = JDBCUtil.getSharedConnection(context, connectionId, connectionId);
+				con = JDBCUtil.getSharedConnection(context, sharedConnectionKey, connectionId);
 			}
 			//execute the statement only if the current process result is successful
 			if (context.getResult() == Result.SUCCESSFULL) {

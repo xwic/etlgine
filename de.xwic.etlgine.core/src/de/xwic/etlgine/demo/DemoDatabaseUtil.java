@@ -163,7 +163,8 @@ public class DemoDatabaseUtil {
                         "[CreatorInfo]  [varchar](128)  NULL," +
                         "[Hostname]     [varchar](128)  NULL," +
                         "[ETLgineName]  [varchar](128)  NULL," +
-                        "[ETLgineId]    [varchar](128)  NULL" +
+                        "[ETLgineId]    [varchar](128)  NULL," +
+                        "[ToDelete]    [bit]  NULL" +
                         ")";
         stmt.executeUpdate(sql);
         stmt.close();

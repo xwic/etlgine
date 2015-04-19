@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.print.attribute.standard.QueuedJobCount;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,7 +59,8 @@ public class ServerContext extends Context {
 	
 	private Map<String, IJob> jobs = new HashMap<String, IJob>();
 	private Map<String, JobQueue> queues = new HashMap<String, JobQueue>();
-
+	private Map<String, String> jobToQueueMapping = new HashMap<String, String>();
+	
 	private List<IServerContextListener> listeners = new ArrayList<IServerContextListener>();
 	
 	/**
@@ -109,6 +112,19 @@ public class ServerContext extends Context {
 	 * Load a Job from a script.
 	 * @param name
 	 * @param scriptFile
+	 * @param queueName
+	 */
+	public IJob loadJob(String name, String scriptFile, String queueName) throws ETLException {
+		
+		IJob loadedJob = loadJob(name, scriptFile);
+		jobToQueueMapping.put(loadedJob.getName(), queueName);
+		return loadedJob;
+	}
+	
+	/**
+	 * Load a Job from a script.
+	 * @param name
+	 * @param scriptFile
 	 */
 	public IJob loadJob(String name, String scriptFile) throws ETLException {
 		
@@ -146,7 +162,10 @@ public class ServerContext extends Context {
 			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
 		}
 
-		jobs.put(name, job);
+		jobs.put(job.getName(), job);
+		if (!jobToQueueMapping.containsKey(job.getName())){
+			jobToQueueMapping.put(job.getName(), ServerContext.DEFAULT_QUEUE);
+		}
 		return job;
 	}
 	
@@ -154,9 +173,9 @@ public class ServerContext extends Context {
 	 * Returns the default job queue.
 	 * @return
 	 */
-	public JobQueue getDefaultJobQueue() {
-		return queues.get(DEFAULT_QUEUE);
-	}
+	//public JobQueue getDefaultJobQueue() {
+	//	return queues.get(DEFAULT_QUEUE);
+	//}
 	
 	/**
 	 * Returns the queue with the specified name.
@@ -165,6 +184,15 @@ public class ServerContext extends Context {
 	 */
 	public JobQueue getJobQueue(String name) {
 		return queues.get(name);
+	}
+	
+	/**
+	 * Return the queue associated with the job
+	 * @param jobName
+	 * @return
+	 */
+	public JobQueue getJobQueueForJob(String jobName) {
+		return getJobQueue(jobToQueueMapping.get(jobName));
 	}
 	
 	/**
@@ -197,6 +225,7 @@ public class ServerContext extends Context {
 			throw new ETLException("A job with this name does not exists. (" + jobName + ")");
 		}
 		jobs.remove(jobName);
+		jobToQueueMapping.remove(jobName);
 	}
 	
 	/**
@@ -214,6 +243,13 @@ public class ServerContext extends Context {
 	 */
 	public Collection<IJob> getJobs() {
 		return jobs.values();
+	}
+	
+	public void addJobQueue(String queueName, JobQueue jobQueue) throws ETLException{
+		if (queues.containsKey(queueName)) {
+			throw new ETLException("A queue with this name already exists. (" + queueName + ")");
+		}
+		queues.put(queueName, jobQueue);
 	}
 
 	

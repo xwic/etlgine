@@ -261,6 +261,7 @@ public class JDBCExtractor extends AbstractExtractor {
 						dt = DataType.INT;
 					}
 					break;
+				case Types.TINYINT:
 				case Types.INTEGER:
 					dt = DataType.INT;
 					break;

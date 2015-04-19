@@ -14,6 +14,7 @@
 # Maven
 .logs/
 .target/
+.target-mvn/
 target/
 target-ide/
 .deploy/

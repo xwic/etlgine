@@ -86,6 +86,11 @@ public class DatabaseLoader extends AbstractLoader {
 
 	/** The name of the connection, used to take the connection configuration form the server.properties file. */
 	private String connectionId;
+	
+	/**
+	 * The key used to store in the process context a shared connection to be used by multiple finalizers if commitOnFinish flag is set to false
+	 */
+	private String sharedConnectionKey;
 
 	/** The database-dependent identity manager */
 	private IIdentityManager identityManager;
@@ -148,7 +153,10 @@ public class DatabaseLoader extends AbstractLoader {
 
 		// Share the connection (to be reused within the finalizers)
 		Connection connection = DataSourceUtils.getConnection(dataSource);
-		JDBCUtil.setSharedConnection(processContext, connectionId, connection);
+		if (null == sharedConnectionKey){
+			sharedConnectionKey = connectionId;
+		}
+		JDBCUtil.setSharedConnection(processContext, sharedConnectionKey, connection);
 
 		if (quoteChar == null) {
 			quoteChar = JDBCUtil.getIdentifierSeparator(connection);
@@ -342,6 +350,10 @@ public class DatabaseLoader extends AbstractLoader {
 
 	public void setConnectionId(final String connectionId) {
 		this.connectionId = connectionId;
+	}
+	
+	public void setSharedConnectionKey(final String sharedConnectionKey) {
+		this.sharedConnectionKey = sharedConnectionKey;
 	}
 
 	public boolean isCommitOnProcessFinished() {

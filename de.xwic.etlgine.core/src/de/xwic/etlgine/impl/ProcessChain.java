@@ -73,6 +73,17 @@ public class ProcessChain implements IProcessChain {
 		processList.add(process);
 	}
 	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#addCustomProcess(int, de.xwic.etlgine.IProcess)
+	 */
+	public void addCustomProcess(int index, IProcess process) {
+		process.setMonitor(monitor);
+		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_ADD_CUSTOM_PROCESS, process);
+		processList.add(index, process);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#addProcess(de.xwic.etlgine.IProcess)
 	 */
@@ -121,6 +132,45 @@ public class ProcessChain implements IProcessChain {
 		processList.add(process);
 		return process;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.etlgine.IProcessChain#createProcessFromScript(java.lang.String, java.lang.String, int)
+	 */
+	public IETLProcess createProcessFromScript(String name, String filename, int index) throws FileNotFoundException, ETLException {
+		
+		File jobPath = new File(globalContext.getProperty("scriptpath", "."));
+		if (!jobPath.exists()) {
+			throw new ETLException("The job path " + jobPath.getAbsolutePath() + " does not exist.");
+		}
+		
+		File file = new File(jobPath, filename);
+		if (!file.exists()) {
+			throw new FileNotFoundException(file.getAbsolutePath());
+		}
+		
+		ETLProcess process = new ETLProcess(globalContext, name);
+		process.setMonitor(monitor);
+		process.setScriptFilename(file.getAbsolutePath());
+		process.setCreatorInfo(filename);
+		
+		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_CREATE_PROCESS_FROM_SCRIPT, process);
+		
+		Binding binding = new Binding();
+		binding.setVariable("context", globalContext);
+		binding.setVariable("process", process);
+		binding.setVariable("processChain", this);
+
+		GroovyShell shell = new GroovyShell(binding);
+		try {
+			shell.evaluate(file);
+		} catch (Exception e) {
+			throw new ETLException("Error evaluating script '" + file.getName() + "':" + e, e);
+		}
+
+		processList.add(index, process);
+		return process;
+	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#getGlobalContext()
@@ -163,7 +213,12 @@ public class ProcessChain implements IProcessChain {
 
 		try {
 			result = Result.SUCCESSFULL;
-			for (IProcess process : processList) {
+			
+			/*for (IProcess process : processList)
+			  changed to this iteration form to support adding new processes dynamically 	
+			*/
+			for (int iCnt = 0; iCnt < processList.size(); iCnt++) {
+				IProcess process = processList.get(iCnt);
 				activeProcess = process;
 				Result pResult = process.start();
 				if (pResult == Result.FAILED || pResult == Result.FINISHED_WITH_ERRORS) {

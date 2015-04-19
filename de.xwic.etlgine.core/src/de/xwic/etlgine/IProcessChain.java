@@ -34,6 +34,16 @@ public interface IProcessChain {
 	public void addCustomProcess(IProcess process);
 	
 	/**
+	 * Add a custom process at the specified index. This is useful when adding processes dynamically.
+	 * It is important that the current running process to add a new process only after it in the list of processes.
+	 * Adding a new process before it will not work since the index passed that value.
+	 *  
+	 * @param index 
+	 * @param process
+	 */
+	public void addCustomProcess(int index, IProcess process);
+	
+	/**
 	 * Add a process. 
 	 * @param process
 	 */
@@ -69,6 +79,20 @@ public interface IProcessChain {
 	 * @throws ETLException 
 	 */
 	public IETLProcess createProcessFromScript(String name, String filename) throws FileNotFoundException, ETLException;
+	
+	/**
+	 * Create a new process from a script file and adds it at the specified index in the processes list. This is useful for creating
+	 * dynamically processes from inside an process. It is important the index to be greater than the curent process index in order 
+	 * to be executed.   
+	 * 
+	 * @param name
+	 * @param filename
+	 * @param index
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws ETLException
+	 */
+	public IETLProcess createProcessFromScript(String name, String filename, int index) throws FileNotFoundException, ETLException;
 
 	/**
 	 * Returns the currently active process or null.

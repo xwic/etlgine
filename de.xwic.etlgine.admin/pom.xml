@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>de.xwic.etlgine</groupId>
 		<artifactId>etlgine</artifactId>
-		<version>5.2.42-SNAPSHOT</version>
+		<version>5.2.47-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<name>ETLGINE::ADMIN</name>
@@ -100,7 +100,7 @@
 		<dependency>
 			<groupId>de.xwic.etlgine</groupId>
 			<artifactId>etlgine-core</artifactId>
-			<version>5.2.42-SNAPSHOT</version>
+			<version>5.2.47-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

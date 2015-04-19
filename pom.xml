@@ -11,7 +11,7 @@
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine</artifactId>
-	<version>5.2.42-SNAPSHOT</version>
+	<version>5.2.47-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>xWic - ETLGine</name>
@@ -91,9 +91,10 @@
 		<mvnDependencyVersionxWicCube>5.2.5</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
+		
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>		
 	</properties>
 
 	<build>
@@ -290,7 +291,7 @@
 						</packagingExcludes>
 					</configuration>
 				</plugin>
-
+				
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -336,13 +337,26 @@
 										let's ignore it or annoying error markers appear
 										see http://wiki.eclipse.org/M2E_plugin_execution_not_covered
 										-->
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-enforcer-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+									<ignore />
+									</action>
+								</pluginExecution>																
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>				
 										<versionRange>[1.0.0,)</versionRange>
 										<goals>
 											<goal>enforce</goal>
@@ -400,7 +414,7 @@
 				<configuration>
 					<destFile>${sonar.jacoco.reportPath}</destFile>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>		
 	</build>
 
@@ -687,18 +701,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-<distributionManagement>
-  <repository>
-   <id>common-releases</id>
-   <name>NetApp common</name>
-   <url>http://sesbuild.corp.netapp.com/nexus/content/repositories/common-releases/</url>
-  </repository>
-  <snapshotRepository>
-   <id>common-snapshot</id>
-   <name>NetApp common SNAPSHOT</name>
-   <url>http://sesbuild.corp.netapp.com/nexus/content/repositories/common-snapshot/</url>
-  </snapshotRepository>
- </distributionManagement>
-
 </project>

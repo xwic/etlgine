@@ -14,6 +14,7 @@ import de.jwic.controls.tableviewer.RowContext;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.ITrigger;
+import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.admin.ImageLibrary;
 import de.xwic.etlgine.trigger.ScheduledTrigger;
 import de.xwic.etlgine.trigger.TriggerList;
@@ -110,6 +111,8 @@ public class JobTableLabelProvider implements ITableLabelProvider {
 				}
 			}
 			
+		} else if ("queue".equals(column.getUserObject())) {
+			cell.text = ETLgineServer.getInstance().getServerContext().getJobQueueForJob(job.getName()).getName();
 		}
 		return cell;
 	}

@@ -87,8 +87,8 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />		
-		<mvnDependencyVersionxWicjWic>5.2.5</mvnDependencyVersionxWicjWic>
-		<mvnDependencyVersionxWicCube>5.2.5</mvnDependencyVersionxWicCube>
+		<mvnDependencyVersionxWicjWic>5.2.11</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
 		

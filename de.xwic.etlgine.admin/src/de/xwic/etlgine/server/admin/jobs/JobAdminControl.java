@@ -64,19 +64,19 @@ public class JobAdminControl extends BaseContentContainer {
 		loadJobsList();
 		
 		table.setTableLabelProvider(new JobTableLabelProvider());
-		table.setWidth(949);
-		table.setHeight(500);
+		table.setWidth(990);
+		table.setHeight(650);
 		table.setResizeableColumns(true);
-		table.setScrollable(true);
+		table.setScrollable(false);
 		table.setShowStatusBar(false);
 		
 		TableModel model = table.getModel();
 		model.setSelectionMode(TableModel.SELECTION_SINGLE);
 		model.addColumn(new TableColumn("Job Name", 450, "name"));
-		model.addColumn(new TableColumn("State", 150, "state"));
+		model.addColumn(new TableColumn("State", 130, "state"));
 		model.addColumn(new TableColumn("Finished", 130, "lastFinish"));
-		model.addColumn(new TableColumn("Next Run", 130, "nextRun"));
-		model.addColumn(new TableColumn("Queue", 130, "queue"));
+		model.addColumn(new TableColumn("Next Run", 110, "nextRun"));
+		model.addColumn(new TableColumn("Queue", 160, "queue"));
 		
 		model.addElementSelectedListener(new ElementSelectedListener() {
 			private static final long serialVersionUID = 1L;
@@ -84,6 +84,8 @@ public class JobAdminControl extends BaseContentContainer {
 				updateButtons();
 			}
 		});
+		
+		updateButtons();
 		
 	}
 
@@ -94,6 +96,9 @@ public class JobAdminControl extends BaseContentContainer {
 		boolean selected = table.getModel().getFirstSelectedKey() != null && table.getModel().getFirstSelectedKey().length() != 0;
 		btRun.setEnabled(selected);
 		btViewJob.setEnabled(selected);
+		btStopJob.setEnabled(selected);
+		btReloadJob.setEnabled(selected);
+		btRemoveJob.setEnabled(selected);
 	}
 
 	/**

@@ -65,7 +65,7 @@ public class JDBCUtil {
 	private static String getThreadQueueName() {
 		String queueName = Thread.currentThread().getName();
 		if (null != queueName && -1 != queueName.indexOf(JobQueue.QUEUE_THREAD_PREFIX)){
-			queueName = queueName.substring(queueName.indexOf(JobQueue.QUEUE_THREAD_PREFIX)+JobQueue.QUEUE_THREAD_PREFIX.length()+1);
+			queueName = queueName.substring(queueName.indexOf(JobQueue.QUEUE_THREAD_PREFIX)+JobQueue.QUEUE_THREAD_PREFIX.length());
 		}else{
 			queueName="";
 		}

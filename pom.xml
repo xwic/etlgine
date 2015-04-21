@@ -11,7 +11,7 @@
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine</artifactId>
-	<version>5.2.45-SNAPSHOT</version>
+	<version>5.2.48-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>xWic - ETLGine</name>
@@ -87,8 +87,8 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />		
-		<mvnDependencyVersionxWicjWic>5.2.5</mvnDependencyVersionxWicjWic>
-		<mvnDependencyVersionxWicCube>5.2.5</mvnDependencyVersionxWicCube>
+		<mvnDependencyVersionxWicjWic>5.2.11</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
 		
@@ -291,6 +291,72 @@
 						</packagingExcludes>
 					</configuration>
 				</plugin>
+				
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>
+											[2.8,)
+										</versionRange>
+										<goals>
+											<goal>
+												copy-dependencies
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jacoco</groupId>
+										<artifactId>jacoco-maven-plugin</artifactId>
+										<versionRange>[0.5,)
+										</versionRange>
+										<goals>
+											<goal>prepare-agent</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<!-- m2e doesn't know what to do with jacoco,
+										let's ignore it or annoying error markers appear
+										see http://wiki.eclipse.org/M2E_plugin_execution_not_covered
+										-->
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-enforcer-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+									<ignore />
+									</action>
+								</pluginExecution>								
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>				
 			</plugins>
 		</pluginManagement>
 		<plugins>

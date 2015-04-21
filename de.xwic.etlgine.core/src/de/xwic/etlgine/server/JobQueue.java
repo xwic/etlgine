@@ -17,7 +17,8 @@ import de.xwic.etlgine.server.ServerContext.EventType;
  * @author lippisch
  */
 public class JobQueue implements Runnable {
-
+	
+	public static final String QUEUE_THREAD_PREFIX = "jobQueue-";
 	private static final int SLEEP_TIME = 2 * 1000;
 	
 	private static final Log log = LogFactory.getLog(JobQueue.class);
@@ -39,8 +40,8 @@ public class JobQueue implements Runnable {
 		this.context = context;
 		this.name = name;
 		
-		threadGroup = new ThreadGroup("jobQueue-" + name);
-		myThread = new Thread(threadGroup, this, "jobQueue-" + name);
+		threadGroup = new ThreadGroup(QUEUE_THREAD_PREFIX + name);
+		myThread = new Thread(threadGroup, this, QUEUE_THREAD_PREFIX + name);
 		myThread.start();
 	}
 	

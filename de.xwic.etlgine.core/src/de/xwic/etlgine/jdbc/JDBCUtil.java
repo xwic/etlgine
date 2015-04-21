@@ -43,10 +43,14 @@ public class JDBCUtil {
 	public static Connection getSharedConnection(IContext context, String shareName, String connectName) throws ETLException, SQLException {
 		
 		String queueName = getThreadQueueName();
-		Connection con = (Connection) context.getData(SHARE_PREFIX + shareName + queueName);
+		String sharedKey = SHARE_PREFIX + shareName;
+		if (!sharedKey.contains(queueName)){
+			sharedKey += queueName;
+		}
+		Connection con = (Connection) context.getData(sharedKey);
 		if (con == null || con.isClosed()) {
 			if(log.isDebugEnabled()) {
-				log.debug("Shared connection with name: " + SHARE_PREFIX + shareName + queueName +
+				log.debug("Shared connection with name: " + sharedKey +
 						" was not found, or already closed. Opening a new connection...");
 			}
 			con = openConnection(context, connectName);

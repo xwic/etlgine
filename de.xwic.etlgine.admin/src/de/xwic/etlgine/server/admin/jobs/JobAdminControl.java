@@ -67,7 +67,7 @@ public class JobAdminControl extends BaseContentContainer {
 		table.setWidth(990);
 		table.setHeight(650);
 		table.setResizeableColumns(true);
-		table.setScrollable(false);
+		table.setScrollable(true);
 		table.setShowStatusBar(false);
 		
 		TableModel model = table.getModel();

@@ -208,8 +208,14 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 						}
 						context.getMonitor().logInfo(message);
 						stmt.close();
+						
+						if (context.isStopFlag()) {
+							break; 
+						}
 					}
 				}
+				
+				context.setResult(context.isStopFlag() ? Result.FAILED : Result.SUCCESSFULL);
 
 			}
 

@@ -318,6 +318,7 @@ public class ETLProcess extends Process implements IETLProcess {
 					if (null == processContext.getLastException()){
 						processContext.setLastException(t);
 					}
+					throw new ETLException("Error during ETL process finalizer: " + t, t);
 				}
 			}
 			

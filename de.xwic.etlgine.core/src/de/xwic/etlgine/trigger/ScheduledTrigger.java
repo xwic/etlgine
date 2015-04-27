@@ -16,6 +16,7 @@ public class ScheduledTrigger implements ITrigger {
 
 	public enum Type {
 		DAILY, // fixed time daily execution at a  
+		DAILY_EXCEPT_ONE_WEEK_DAY, //fixed time daily execution excluding one week day 1-7
 		INTERVAL, // starts the job again every x seconds after the last execution
 		WEEKLY,
 		MONTLY,
@@ -34,7 +35,7 @@ public class ScheduledTrigger implements ITrigger {
 	
 	private int intervalInSeconds;
 	private Integer intervalInSecondsAfterError;
-
+	
 	private Date nextStart = null;
 	private Date lastRun = null;
 	
@@ -144,6 +145,7 @@ public class ScheduledTrigger implements ITrigger {
 		switch (type) {
 		case MONTLY:
 		case WEEKLY:
+		case DAILY_EXCEPT_ONE_WEEK_DAY:
 		case DAILY: {
 			
 			Date last = lastRun != null ? lastRun : now;
@@ -186,7 +188,13 @@ public class ScheduledTrigger implements ITrigger {
 				case DAILY:
 					cal.add(Calendar.DAY_OF_MONTH, 1);
 					break;
-				}
+				case DAILY_EXCEPT_ONE_WEEK_DAY:
+					cal.add(Calendar.DAY_OF_MONTH, 1);
+					if (cal.get(Calendar.DAY_OF_WEEK) ==  dayOfWeek){
+						cal.add(Calendar.DAY_OF_MONTH, 1);
+					}
+				break;
+			}
 			}
 			nextStart = cal.getTime();
 			

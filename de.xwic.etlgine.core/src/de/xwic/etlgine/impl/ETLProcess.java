@@ -315,6 +315,9 @@ public class ETLProcess extends Process implements IETLProcess {
 					finalizer.onFinish(processContext);
 				} catch (Throwable t) {
 					monitor.logError("Error executing finalizer!", t);
+					if (null == processContext.getLastException()){
+						processContext.setLastException(t);
+					}
 				}
 			}
 			

@@ -11,7 +11,7 @@
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine</artifactId>
-	<version>5.2.53-SNAPSHOT</version>
+	<version>5.2.53</version>
 	<packaging>pom</packaging>
 
 	<name>xWic - ETLGine</name>
@@ -30,7 +30,7 @@
 		<connection>scm:git:https://github.com/xwic/etlgine.git</connection>
 		<developerConnection>scm:git:https://github.com/xwic/etlgine.git</developerConnection>
 		<url>https://github.com/xwic/etlgine</url>
-		<tag>etlgine-5.2.35</tag>
+		<tag>etlgine-5.2.53</tag>
 	</scm>
 	<developers>
 		<developer>

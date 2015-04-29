@@ -12,6 +12,7 @@ import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.IMonitor;
 import de.xwic.etlgine.IProcess;
+import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.Result;
@@ -32,6 +33,11 @@ public abstract class Process implements IProcess {
 	protected String creatorInfo = null;
 	
 	/**
+	 * The process chain to which this process belongs 
+	 */
+	protected IProcessChain processChain = null;
+	
+	/**
 	 * Construct a new process.
 	 * @param name
 	 */
@@ -47,6 +53,19 @@ public abstract class Process implements IProcess {
 	 */
 	public Process(IContext context, String name) {
 		this.name = name;
+		processContext = new ProcessContext(this, context);
+		processContext.setMonitor(monitor);
+	}
+	
+	/**
+	 * Construct a new process.
+	 * @param processChain
+	 * @param context
+	 * @param name
+	 */
+	public Process(IProcessChain processChain, IContext context, String name) {
+		this.name = name;
+		this.processChain = processChain;
 		processContext = new ProcessContext(this, context);
 		processContext.setMonitor(monitor);
 	}
@@ -117,6 +136,16 @@ public abstract class Process implements IProcess {
 	 */
 	public void setCreatorInfo(String creatorInfo) {
 		this.creatorInfo = creatorInfo;
+	}
+	
+	@Override
+	public IProcessChain getProcessChain() {
+		return processChain;
+	}
+	
+	@Override
+	public void setProcessChain(IProcessChain processChain){
+		this.processChain = processChain;
 	}
 
 }

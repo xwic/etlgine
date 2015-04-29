@@ -51,6 +51,7 @@ public class Job implements IJob {
 
 	private String serverInstanceId = null;
 	private String serverInstanceName = null;
+	protected String queueName = null; 
 	
 	/**
 	 * @param name
@@ -58,6 +59,17 @@ public class Job implements IJob {
 	public Job(String name) {
 		super();
 		this.name = name;
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param queueName
+	 */
+	public Job(String name, String queueName) {
+		super();
+		this.name = name;
+		this.queueName = queueName;
 	}
 
 	/* (non-Javadoc)
@@ -135,7 +147,7 @@ public class Job implements IJob {
 		}
 		
 		if (processChain == null) {
-			processChain = ETLgine.createProcessChain(context, chainScriptName);
+			processChain = ETLgine.createProcessChain(this, context, chainScriptName);
 		}
 		processChain.setMonitor(monitor);
 		
@@ -440,6 +452,11 @@ public class Job implements IJob {
 
 	public void setServerInstanceName(String serverInstanceName) {
 		this.serverInstanceName = serverInstanceName;
+	}
+
+	@Override
+	public String getQueueName() {
+		return queueName;
 	}
 	
 	

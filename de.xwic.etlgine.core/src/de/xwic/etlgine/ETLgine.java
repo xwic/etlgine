@@ -30,6 +30,10 @@ public class ETLgine {
 	public static IProcessChain createProcessChain(IContext parentContext, String name) {
 		return new ProcessChain(parentContext, name);
 	}
+	
+	public static IProcessChain createProcessChain(IJob job, IContext parentContext, String name) {
+		return new ProcessChain(job, parentContext, name);
+	}
 
 	/**
 	 * Perform a system integrity test. If the ETLgine is running from a network drive

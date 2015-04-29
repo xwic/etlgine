@@ -46,6 +46,10 @@ public class ProcessChain implements IProcessChain {
 	private String creatorInfo = null;
 	
 	/**
+	 * The job to which belongs this process chain
+	 */
+	protected IJob job = null;
+	/**
 	 * Constructor.
 	 * @param name
 	 */
@@ -63,12 +67,26 @@ public class ProcessChain implements IProcessChain {
 		this.name = name;
 		this.globalContext = new GlobalContext(parentContext);
 	}
+	
+	/**
+	 * 
+	 * @param job
+	 * @param parentContext
+	 * @param name
+	 */
+	public ProcessChain(IJob job, IContext parentContext, String name) {
+		this.job = job;
+		this.name = name;
+		this.globalContext = new GlobalContext(parentContext);
+	}
+
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessChain#addCustomProcess(de.xwic.etlgine.IProcess)
 	 */
 	public void addCustomProcess(IProcess process) {
 		process.setMonitor(monitor);
+		process.setProcessChain(this);
 		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_ADD_CUSTOM_PROCESS, process);
 		processList.add(process);
 	}
@@ -80,6 +98,7 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public void addCustomProcess(int index, IProcess process) {
 		process.setMonitor(monitor);
+		process.setProcessChain(this);
 		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_ADD_CUSTOM_PROCESS, process);
 		processList.add(index, process);
 	}
@@ -88,7 +107,7 @@ public class ProcessChain implements IProcessChain {
 	 * @see de.xwic.etlgine.IProcessChain#addProcess(de.xwic.etlgine.IProcess)
 	 */
 	public IETLProcess createProcess(String name) {
-		IETLProcess process = new ETLProcess(globalContext, name);
+		IETLProcess process = new ETLProcess(this, globalContext, name);
 		process.setMonitor(monitor);
 		monitor.onEvent(process.getContext(), EventType.PROCESSCHAIN_CREATE_PROCESS, process);
 		processList.add(process);
@@ -110,7 +129,7 @@ public class ProcessChain implements IProcessChain {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		
-		ETLProcess process = new ETLProcess(globalContext, name);
+		ETLProcess process = new ETLProcess(this, globalContext, name);
 		process.setMonitor(monitor);
 		process.setScriptFilename(file.getAbsolutePath());
 		process.setCreatorInfo(filename);
@@ -149,7 +168,7 @@ public class ProcessChain implements IProcessChain {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		
-		ETLProcess process = new ETLProcess(globalContext, name);
+		ETLProcess process = new ETLProcess(this, globalContext, name);
 		process.setMonitor(monitor);
 		process.setScriptFilename(file.getAbsolutePath());
 		process.setCreatorInfo(filename);
@@ -315,6 +334,11 @@ public class ProcessChain implements IProcessChain {
 	 */
 	public void setCreatorInfo(String creatorInfo) {
 		this.creatorInfo = creatorInfo;
+	}
+
+	@Override
+	public IJob getJob() {
+		return job;
 	}
 
 }

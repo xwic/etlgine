@@ -116,18 +116,6 @@ public class ServerContext extends Context {
 	 */
 	public IJob loadJob(String name, String scriptFile, String queueName) throws ETLException {
 		
-		IJob loadedJob = loadJob(name, scriptFile);
-		jobToQueueMapping.put(loadedJob.getName(), queueName);
-		return loadedJob;
-	}
-	
-	/**
-	 * Load a Job from a script.
-	 * @param name
-	 * @param scriptFile
-	 */
-	public IJob loadJob(String name, String scriptFile) throws ETLException {
-		
 		if (jobs.containsKey(name)) {
 			throw new ETLException("A job with the name already exist. (" + name + ")");
 		}
@@ -141,7 +129,12 @@ public class ServerContext extends Context {
 			throw new ETLException("The script file " + file.getAbsolutePath() + " does not exist.");
 		}
 		
-		Job job = new Job(name);
+		Job job = null;
+		if (queueName != null && !"".equals(queueName.trim())){ 
+			job = new Job(name, queueName);
+		}else{
+			job = new Job(name, ServerContext.DEFAULT_QUEUE);
+		}
 		job.setMonitor(createDefaultMonitor());
 		job.setCreatorInfo(scriptFile);
 		
@@ -164,7 +157,7 @@ public class ServerContext extends Context {
 
 		jobs.put(job.getName(), job);
 		if (!jobToQueueMapping.containsKey(job.getName())){
-			jobToQueueMapping.put(job.getName(), ServerContext.DEFAULT_QUEUE);
+			jobToQueueMapping.put(job.getName(), job.getQueueName());
 		}
 		return job;
 	}

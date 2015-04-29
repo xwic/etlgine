@@ -59,4 +59,16 @@ public interface IProcess {
 	 * @return
 	 */
 	public String getCreatorInfo();
+	
+	/**
+	 * Returns the process chain to which belongs this process
+	 * @return
+	 */
+	public IProcessChain getProcessChain();
+	
+	/**
+	 * Assign the process chain to this process
+	 * @param processChain
+	 */
+	public void setProcessChain(IProcessChain processChain);
 }

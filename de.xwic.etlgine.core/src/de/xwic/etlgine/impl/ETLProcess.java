@@ -21,6 +21,7 @@ import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.ILoader;
 import de.xwic.etlgine.IMonitor.EventType;
+import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
@@ -48,6 +49,15 @@ public class ETLProcess extends Process implements IETLProcess {
 		super(context, name);
 	}
 
+	/**
+	 * 
+	 * @param processChain
+	 * @param context
+	 * @param name
+	 */
+	public ETLProcess(IProcessChain processChain, IContext context, String name) {
+		super(processChain, context, name);
+	}
 	/**
 	 * @param name
 	 */
@@ -413,4 +423,5 @@ public class ETLProcess extends Process implements IETLProcess {
 			return null;
 		}
 	}
+	
 }

@@ -127,4 +127,10 @@ public interface IProcessChain {
 	 * @return
 	 */
 	public String getCreatorInfo();
+	
+	/**
+	 * Returns the current job that created the process chain
+	 * @return
+	 */
+	public IJob getJob();
 }

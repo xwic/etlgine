@@ -9,9 +9,12 @@
 package de.xwic.etlgine.finalizer;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -22,6 +25,7 @@ import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IProcessFinalizer;
 import de.xwic.etlgine.Result;
 import de.xwic.etlgine.jdbc.JDBCUtil;
+import de.xwic.etlgine.loader.jdbc.SqlDialect;
 
 /**
  * Process finalizer allows the execution of an insert, update or delete sql statement on a given shared connection. The finalizer can
@@ -71,6 +75,22 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 	 * rolled back
 	 */
 	protected List<String> sqlStatements;
+	
+	/**
+	 * Stores the list of processed statements
+	 */
+	protected List<String> processedSqlStatements = new ArrayList<String>();
+	
+	/**
+	 * Flag to indicate if the same date value shall be used for all statements that are getting the current date via getdate() or sysdate or else
+	 */
+	protected boolean useSameDateForAllStatements = false;
+	
+	protected SqlDialect sqlDialect = SqlDialect.MSSQL;
+		
+	protected Date dbServerDate = null;
+	
+	protected String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * 
@@ -196,9 +216,21 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 					sqlStatements.clear();
 					sqlStatements.add(sql);
 				}
+				
+				SimpleDateFormat sdf = null;
+				if (useSameDateForAllStatements){
+					dbServerDate = getDbServerDate(con);
+					sdf = new SimpleDateFormat(dateFormat);
+				}
+				
+				
 				if (null != sqlStatements) {
 					for (String sqlStatement : sqlStatements) {
 						stmt = con.createStatement();
+						if (useSameDateForAllStatements){
+							sqlStatement = sqlStatement.replaceAll("(?i)"+getSQLDateFunction(), getSQLCastTextAsDate(sdf));
+							
+						}
 						context.getMonitor().logInfo("Executing: " + sqlStatement);
 						int cnt = stmt.executeUpdate(sqlStatement);
 						String message = "Processed " + cnt + " records";
@@ -207,6 +239,7 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 							successMessage = message;
 						}
 						context.getMonitor().logInfo(message);
+						processedSqlStatements.add(sqlStatement);
 						stmt.close();
 						
 						if (context.isStopFlag()) {
@@ -352,6 +385,96 @@ public class ExecuteSqlFinalizer implements IProcessFinalizer {
 	 */
 	public void setSqlStatements(List<String> sqlStatements) {
 		this.sqlStatements = sqlStatements;
+	}
+
+	
+	/**
+	 * @return the useSameDateForAllStatements
+	 */
+	public boolean isUseSameDateForAllStatements() {
+		return useSameDateForAllStatements;
+	}
+
+	
+	/**
+	 * @param useSameDateForAllStatements the useSameDateForAllStatements to set
+	 */
+	public void setUseSameDateForAllStatements(boolean useSameDateForAllStatements) {
+		this.useSameDateForAllStatements = useSameDateForAllStatements;
+	}
+
+	
+	/**
+	 * @return the sqlDialect
+	 */
+	public SqlDialect getSqlDialect() {
+		return sqlDialect;
+	}
+
+	
+	/**
+	 * @param sqlDialect the sqlDialect to set
+	 */
+	public void setSqlDialect(SqlDialect sqlDialect) {
+		this.sqlDialect = sqlDialect;
+	}
+	
+	public Date getDbServerDate(Connection con) throws SQLException{
+		
+		if (null == dbServerDate){
+			Statement stmt = con.createStatement();
+			String dateSQL="getdate()";
+			
+			if (sqlDialect == SqlDialect.MSSQL){
+				dateSQL = "select "+dateSQL;
+			}else if (sqlDialect == SqlDialect.ORACLE){
+				dateSQL = "select systimestamp from dual";
+			}
+			try{
+			ResultSet rs = stmt.executeQuery(dateSQL);
+			if (rs.next()){
+				dbServerDate = rs.getDate(1);
+			}
+			}finally{
+				if (null != stmt){
+					stmt.close();
+				}
+			}
+			
+		}
+		
+		return dbServerDate;
+	}
+	
+	protected String getSQLDateFunction(){
+		if (sqlDialect == SqlDialect.MSSQL){
+			return "getdate\\(\\)";
+		}else if (sqlDialect == SqlDialect.ORACLE){
+			return "systimestamp";
+		}
+		return "";
+	}
+	
+	protected String getSQLCastTextAsDate(SimpleDateFormat sdf){
+		
+		if (sqlDialect == SqlDialect.MSSQL){
+			return "cast('"+sdf.format(dbServerDate)+"' as datetime)";
+		}else if (sqlDialect == SqlDialect.ORACLE){
+			return "to_timestamp('"+sdf.format(dbServerDate)+"','YYYY-MM-DD HH24:MI:SS')";
+		}
+		return "";
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+	
+	public List<String> getProcessedSqlStatements(){
+		return processedSqlStatements;
 	}
 
 }

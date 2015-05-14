@@ -165,4 +165,10 @@ public interface IJob {
 	 * @return
 	 */
 	public String getCreatorInfo();
+	
+	/**
+	 * Returns the queue name in which the job will run if scheduled or started 
+	 * @return
+	 */
+	public String getQueueName();
 }

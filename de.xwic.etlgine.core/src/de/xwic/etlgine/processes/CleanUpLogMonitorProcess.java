@@ -1,16 +1,15 @@
 package de.xwic.etlgine.processes;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
+import de.xwic.etlgine.IProcessChain;
 import de.xwic.etlgine.Result;
 import de.xwic.etlgine.extractor.jdbc.JDBCExtractor;
 import de.xwic.etlgine.extractor.jdbc.JDBCSource;
 import de.xwic.etlgine.finalizer.ExecuteSqlFinalizer;
 import de.xwic.etlgine.impl.ETLProcess;
-import de.xwic.etlgine.server.ServerContext;
 
 public class CleanUpLogMonitorProcess extends ETLProcess {
 
@@ -24,9 +23,9 @@ public class CleanUpLogMonitorProcess extends ETLProcess {
 	private final int noOfDaysFailed;
 	private final boolean lOnlyFlagForDelete;
 
-	public CleanUpLogMonitorProcess(IContext context, String name, String connectionId, String etlGineId, int noOfDaysSuccess,
+	public CleanUpLogMonitorProcess(IProcessChain processChain, IContext context, String name, String connectionId, String etlGineId, int noOfDaysSuccess,
 			int noOfDaysFailed, boolean lOnlyFlagForDelete) {
-		super(context, name);
+		super(processChain, context, name);
 		this.connectionId = connectionId;
 		this.etlGineId = etlGineId;
 		this.noOfDaysSuccess = noOfDaysSuccess;
@@ -34,8 +33,8 @@ public class CleanUpLogMonitorProcess extends ETLProcess {
 		this.lOnlyFlagForDelete = lOnlyFlagForDelete;
 	}
 
-	public CleanUpLogMonitorProcess(IContext context, String name, String connectionId) {
-		this(context, name, connectionId, "", DEFAULT_KEEP_DAYS_SUCCESS, DEFAULT_KEEP_DAYS_FAILED, DEFAULT_ONLY_FLAG_FOR_DELETE);
+	public CleanUpLogMonitorProcess(IProcessChain processChain, IContext context, String name, String connectionId) {
+		this(processChain, context, name, connectionId, "", DEFAULT_KEEP_DAYS_SUCCESS, DEFAULT_KEEP_DAYS_FAILED, DEFAULT_ONLY_FLAG_FOR_DELETE);
 	}
 
 	@Override

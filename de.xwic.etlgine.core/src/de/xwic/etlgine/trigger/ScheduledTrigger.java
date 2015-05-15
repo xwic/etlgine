@@ -40,6 +40,11 @@ public class ScheduledTrigger implements ITrigger {
 	private Date lastRun = null;
 	
 	/**
+	 * Flag to indicate if the next interval shall be computed from the job start if true or job end if false
+	 */
+	private boolean intervalFromJobStart = false;
+	
+	/**
 	 * Constructor.
 	 */
 	public ScheduledTrigger() {
@@ -202,6 +207,14 @@ public class ScheduledTrigger implements ITrigger {
 		case INTERVAL : {
 			
 			Calendar cal = Calendar.getInstance();
+			//if this is the first run after server restart or so 
+			if (lastRun == null){
+				//if the hour and minute was set to non default values
+				if (!(0 == hourOfDay && 0 == minuteOfDay)){
+					cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+					cal.set(Calendar.MINUTE, minuteOfDay);
+				}
+			}
 			if (withErrors && intervalInSecondsAfterError != null) {
 				cal.add(Calendar.SECOND, intervalInSecondsAfterError);
 			} else {
@@ -220,7 +233,10 @@ public class ScheduledTrigger implements ITrigger {
 	 * @see de.xwic.etlgine.ITrigger#notifyJobFinished(boolean)
 	 */
 	public void notifyJobFinished(boolean withErrors) {
-		
+		//if there is a interval trigger and the interval shall be computed from the job start we don't have to recalculate the interval after job finished
+		if (type == Type.INTERVAL && intervalFromJobStart) {
+			return;
+		}
 		calculateNextStart(withErrors);
 		
 	}
@@ -397,6 +413,22 @@ public class ScheduledTrigger implements ITrigger {
 	 */
 	public void setDayOfWeek(int dayOfWeek) {
 		this.dayOfWeek = dayOfWeek;
+	}
+
+	
+	/**
+	 * @return the intervalFromJobStart
+	 */
+	public boolean isIntervalFromJobStart() {
+		return intervalFromJobStart;
+	}
+
+	
+	/**
+	 * @param intervalFromJobStart the intervalFromJobStart to set
+	 */
+	public void setIntervalFromJobStart(boolean intervalFromJobStart) {
+		this.intervalFromJobStart = intervalFromJobStart;
 	}
 
 }

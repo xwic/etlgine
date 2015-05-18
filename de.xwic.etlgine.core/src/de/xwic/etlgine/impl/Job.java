@@ -123,7 +123,7 @@ public class Job implements IJob {
 					trigger.notifyJobFinished(state == State.ERROR);
 				}
 			} finally {
-                stopTriggerAfterError = true;
+				//stopTriggerAfterError = true;
 				executing = false;
 				processChain = null;
 				monitor.onEvent(context, EventType.JOB_EXECUTION_END, this);

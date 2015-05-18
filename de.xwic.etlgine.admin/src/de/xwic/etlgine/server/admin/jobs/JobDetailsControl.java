@@ -72,7 +72,7 @@ public class JobDetailsControl extends BaseContentContainer {
 			}
 		});
 
-        btReactivateJobTrigger = group.addButton();
+       /* btReactivateJobTrigger = group.addButton();
         btReactivateJobTrigger.setIconEnabled(ImageLibrary.IMAGE_SCRIPT_RED);
         btReactivateJobTrigger.setTitle("Activate Trigger for Failed Job");
         btReactivateJobTrigger.addSelectionListener(new SelectionListener() {
@@ -80,7 +80,7 @@ public class JobDetailsControl extends BaseContentContainer {
             public void objectSelected(SelectionEvent event) {
                 onActivateJobTrigger();
             }
-        });
+        });*/
 
 		
 	}

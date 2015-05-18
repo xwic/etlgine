@@ -298,20 +298,25 @@ public class JobAdminControl extends BaseContentContainer {
             if (job.isExecuting()) {
                 errInfo.showError("The selected job is currently executing.");
             } else {
+            	boolean errorFlag=false;
             	try {
-            		String jobName = job.getCreatorInfo();
+            		
+            		String jobName = (job.getName() != null ?  job.getName():job.getCreatorInfo());
             		if (jobName.toLowerCase().endsWith(".groovy")) {
             			jobName = jobName.substring(0, jobName.length() - ".groovy".length());
             		}
             		
             		JobQueue jobQueueForJob = ETLgineServer.getInstance().getServerContext().getJobQueueForJob(jobName);
 					ETLgineServer.getInstance().getServerContext().removeJob(jobName);
-					ETLgineServer.getInstance().getServerContext().loadJob(jobName, job.getCreatorInfo(), null != jobQueueForJob ? jobQueueForJob.getName():ServerContext.DEFAULT_QUEUE);
+					 IJob loaded =ETLgineServer.getInstance().getServerContext().loadJob(jobName, job.getCreatorInfo(), null != jobQueueForJob ? jobQueueForJob.getName():ServerContext.DEFAULT_QUEUE);
 				} catch (ETLException e) {
-					errInfo.showError("The selected job can not be reloaded", e.getMessage());
+					errInfo.showError("The selected job can not be reloaded "+ e.getMessage());
+					errorFlag = true;
 				}
             	loadJobsList();
-                errInfo.showWarning("The job has been reloaded");
+                if (!errorFlag){
+                	errInfo.showWarning("The job has been reloaded");
+                }
                 table.setRequireRedraw(true);
             }
         }

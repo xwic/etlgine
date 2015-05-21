@@ -119,6 +119,9 @@ public class JDBCExtractor extends AbstractExtractor {
 					case LONG:
 						value = rs.getLong(i);
 						break;
+					case BIGDECIMAL:
+						value = rs.getBigDecimal(i);
+						break;
 					case DATE:
 					case DATETIME:
 						if (currSource.isUseJavaDate()) {
@@ -242,6 +245,7 @@ public class JDBCExtractor extends AbstractExtractor {
 				int lengthHint = metaData.getPrecision(i);
 				int scale = metaData.getScale(i);
 				int type = metaData.getColumnType(i);
+				boolean signed = metaData.isSigned(i);
 				switch (type) {
 				case Types.CHAR:
 				case Types.VARCHAR:
@@ -266,7 +270,11 @@ public class JDBCExtractor extends AbstractExtractor {
 					dt = DataType.INT;
 					break;
 				case Types.BIGINT:
-					dt = DataType.LONG;
+					if (signed){
+						dt = DataType.LONG;
+					}else{
+						dt = DataType.BIGDECIMAL;
+					}
 					break;
 				case Types.FLOAT:
 				case Types.DOUBLE:

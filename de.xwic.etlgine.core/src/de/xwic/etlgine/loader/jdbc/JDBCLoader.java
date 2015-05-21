@@ -1334,6 +1334,10 @@ public class JDBCLoader extends AbstractLoader {
 			typeName = BIGINT;
 			dbcd.setType(Types.BIGINT);
 			break;
+		case BIGDECIMAL:
+			typeName = BIGINT;
+			dbcd.setType(Types.BIGINT);
+			break;	
 		case BOOLEAN:
 			typeName = BIT;
 			dbcd.setType(Types.BIT);
@@ -1703,6 +1707,8 @@ public class JDBCLoader extends AbstractLoader {
 					}
 				} else if (value instanceof Double) {
 					ps.setDouble(idx, (Double)value);
+				} else if (value instanceof BigDecimal) {
+					ps.setBigDecimal(idx, (BigDecimal)value);
 				} else {
 					// unknown value
 					ps.setObject(idx, value);

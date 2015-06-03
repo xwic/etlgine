@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -21,13 +22,22 @@ public class EmailAttachment implements IAttachment {
 
 	@Override
 	public byte[] getData() {
-
+		InputStream fis = null;
 		try {
-			return IOUtils.toByteArray(new FileInputStream(file.getPath()));
+			fis=new FileInputStream(file.getPath());
+			return IOUtils.toByteArray(fis);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}finally{
+			if (null != fis){
+				try {
+					fis.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return null;
 	}

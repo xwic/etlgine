@@ -98,7 +98,7 @@ public class XLSExtractor extends AbstractExtractor {
 				IRecord record = context.newRecord();
 				Row row;
 				// read until we find a row that contains data.
-				while ((row = currSheet.getRow(currRow)) == null && !reachedEnd ) {
+				while (((row = currSheet.getRow(currRow)) == null) && !reachedEnd ) {
 					currRow++;
 					if (currRow > maxRow) {
 						sheetIdx++;

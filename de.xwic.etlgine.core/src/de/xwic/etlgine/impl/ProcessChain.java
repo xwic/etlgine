@@ -245,6 +245,12 @@ public class ProcessChain implements IProcessChain {
 					monitor.logError("Exiting ProcessChain execution because process " + process.getName() + " finished with result: " + result);
 					break;
 				}
+				
+				if (globalContext.isStopFlag()){
+					monitor.logWarn("Exiting ProcessChain execution because it was stopped by the user ");
+					result = result.FINISHED_WITH_ERRORS;
+					break;
+				}
 			}
 		} catch (ETLException ee) {
 			if (ee.getProcess() == null) {

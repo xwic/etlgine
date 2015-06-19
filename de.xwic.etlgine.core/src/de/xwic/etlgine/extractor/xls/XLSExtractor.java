@@ -98,7 +98,7 @@ public class XLSExtractor extends AbstractExtractor {
 				IRecord record = context.newRecord();
 				Row row;
 				// read until we find a row that contains data.
-				while ((row = currSheet.getRow(currRow)) == null) {
+				while ((row = currSheet.getRow(currRow)) == null && !reachedEnd ) {
 					currRow++;
 					if (currRow > maxRow) {
 						sheetIdx++;
@@ -108,6 +108,10 @@ public class XLSExtractor extends AbstractExtractor {
 							initSheet(sheetIdx);
 						}
 					}
+				}
+				
+				if (reachedEnd){
+					return null;
 				}
 				
 				record.setData(COL_SHEETNAME, sheetNames.get(sheetIdx));

@@ -4,19 +4,37 @@
 package de.xwic.etlgine.notify;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import de.jwic.renderer.util.JWicTools;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.IProcess;
+import de.xwic.etlgine.jdbc.JDBCUtil;
+import de.xwic.etlgine.mail.EmptyMail;
+import de.xwic.etlgine.mail.IAttachment;
 import de.xwic.etlgine.mail.IMailManager;
 import de.xwic.etlgine.mail.MailFactory;
+import de.xwic.etlgine.mail.impl.EmailAttachment;
 import de.xwic.etlgine.server.IServerContextListener;
+import de.xwic.etlgine.server.JobQueue;
 import de.xwic.etlgine.server.ServerContext;
 import de.xwic.etlgine.server.ServerContextEvent;
 
@@ -27,7 +45,9 @@ import de.xwic.etlgine.server.ServerContextEvent;
  * @author lippisch
  */
 public class NotificationService implements IServerContextListener {
-
+	
+	private static final Log log = LogFactory.getLog(NotificationService.class);
+	
 	public enum Level {
 		ALL,
 		WARN,
@@ -180,7 +200,100 @@ public class NotificationService implements IServerContextListener {
 		}		
 		content += "</body></html>";
 		
-		mailManager.sendEmail(content, subject, mailTo.split(";"), new String[0], mailFrom);		
+		String connectionId = serverContext.getProperty("monitor.connection","");
+		
+		//if the config for sending the job execution log is activated and we have a valid monitor connection defined 
+		if (serverContext.getPropertyBoolean("notifications.attachexecutionlog.enabled", false) && !"".equals(connectionId)){
+			
+			//create a temporary file to fill it with the execution log
+			String tempDir = System.getProperty("java.io.tmpdir");
+			String fileName = "ExecutionLog"+System.currentTimeMillis()+".log";
+			File logFile = new File(tempDir, fileName);
+			try{
+				
+				extractExecutionLogInFile(job,connectionId, logFile);
+				
+				//prepare the email
+				EmptyMail email = new EmptyMail();
+				email.setContent(content);
+				email.setSenderAddress(mailFrom);
+				email.setSubject(subject);
+				email.setToAddresses(Arrays.asList(mailTo.split(";")));
+				
+				List<IAttachment> attachments = new ArrayList<IAttachment>();
+				EmailAttachment att = new EmailAttachment(logFile);
+				attachments.add(att);
+				email.setAttachments(attachments);
+			
+				//sending the email
+				mailManager.sendEmail(email);
+			} catch (Exception e) {
+				log.error(e);
+			}
+		}else{
+			mailManager.sendEmail(content, subject, mailTo.split(";"), new String[0], mailFrom);
+		}
+	}
+	
+	private void extractExecutionLogInFile(IJob job, String connectionId, File tempLogFile) throws Exception{
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM:hh:mm:ss.SSS ", Locale.ENGLISH);
+
+		Connection conn = null;
+		PreparedStatement prepareStatement = null;
+		FileOutputStream fos = null;
+		try{
+			//open the connection to jdbc monitor to get the execution log from db
+			conn = JDBCUtil.openConnection(serverContext, connectionId);
+			String sql = "select created,level,message from "+ serverContext.getProperty("monitor.table")+ " where job='" + job.getName()
+					+ "' and ETLgineId='" + serverContext.getProperty(ServerContext.PROPERTY_SERVER_INSTANCEID) + "'"
+					+ " and created >= ? and created <= ? order by created asc";
+			Timestamp start = null;
+			Timestamp finished = null;
+			
+			prepareStatement = conn.prepareStatement(sql);
+			if (job.getLastStarted() != null) {
+				start = new Timestamp(job.getLastStarted().getTime());
+			}
+			if (job.getLastFinished() != null) {
+				finished = new Timestamp(job.getLastFinished().getTime());
+			}
+			prepareStatement.setTimestamp(1, start);
+			prepareStatement.setTimestamp(2, finished);
+			
+			ResultSet rs = prepareStatement.executeQuery();
+			
+			fos = new FileOutputStream(tempLogFile);
+			StringBuilder sb = new StringBuilder();
+			
+			//write each record in the temp file
+			while (rs.next()){
+				sb.setLength(0);
+				Timestamp timestamp = rs.getTimestamp("created");
+				String level =rs.getString("level");
+				String msg = rs.getString("message");
+				//prepare the line content as date + logging level + message
+				sb.append(sdf.format(timestamp)).append("   ")
+				  .append(" [").append(level).append("] ").append(msg)
+				  .append("\n");
+				fos.write(sb.toString().getBytes());
+			}
+			
+		}finally{
+			try {
+				//cleanup
+				if (null != prepareStatement){
+					prepareStatement.close();
+				}
+				if (null != conn){
+					conn.close();
+				}
+				if (null != fos){
+					fos.close();
+				}
+			} catch (Exception e) {
+				log.error(e);
+			}
+		}
 	}
 	
 }

@@ -148,8 +148,8 @@ public class CopyAndMoveFinalizerTest {
 		String source = "s:/x";
 		testProc.addSource(new FileSource(source));
 		
-		String destToCopy = "FolderToCopy\\";
-		String destToMove = "FolderToMove\\";
+		String destToCopy = "FolderToCopy"+File.separator;
+		String destToMove = "FolderToMove"+File.separator;
 		
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(destToCopy,destToMove,true);
 		
@@ -188,15 +188,15 @@ public class CopyAndMoveFinalizerTest {
 		
 		String sourcePath = source.getAbsolutePath();
 		String sourceName = source.getName();
-		String destToCopy = sourcePath + "FolderToCopy\\";
-		String destToMove = sourcePath + "FolderToMove\\";
+		String destToCopy = sourcePath + "FolderToCopy"+File.separator;
+		String destToMove = sourcePath + "FolderToMove"+File.separator;
 		long length = source.length();
 		
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(destToCopy, destToMove, true);
 		transf.onFinish(processContext);
 		assertTrue("The file is not copied in the destination path",new File(destToCopy + sourceName).exists());
 		assertEquals("The source file and the copied file are not the same size;",length,new File(destToCopy + sourceName).length());
-		assertTrue("The file is not moved in the destination path",new File(destToMove + sourceName).exists());
+		assertTrue("The file is not moved in the destination path "+destToMove + sourceName,new File(destToMove + sourceName).exists());
 		assertFalse("The file is not moved from the source path",new File(sourcePath + sourceName).exists());
 		
 		destinationToCopy = destToCopy + sourceName;
@@ -212,7 +212,7 @@ public class CopyAndMoveFinalizerTest {
 		
 		String sourcePath = source.getAbsolutePath();
 		String sourceName = source.getName();
-		String destToCopy = sourcePath + "FolderToCopy\\";
+		String destToCopy = sourcePath + "FolderToCopy"+File.separator;
 		long length = source.length();
 		
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(destToCopy,"", true);
@@ -232,8 +232,8 @@ public class CopyAndMoveFinalizerTest {
 		
 		String sourcePath = source.getAbsolutePath();
 		String sourceName = source.getName();
-		String destToCopy = sourcePath + "FolderToCopy\\";
-		String destToMove = sourcePath + "FolderToMove\\";
+		String destToCopy = sourcePath + "FolderToCopy"+File.separator;
+		String destToMove = sourcePath + "FolderToMove"+File.separator;
 		long length = source.length();
 		
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(destToCopy,destToMove, true);
@@ -241,7 +241,7 @@ public class CopyAndMoveFinalizerTest {
 		transf.onFinish(processContext);
 		assertTrue("The file is not copied in the destination path",new File(destToCopy + sourceName).exists());
 		assertEquals("The source file and the copied file are not the same size;",length,new File(destToCopy + sourceName).length());
-		assertTrue("The file is not moved in the destination path",new File(destToMove + sourceName).exists());
+		assertTrue("The file is not moved in the destination path "+destToMove + sourceName,new File(destToMove + sourceName).exists());
 		assertFalse("The file is not moved from the source path",new File(sourcePath + sourceName).exists());
 		
 		destinationToCopy = destToCopy + sourceName;
@@ -257,8 +257,8 @@ public class CopyAndMoveFinalizerTest {
 		
 		String sourcePath = source.getAbsolutePath();
 		String sourceName = source.getName();
-		String destToCopy = sourcePath + "FolderToCopy\\";
-		String destToMove = sourcePath + "FolderToMove\\";
+		String destToCopy = sourcePath + "FolderToCopy"+File.separator;
+		String destToMove = sourcePath + "FolderToMove"+File.separator;
 		long length = source.length();
 		
 		Mockito.when(processContext.getResult()).thenReturn(Result.FAILED);
@@ -307,8 +307,8 @@ public class CopyAndMoveFinalizerTest {
 		String serverKey = "tpm_copy2_files";
 		
 		Mockito.when(processContext.getProperty(serverKey + ".source.path")).thenReturn(source.getAbsolutePath());
-		Mockito.when(processContext.getProperty(serverKey + ".dest.path1")).thenReturn(source.getAbsolutePath() + "FolderToCopy\\");
-		Mockito.when(processContext.getProperty(serverKey + ".dest.path2")).thenReturn(source.getAbsolutePath() + "FolderToMove\\");
+		Mockito.when(processContext.getProperty(serverKey + ".dest.path1")).thenReturn(source.getAbsolutePath() + "FolderToCopy"+File.separator);
+		Mockito.when(processContext.getProperty(serverKey + ".dest.path2")).thenReturn(source.getAbsolutePath() + "FolderToMove"+File.separator);
 		
 		String sourcePath = processContext.getProperty(serverKey + ".source.path");
 		String destToCopy = processContext.getProperty(serverKey + ".dest.path1");
@@ -320,7 +320,7 @@ public class CopyAndMoveFinalizerTest {
 		transf.onFinish(processContext);
 		assertTrue("The file is not copied in the destination path",new File(destToCopy + sourceName).exists());
 		assertEquals("The source file and the copied file are not the same size;",length,new File(destToCopy + sourceName).length());
-		assertTrue("The file is not moved in the destination path",new File(destToMove + sourceName).exists());
+		assertTrue("The file is not moved in the destination path "+destToMove + sourceName,new File(destToMove + sourceName).exists());
 		assertFalse("The file is not moved from the source path",new File(sourcePath + sourceName).exists());
 		
 		destinationToCopy = destToCopy + sourceName;
@@ -344,15 +344,15 @@ public class CopyAndMoveFinalizerTest {
 		File source = File.createTempFile("test",".tmp");
 		String sourcePath = source.getAbsolutePath();
 		String sourceName = source.getName();
-		String destToCopy = sourcePath + "FolderToCopy\\";
-		String destToMove = sourcePath + "FolderToMove\\";
+		String destToCopy = sourcePath + "FolderToCopy"+File.separator;
+		String destToMove = sourcePath + "FolderToMove"+File.separator;
 		long length = source.length();
 		
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(sourcePath,destToCopy, destToMove, true);
 		transf.onFinish(processContext);
 		assertTrue("The file is not copied in the destination path",new File(destToCopy + sourceName).exists());
 		assertEquals("The source file and the copied file are not the same size;",length,new File(destToCopy + sourceName).length());
-		assertTrue("The file is not moved in the destination path",new File(destToMove + sourceName).exists());
+		assertTrue("The file is not moved in the destination path "+destToMove + sourceName,new File(destToMove + sourceName).exists());
 		assertFalse("The file is not moved from the source path",new File(sourcePath + sourceName).exists());
 		
 		destinationToCopy = destToCopy + sourceName;
@@ -367,8 +367,8 @@ public class CopyAndMoveFinalizerTest {
 		File source = File.createTempFile("test",".tmp");
 		String sourcePath = source.getAbsolutePath();
 		String sourceName = source.getName();
-		String destToCopy = sourcePath + "FolderToCopy\\";
-		String destToMove = sourcePath + "FolderToMove\\";
+		String destToCopy = sourcePath + "FolderToCopy"+File.separator;
+		String destToMove = sourcePath + "FolderToMove"+File.separator;
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(sourcePath,destToCopy, destToMove, false);
 		transf.onFinish(processContext);
 		

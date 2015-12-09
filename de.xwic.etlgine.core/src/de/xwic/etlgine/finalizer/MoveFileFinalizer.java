@@ -101,7 +101,7 @@ public class MoveFileFinalizer implements IProcessFinalizer, IJobFinalizer {
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.IProcessFinalizer#onFinish(de.xwic.etlgine.IProcessContext)
 	 */
-	public void onFinish(IProcessContext context) {
+	public void onFinish(IProcessContext context) throws ETLException{
 		
 		setMonitor(context.getMonitor());
 		if (!targetPath.exists()) {

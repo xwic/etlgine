@@ -163,12 +163,12 @@ public class CopyAndMoveFinalizerTest {
 	}
 	
 	@Test
-	public void invalidEmptyDestToMove1() throws IOException, ETLException {
+	public void invalidEmptyStringDestToCopy() throws IOException, ETLException {
 		
 		IETLProcess testProc = createProcess();
 		File source = File.createTempFile("test", ".tmp");
 		String sourcePath = source.getAbsolutePath();
-		String destToCopy = "V:\\abbsdd:xa\\";
+		String destToCopy = "V:\\abbsdd:xa?>*\\"+"\0";
 		
 		CopyAndMoveFinalizer transf = new CopyAndMoveFinalizer(sourcePath,destToCopy,"",true); 
 		try {

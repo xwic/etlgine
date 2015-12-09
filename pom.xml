@@ -77,6 +77,10 @@
 			<id>WebEnd</id>
 			<name>Eugen Fleseriu</name>
 		</developer>
+		<developer>
+			<id>ionut</id>
+			<name>Ionut Bucurescu</name>
+		</developer>
 	</developers>
 
 	<properties>

@@ -259,6 +259,8 @@ public class JDBCExtractor extends AbstractExtractor {
 					if (scale > 0 || (scale == -127 && connection.getMetaData().getURL().contains("oracle"))) {
 					//if (scale > 0) {
 						dt = DataType.DOUBLE;
+					} else if (lengthHint >= 20) {
+						dt = DataType.BIGDECIMAL;
 					} else if (lengthHint > 10) {
 						dt = DataType.LONG;
 					} else {

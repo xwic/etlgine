@@ -64,24 +64,26 @@ public class OnOffControl extends ControlContainer {
             }
         });
 
-        for (final CubePublishDestination cubePublishDestination : getPublishDestinations()) {
-    		new Label(table).setText(cubePublishDestination.getFullKey()+":");
-            Button btPublishEnable = new Button(table, "btPublishEnable_"+cubePublishDestination.getFullKey());
-            btPublishEnable.setTitle("On");
-            btPublishEnable.addSelectionListener(new SelectionListener() {
-                public void objectSelected(SelectionEvent event) {
-                	setPublishStatus(cubePublishDestination.getFullKey(), true);
-                }
-            });
-        		
-            Button btPublishDisable = new Button(table, "btPublishDisable_"+cubePublishDestination.getFullKey());
-            btPublishDisable.setTitle("Off");
-            btPublishDisable.addSelectionListener(new SelectionListener() {
-                public void objectSelected(SelectionEvent event) {
-                	setPublishStatus(cubePublishDestination.getFullKey(), false);
-                }
-            });
-		}
+        if (null != getPublishDestinations()) {
+            for (final CubePublishDestination cubePublishDestination : getPublishDestinations()) {
+        		new Label(table).setText(cubePublishDestination.getFullKey()+":");
+                Button btPublishEnable = new Button(table, "btPublishEnable_"+cubePublishDestination.getFullKey());
+                btPublishEnable.setTitle("On");
+                btPublishEnable.addSelectionListener(new SelectionListener() {
+                    public void objectSelected(SelectionEvent event) {
+                    	setPublishStatus(cubePublishDestination.getFullKey(), true);
+                    }
+                });
+            		
+                Button btPublishDisable = new Button(table, "btPublishDisable_"+cubePublishDestination.getFullKey());
+                btPublishDisable.setTitle("Off");
+                btPublishDisable.addSelectionListener(new SelectionListener() {
+                    public void objectSelected(SelectionEvent event) {
+                    	setPublishStatus(cubePublishDestination.getFullKey(), false);
+                    }
+                });
+    		}
+        }
         
         
         

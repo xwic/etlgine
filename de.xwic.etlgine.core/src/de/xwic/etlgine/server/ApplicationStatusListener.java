@@ -66,15 +66,16 @@ public class ApplicationStatusListener extends HttpServlet {
 		ETLgineServer server = ETLgineServer.getInstance();
 		ServerContext context = server.getServerContext();
 		for (JobQueue queue : context.getJobQueues()) {
+			
 			IJob job = queue.getActiveJob();
 			if (job == null) {
-				response.put("queueStatus","Empty");
+				response.put(queue.getName()+"_queueStatus","Empty");
 			} else {
-				response.put("queueStatus","Executing");
-				response.put("queueJobName",job.getName());
-				response.put("queueJobState",job.getState().toString());
+				response.put(queue.getName()+"_queueStatus","Executing");
+				response.put(queue.getName()+"_queueJobName",job.getName());
+				response.put(queue.getName()+"_queueJobState",job.getState().toString());
 				long duration = System.currentTimeMillis() - job.getLastStarted().getTime();
-				response.put("queueJobDuration",""+duration);
+				response.put(queue.getName()+"_queueJobDuration",""+duration);
 			}
 		}
 		

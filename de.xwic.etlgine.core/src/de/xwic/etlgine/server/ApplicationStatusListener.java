@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 
 import de.xwic.etlgine.IJob;
+import de.xwic.etlgine.IProcess;
+import de.xwic.etlgine.ISource;
 import de.xwic.etlgine.IJob.State;
 
 public class ApplicationStatusListener extends HttpServlet {
@@ -76,6 +78,10 @@ public class ApplicationStatusListener extends HttpServlet {
 				response.put(queue.getName()+"_queueJobState",job.getState().toString());
 				long duration = System.currentTimeMillis() - job.getLastStarted().getTime();
 				response.put(queue.getName()+"_queueJobDuration",""+duration);
+				IProcess p = job.getProcessChain() != null ? job.getProcessChain().getActiveProcess() : null;
+				if (p != null) {
+					response.put(queue.getName()+"_queueJobProcess",""+p.getName());
+				}
 			}
 		}
 		

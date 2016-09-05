@@ -36,6 +36,11 @@
   	<servlet-class>de.xwic.etlgine.server.ApplicationStatusListener</servlet-class>
   </servlet>
   
+  <servlet>
+  	<servlet-name>applicationStatusListenerV2</servlet-name>
+  	<servlet-class>de.xwic.etlgine.server.appstatus.ApplicationStatusListener</servlet-class>
+  </servlet>
+  
   <!-- map the servlet to all files ending with .wic -->
   <servlet-mapping>
     <servlet-name>jwic</servlet-name>
@@ -51,6 +56,11 @@
   <servlet-mapping>
   	<servlet-name>applicationStatusListener</servlet-name>
   	<url-pattern>/applicationStatus</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+  	<servlet-name>applicationStatusListenerV2</servlet-name>
+  	<url-pattern>/applicationStatusV2</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>

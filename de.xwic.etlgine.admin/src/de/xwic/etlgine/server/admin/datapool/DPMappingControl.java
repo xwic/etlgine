@@ -4,6 +4,7 @@
 package de.xwic.etlgine.server.admin.datapool;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,13 +58,22 @@ public class DPMappingControl extends BaseContentContainer {
 		 */
 		public Iterator<?> getContentIterator(Range range) {
 			// load the List
+			Connection connection = null;
 			try {
-				Connection connection = JDBCUtil.openConnection(ETLgineServer.getInstance().getServerContext(), syncTableConnectionName);
+				connection = JDBCUtil.openConnection(ETLgineServer.getInstance().getServerContext(), syncTableConnectionName);
 				DimMappingDefDAO dao = new DimMappingDefDAO(connection);
 				lastList = dao.listMappings();
 			} catch (Exception se) {
 				//log.error("Error in DPMappingControl.setupTable()", se);
 				throw new RuntimeException("Error reading data", se);
+			}finally{
+				if (null != connection){
+					try {
+						connection.close();
+					} catch (SQLException e) {
+						log.error("Error closing connection:"+e.getMessage());
+					}
+				}
 			}
 			
 			return lastList.iterator();

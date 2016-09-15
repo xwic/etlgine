@@ -2,6 +2,7 @@ package de.xwic.etlgine.server.appstatus;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +42,18 @@ public class ApplicationStatusListener extends HttpServlet {
 		appDetails.setInstanceNotificationEnabled(notificationsEnabled);
 		appDetails.setInstanceTriggerEnabled(triggerEnabled);
 
+		// Memory
+		Runtime rt = Runtime.getRuntime();
+		NumberFormat nf = NumberFormat.getIntegerInstance();
+		long maxMemoryK = rt.maxMemory() / 1024;
+
+		long totalMemoryK = rt.totalMemory() / 1024;
+		long freeMemoryK = rt.freeMemory() / 1024;
+		long usedMemoryK = totalMemoryK-freeMemoryK;
+		
+		appDetails.setInstanceMemoryFreeK(freeMemoryK);
+		appDetails.setInstanceMemoryUsedK(usedMemoryK);
+		
 		int totalLoadedJobs = 0;
 		int totalErrorJobs = 0;
 		int totalInactiveJobs = 0;

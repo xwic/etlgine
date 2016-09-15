@@ -11,6 +11,8 @@ public class ApplicationStatusDetails implements Serializable {
 	private long instanceUptime;
 	private int instanceNotificationEnabled;
 	private int instanceTriggerEnabled;
+	private long instanceMemoryUsedK;
+	private long instanceMemoryFreeK;
 	private int jobsLoaded;
 	private int jobsDisabled;
 	private int jobsFailed;
@@ -60,6 +62,22 @@ public class ApplicationStatusDetails implements Serializable {
 
 	public void setInstanceTriggerEnabled(int instanceTriggerEnabled) {
 		this.instanceTriggerEnabled = instanceTriggerEnabled;
+	}
+
+	public long getInstanceMemoryUsedK() {
+		return instanceMemoryUsedK;
+	}
+
+	public void setInstanceMemoryUsedK(long instanceMemoryUsedK) {
+		this.instanceMemoryUsedK = instanceMemoryUsedK;
+	}
+
+	public long getInstanceMemoryFreeK() {
+		return instanceMemoryFreeK;
+	}
+
+	public void setInstanceMemoryFreeK(long instanceMemoryFreeK) {
+		this.instanceMemoryFreeK = instanceMemoryFreeK;
 	}
 
 	public int getJobsLoaded() {

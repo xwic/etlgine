@@ -84,15 +84,15 @@
 	</developers>
 
 	<properties>
-		<compileSource>1.6</compileSource>
-		<compileTarget>1.6</compileTarget>
+		<compileSource>1.8</compileSource>
+		<compileTarget>1.8</compileTarget>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />		
-		<mvnDependencyVersionxWicjWic>5.2.11</mvnDependencyVersionxWicjWic>
-		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
+		<mvnDependencyVersionxWicjWic>5.3.19</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
 		
@@ -183,7 +183,7 @@
 
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.3.1</version>
+					<version>3.5.1</version>
 					<configuration>
 						<showDeprecation>false</showDeprecation>
 						<showWarnings>false</showWarnings>
@@ -194,7 +194,7 @@
 
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.3.1</version>
+					<version>3.0.2</version>
 					<inherited>true</inherited>
 					<executions>
 						<execution>
@@ -217,7 +217,7 @@
 
 				<plugin>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>2.1.2</version>
+					<version>3.0.1</version>
 					<inherited>true</inherited>
 					<executions>
 						<execution>
@@ -276,7 +276,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.4</version>
+					<version>2.6</version>
 					<configuration>
 						<!-- Name of the WEB folder -->
 						<warSourceDirectory>web_root</warSourceDirectory>
@@ -387,7 +387,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.4.201502262128</version>
+				<version>0.7.7.201606060606</version>
 				<executions>
 					<execution>
 						<goals>

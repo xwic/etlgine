@@ -28,8 +28,8 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:https://github.com/xwic/etlgine.git</connection>
-		<developerConnection>scm:git:https://github.com/xwic/etlgine.git</developerConnection>
+		<connection>scm:git:git@github.com:xwic/etlgine.git</connection>
+		<developerConnection>scm:git:git@github.com:xwic/etlgine.git</developerConnection>
 		<url>https://github.com/xwic/etlgine</url>
 		<tag>etlgine-5.2.35</tag>
 	</scm>

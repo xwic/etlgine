@@ -97,9 +97,12 @@
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
 
+		<sonar.language>java</sonar.language>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>
+		
+		
 	</properties>
 
 	<build>

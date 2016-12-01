@@ -589,7 +589,12 @@
                 <artifactId>jwic-controls</artifactId>
                 <version>${mvnDependencyVersionxWicjWic}</version>
             </dependency>
-
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-web</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
+			
             <dependency>
                 <groupId>de.xwic.cube</groupId>
                 <artifactId>cube-core</artifactId>

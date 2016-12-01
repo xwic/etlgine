@@ -65,12 +65,12 @@
 		<servlet-name>cpres</servlet-name>
 		<url-pattern>/cp/*</url-pattern>
 	</servlet-mapping>
-	
+	<!-- 
 	<servlet-mapping>
 		<servlet-name>jwicres</servlet-name>
 		<url-pattern>/jwic/*</url-pattern>
 	</servlet-mapping>
-	
+	 -->
 	<servlet-mapping>
 		<servlet-name>applicationStatusListener</servlet-name>
 		<url-pattern>/applicationStatus</url-pattern>

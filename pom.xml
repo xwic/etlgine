@@ -102,7 +102,7 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>
 		
-		
+		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<build>
@@ -706,10 +706,6 @@
 				<configuration>
 					<show>private</show>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</reporting>

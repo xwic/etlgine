@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -87,18 +88,18 @@
 		<compileSource>1.8</compileSource>
 		<compileTarget>1.8</compileTarget>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
-        <cubeUpdateVersion />		
+		<cubeUpdateVersion />
 		<mvnDependencyVersionxWicjWic>5.3.19</mvnDependencyVersionxWicjWic>
 		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
-		
+
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>		
+		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>
 	</properties>
 
 	<build>
@@ -149,22 +150,25 @@
 					<version>2.8.1</version>
 					<configuration>
 						<skip>true</skip>
-					</configuration>						
+					</configuration>
 				</plugin>
-		        
-		        <plugin>
-		          <groupId>org.apache.maven.plugins</groupId>
-		          <artifactId>maven-surefire-plugin</artifactId>
-		          <version>2.17</version>
-		          <configuration>
-					<testFailureIgnore>false</testFailureIgnore>
-		          </configuration>
-		        </plugin>
-		        
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.17</version>
+					<configuration>
+						<testFailureIgnore>false</testFailureIgnore>
+					</configuration>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.4.2</version>
+					<version>2.5.3</version>
+					<configuration>
+						<preparationGoals>clean verify sonar:sonar</preparationGoals>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -272,7 +276,7 @@
 						<detectOfflineLinks>false</detectOfflineLinks>
 					</configuration>
 				</plugin>
-				
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
@@ -288,14 +292,14 @@
 						<attachClasses>true</attachClasses>
 						<classesClassifier>classes</classesClassifier>
 						<packagingExcludes>
-                            WEB-INF/lib/servlet-api-*.jar,
+							WEB-INF/lib/servlet-api-*.jar,
 							WEB-INF/sessions/**,
 							WEB-INF/classes/**,
 							**/*.log
 						</packagingExcludes>
 					</configuration>
 				</plugin>
-				
+
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -337,10 +341,8 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<!-- m2e doesn't know what to do with jacoco,
-										let's ignore it or annoying error markers appear
-										see http://wiki.eclipse.org/M2E_plugin_execution_not_covered
-										-->
+										<!-- m2e doesn't know what to do with jacoco, let's ignore it or 
+											annoying error markers appear see http://wiki.eclipse.org/M2E_plugin_execution_not_covered -->
 										<ignore />
 									</action>
 								</pluginExecution>
@@ -354,13 +356,13 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-									<ignore />
+										<ignore />
 									</action>
-								</pluginExecution>								
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
-				</plugin>				
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -381,8 +383,13 @@
 					<serverId>sonatype-nexus-staging</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-					<autoDropAfterRelease>true</autoDropAfterRelease>					
+					<autoDropAfterRelease>true</autoDropAfterRelease>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.1.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -406,12 +413,13 @@
 					<destFile>${sonar.jacoco.reportPath}</destFile>
 				</configuration>
 			</plugin>
-		</plugins>		
+		</plugins>
 	</build>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- All Central project dependencies  are added here with version and used in child pom without the version info-->
+			<!-- All Central project dependencies are added here with version and 
+				used in child pom without the version info -->
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
@@ -426,7 +434,7 @@
 				<groupId>commons-digester</groupId>
 				<artifactId>commons-digester</artifactId>
 				<version>2.1</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils-core</artifactId>
@@ -471,12 +479,12 @@
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
 				<version>3.9</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
 				<version>3.9</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml-schemas</artifactId>
@@ -501,12 +509,12 @@
 				<groupId>org.apache.james</groupId>
 				<artifactId>apache-mime4j</artifactId>
 				<version>0.6</version>
-			</dependency>	
+			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
 				<version>4.0</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
@@ -517,7 +525,7 @@
 				<artifactId>mail</artifactId>
 				<version>1.4</version>
 			</dependency>
-			
+
 			<!-- Spring dependencies -->
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -535,11 +543,11 @@
 				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
-    			<groupId>org.springframework</groupId>
-    			<artifactId>spring-jdbc</artifactId>
-    			<version>${spring.version}</version>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${spring.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate</artifactId>
@@ -556,9 +564,9 @@
 				<version>1.4</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.codehaus.groovy</groupId>
-			    <artifactId>groovy-all</artifactId>
-			    <version>2.3.1</version>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy-all</artifactId>
+				<version>2.3.1</version>
 			</dependency>
 
 			<dependency>
@@ -567,49 +575,49 @@
 				<version>1.2.2</version>
 			</dependency>
 
-            <dependency>
-                <groupId>org.xerial</groupId>
-                <artifactId>sqlite-jdbc</artifactId>
-                <version>3.7.15-M1</version>
-            </dependency>
-            
 			<dependency>
-			    <groupId>com.google.code.gson</groupId>
-			    <artifactId>gson</artifactId>
-			    <version>2.3</version>
+				<groupId>org.xerial</groupId>
+				<artifactId>sqlite-jdbc</artifactId>
+				<version>3.7.15-M1</version>
 			</dependency>
-			
-            <dependency>
-                <groupId>de.xwic.jwic</groupId>
-                <artifactId>jwic-core</artifactId>
-                <version>${mvnDependencyVersionxWicjWic}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.xwic.jwic</groupId>
-                <artifactId>jwic-controls</artifactId>
-                <version>${mvnDependencyVersionxWicjWic}</version>
-            </dependency>
+
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-core</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-controls</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-web</artifactId>
 				<version>${mvnDependencyVersionxWicjWic}</version>
 			</dependency>
-			
-            <dependency>
-                <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-core</artifactId>
-                <version>${mvnDependencyVersionxWicCube}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-xlsbridge</artifactId>
-                <version>${mvnDependencyVersionxWicCube}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-webui-core</artifactId>
-                <version>${mvnDependencyVersionxWicCube}</version>
-            </dependency>
+
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-core</artifactId>
+				<version>${mvnDependencyVersionxWicCube}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-xlsbridge</artifactId>
+				<version>${mvnDependencyVersionxWicCube}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-webui-core</artifactId>
+				<version>${mvnDependencyVersionxWicCube}</version>
+			</dependency>
 
 			<dependency>
 				<!-- Common Public License 1.0 -->
@@ -650,7 +658,7 @@
 			<properties>
 				<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 			</properties>
-		</profile>        
+		</profile>
 	</profiles>
 
 	<reporting>

@@ -100,8 +100,6 @@
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>
-		
-		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<build>

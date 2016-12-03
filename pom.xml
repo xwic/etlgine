@@ -169,7 +169,7 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.5.3</version>
 					<configuration>
-						<preparationGoals>clean verify sonar:sonar -Dsonar:branch=master</preparationGoals>
+						<preparationGoals>clean verify sonar:sonar -Dsonar.branch=master</preparationGoals>
 					</configuration>
 				</plugin>
 
@@ -217,6 +217,11 @@
 								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							</manifest>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Implementation-Version>${mvnBuildJenkinsID}</Implementation-Version>
+							</manifestEntries>
 						</archive>
 					</configuration>
 				</plugin>
@@ -284,6 +289,19 @@
 					<artifactId>maven-war-plugin</artifactId>
 					<version>2.6</version>
 					<configuration>
+
+						<archive>
+							<manifest>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Implementation-Version>${mvnBuildJenkinsID}</Implementation-Version>
+							</manifestEntries>
+						</archive>
+					
 						<!-- Name of the WEB folder -->
 						<warSourceDirectory>web_root</warSourceDirectory>
 

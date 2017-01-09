@@ -11,6 +11,7 @@ import de.jwic.events.SelectionListener;
 import de.xwic.etlgine.server.ETLgineServer;
 import de.xwic.etlgine.server.admin.datapool.DPAdminControl;
 import de.xwic.etlgine.server.admin.jobs.JobAdminControl;
+import de.xwic.etlgine.server.admin.users.UsersListControl;
 
 /**
  * @author Developer
@@ -57,6 +58,15 @@ public class MainMenuControl extends BaseContentContainer {
 			}
 		});
 
+		Button btUserList = new Button(this, "btUserList");
+		btUserList.setTitle("Users");
+		btUserList.setWidth(120);
+		btUserList.setIconEnabled(ImageLibrary.IMAGE_TABLE);
+		btUserList.addSelectionListener(new SelectionListener() {
+			public void objectSelected(SelectionEvent event) {
+				onUsersListSelection();
+			}
+		});
 		
 	}
 
@@ -86,6 +96,12 @@ public class MainMenuControl extends BaseContentContainer {
 		StackedContentContainer sc = (StackedContentContainer)getContainer();
 		DPAdminControl dpAdmin = new DPAdminControl(sc, "dp");
 		sc.setCurrentControlName(dpAdmin.getName());		
+	}
+	protected void onUsersListSelection() {
+		StackedContentContainer sc = (StackedContentContainer)getContainer();
+		
+		UsersListControl usersList = new UsersListControl(sc, "acl");
+		sc.setCurrentControlName(usersList.getName());		
 	}
 	
 	

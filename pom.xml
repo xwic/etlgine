@@ -91,7 +91,8 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
 		<cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.19</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.20</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicAppKit>5.3.20</mvnDependencyVersionxWicAppKit>
 		<mvnDependencyVersionxWicCube>5.3.0.1</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
@@ -638,7 +639,18 @@
 				<artifactId>cube-webui-core</artifactId>
 				<version>${mvnDependencyVersionxWicCube}</version>
 			</dependency>
-
+			<!-- AppKit ${mvnDependencyVersionxWicAppKit} -->
+			<dependency>
+				<groupId>de.xwic.appkit</groupId>
+				<artifactId>appkit-core</artifactId>
+				<version>${mvnDependencyVersionxWicAppKit}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.appkit</groupId>
+				<artifactId>appkit-webbase</artifactId>
+				<version>${mvnDependencyVersionxWicAppKit}</version>
+			</dependency>
+			
 			<dependency>
 				<!-- Common Public License 1.0 -->
 				<groupId>junit</groupId>

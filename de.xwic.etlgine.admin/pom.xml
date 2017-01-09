@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>de.xwic.etlgine</groupId>
 		<artifactId>etlgine</artifactId>
@@ -36,7 +37,7 @@
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
@@ -44,11 +45,11 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-		</dependency>			
+		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
@@ -87,20 +88,27 @@
 			<groupId>de.xwic.jwic</groupId>
 			<artifactId>jwic-web</artifactId>
 		</dependency>
-				
+
 		<dependency>
 			<groupId>de.xwic.cube</groupId>
 			<artifactId>cube-core</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>de.xwic.cube</groupId>
-            <artifactId>cube-xlsbridge</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>de.xwic.cube</groupId>
+			<artifactId>cube-xlsbridge</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>de.xwic.cube</groupId>
 			<artifactId>cube-webui-core</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>de.xwic.appkit</groupId>
+			<artifactId>appkit-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.xwic.appkit</groupId>
+			<artifactId>appkit-webbase</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>de.xwic.etlgine</groupId>
 			<artifactId>etlgine-core</artifactId>

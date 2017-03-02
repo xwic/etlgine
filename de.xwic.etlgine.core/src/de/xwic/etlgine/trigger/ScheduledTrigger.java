@@ -181,8 +181,8 @@ public class ScheduledTrigger implements ITrigger {
 				cal.set(Calendar.DAY_OF_MONTH, dayOfWeek);
 			}
 
-			
-			if (cal.getTime().before(last)) {
+			//if the scheduled date is in the past( because last run is set to now after restart) or if the server was restarted today but the today has to be skipped
+			if (cal.getTime().before(last) || (type == Type.DAILY_EXCEPT_ONE_WEEK_DAY && dayOfWeek == cal.get(Calendar.DAY_OF_WEEK) )) {
 				switch (type) {
 				case MONTLY:
 					cal.add(Calendar.MONTH, 1);

@@ -11,7 +11,7 @@
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine</artifactId>
-	<version>5.2.68-SNAPSHOT</version>
+	<version>5.3.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>xWic - ETLGine</name>
@@ -27,10 +27,10 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:https://github.com/xwic/etlgine.git</connection>
-		<developerConnection>scm:git:https://github.com/xwic/etlgine.git</developerConnection>
+		<connection>scm:git:git@github.com:xwic/etlgine.git</connection>
+		<developerConnection>scm:git:git@github.com:xwic/etlgine.git</developerConnection>
 		<url>https://github.com/xwic/etlgine</url>
-		<tag>etlgine-5.2.35</tag>
+		<tag>etlgine-5.3.0.1</tag>
 	</scm>
 	<developers>
 		<developer>
@@ -84,21 +84,24 @@
 	</developers>
 
 	<properties>
-		<compileSource>1.6</compileSource>
-		<compileTarget>1.6</compileTarget>
+		<compileSource>1.8</compileSource>
+		<compileTarget>1.8</compileTarget>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
-        <cubeUpdateVersion />		
-		<mvnDependencyVersionxWicjWic>5.2.11</mvnDependencyVersionxWicjWic>
-		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
+		<cubeUpdateVersion />
+		<mvnDependencyVersionxWicjWic>5.3.19</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicCube>5.3.0.1</mvnDependencyVersionxWicCube>
 		<runEnvironment />
 		<spring.version>4.1.1.RELEASE</spring.version>
-		
+
+		<sonar.language>java</sonar.language>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>		
+		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>
+		
+		<additionalparam>-Xdoclint:none</additionalparam>
 	</properties>
 
 	<build>
@@ -149,22 +152,25 @@
 					<version>2.8.1</version>
 					<configuration>
 						<skip>true</skip>
-					</configuration>						
+					</configuration>
 				</plugin>
-		        
-		        <plugin>
-		          <groupId>org.apache.maven.plugins</groupId>
-		          <artifactId>maven-surefire-plugin</artifactId>
-		          <version>2.17</version>
-		          <configuration>
-					<testFailureIgnore>false</testFailureIgnore>
-		          </configuration>
-		        </plugin>
-		        
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.17</version>
+					<configuration>
+						<testFailureIgnore>false</testFailureIgnore>
+					</configuration>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.4.2</version>
+					<version>2.5.3</version>
+					<configuration>
+						<preparationGoals>clean verify sonar:sonar -Dsonar.branch=master</preparationGoals>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -183,7 +189,7 @@
 
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.3.1</version>
+					<version>3.5.1</version>
 					<configuration>
 						<showDeprecation>false</showDeprecation>
 						<showWarnings>false</showWarnings>
@@ -194,7 +200,7 @@
 
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.3.1</version>
+					<version>3.0.2</version>
 					<inherited>true</inherited>
 					<executions>
 						<execution>
@@ -211,13 +217,18 @@
 								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							</manifest>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Implementation-Version>${mvnBuildJenkinsID}</Implementation-Version>
+							</manifestEntries>
 						</archive>
 					</configuration>
 				</plugin>
 
 				<plugin>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>2.1.2</version>
+					<version>3.0.1</version>
 					<inherited>true</inherited>
 					<executions>
 						<execution>
@@ -272,12 +283,25 @@
 						<detectOfflineLinks>false</detectOfflineLinks>
 					</configuration>
 				</plugin>
-				
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.4</version>
+					<version>2.6</version>
 					<configuration>
+
+						<archive>
+							<manifest>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Implementation-Version>${mvnBuildJenkinsID}</Implementation-Version>
+							</manifestEntries>
+						</archive>
+					
 						<!-- Name of the WEB folder -->
 						<warSourceDirectory>web_root</warSourceDirectory>
 
@@ -288,14 +312,14 @@
 						<attachClasses>true</attachClasses>
 						<classesClassifier>classes</classesClassifier>
 						<packagingExcludes>
-                            WEB-INF/lib/servlet-api-*.jar,
+							WEB-INF/lib/servlet-api-*.jar,
 							WEB-INF/sessions/**,
 							WEB-INF/classes/**,
 							**/*.log
 						</packagingExcludes>
 					</configuration>
 				</plugin>
-				
+
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -337,10 +361,8 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<!-- m2e doesn't know what to do with jacoco,
-										let's ignore it or annoying error markers appear
-										see http://wiki.eclipse.org/M2E_plugin_execution_not_covered
-										-->
+										<!-- m2e doesn't know what to do with jacoco, let's ignore it or 
+											annoying error markers appear see http://wiki.eclipse.org/M2E_plugin_execution_not_covered -->
 										<ignore />
 									</action>
 								</pluginExecution>
@@ -354,13 +376,13 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-									<ignore />
+										<ignore />
 									</action>
-								</pluginExecution>								
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
-				</plugin>				
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -381,13 +403,18 @@
 					<serverId>sonatype-nexus-staging</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-					<autoDropAfterRelease>true</autoDropAfterRelease>					
+					<autoDropAfterRelease>true</autoDropAfterRelease>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.1.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.4.201502262128</version>
+				<version>0.7.7.201606060606</version>
 				<executions>
 					<execution>
 						<goals>
@@ -406,12 +433,13 @@
 					<destFile>${sonar.jacoco.reportPath}</destFile>
 				</configuration>
 			</plugin>
-		</plugins>		
+		</plugins>
 	</build>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- All Central project dependencies  are added here with version and used in child pom without the version info-->
+			<!-- All Central project dependencies are added here with version and 
+				used in child pom without the version info -->
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
@@ -426,7 +454,7 @@
 				<groupId>commons-digester</groupId>
 				<artifactId>commons-digester</artifactId>
 				<version>2.1</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils-core</artifactId>
@@ -471,12 +499,12 @@
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
 				<version>3.9</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
 				<version>3.9</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml-schemas</artifactId>
@@ -501,12 +529,12 @@
 				<groupId>org.apache.james</groupId>
 				<artifactId>apache-mime4j</artifactId>
 				<version>0.6</version>
-			</dependency>	
+			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
 				<version>4.0</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
@@ -517,7 +545,7 @@
 				<artifactId>mail</artifactId>
 				<version>1.4</version>
 			</dependency>
-			
+
 			<!-- Spring dependencies -->
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -535,11 +563,11 @@
 				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
-    			<groupId>org.springframework</groupId>
-    			<artifactId>spring-jdbc</artifactId>
-    			<version>${spring.version}</version>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${spring.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate</artifactId>
@@ -556,9 +584,9 @@
 				<version>1.4</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.codehaus.groovy</groupId>
-			    <artifactId>groovy-all</artifactId>
-			    <version>2.3.1</version>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy-all</artifactId>
+				<version>2.3.1</version>
 			</dependency>
 
 			<dependency>
@@ -567,44 +595,49 @@
 				<version>1.2.2</version>
 			</dependency>
 
-            <dependency>
-                <groupId>org.xerial</groupId>
-                <artifactId>sqlite-jdbc</artifactId>
-                <version>3.7.15-M1</version>
-            </dependency>
-            
 			<dependency>
-			    <groupId>com.google.code.gson</groupId>
-			    <artifactId>gson</artifactId>
-			    <version>2.3</version>
+				<groupId>org.xerial</groupId>
+				<artifactId>sqlite-jdbc</artifactId>
+				<version>3.7.15-M1</version>
 			</dependency>
-			
-            <dependency>
-                <groupId>de.xwic.jwic</groupId>
-                <artifactId>jwic-core</artifactId>
-                <version>${mvnDependencyVersionxWicjWic}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.xwic.jwic</groupId>
-                <artifactId>jwic-controls</artifactId>
-                <version>${mvnDependencyVersionxWicjWic}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-core</artifactId>
-                <version>${mvnDependencyVersionxWicCube}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-xlsbridge</artifactId>
-                <version>${mvnDependencyVersionxWicCube}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.xwic.cube</groupId>
-                <artifactId>cube-webui-core</artifactId>
-                <version>${mvnDependencyVersionxWicCube}</version>
-            </dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-core</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-controls</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-web</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-core</artifactId>
+				<version>${mvnDependencyVersionxWicCube}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-xlsbridge</artifactId>
+				<version>${mvnDependencyVersionxWicCube}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-webui-core</artifactId>
+				<version>${mvnDependencyVersionxWicCube}</version>
+			</dependency>
 
 			<dependency>
 				<!-- Common Public License 1.0 -->
@@ -645,7 +678,7 @@
 			<properties>
 				<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 			</properties>
-		</profile>        
+		</profile>
 	</profiles>
 
 	<reporting>
@@ -692,9 +725,10 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+
 		</plugins>
 	</reporting>
 </project>

@@ -2,71 +2,89 @@
 <!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/web-app_2_3.dtd'>
 
 <web-app>
+	
+	<listener>
+		<listener-class>de.xwic.etlgine.server.ETLGineServerLifecycleListener</listener-class>
+	</listener>
+	
+	<!-- Define the jWic main servlet -->
+	<servlet>
+		<servlet-name>jwic</servlet-name>
+		<servlet-class>de.jwic.web.DispatcherServlet</servlet-class>
+		<!-- Specifies the location of the log4j initialisation file. If you - 
+			do not specify this parameter, the servlet assumes that the - a logging system 
+			is already setup elsewhere. -->
+		<init-param>
+			<param-name>log4j-init-file</param-name>
+			<param-value>/WEB-INF/log4j.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>setRootDir</param-name>
+			<param-value>jwicweb.root</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
-  <!-- Define the jWic main servlet -->
-  <servlet>
-    <servlet-name>jwic</servlet-name>
-    <servlet-class>de.jwic.web.DispatcherServlet</servlet-class>
-    <!-- Specifies the location of the log4j initialisation file. If you
-       - do not specify this parameter, the servlet assumes that the
-       - a logging system is already setup elsewhere.
-      -->
-    <init-param>
-      <param-name>log4j-init-file</param-name>
-      <param-value>/WEB-INF/log4j.properties</param-value>
-    </init-param>
-    <init-param>
-      <param-name>setRootDir</param-name>
-      <param-value>jwicweb.root</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  
-  <!-- Define the ClassPathResourceServlet.
-     - This servlet allows jWic application to reference 
-     - images that are stored in the classpath (jar).
-     -->
-  <servlet>
-      <servlet-name>cpres</servlet-name>
-      <servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
-  </servlet>
-  
-  <servlet>
-  	<servlet-name>applicationStatusListener</servlet-name>
-  	<servlet-class>de.xwic.etlgine.server.ApplicationStatusListener</servlet-class>
-  </servlet>
-  
-  <servlet>
-  	<servlet-name>applicationStatusListenerV2</servlet-name>
-  	<servlet-class>de.xwic.etlgine.server.appstatus.ApplicationStatusListener</servlet-class>
-  </servlet>
-  
-  <!-- map the servlet to all files ending with .wic -->
-  <servlet-mapping>
-    <servlet-name>jwic</servlet-name>
-    <url-pattern>*.xwic</url-pattern>
-  </servlet-mapping>
+	<!-- Define the ClassPathResourceServlet. - This servlet allows jWic application 
+		to reference - images that are stored in the classpath (jar). -->
+	<servlet>
+		<servlet-name>cpres</servlet-name>
+		<servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
+		<init-param>
+			<param-name>classresource</param-name>
+			<param-value>false</param-value>
+		</init-param>		
+	</servlet>
+	
+	<servlet>
+		<servlet-name>jwicres</servlet-name>
+		<servlet-class>de.jwic.web.ClasspathResourceServlet</servlet-class>
+		<init-param>
+			<param-name>classresource</param-name>
+			<param-value>true</param-value>
+		</init-param>
+ 	</servlet>
+ 	
+	<servlet>
+		<servlet-name>applicationStatusListener</servlet-name>
+		<servlet-class>de.xwic.etlgine.server.ApplicationStatusListener</servlet-class>
+	</servlet>
 
+	<servlet>
+		<servlet-name>applicationStatusListenerV2</servlet-name>
+		<servlet-class>de.xwic.etlgine.server.appstatus.ApplicationStatusListener</servlet-class>
+	</servlet>
 
-  <servlet-mapping>
-    <servlet-name>cpres</servlet-name>
-    <url-pattern>/cp/*</url-pattern>
-  </servlet-mapping>
+	<!-- map the servlet to all files ending with .wic -->
+	<servlet-mapping>
+		<servlet-name>jwic</servlet-name>
+		<url-pattern>*.xwic</url-pattern>
+	</servlet-mapping>
 
-  <servlet-mapping>
-  	<servlet-name>applicationStatusListener</servlet-name>
-  	<url-pattern>/applicationStatus</url-pattern>
-  </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cpres</servlet-name>
+		<url-pattern>/cp/*</url-pattern>
+	</servlet-mapping>
+	<!-- 
+	<servlet-mapping>
+		<servlet-name>jwicres</servlet-name>
+		<url-pattern>/jwic/*</url-pattern>
+	</servlet-mapping>
+	 -->
+	<servlet-mapping>
+		<servlet-name>applicationStatusListener</servlet-name>
+		<url-pattern>/applicationStatus</url-pattern>
+	</servlet-mapping>
 
-  <servlet-mapping>
-  	<servlet-name>applicationStatusListenerV2</servlet-name>
-  	<url-pattern>/applicationStatusV2</url-pattern>
-  </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>applicationStatusListenerV2</servlet-name>
+		<url-pattern>/applicationStatusV2</url-pattern>
+	</servlet-mapping>
 
-  <welcome-file-list>
-    <welcome-file>
-      index.html
-    </welcome-file>
-  </welcome-file-list>
+	<welcome-file-list>
+		<welcome-file>
+			index.html
+		</welcome-file>
+	</welcome-file-list>
 
 </web-app>

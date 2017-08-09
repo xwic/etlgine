@@ -183,7 +183,7 @@ public class ETLgineServer implements Runnable {
 	 */
 	private void checkJobTime(){
 		int jobTime = 0;
-		int maxJobTime = serverContext.getPropertyInt("maxJobTime", 0);
+		int maxJobTime = serverContext.getPropertyInt("maxJobTime.duration", 0);
 		for (JobQueue queue : serverContext.getJobQueues()) {
 			IJob job = queue.getActiveJob();
 			if(null != job && maxJobTime > 0){
@@ -202,11 +202,11 @@ public class ETLgineServer implements Runnable {
 	 * @param jobTime
 	 */
 	private void sendEmail(IJob job, int jobTime){
-		String toAddresses = serverContext.getProperty("toAddress");
-		String ccAddresses = serverContext.getProperty("ccAddress");
+		String toAddresses = serverContext.getProperty("maxJobTime.toAddress");
+		String ccAddresses = serverContext.getProperty("maxJobTime.ccAddress");
 		String subject = "ETLgine [" + serverContext.getProperty("name") + "]: Job '" + job.getName()
 				+ "' ran too long for " + jobTime + " minutes";
-		String senderAddress = serverContext.getProperty("senderAddress");
+		String senderAddress = serverContext.getProperty("maxJobTime.senderAddress");
 		String content = "";
 		
 		EmptyMail email = new EmptyMail();

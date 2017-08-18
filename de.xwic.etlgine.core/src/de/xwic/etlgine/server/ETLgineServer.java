@@ -70,6 +70,7 @@ public class ETLgineServer implements Runnable {
 	private boolean doExit = false;
 	private boolean running = false;
 	private boolean exitAfterFinish = false;
+	private static int counter = 0;
 
 	private long intializedTimeInMilis = 0;
 
@@ -181,22 +182,26 @@ public class ETLgineServer implements Runnable {
 	/**
 	 * 
 	 */
-	private void checkJobTime(){
+	private void checkJobTime() {
 		int jobTime = 0;
 		int maxJobTime = serverContext.getPropertyInt("maxJobTime.duration", 0);
+		int jobEmailInterval = serverContext.getPropertyInt("maxJobTime.email.interval", 60);
 		for (JobQueue queue : serverContext.getJobQueues()) {
 			IJob job = queue.getActiveJob();
-			if(null != job && maxJobTime > 0){
+			if (null != job && maxJobTime > 0) {
 				jobTime = Integer.parseInt(job.getDurationInfo().substring(0, job.getDurationInfo().indexOf(':')));
-				log.info("JOB " + job.getName() + " TOOK " + job.getDurationInfo() + " SO FAR!!!!!!");
-				if(jobTime > maxJobTime){
-					sendEmail(job, jobTime);
-					//queue.stopQueue();
+				if (jobTime > maxJobTime) {
+					counter = counter + 1;
+					if (((counter == 1) || (counter % ((jobEmailInterval * 60) / (SLEEP_TIME / 1000)) == 0))) {
+						log.info("JOB " + job.getName() + " TOOK " + job.getDurationInfo() + " SO FAR!!!!!!");
+						sendEmail(job, jobTime);
+						//queue.stopQueue();
+					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * @param job
 	 * @param jobTime
@@ -220,7 +225,7 @@ public class ETLgineServer implements Runnable {
 		MailFactory.initialize(prop);
 		IMailManager mailManager = MailFactory.getMailManager();
 		try {
-			log.info("Sending email!");
+			log.info("Sending email for job: " + job.getName() + " to " + toAddresses);
 			mailManager.sendEmail(email);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

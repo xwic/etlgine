@@ -184,16 +184,17 @@ public class ETLgineServer implements Runnable {
 	 */
 	private void checkJobTime() {
 		int jobTime = 0;
-		int maxJobTime = serverContext.getPropertyInt("maxJobTime.duration", 0);
+		int maxJobTime = 0;
 		int jobEmailInterval = serverContext.getPropertyInt("maxJobTime.email.interval", 60);
 		for (JobQueue queue : serverContext.getJobQueues()) {
 			IJob job = queue.getActiveJob();
-			if (null != job && maxJobTime > 0) {
+			if (null != job) {
 				jobTime = Integer.parseInt(job.getDurationInfo().substring(0, job.getDurationInfo().indexOf(':')));
-				if (jobTime > maxJobTime) {
+				maxJobTime = (job.getMaxJobDuration() != 0) ? job.getMaxJobDuration() : serverContext.getPropertyInt("maxJobTime.duration", 0);
+				if (maxJobTime > 0 && (jobTime == maxJobTime || jobTime > maxJobTime)) {
 					counter = counter + 1;
 					if (((counter == 1) || (counter % ((jobEmailInterval * 60) / (SLEEP_TIME / 1000)) == 0))) {
-						log.info("JOB " + job.getName() + " TOOK " + job.getDurationInfo() + " SO FAR!!!!!!");
+						log.info("JOB [" + job.getName() + "] TOOK " + job.getDurationInfo() + " SO FAR!!!!!!");
 						sendEmail(job, jobTime);
 						//queue.stopQueue();
 					}

@@ -11,7 +11,7 @@
 
 	<groupId>de.xwic.etlgine</groupId>
 	<artifactId>etlgine</artifactId>
-	<version>5.3.6-SNAPSHOT</version>
+	<version>5.3.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>xWic - ETLGine</name>

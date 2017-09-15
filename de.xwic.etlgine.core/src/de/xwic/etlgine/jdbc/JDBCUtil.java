@@ -147,6 +147,18 @@ public class JDBCUtil {
 	 * @return
 	 */
 	public static Connection openConnection(IContext context, String name) throws ETLException, SQLException {
+		return openConnection(context, name, true);
+	}
+
+	/**
+	 * Open a pre-configured connection. The connection details are obtained from
+	 * the context properties in the format: [name].connection.XXX
+	 * @param context
+	 * @param name
+	 * @param logging
+	 * @return
+	 */
+	public static Connection openConnection(IContext context, String name, boolean logging) throws ETLException, SQLException {
 		
 		String driver = context.getProperty(name + ".connection.driver", "net.sourceforge.jtds.jdbc.Driver");
 		String url = context.getProperty(name + ".connection.url");
@@ -169,9 +181,9 @@ public class JDBCUtil {
 		} catch (ClassNotFoundException cnfe) {
 			throw new ETLException("Driver " + driver + " can not be found.");
 		}
-		
-		log.info("Opening new JDBC connection to: " + url);
-		
+		if (logging){
+			log.info("Opening new JDBC connection to: " + url);
+		}
 		Connection con;
 		try {
 			con = DriverManager.getConnection(url, username, password);
@@ -216,9 +228,10 @@ public class JDBCUtil {
 			transIso = "Unknown Transaction Isolation!";
 			break;
 		}
-		
+		if (logging){
 		log.info("RDBMS: " + databaseName + ", version: " + meta.getDatabaseProductVersion().replace("\n", ", ") + 
 				", JDBC driver: " + meta.getDriverName() + ", version: " + meta.getDriverVersion() + ", " + transIso);
+		}
 		return con;
 		
 		/*
@@ -238,7 +251,7 @@ public class JDBCUtil {
 		};
 		*/
 	}
-	
+
 	/**
 	 * Returns the batch size used for this jdbc statements.
 	 * @param context

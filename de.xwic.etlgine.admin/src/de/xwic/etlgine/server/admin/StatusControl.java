@@ -35,12 +35,14 @@ import de.xwic.etlgine.server.ServerContext;
 @JavaScriptSupport
 public class StatusControl extends JsonResourceControl{
 	private long refreshInterval = 1000;
+	private String initialClone = null;
 	/**
 	 * @param container
 	 * @param name
 	 */
 	public StatusControl(IControlContainer container, String name) {
 		super(container, name);
+		initialClone = ETLgineServer.getInstance().getServerContext().getProperty("ps.proxy.cloning.mode");
 	}
 
 	@Override
@@ -94,6 +96,10 @@ public class StatusControl extends JsonResourceControl{
         res.key("triggerStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("trigger.enabled", true)?"Enabled":"Disabled");
         
         res.key("notificationStatus").value(ETLgineServer.getInstance().getServerContext().getPropertyBoolean("notifications.enabled", false)?"Enabled":"Disabled");
+        
+        if (null != initialClone && !initialClone.isEmpty() && !initialClone.equals("0")){
+        	res.key("cloneStatus").value("0".equals(ETLgineServer.getInstance().getServerContext().getProperty("ps.proxy.cloning.mode"))?"Disabled":"Enabled");
+        }
         
         List<CubePublishDestination> publishDestinations = CubePublisherManager.getInstance().getPublishTargets();
 

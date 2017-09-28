@@ -125,6 +125,12 @@
             <td class="caption">Trigger:</td>
             <td class="enabledDisabled"><span class="${triggerStatus}">${triggerStatus}</span></td>
         </tr>
+{{if cloneStatus}}
+        <tr>
+            <td class="caption">Clone:</td>
+            <td class="enabledDisabled"><span class="${cloneStatus}">${cloneStatus}</span></td>
+        </tr>
+{{/if}}
 {{if publishers.length}}
         <tr>
             <td class="caption">Publish:</td>

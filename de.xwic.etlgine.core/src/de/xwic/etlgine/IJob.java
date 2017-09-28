@@ -171,4 +171,14 @@ public interface IJob {
 	 * @return
 	 */
 	public String getQueueName();
+	
+	/**
+	 * @return the maxJobDuration
+	 */
+	public int getMaxJobDuration();
+
+	/**
+	 * @param maxJobDuration the maxJobDuration to set
+	 */
+	public void setMaxJobDuration(int maxJobDuration);
 }

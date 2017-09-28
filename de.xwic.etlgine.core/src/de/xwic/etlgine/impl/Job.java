@@ -36,6 +36,7 @@ public class Job implements IJob {
 	private Date lastFinished = null;
 	private long lastDuration = 0;
 	private String name = null;
+	private int maxJobDuration = 0;
 	private boolean executing = false;
 	private boolean disabled = false;
 	private boolean stopTriggerAfterError = true;
@@ -305,6 +306,20 @@ public class Job implements IJob {
 	 */
 	public Date getLastStarted() {
 		return lastStarted;
+	}
+	
+	/**
+	 * @return the maxJobDuration
+	 */
+	public int getMaxJobDuration() {
+		return maxJobDuration;
+	}
+
+	/**
+	 * @param maxJobDuration the maxJobDuration to set
+	 */
+	public void setMaxJobDuration(int maxJobDuration) {
+		this.maxJobDuration = maxJobDuration;
 	}
 
 	/**

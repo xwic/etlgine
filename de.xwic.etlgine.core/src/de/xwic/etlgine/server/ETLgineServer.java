@@ -3,15 +3,14 @@
  */
 package de.xwic.etlgine.server;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -29,8 +28,13 @@ import de.xwic.etlgine.IJob;
 import de.xwic.etlgine.IJob.State;
 import de.xwic.etlgine.cube.CubeHandler;
 import de.xwic.etlgine.demo.DemoDatabaseUtil;
+import de.xwic.etlgine.mail.EmptyMail;
+import de.xwic.etlgine.mail.IMailManager;
+import de.xwic.etlgine.mail.MailFactory;
 import de.xwic.etlgine.notify.NotificationService;
 import de.xwic.etlgine.publish.CubePublisherManager;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 
 /**
  * The server supports parallel queue by adding in the server properties new keys prefixed by loadJobs.
@@ -54,6 +58,8 @@ public class ETLgineServer implements Runnable {
 	private static final Log log = LogFactory.getLog(ETLgineServer.class);
 
 	private static final long SLEEP_TIME = 5 * 1000; // 5 sec.
+	
+	private static final String EMAIL_SERVER = "mail.smtp.host";
 
 	private String rootPath = ".";
 
@@ -64,6 +70,7 @@ public class ETLgineServer implements Runnable {
 	private boolean doExit = false;
 	private boolean running = false;
 	private boolean exitAfterFinish = false;
+	private static int counter = 0;
 
 	private long intializedTimeInMilis = 0;
 
@@ -119,6 +126,9 @@ public class ETLgineServer implements Runnable {
 				}
 			}
 
+			//check jobs not to take longer than specified
+			checkJobTime();
+			
 			// check triggers
 			checkTriggers();
 
@@ -167,6 +177,82 @@ public class ETLgineServer implements Runnable {
 
 		}
 
+	}
+	
+	/**
+	 * 
+	 */
+	private void checkJobTime() {
+		int jobTime = 0;
+		int maxJobTime = 0;
+		try {
+			int jobEmailInterval = serverContext.getPropertyInt("maxJobTime.email.interval", 60);
+			for (JobQueue queue : serverContext.getJobQueues()) {
+				IJob job = queue.getActiveJob();
+				if (null != job) {
+					jobTime = Integer.parseInt(job.getDurationInfo().substring(0, job.getDurationInfo().indexOf(':')));
+					maxJobTime = (job.getMaxJobDuration() != 0) ? job.getMaxJobDuration() : serverContext.getPropertyInt("maxJobTime.duration", 0);
+					if (maxJobTime > 0 && (jobTime == maxJobTime || jobTime > maxJobTime)) {
+						counter = counter + 1;
+						if (((counter == 1) || (counter % ((jobEmailInterval * 60) / (SLEEP_TIME / 1000)) == 0))) {
+							log.info("JOB [" + job.getName() + "] TOOK " + job.getDurationInfo() + " SO FAR!!!!!!");
+							sendEmail(job, jobTime);
+							//queue.stopQueue();
+						}
+					}
+				} else {
+					counter = 0;
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * @param job
+	 * @param jobTime
+	 */
+	private void sendEmail(IJob job, int jobTime){
+		String toAddresses = serverContext.getProperty("maxJobTime.toAddress");
+		String ccAddresses = serverContext.getProperty("maxJobTime.ccAddress");
+		String subject = "ETLgine [" + serverContext.getProperty("name") + "]: Job '" + job.getName()
+				+ "' ran too long for " + jobTime + " minutes";
+		String senderAddress = serverContext.getProperty("maxJobTime.senderAddress");
+		String content = "";
+		
+		EmptyMail email = new EmptyMail();
+		email.setContent(content);
+		email.setSenderAddress(senderAddress);
+		email.setSubject(subject);
+		email.setToAddresses(parseAndValidateEmails(toAddresses));
+		email.setCcAddresses(parseAndValidateEmails(ccAddresses));
+		Properties prop = new Properties();
+		prop.setProperty(EMAIL_SERVER, serverContext.getProperty(EMAIL_SERVER));
+		MailFactory.initialize(prop);
+		IMailManager mailManager = MailFactory.getMailManager();
+		try {
+			log.info("Sending email for job: " + job.getName() + " to " + toAddresses);
+			mailManager.sendEmail(email);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * @param emailTo
+	 * @return
+	 */
+	private List<String> parseAndValidateEmails(String emailTo) {
+		List<String> emailTos = new ArrayList<String>();
+
+		String[] tos = emailTo.split(";");
+
+		for (int i = 0; i < tos.length; i++) {
+				emailTos.add(tos[i]);
+		}
+
+		return emailTos;
 	}
 
 	/**

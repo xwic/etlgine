@@ -18,7 +18,8 @@ public interface IColumn {
 		DATE,
 		DATETIME,
 		BOOLEAN,
-		BIGDECIMAL
+		BIGDECIMAL,
+		BINARY
 	}
 	
 	

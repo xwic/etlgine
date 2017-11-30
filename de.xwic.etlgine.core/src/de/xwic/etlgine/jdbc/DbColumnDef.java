@@ -18,7 +18,9 @@ public class DbColumnDef {
 	private String typeName = null;
 	private int type = 0;
 	private int size = 0;
+	private int scale = 0;
 	private boolean allowsNull = false;
+	private boolean readOnly = false;
 	
 	/**
 	 * Construct just with a name.
@@ -45,11 +47,12 @@ public class DbColumnDef {
 	 * @param size
 	 * @param allowsNull
 	 */
-	public DbColumnDef(String name, int type, int size, boolean allowsNull) {
+	public DbColumnDef(String name, int type, int size, int scale, boolean allowsNull) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.size = size;
+		this.scale = scale;
 		this.allowsNull = allowsNull;
 	}
 
@@ -58,15 +61,28 @@ public class DbColumnDef {
 	 * @param type
 	 * @param typeName
 	 * @param size
+	 * @param scale
 	 * @param allowsNull
 	 */
-	public DbColumnDef(String name, int type, String typeName, int size, boolean allowsNull) {
+	public DbColumnDef(String name, int type, String typeName, int size, int scale, boolean allowsNull) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.typeName = typeName;
 		this.size = size;
+		this.scale = scale;
 		this.allowsNull = allowsNull;
+		// oracle NUMBER/NUMERIC convertion
+		if (type == Types.NUMERIC && scale == 0) {
+			// must be an integer
+			if (size > 10) {
+				// treat as bigint
+				this.type = Types.BIGINT;
+			} else {
+				// treat as int
+				this.type = Types.INTEGER;
+			}
+		}
 	}
 
 	/**
@@ -105,6 +121,21 @@ public class DbColumnDef {
 	public void setSize(int size) {
 		this.size = size;
 	}
+	
+	/**
+	 * @return the scale
+	 */
+	public int getScale() {
+		return scale;
+	}
+
+	/**
+	 * @param scale the scale to set
+	 */
+	public void setScale(int precision) {
+		this.scale = precision;
+	}
+
 	/**
 	 * @return the allowsNull
 	 */
@@ -145,6 +176,20 @@ public class DbColumnDef {
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
 	}
+	
+	/**
+	 * @return the readOnly
+	 */
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	/**
+	 * @param readOnly the readOnly to set
+	 */
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
 
 	/**
 	 * @return the full SQL type name with length for varchar
@@ -154,7 +199,13 @@ public class DbColumnDef {
 		switch (type) {
 		case Types.VARCHAR:
 		case Types.NVARCHAR:
+		case Types.BINARY:
+		case Types.VARBINARY:
+		case Types.LONGVARBINARY:
 			s += "(" + size + ")";
+			break;
+		case Types.NUMERIC:
+			s += "(" + size + "," + scale + ")";
 			break;
 		}
 		return s;
@@ -162,7 +213,66 @@ public class DbColumnDef {
 	
 	@Override
 	public String toString() {
-		return name + " " + getTypeNameDetails();
+		return "\"" + name + "\" " + getTypeNameDetails();
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (allowsNull ? 1231 : 1237);
+		result = prime * result + ((column == null) ? 0 : column.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + (readOnly ? 1231 : 1237);
+		result = prime * result + scale;
+		result = prime * result + size;
+		result = prime * result + type;
+		result = prime * result + ((typeName == null) ? 0 : typeName.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DbColumnDef other = (DbColumnDef) obj;
+		if (allowsNull != other.allowsNull)
+			return false;
+		if (column == null) {
+			if (other.column != null)
+				return false;
+		} else if (!column.equals(other.column))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (readOnly != other.readOnly)
+			return false;
+		if (scale != other.scale)
+			return false;
+		if (size != other.size)
+			return false;
+		if (type != other.type)
+			return false;
+		if (typeName == null) {
+			if (other.typeName != null)
+				return false;
+		} else if (!typeName.equals(other.typeName))
+			return false;
+		return true;
+	}
+
 	
 }

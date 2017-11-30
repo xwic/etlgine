@@ -18,13 +18,20 @@ public abstract class Context implements IContext {
 	protected Map<String, String> properties = new HashMap<String, String>();
 	protected Map<String, Object> globals = new HashMap<String, Object>();
 	protected boolean stopFlag = false;
+	protected static ThreadLocal<IContext> threadContext = new ThreadLocal<IContext>();
 	
-
 	/**
 	 * Default Constructor.
 	 */
 	public Context() {
 		
+	}
+	
+	/**
+	 * @return ThreadLocal<IContext>
+	 */
+	public static ThreadLocal<IContext> getThreadContext() {
+		return threadContext;
 	}
 	
 	/**
@@ -40,7 +47,7 @@ public abstract class Context implements IContext {
 	 * @param name
 	 * @param value
 	 */
-	public void setProperty(String name, String value) {
+	public synchronized void setProperty(String name, String value) {
 		properties.put(name, value);
 	}
 
@@ -58,7 +65,7 @@ public abstract class Context implements IContext {
 	 * @param name
 	 * @param value
 	 */
-	public String getProperty(String name, String defaultValue) {
+	public synchronized String getProperty(String name, String defaultValue) {
 		String value = properties.get(name);
 		if (value == null) {
 			if (parentContext == null) {
@@ -110,7 +117,7 @@ public abstract class Context implements IContext {
 	 * @param name
 	 * @param object
 	 */
-	public void setData(String name, Object object) {
+	public synchronized void setData(String name, Object object) {
 		globals.put(name, object);
 	}
 
@@ -128,7 +135,7 @@ public abstract class Context implements IContext {
 	 * @param name
 	 * @param object
 	 */
-	public Object getData(String name, Object defaultObject) {
+	public synchronized Object getData(String name, Object defaultObject) {
 		Object value = globals.get(name);
 		if (value == null) {
 			if (parentContext == null) {
@@ -150,7 +157,7 @@ public abstract class Context implements IContext {
 	/**
 	 * @return the stopFlag
 	 */
-	public boolean isStopFlag() {
+	public synchronized boolean isStopFlag() {
 		if (!stopFlag && parentContext != null) {
 			return parentContext.isStopFlag();
 		}
@@ -160,8 +167,13 @@ public abstract class Context implements IContext {
 	/**
 	 * @param stopFlag the stopFlag to set
 	 */
-	public void setStopFlag(boolean stopFlag) {
+	public synchronized void setStopFlag(boolean stopFlag) {
 		this.stopFlag = stopFlag;
 	}
 	
+	public void clear() {
+		properties.clear();
+		globals.clear();
+		threadContext.remove();
+	}
 }

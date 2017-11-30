@@ -79,4 +79,9 @@ public interface IDataSet {
 	 */
 	public void updateColumn(IColumn column) throws ETLException;
 
+	/**
+	 * Registers column added event.
+	 * @param columnAddedListener
+	 */
+	public void addOnDataSetColumnAdded(IDataSetColumnAdded columnAddedListener);
 }

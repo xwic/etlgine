@@ -12,6 +12,7 @@ import java.util.Map;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IDataSet;
+import de.xwic.etlgine.IDataSetColumnAdded;
 
 /**
  * @author lippisch
@@ -23,6 +24,7 @@ public class DataSet implements IDataSet {
 	protected Map<String, IColumn> aliasMap = new HashMap<String, IColumn>();
 	protected Map<Integer, IColumn> columnIndexMap = new HashMap<Integer, IColumn>();
 	
+	protected List<IDataSetColumnAdded> onColumnAdded = new ArrayList<IDataSetColumnAdded>();
 	/**
 	 * Add a new column.
 	 * @param name
@@ -71,6 +73,11 @@ public class DataSet implements IDataSet {
 		
 		columns.add(column);
 		columnMap.put(column.getName(), column);
+		
+		// fire column added event
+		for (IDataSetColumnAdded columnAdded : onColumnAdded) {
+			columnAdded.onDataSetColumnAdded(this, column);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -148,4 +155,13 @@ public class DataSet implements IDataSet {
 			columnIndexMap.put(column.getSourceIndex(), column);
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.etlgine.IDataSet#addOnDataSetColumnAdded(de.xwic.etlgine.IDataSetColumnAdded)
+	 */
+	@Override
+	public void addOnDataSetColumnAdded(IDataSetColumnAdded columnAddedListener) {
+		onColumnAdded.add(columnAddedListener);
+	}
+	
 }

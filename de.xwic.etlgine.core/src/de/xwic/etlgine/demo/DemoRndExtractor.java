@@ -14,11 +14,12 @@ public class DemoRndExtractor  extends AbstractExtractor {
     private int entries = 1;
     private int count = 0;
     private Random random = new Random(System.currentTimeMillis());
+    private int cycles = 0;
 
-    private String[] NAMES = { "Jens", "Florian", "Peter", "Heinz", "Paul", "Martin", "Alfred", "Simon", "Hugo" };
+    private String[] NAMES = { "Jens", "Florian", "Peter", "Heinz", "Paul", "Martin", "Alfred", "Simon", "Hugo", null /* dynamic size based on cycles */ };
 
     public void close() throws ETLException {
-
+    	cycles++;
     }
 
     /* (non-Javadoc)
@@ -39,7 +40,20 @@ public class DemoRndExtractor  extends AbstractExtractor {
 
         record.setData("Date", cal.getTime());
         record.setData("Bookings", new Double(random.nextDouble() * 100000));
-        record.setData("Name", NAMES[random.nextInt(NAMES.length)]);
+        String name = NAMES[random.nextInt(NAMES.length)];
+        if (name == null) {
+        	for (String n : NAMES) {
+        		if (n == null) continue;
+        		for (int i = 0; i <= cycles; i++) {
+        			if (name == null) {
+        				name = n;
+        			} else {
+        				name += "-" + n;
+        			}
+        		}
+        	}
+        }
+        record.setData("Name", name);
 
         return record;
     }

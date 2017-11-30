@@ -229,6 +229,7 @@ public class ProcessChain implements IProcessChain {
 	public void start() throws ETLException {
 		
 		monitor.onEvent(globalContext, EventType.PROCESSCHAIN_START, this);
+		Context.getThreadContext().set(globalContext);
 
 		try {
 			result = Result.SUCCESSFULL;
@@ -263,6 +264,7 @@ public class ProcessChain implements IProcessChain {
 			throw ee;
 		} finally {
 			activeProcess = null;
+			Context.getThreadContext().set(globalContext);
 		}
 
 	}
@@ -281,6 +283,7 @@ public class ProcessChain implements IProcessChain {
 			}
 		}
 		
+		Context.getThreadContext().set(null);
 		monitor.onEvent(globalContext, EventType.PROCESSCHAIN_FINISHED, this);
 	}
 

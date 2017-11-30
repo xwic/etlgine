@@ -6,6 +6,7 @@ package de.xwic.etlgine;
 import java.io.InputStream;
 import java.util.Properties;
 
+import de.xwic.etlgine.impl.Context;
 import de.xwic.etlgine.impl.ProcessChain;
 import de.xwic.etlgine.mail.MailFactory;
 
@@ -20,7 +21,9 @@ public class ETLgine {
 	 * @return
 	 */
 	public static IProcessChain createProcessChain(String name) {
-		return new ProcessChain(name);
+		IProcessChain processChain = new ProcessChain(name);
+		Context.getThreadContext().set(processChain.getGlobalContext());
+		return processChain;
 	}
 	
 	/**
@@ -28,11 +31,15 @@ public class ETLgine {
 	 * @return
 	 */
 	public static IProcessChain createProcessChain(IContext parentContext, String name) {
-		return new ProcessChain(parentContext, name);
+		IProcessChain processChain = new ProcessChain(parentContext, name);
+		Context.getThreadContext().set(processChain.getGlobalContext());
+		return processChain;
 	}
 	
 	public static IProcessChain createProcessChain(IJob job, IContext parentContext, String name) {
-		return new ProcessChain(job, parentContext, name);
+		IProcessChain processChain = new ProcessChain(job, parentContext, name);
+		Context.getThreadContext().set(processChain.getGlobalContext());
+		return processChain;
 	}
 
 	/**

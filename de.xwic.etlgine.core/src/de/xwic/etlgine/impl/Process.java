@@ -45,6 +45,7 @@ public abstract class Process implements IProcess {
 		this.name = name;
 		processContext = new ProcessContext(this);
 		processContext.setMonitor(monitor);
+		Context.getThreadContext().set(processContext);
 	}
 
 	/**
@@ -55,6 +56,7 @@ public abstract class Process implements IProcess {
 		this.name = name;
 		processContext = new ProcessContext(this, context);
 		processContext.setMonitor(monitor);
+		Context.getThreadContext().set(processContext);
 	}
 	
 	/**

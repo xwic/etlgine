@@ -14,20 +14,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +42,8 @@ import de.xwic.etlgine.AbstractTransformer;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
 import de.xwic.etlgine.IColumn.DataType;
+import de.xwic.etlgine.IDataSet;
+import de.xwic.etlgine.IDataSetColumnAdded;
 import de.xwic.etlgine.IETLProcess;
 import de.xwic.etlgine.IExtractor;
 import de.xwic.etlgine.IProcess;
@@ -68,6 +76,62 @@ public class JDBCLoader extends AbstractLoader {
 		INSERT_OR_UPDATE
 	}
 	
+	public enum OnColumnsType {
+		/** Default mode, OnColumns uniquely identify the record */
+		UNIQUE,
+		/** OnColumns define measures and changing attributes, any other not excluded column uniquely identify the record */
+		REVERSE_UNIQUE
+	}
+	
+	public enum OnColumnsMode {
+		/** Original replace on mechanism @deprecated use REPLACE_NEW instead (source can be incremental)*/
+		REPLACE_ALL,
+		
+		/** Delete new records, that already exist.
+		 *  Delete existing records that are going to be replaced.
+		 *  (source can be incremental)
+		 */
+		REPLACE_NEW,
+		
+		/** OnColumns must uniquely identify a record!
+		 *  Delete new records, that already exist.
+		 *  Update old records, that have changed.
+		 *  Delete new records, that have updated old records.
+		 *  (source can be incremental, old records will remain)
+		 */
+		UPDATE,
+		
+		/** OnColumns must uniquely identify a record!
+		 *  Delete new records, that already exist.
+		 *  Update old records, that have changed or delete those that don't exist in source anymore.
+		 *  Delete new records, that have updated old records.
+		 *  (source MUST contain complete data set!)
+		 */
+		UPDATE_REMOVE_DELETED,
+
+		/** History supporting extension of REPLACE_NEW mode.
+		 *  Maintains history of records (incl. history start and end date)!
+		 *  Delete new records, that already exist for current record (history end date = 9999-12-31).
+		 *  Update old records' history end date, that have changed or got deleted (use history deleted date column
+		 *  when source does not contain complete data set!).
+		 *  When source is incremental and records get deleted the source requires a history deleted date column with
+		 *  date(/time) of the deletion in database time-zone, or the source contains complete data set!
+		 *  When history start or end columns exist in the source with values, these are used instead of current time!
+		 */
+		REPLACE_NEW_MAINTAIN_HISTORY
+	}
+	
+	public enum AutoAlterColumnsMode {
+		PRESERVE_KIND,
+		ANY_TO_VARCHAR
+	}
+	
+	/*
+	 * When onColumns contains this tag, it's treated as a formula and not a column name
+	 */
+	public static String ONCOLUMNS_FORMULA = "/*{alias.}*/";
+	protected static Map<String, String> SYNCHRONIZE_TABLE_ACCESS = Collections.synchronizedMap(new HashMap<String, String>());
+	
 	//protected static int[] INT_RANGE = {(int)Math.pow(-2, 31), (int)Math.pow(2, 31) - 1};
 	//protected static long[] BIGINT_RANGE = {(long)Math.pow(-2, 63), (long)Math.pow(2, 63) - 1};
 	
@@ -79,10 +143,7 @@ public class JDBCLoader extends AbstractLoader {
 	private String username = null;
 	private String password = null;
 	private String catalogname = null;
-
-    //RPF: Trying to implement schema definitions in JDBC Loader
-    private String schemaName = null;
-
+	private String schemaname = null;
 	private String tablename = null;
 	private String originalTablename = null;
 	private boolean enableObjectAlias = true;
@@ -92,17 +153,22 @@ public class JDBCLoader extends AbstractLoader {
 	private boolean autoCreateTable = false;
 	private boolean autoCreateColumns = false;
 	private boolean autoDetectColumnTypes = false;
+	private boolean autoDetectColumnTypesNullable = true;
 	private boolean autoDetectColumnTypesRunning = false;
-	private boolean autoAlterColumns = false;	
+	private boolean autoAlterColumns = false;
+	private AutoAlterColumnsMode autoAlterColumnsMode = AutoAlterColumnsMode.PRESERVE_KIND;	
 	private boolean autoDataTruncate = false;
 	private boolean commitOnProcessFinished = true;
 	
+	private boolean ignoreMissingSourceColumns = false;
 	private boolean ignoreMissingTargetColumns = false;
 	private boolean treatEmptyAsNull = false;
 	private boolean truncateTable = false;
 	private boolean deleteTable = false;
 	private boolean tablePurged = false;
 	private boolean skipError = false;
+	private boolean preventNotNullError = false;
+	private boolean addColumnsToDataSet = true;
 	private int batchSize = -1;
 	private int batchCountInsert = 0;
 	private int batchCountUpdate = 0;
@@ -118,14 +184,18 @@ public class JDBCLoader extends AbstractLoader {
 	private String newIdentifierColumn = null;
 	private String newIdentifierValue = null;
 	
-	private long insertCount = 0;
-	private long updateCount = 0;
+	protected long insertCount = 0;
+	protected long updateCount = 0;
+	protected long deleteCount = 0;
+	protected long processRecordCount = 0;
 		
 	private Connection connection = null;
+	protected boolean reopenClosedConnection = true;
 	private PreparedStatement psInsert = null;
 	private PreparedStatement psUpdate = null;
 	private Map<String, DbColumnDef> columns;
 	private Set<String> ignoredColumns = new HashSet<String>();
+	private Set<String> excludedColumns = new HashSet<String>();
 	
 	private boolean withTablock = false;
 	private boolean simulatePkIdentity = true;
@@ -137,24 +207,45 @@ public class JDBCLoader extends AbstractLoader {
 	private Properties properties = new Properties();
 	
 	private String is = null;
+
+	private String autoIncrementColumn = JDBCUtil.PK_IDENTITY_COLUMN;
+	private Object onColumnsMaxValue = null;
+	private Object onColumnsLastMaxValue = null;
 	
-	private boolean replaceOnColumnsOnProcessFinished = false;
-	private String replaceOnAutoIncrementColumn = "Id";
-	private String[] replaceOnColumns = null;
-	private Object replaceOnMaxId = null;
-	private Object lastReplaceOnMaxId = null;
-	private String[] replaceOnColumnsNullValue = null;
-	private String[] replaceOnColumnsCollate = null;
+	// fields for "replace on" functionality that deleted old records based on the newly imported
+	// fields for "update on" functionality that updates old records base on the newly imported (that get delete finally)
+	private OnColumnsMode onColumnsMode = OnColumnsMode.REPLACE_ALL;
+
+	private boolean onColumnsOnProcessFinished = false;
+	private String[] onColumns = null;
+	private boolean onColumnsIncludeMissingTargetColumns = true;
+	private OnColumnsType onColumnsType = OnColumnsType.UNIQUE; 
+	private String[] onColumnsExclude = null;
+	private String[] onColumnsNullValue = null;
+	private String[] onColumnsCollate = null;
+	private String onColumnsHistoryStartDate = null;
+	private String onColumnsHistoryEndDate = null;
+	private String onColumnsHistoryDeletedDate = null;
 	
 	private Map<String, String> objectAliasByName = null;
 	private Map<String, String> objectNameByAlias = null;
+	
+	private IDataSetColumnAdded columnAddedListener = null;
+	private long nanoTimeProcessRecord = 0;
+	private long nanoTimeExecuteBatch = 0;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#initialize(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void initialize(IProcessContext processContext) throws ETLException {
-		super.initialize(processContext);
+	public void initialize(IProcessContext context) throws ETLException {
+		
+		// allow early initialization
+		if (connection != null) {
+			return;
+		}
+		
+		super.initialize(context);
 		
 		if (mode == Mode.UPDATE || mode == Mode.INSERT_OR_UPDATE) {
 			Validate.notNull(pkColumn, "PkColumn must be specified for UPDATE mode.");
@@ -162,7 +253,48 @@ public class JDBCLoader extends AbstractLoader {
 		if (mode == Mode.INSERT_OR_UPDATE) {
 			Validate.notNull(newIdentifierColumn, "NewIdentifierColumn must be specified for INSERT_OR_UPDATE mode.");
 		}
+
+		initConnection(context);
+
+		tablePurged = false;
+
+		/* 
+		 * register JDBCLoader also as first Transformer to execute bulk updates before other Transformers
+		 * to ensure all records are committed.
+		 */
 		
+		IProcess iProcess = context.getProcess();
+		if (iProcess instanceof ETLProcess) {
+			ETLProcess etlProcess = (ETLProcess)iProcess;
+			ITransformer transformer = new AbstractTransformer() {
+				@Override
+				public void postSourceProcessing(IProcessContext context) throws ETLException {
+					if (connection != null) {
+						// check open batch statements
+						executeBatch();
+						// don't call delete on columns as that might be to early (needs to wait for possible transformer adjustments)
+					}
+				}
+			};
+			etlProcess.addTransformer(transformer, 0);
+		}
+		
+		/*
+		 * Check replace on columns logic
+		 */
+		
+		if (onColumnsNullValue != null && onColumns != null && onColumnsNullValue.length != 1 && onColumnsNullValue.length != onColumns.length) {
+			
+			context.getMonitor().logWarn("Replace on column configuration inconsistent on table " + getTablenameQuoted());
+		}
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 * @throws ETLException
+	 */
+	protected void initConnection(IProcessContext context) throws ETLException {
 		if (connectionName == null) {
 			if (connectionUrl == null) {
 				throw new ETLException("No connection NAME or URL specified");
@@ -182,10 +314,12 @@ public class JDBCLoader extends AbstractLoader {
 					throw new ETLException("The specified driver (" + driverName + ") can not be found.", e);
 				}
 				
-				
-				properties.setProperty("user", username);
-				properties.setProperty("password", password);
-				
+				if (username != null) {
+					properties.setProperty("user", username);
+				}
+				if (password != null) {
+					properties.setProperty("password", password);
+				}
 				connection = DriverManager.getConnection(connectionUrl, properties);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
@@ -193,13 +327,18 @@ public class JDBCLoader extends AbstractLoader {
 		} else {
 			monitor.logInfo("Using named connection: " + connectionName);
 			if (batchSize == -1) {
-				batchSize = JDBCUtil.getBatchSize(processContext, connectionName);
+				batchSize = JDBCUtil.getBatchSize(context, connectionName);
+			}
+			String dialect = JDBCUtil.getDialect(context, connectionName);
+			if (dialect != null && dialect.length() > 0) {
+				// read dialect
+				setSqlDialect(SqlDialect.valueOf(dialect));
 			}
 			try {
 				if (sharedConnectionName != null) {
-					connection = JDBCUtil.getSharedConnection(processContext, sharedConnectionName, connectionName);
+					connection = JDBCUtil.getSharedConnection(context, sharedConnectionName, connectionName);
 				} else {
-					connection = JDBCUtil.openConnection(processContext, connectionName);
+					connection = JDBCUtil.openConnection(context, connectionName);
 				}
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
@@ -209,43 +348,11 @@ public class JDBCLoader extends AbstractLoader {
 		if (is == null) {
 			is = JDBCUtil.getIdentifierSeparator(connection);
 		}
-
-		tablePurged = false;
-
-		/* 
-		 * register JDBCLoader also as first Transformer to execute bulk updates before other Transformers
-		 * to ensure all records are committed.
-		 */
-		
-		IProcess iProcess = processContext.getProcess();
-		if (iProcess instanceof ETLProcess) {
-			ETLProcess etlProcess = (ETLProcess)iProcess;
-			ITransformer transformer = new AbstractTransformer() {
-				@Override
-				public void postSourceProcessing(IProcessContext processContext) throws ETLException {
-					if (connection != null) {
-						// check open batch statements
-						executeBatch();
-						// don't call delete on columns as that might be to early (needs to wait for possible transformer adjustments)
-					}
-				}
-			};
-			etlProcess.addTransformer(transformer, 0);
-		}
-		
-		/*
-		 * Check replace on columns logic
-		 */
-		
-		if (replaceOnColumnsNullValue != null && replaceOnColumns != null && replaceOnColumnsNullValue.length != 1 && replaceOnColumnsNullValue.length != replaceOnColumns.length) {
-			
-			processContext.getMonitor().logWarn("Replace on column configuration inconsistent on table " + getTablenameQuoted());
-		}
 	}
-	
+
 	@Override
-	public void postSourceProcessing(IProcessContext processContext) throws ETLException {
-		super.postSourceProcessing(processContext);
+	public void postSourceProcessing(IProcessContext context) throws ETLException {
+		super.postSourceProcessing(context);
 		
 		// called from finalizer as well
 		postSourceProcessing();
@@ -260,13 +367,9 @@ public class JDBCLoader extends AbstractLoader {
 			// check open batch statements
 			executeBatch();
 
-			if (!replaceOnColumnsOnProcessFinished) {
-				// if replace on columns is enabled and records existed, ensure consistency 
-				try {
-					executeDeleteForReplace();
-				} catch (SQLException e) {
-					throw new ETLException(e);
-				}
+			if (!onColumnsOnProcessFinished && onColumnsMode != null) {
+				// if replace on columns is enabled and records existed, ensure consistency
+				executeReplaceData();
 			}			
 		}
 	}
@@ -275,30 +378,34 @@ public class JDBCLoader extends AbstractLoader {
 	 * @see de.xwic.etlgine.impl.AbstractLoader#onProcessFinished(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void onProcessFinished(IProcessContext processContext) throws ETLException {
+	public void onProcessFinished(IProcessContext context) throws ETLException {
 		
 		if (connection != null) {
 			try {
 				// check open batch statements
 				executeBatch();
+				if (psInsert != null) {
+					psInsert.close();
+					psInsert = null;
+				}
+				if (psUpdate != null) {
+					psUpdate.close();
+					psUpdate = null;
+				}
 
-				if (replaceOnColumnsOnProcessFinished) {
-					// if replace on columns is enabled and records existed, ensure consistency 
-					try {
-						executeDeleteForReplace();
-					} catch (SQLException e) {
-						throw new ETLException(e);
-					}
+				if (onColumnsOnProcessFinished && onColumnsMode != null) {
+					// if replace on columns is enabled and records existed, ensure consistency
+					executeReplaceData();
 				}			
 
 				if (sharedConnectionName == null) {
 					// only close the connection if it is not shared!
-					monitor.logInfo("JDBCLoader close connection");
+					monitor.logInfo(this + " close connection");
 					connection.close();
 				} else {
 					if (commitOnProcessFinished && !connection.getAutoCommit()) {
 						// commit for shared connections
-						monitor.logInfo("JDBCLoader commit transaction");
+						monitor.logInfo(this + " commit transaction");
 						connection.commit();
 					}
 				}
@@ -307,12 +414,45 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			connection = null;
 		}
-
-		monitor.logInfo("JDBCLoader " + insertCount + " records inserted, " + updateCount + " records updated.");
+		
+		DecimalFormat df = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.US));
+		monitor.logInfo(this + " " + insertCount + " records inserted, " + updateCount + " records updated, " + deleteCount + " records deleted. " + 
+						"Total nano time/record: " + df.format((double)(nanoTimeExecuteBatch + nanoTimeProcessRecord) / processRecordCount) + 
+						", ProcessRecord: " + df.format((double)nanoTimeProcessRecord / processRecordCount) + 
+						", ExecuteBatch: " + df.format((double)nanoTimeExecuteBatch / processRecordCount));
 	}
 	
 	/**
-	 * Deletes the records that had been inserted.
+	 * @throws ETLException 
+	 * 
+	 */
+	protected void executeReplaceData() throws ETLException {
+		if (onColumns == null) {
+			// nothing to do
+			return;
+		}
+		try {
+			switch (onColumnsMode) {
+			case REPLACE_ALL:
+				// old @deprecated mode
+				executeDeleteForReplace();
+				break;
+			case REPLACE_NEW:
+			case REPLACE_NEW_MAINTAIN_HISTORY:
+			case UPDATE:
+			case UPDATE_REMOVE_DELETED:
+				executeOnColumns();
+				break;
+			}
+			
+		} catch (SQLException e) {
+			throw new ETLException(e);
+		}
+	}
+	
+	/**
+	 * Deletes exiting records that will be replaced with the inserted once.
+	 * @deprecated
 	 * @throws SQLException
 	 */
 	protected void executeDeleteForReplace() throws SQLException {
@@ -321,70 +461,791 @@ public class JDBCLoader extends AbstractLoader {
 			return;
 		}
 		
+		String aCol = is + autoIncrementColumn + is;
 		// check for replace
-		if (replaceOnMaxId != null) {
-			lastReplaceOnMaxId = null;
+		if (onColumnsMaxValue != null) {
+			onColumnsLastMaxValue = null;
 			StringBuilder sql = new StringBuilder("delete t\n");
 			sql
 			.append("from " + getTablenameQuoted() + " t\n")
 			.append("inner join (\n")
 			.append("select distinct ");
 			StringBuilder on = new StringBuilder();
-			for (int i = 0; i < replaceOnColumns.length; i++) {
-				String col = replaceOnColumns[i];
-				String nul = replaceOnColumnsNullValue != null ? 
-						replaceOnColumnsNullValue.length > i ? replaceOnColumnsNullValue[i] : 
-						replaceOnColumnsNullValue.length == 1 ? replaceOnColumnsNullValue[0] : null
+			
+			List<String> usedOnColumns = new ArrayList<String>();
+			if (onColumnsType == OnColumnsType.UNIQUE && onColumns.length > 0) {
+				// default mode
+				usedOnColumns = Arrays.asList(onColumns);
+			} else {
+				// reverse mode
+				for (DbColumnDef colDef : columns.values()) {
+					
+					IColumn iCol = colDef.getColumn();
+					boolean skip = colDef.isReadOnly() || iCol == null || iCol.isExclude();
+					
+					if (!skip && onColumnsExclude != null) {
+						for (String c : onColumnsExclude) {
+							if (c.equalsIgnoreCase(colDef.getName())) {
+								skip = true;
+								break;
+							}
+						}
+					}
+					
+					if (skip) {
+						continue;
+					}
+					
+					String addOnColumn = null;
+					if (onColumns.length == 0) {
+						// if onColumns is empty use all
+						addOnColumn = colDef.getName();
+					} else {
+						int not_in_list = 0;
+						for (String c : onColumns) {
+							if (c.equalsIgnoreCase(colDef.getName())) {
+								if (onColumnsType == OnColumnsType.UNIQUE) {
+									// columns define a unique record
+									addOnColumn = colDef.getName();
+									break;
+								}
+							} else {
+								// all columns except the onColumns once define a unique record
+								not_in_list++;
+							}
+						}
+						if (onColumnsType == OnColumnsType.REVERSE_UNIQUE && not_in_list == onColumns.length) {
+							// all columns except the onColumns once define a unique record
+							addOnColumn = colDef.getName();;
+						}						
+					}
+					if (addOnColumn != null) {
+						usedOnColumns.add(addOnColumn);						
+					}
+				}						
+			}
+			for (int i = 0; i < usedOnColumns.size(); i++) {
+				String col = usedOnColumns.get(i);
+				String nul = onColumnsNullValue != null ? 
+						onColumnsNullValue.length > i ? onColumnsNullValue[i] : 
+						onColumnsNullValue.length == 1 ? onColumnsNullValue[0] : null
 						: null;
-				String collate = replaceOnColumnsCollate != null && replaceOnColumnsCollate.length > i ? replaceOnColumnsCollate[i] : null;
+				String collate = onColumnsCollate != null && onColumnsCollate.length > i ? onColumnsCollate[i] : null;
 				if (on.length() > 0) {
 					sql.append(", ");
 					on.append(" and ");
 				}
-				col = is + col + is;
+				String col_n = "n." + is + col + is;
+				String col_t = "t." + is + col + is;
+				
+				// check for formula
+				if (Pattern.compile(ONCOLUMNS_FORMULA, Pattern.LITERAL + Pattern.CASE_INSENSITIVE).matcher(col).replaceAll(Matcher.quoteReplacement("")).length() < col.length()) {
+					// column specifies a formula, set col_n and col_t accordingly
+					col_n = Pattern.compile(ONCOLUMNS_FORMULA, Pattern.LITERAL + Pattern.CASE_INSENSITIVE).matcher(col).replaceAll(Matcher.quoteReplacement("n."));
+					col_t = Pattern.compile(ONCOLUMNS_FORMULA, Pattern.LITERAL + Pattern.CASE_INSENSITIVE).matcher(col).replaceAll(Matcher.quoteReplacement("t."));
+				}
+				
 				if (nul == null) {
 					// default behavior
-					sql.append(col);
-					if (collate != null) {
-						sql.append(" ").append(collate).append(" as ").append(col);
+					if (collate == null) {
+						sql.append(col_n + " as n" + i);
+					} else {
+						sql.append(col_n + " " + collate + " as n" + i);
 					}
-					on.append("n.").append(col).append(" = t.").append(col);
+					on.append("n" + i + " = " + col_t);
 				} else {
 					// use coalesce on null values
-					sql.append("coalesce(").append(col).append(",").append(nul).append(")");
+					sql.append("coalesce(" + col_n + "," + nul + ")");
 					if (collate != null) {
-						sql.append(" ").append(collate);
+						sql.append(" " + collate);
 					}
-					sql.append(" as ").append(col);
-					on.append("n.").append(col).append(" = coalesce(t.").append(col).append(",").append(nul).append(")");
+					sql.append(" as n" + i);
+					on.append("n" + i + " = coalesce(" + col_t + "," + nul + ")");
 				}
 			}
-			sql.append(" from " + getTablenameQuoted() + " where " + is + replaceOnAutoIncrementColumn + is + " > ?\n")
-			.append(") n on ").append(on).append("\n")
-			.append("where t.").append(is).append(replaceOnAutoIncrementColumn).append(is).append(" <= ?");
+			sql.append(" from " + getTablenameQuoted() + " n where " + aCol + " > ?\n")
+			.append(") n on " + on + "\n")
+			.append("where t." + aCol + " <= ?");
 
 			PreparedStatement ps = connection.prepareStatement(sql.toString());
-			ps.setObject(1, replaceOnMaxId);
-			ps.setObject(2, replaceOnMaxId);
+			ps.setObject(1, onColumnsMaxValue);
+			ps.setObject(2, onColumnsMaxValue);
 			try {
-				monitor.logInfo("JDBCLoader executes delete statement on table " + getTablenameQuoted()); 
+				monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted()); 
 				int cnt = ps.executeUpdate();
-				monitor.logInfo("JDBCLoader " + cnt + " records deleted.");
+				deleteCount += cnt;
+				monitor.logInfo(this + " " + cnt + " records deleted.");
 			} finally {
-				lastReplaceOnMaxId = replaceOnMaxId;
+				onColumnsLastMaxValue = onColumnsMaxValue;
 				// clear max id
-				replaceOnMaxId = null;
+				onColumnsMaxValue = null;
 				ps.close();
 			}
 		}
 	}
 
+	/**
+	 * Deletes exiting records that will be replaced with the inserted once.
+	 * Supported modes are defined in OnColumnsMode.
+	 * @throws SQLException
+	 */
+	protected void executeOnColumns() throws SQLException {
+		// exit if not applicable
+		if (autoDetectColumnTypesRunning) {
+			return;
+		}
+		//connection.commit();
+		final String[] psSql = new String[1];
+		String t = is + "t" + is;
+		String n = is + "n" + is;
+		String o = is + "o" + is;
+		String aCol = is + autoIncrementColumn + is;
+		// check for delete/update
+		if (onColumnsMaxValue != null) {
+			onColumnsLastMaxValue = null;
+			
+			// on join for onColumns only
+			StringBuilder onCols = new StringBuilder();
+			// on join for all columns except read only
+			StringBuilder onAll = new StringBuilder();
+			// columns that will be updated
+			StringBuilder setColumns = new StringBuilder();
+			// distinct onColumns for delete
+			StringBuilder selectOnCols = new StringBuilder();
+			StringBuilder onSelectOnCols = new StringBuilder();
+
+			// list of used onColumn (@see OnColumnsType)
+			List<String> usedOnColumns = new ArrayList<String>();
+			for (DbColumnDef colDef : columns.values()) {
+				
+				IColumn iCol = colDef.getColumn();
+				boolean skip = colDef.isReadOnly() || (iCol == null && onColumnsIncludeMissingTargetColumns) || (iCol != null && iCol.isExclude());
+				if (!skip && colDef.getName().equalsIgnoreCase(pkColumn != null ? pkColumn : autoIncrementColumn)) {
+					skip = true;
+				}
+				
+				if (!skip && onColumnsExclude != null) {
+					for (String c : onColumnsExclude) {
+						if (c.equalsIgnoreCase(colDef.getName())) {
+							skip = true;
+							break;
+						}
+					}
+				}
+				
+				if (skip) {
+					continue;
+				}
+				
+				String col = is + colDef.getName() + is;
+				String nul = colDef.isAllowsNull() ? getColumnDefaultValueForNullOnJoin(colDef) : null;
+				if (onAll.length() > 0) {
+					onAll.append(" and ");
+				}
+				if (nul == null) {
+					// default behavior
+					onAll.append(n + "." + col + " = " + t + "." + col);
+				} else {
+					// use coalesce on null values
+					onAll.append("coalesce(" + n + "." + col + "," + nul + ")" + " = coalesce(" + t + "." + col + "," + nul + ")");
+				}
+				
+				// onColumns join
+				String addOnColumn = null;
+				
+				if (onColumns.length == 0) {
+					// if onColumns is empty use all
+					addOnColumn = colDef.getName();
+				} else {
+					int not_in_list = 0;
+					for (String c : onColumns) {
+						if (c.equalsIgnoreCase(colDef.getName())) {
+							if (onColumnsType == OnColumnsType.UNIQUE) {
+								// columns define a unique record
+								addOnColumn = colDef.getName();
+								break;
+							}
+						} else {
+							// all columns except the onColumns once define a unique record
+							not_in_list++;
+						}
+					}
+					if (onColumnsType == OnColumnsType.REVERSE_UNIQUE && not_in_list == onColumns.length) {
+						// all columns except the onColumns once define a unique record
+						addOnColumn = colDef.getName();;
+					}						
+				}
+				
+				if (addOnColumn != null) {
+					usedOnColumns.add(addOnColumn);
+					if (onCols.length() > 0) {
+						onCols.append(" and ");
+						onSelectOnCols.append(" and ");
+						selectOnCols.append(", ");
+					}
+					if (nul == null) {
+						// default behavior
+						onCols.append("" + n + "." + col + " = " + t + "." + col);
+						selectOnCols.append(col);
+					} else {
+						// use coalesce on null values
+						onCols.append("coalesce(" + n + "." + col + "," + nul + ")" + " = coalesce(" + t + "." + col + "," + nul + ")");
+						selectOnCols.append("coalesce(" + col + "," + nul + ") as " + col);
+					}
+					onSelectOnCols.append("" + o + "." + col + " = " + t + "." + col);
+				} else {
+					// add set columns
+					if (setColumns.length() > 0) {
+						setColumns.append(", ");
+					}
+					setColumns.append("" + t + "." + col + " = " + n + "." + col + "\n");
+				}
+			}
+			
+			class PreparedStatementHelper {
+				PreparedStatement getPreparedStatement(String sql, int idCountForColumnsMaxValue) throws SQLException {
+					psSql[0] = sql;
+					PreparedStatement ps = connection.prepareStatement(sql);
+					for (int i = 1; i <= idCountForColumnsMaxValue; i++) {
+						ps.setObject(i, onColumnsMaxValue);
+					}
+					return ps;
+				}
+			}
+			PreparedStatementHelper helper = new PreparedStatementHelper();
+			
+			String uuid = UUID.randomUUID().toString();
+			String 	tempTable = is + "_" + uuid + is; // #temp tables don't survive, don't know why :-(
+			String 	tempSql = null;
+			int		tempSqlIds = 0;
+			String	deleteGoneSql = null;
+			int		deleteGoneSqlIds = 0;
+			String	deleteSql = null;
+			int		deleteSqlIds = 0;
+			String	updateSql = null;
+			int		updateSqlIds = 0;
+			String	deleteUpdatedSql = null;
+			int		deleteUpdatedSqlIds = 0;
+			String	deleteForReplace = null;
+			int		deleteForReplaceIds = 0;
+			
+			// define sql string value for history start date & time (java now!)
+			SimpleDateFormat sqlTimestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); //2010-10-20 17:34:30.000
+			String sql_history_start_now = "'" + sqlTimestampFormat.format(new Date()) + "'";
+			String sql_history_end_now = "DateAdd(ms,-2," + sql_history_start_now + ")";
+			
+			PreparedStatement ps = null;
+
+			String delete_t_from = "delete t from\n";
+			String delete_n_from = "delete n from\n";
+			String delete_end = "";
+			if (sqlDialect == SqlDialect.ORACLE) {
+				delete_t_from = "delete (select " + t + ".* from\n";
+				delete_n_from = "delete (select " + n + ".* from\n";
+				delete_end = ") " + t;
+			}
+			
+			switch (onColumnsMode) {
+			case REPLACE_ALL:
+				break;
+				
+			case UPDATE_REMOVE_DELETED:
+				// delete old records, that don't exist anymore (IMPORTANT: Data MUST contain complete dataset!)
+				deleteGoneSqlIds = 2;
+				deleteGoneSql =
+					delete_t_from
+					+ "(\n"
+					+ "	select " + aCol + "\n"
+					+ "	, " + selectOnCols + "\n"
+					+ "	from "+ getTablenameQuoted() + " t\n"
+					+ "	where " + aCol + " <= ?\n"
+					+ ") t\n"
+					+ "left outer join (\n"
+					+ "	select distinct " + selectOnCols + "\n"
+					+ "	,1 as " + is + "Exists " + uuid + is + "\n"
+					+ "	from " + getTablenameQuoted() + " t\n"
+					+ "	where " + aCol + " > ?\n"
+					+ ") o on " + onSelectOnCols + "\n"
+					+ "where " + o + "." + is + "Exists " + uuid + is + " is null\n"
+					+ delete_end;
+				
+			case UPDATE:
+				// delete new records, that already exist
+				deleteSqlIds = 2;
+				deleteSql =
+					  "delete from "+ getTablenameQuoted() + "\n"
+					+ "where " + aCol + " in (\n"
+					+ "select " + t + "." + aCol + "\n"
+					+ "from " + getTablenameQuoted() + " " + t + "\n"
+					+ "inner join " + getTablenameQuoted() + " " + n + "\n"
+					+ "on " + n + "." + aCol + " <= ?\n"
+					+ "and " + onAll + "\n"
+					+ "where " + t + "." + aCol + " > ?\n"
+					+ ")";
+	
+				// update old records, that have changed
+				updateSqlIds = 2;
+				updateSql = setColumns.length() > 0 ?
+					  "update t\n"
+					+ "set " + setColumns
+					+ "from " + getTablenameQuoted() + " t\n"
+					+ "inner join " + getTablenameQuoted() + " n\t"
+					+ "on " + n + "." + aCol + " > ?\n"
+					+ "and " + onCols + "\n"
+					+ "where " + t + "." + aCol + " <= ?"
+				: null;
+				
+				// delete new records, that have updated old records
+				deleteUpdatedSqlIds = 2;
+				deleteUpdatedSql =
+					  delete_n_from
+					+ getTablenameQuoted() + " t\n"
+					+ "inner join " + getTablenameQuoted() + " n\t"
+					+ "on " + n + "." + aCol + " > ?\n"
+					+ "and " + onCols + "\n"
+					+ "where " + t + "." + aCol + " <= ?"
+				    + delete_end;
+
+				break;
+				
+			case REPLACE_NEW:
+				// delete new records, that already exist and existing records that are going to be replaced
+				
+				// identify new records, that already exist
+/*
+	select n."Id"
+	, t."Id" as "Existing Id"
+	into "#sales_bookings"
+	from "sales_bookings" t with (nolock)
+	inner join "sales_bookings" n with (nolock)
+	on n."Id" > 17902113 
+	--and n."Fiscal Date" = t."Fiscal Date" and n."Sales Rep Participant Key" = t."Sales Rep Participant Key"
+	and coalesce(n."Base Booking Flag",'{null:just for join}') = coalesce(t."Base Booking Flag",'{null:just for join}') and coalesce(n."Fiscal Date",'1970-01-01') = coalesce(t."Fiscal Date",'1970-01-01') and coalesce(n."Product Key",-9223372036854775808) = coalesce(t."Product Key",-9223372036854775808) and coalesce(n."Sales Rep Participant Key",-9223372036854775808) = coalesce(t."Sales Rep Participant Key",-9223372036854775808) and coalesce(n."Sales Order Key",-9223372036854775808) = coalesce(t."Sales Order Key",-9223372036854775808) and coalesce(n."Sales Order Line Key",-9223372036854775808) = coalesce(t."Sales Order Line Key",-9223372036854775808) and coalesce(n."Sales District",'{null:just for join}') = coalesce(t."Sales District",'{null:just for join}') and coalesce(n."Sales Team",'{null:just for join}') = coalesce(t."Sales Team",'{null:just for join}') and coalesce(n."Booked Date",'1970-01-01') = coalesce(t."Booked Date",'1970-01-01') and coalesce(n."Sales Order Number",-9223372036854775808) = coalesce(t."Sales Order Number",-9223372036854775808) and coalesce(n."Order Line Number",'{null:just for join}') = coalesce(t."Order Line Number",'{null:just for join}') and coalesce(n."Sales Channel Code",'{null:just for join}') = coalesce(t."Sales Channel Code",'{null:just for join}') and coalesce(n."Sold To Customer NAGP",'{null:just for join}') = coalesce(t."Sold To Customer NAGP",'{null:just for join}') and coalesce(n."Sold To Customer Company CMAT ID",-9223372036854775808) = coalesce(t."Sold To Customer Company CMAT ID",-9223372036854775808) and coalesce(n."Bill To Customer NAGP",'{null:just for join}') = coalesce(t."Bill To Customer NAGP",'{null:just for join}') and coalesce(n."Bill To Customer Company CMAT ID",-9223372036854775808) = coalesce(t."Bill To Customer Company CMAT ID",-9223372036854775808) and coalesce(n."Ship To Customer NAGP",'{null:just for join}') = coalesce(t."Ship To Customer NAGP",'{null:just for join}') and coalesce(n."Ship To Customer Company CMAT ID",-9223372036854775808) = coalesce(t."Ship To Customer Company CMAT ID",-9223372036854775808) and coalesce(n."Account NAGP",'{null:just for join}') = coalesce(t."Account NAGP",'{null:just for join}') and coalesce(n."Account Site CMAT ID",-9223372036854775808) = coalesce(t."Account Site CMAT ID",-9223372036854775808) and coalesce(n."Sold To Partner Site CMAT ID",-9223372036854775808) = coalesce(t."Sold To Partner Site CMAT ID",-9223372036854775808) and coalesce(n."Value Add Partner Site CMAT ID",-9223372036854775808) = coalesce(t."Value Add Partner Site CMAT ID",-9223372036854775808) and coalesce(n."Value Add Partner 2 Site CMAT ID",'{null:just for join}') = coalesce(t."Value Add Partner 2 Site CMAT ID",'{null:just for join}') and coalesce(n."Distributor Site CMAT ID",-9223372036854775808) = coalesce(t."Distributor Site CMAT ID",-9223372036854775808) and coalesce(n."Consolidator Site CMAT ID",'{null:just for join}') = coalesce(t."Consolidator Site CMAT ID",'{null:just for join}') and coalesce(n."SFDC Opportunity Number",'{null:just for join}') = coalesce(t."SFDC Opportunity Number",'{null:just for join}') and coalesce(n."Opportunity ID",'{null:just for join}') = coalesce(t."Opportunity ID",'{null:just for join}') and coalesce(n."System Qty",-9223372036854775808) = coalesce(t."System Qty",-9223372036854775808) and coalesce(n."Controller Qty",-9223372036854775808) = coalesce(t."Controller Qty",-9223372036854775808) and coalesce(n."Storage Capacity GB",-9223372036854775808) = coalesce(t."Storage Capacity GB",-9223372036854775808) and coalesce(n."Booking Qty",-9223372036854775808) = coalesce(t."Booking Qty",-9223372036854775808) and coalesce(n."USD Booking Amount",-9223372036854775808) = coalesce(t."USD Booking Amount",-9223372036854775808) and coalesce(n."USD Extended List Price",-9223372036854775808) = coalesce(t."USD Extended List Price",-9223372036854775808) and coalesce(n."USD Extended Burdened Cost",-9223372036854775808) = coalesce(t."USD Extended Burdened Cost",-9223372036854775808) and coalesce(n."USD Extended Discount",-9223372036854775808) = coalesce(t."USD Extended Discount",-9223372036854775808) and coalesce(n."BE USD Booking Amount",-9223372036854775808) = coalesce(t."BE USD Booking Amount",-9223372036854775808) and coalesce(n."BE USD Extended List Price",-9223372036854775808) = coalesce(t."BE USD Extended List Price",-9223372036854775808) and coalesce(n."BE USD Extended Discount Amount",-9223372036854775808) = coalesce(t."BE USD Extended Discount Amount",-9223372036854775808) and coalesce(n."BE USD Extended Burdened Cost",-9223372036854775808) = coalesce(t."BE USD Extended Burdened Cost",-9223372036854775808) and coalesce(n."GC Booking Amount",-9223372036854775808) = coalesce(t."GC Booking Amount",-9223372036854775808) and coalesce(n."SO Booking Amount",-9223372036854775808) = coalesce(t."SO Booking Amount",-9223372036854775808) and coalesce(n."SO Extended List Price",-9223372036854775808) = coalesce(t."SO Extended List Price",-9223372036854775808) and coalesce(n."SO Extended Burdened Cost",-9223372036854775808) = coalesce(t."SO Extended Burdened Cost",-9223372036854775808) and coalesce(n."SO Extended Discount",-9223372036854775808) = coalesce(t."SO Extended Discount",-9223372036854775808) and coalesce(n."GC Currency Code",'{null:just for join}') = coalesce(t."GC Currency Code",'{null:just for join}') and coalesce(n."SO Extended Burdened Cost2",-9223372036854775808) = coalesce(t."SO Extended Burdened Cost2",-9223372036854775808) and coalesce(n."SO Currency Code",'{null:just for join}') = coalesce(t."SO Currency Code",'{null:just for join}') and coalesce(n."BE Currency Code",'{null:just for join}') = coalesce(t."BE Currency Code",'{null:just for join}') and coalesce(n."SO to GC Conversion Rate",-9223372036854775808) = coalesce(t."SO to GC Conversion Rate",-9223372036854775808) and coalesce(n."BE USD Conversion Rate",-9223372036854775808) = coalesce(t."BE USD Conversion Rate",-9223372036854775808) and coalesce(n."AOP USD Conversion Rate",-9223372036854775808) = coalesce(t."AOP USD Conversion Rate",-9223372036854775808)
+	where t."Id" <= 17902113
+*/
+				tempSqlIds = 2;
+				tempSql = 
+				  "/* create */ select " + n + "." + aCol + "\n"
+				+ ", " + t + "." + aCol + " as " + is + "Existing " + autoIncrementColumn + is + "\n"
+				+ "/* into */" + "\n"
+				+ "from " + getTablenameQuoted() + " " + t + "\n"
+				+ "inner join " +  getTablenameQuoted() + " " + n + "\n"
+				+ "on " + n + "." + aCol + " > ?\n"
+				+ "and " + onAll + "\n"
+				+ "where " + t + "." + aCol + " <= ?\n";
+				if (sqlDialect == SqlDialect.MSSQL) {
+					tempSql = tempSql.replace("/* into */", "into " + tempTable);
+				} else {
+					tempSql = tempSql.replace("/* create */", "create table " + tempTable + " as");
+				}
+				// delete new records, that already exist
+/*
+delete t
+from "sales_bookings" t
+inner join "#sales_bookings" n
+on t.Id = n.Id
+*/
+				deleteSqlIds = 0;
+				deleteSql =
+				  "delete " + t + "\n"
+				+ "from " + getTablenameQuoted() + " " + t + "\n"
+				+ "where " + t + "." + aCol + " in (select " + aCol + " from " + tempTable + ")\n";
+				
+				// delete existing records for replace (excl. the once that should remain)
+
+/*
+delete t
+from (
+	select "Id"
+	, coalesce("Fiscal Date",'1970-01-01') as "Fiscal Date", coalesce("Sales Rep Participant Key",-9223372036854775808) as "Sales Rep Participant Key"
+	from "sales_bookings" t with (nolock)
+	where "Id" <= 18002113
+) t
+inner join (
+	select distinct coalesce("Fiscal Date",'1970-01-01') as "Fiscal Date", coalesce("Sales Rep Participant Key",-9223372036854775808) as "Sales Rep Participant Key"
+	from "sales_bookings" t with (nolock)
+	where "Id" > 18002113
+) o on o."Fiscal Date" = t."Fiscal Date" and o."Sales Rep Participant Key" = t."Sales Rep Participant Key"
+left outer join "#sales_bookings" n
+on n."Existing Id" = t.Id
+where n.[Existing Id] is null
+*/
+				deleteForReplaceIds = 2;
+				deleteForReplace =
+				  "delete from "+ getTablenameQuoted() + "\n"
+				+ "where " + aCol + " in (\n"
+				+ "select " + t + "." + aCol + " from (\n"
+				+ "	select " + aCol + "\n"
+				+ "	, " + selectOnCols + "\n"
+				+ "	from "+ getTablenameQuoted() + " " + t + "\n"
+				+ "	where " + aCol + " <= ?\n"
+				+ ") " + t + "\n"
+				+ "inner join (\n"
+				+ "	select distinct " + selectOnCols + "\n"
+				+ "	from " + getTablenameQuoted() + " " + t + "\n"
+				+ "	where " + aCol + " > ?\n"
+				+ ") " + o + " on " + onSelectOnCols + "\n"
+				+ "left outer join " + tempTable + " " + n + "\n"
+				+ "on " + n + "." + is + "Existing " + autoIncrementColumn + is + " = " + t + "." + aCol + "\n"
+				+ "where " + n + "." + is + "Existing " + autoIncrementColumn + is + " is null"
+				+ ")";
+				
+				break;
+				
+			/** Maintains history of uniquely identified records (incl. history start and end date)!
+			 *  Delete new records, that already exist for current record (history end date = 9999-31-12).
+			 *  Update old records' history end date, that have changed or got deleted (use history deleted date column
+			 *  when source does not contain complete data set!).
+			 *  Delete new records, that have updated old records.
+			 *  (when source is incremental and records get deleted the source requires a history deleted date column with
+			 *  date(/time) of the deletion in database time-zone, or the source contains complete data set!)
+			 */
+			case REPLACE_NEW_MAINTAIN_HISTORY: /* IMPORTANT: This mode is still not ready and under development ! ! ! ! ! ! ! */
+/*
+	select n."Id"
+	, t."Id" as "Existing Id"
+	into "#sales_bookings"
+	from "sales_bookings" t with (nolock)
+	inner join "sales_bookings" n with (nolock)
+	on n."Id" > 17902113 
+	--and n."Fiscal Date" = t."Fiscal Date" and n."Sales Rep Participant Key" = t."Sales Rep Participant Key"
+	and coalesce(n."Base Booking Flag",'{null:just for join}') = coalesce(t."Base Booking Flag",'{null:just for join}') and coalesce(n."Fiscal Date",'1970-01-01') = coalesce(t."Fiscal Date",'1970-01-01') and coalesce(n."Product Key",-9223372036854775808) = coalesce(t."Product Key",-9223372036854775808) and coalesce(n."Sales Rep Participant Key",-9223372036854775808) = coalesce(t."Sales Rep Participant Key",-9223372036854775808) and coalesce(n."Sales Order Key",-9223372036854775808) = coalesce(t."Sales Order Key",-9223372036854775808) and coalesce(n."Sales Order Line Key",-9223372036854775808) = coalesce(t."Sales Order Line Key",-9223372036854775808) and coalesce(n."Sales District",'{null:just for join}') = coalesce(t."Sales District",'{null:just for join}') and coalesce(n."Sales Team",'{null:just for join}') = coalesce(t."Sales Team",'{null:just for join}') and coalesce(n."Booked Date",'1970-01-01') = coalesce(t."Booked Date",'1970-01-01') and coalesce(n."Sales Order Number",-9223372036854775808) = coalesce(t."Sales Order Number",-9223372036854775808) and coalesce(n."Order Line Number",'{null:just for join}') = coalesce(t."Order Line Number",'{null:just for join}') and coalesce(n."Sales Channel Code",'{null:just for join}') = coalesce(t."Sales Channel Code",'{null:just for join}') and coalesce(n."Sold To Customer NAGP",'{null:just for join}') = coalesce(t."Sold To Customer NAGP",'{null:just for join}') and coalesce(n."Sold To Customer Company CMAT ID",-9223372036854775808) = coalesce(t."Sold To Customer Company CMAT ID",-9223372036854775808) and coalesce(n."Bill To Customer NAGP",'{null:just for join}') = coalesce(t."Bill To Customer NAGP",'{null:just for join}') and coalesce(n."Bill To Customer Company CMAT ID",-9223372036854775808) = coalesce(t."Bill To Customer Company CMAT ID",-9223372036854775808) and coalesce(n."Ship To Customer NAGP",'{null:just for join}') = coalesce(t."Ship To Customer NAGP",'{null:just for join}') and coalesce(n."Ship To Customer Company CMAT ID",-9223372036854775808) = coalesce(t."Ship To Customer Company CMAT ID",-9223372036854775808) and coalesce(n."Account NAGP",'{null:just for join}') = coalesce(t."Account NAGP",'{null:just for join}') and coalesce(n."Account Site CMAT ID",-9223372036854775808) = coalesce(t."Account Site CMAT ID",-9223372036854775808) and coalesce(n."Sold To Partner Site CMAT ID",-9223372036854775808) = coalesce(t."Sold To Partner Site CMAT ID",-9223372036854775808) and coalesce(n."Value Add Partner Site CMAT ID",-9223372036854775808) = coalesce(t."Value Add Partner Site CMAT ID",-9223372036854775808) and coalesce(n."Value Add Partner 2 Site CMAT ID",'{null:just for join}') = coalesce(t."Value Add Partner 2 Site CMAT ID",'{null:just for join}') and coalesce(n."Distributor Site CMAT ID",-9223372036854775808) = coalesce(t."Distributor Site CMAT ID",-9223372036854775808) and coalesce(n."Consolidator Site CMAT ID",'{null:just for join}') = coalesce(t."Consolidator Site CMAT ID",'{null:just for join}') and coalesce(n."SFDC Opportunity Number",'{null:just for join}') = coalesce(t."SFDC Opportunity Number",'{null:just for join}') and coalesce(n."Opportunity ID",'{null:just for join}') = coalesce(t."Opportunity ID",'{null:just for join}') and coalesce(n."System Qty",-9223372036854775808) = coalesce(t."System Qty",-9223372036854775808) and coalesce(n."Controller Qty",-9223372036854775808) = coalesce(t."Controller Qty",-9223372036854775808) and coalesce(n."Storage Capacity GB",-9223372036854775808) = coalesce(t."Storage Capacity GB",-9223372036854775808) and coalesce(n."Booking Qty",-9223372036854775808) = coalesce(t."Booking Qty",-9223372036854775808) and coalesce(n."USD Booking Amount",-9223372036854775808) = coalesce(t."USD Booking Amount",-9223372036854775808) and coalesce(n."USD Extended List Price",-9223372036854775808) = coalesce(t."USD Extended List Price",-9223372036854775808) and coalesce(n."USD Extended Burdened Cost",-9223372036854775808) = coalesce(t."USD Extended Burdened Cost",-9223372036854775808) and coalesce(n."USD Extended Discount",-9223372036854775808) = coalesce(t."USD Extended Discount",-9223372036854775808) and coalesce(n."BE USD Booking Amount",-9223372036854775808) = coalesce(t."BE USD Booking Amount",-9223372036854775808) and coalesce(n."BE USD Extended List Price",-9223372036854775808) = coalesce(t."BE USD Extended List Price",-9223372036854775808) and coalesce(n."BE USD Extended Discount Amount",-9223372036854775808) = coalesce(t."BE USD Extended Discount Amount",-9223372036854775808) and coalesce(n."BE USD Extended Burdened Cost",-9223372036854775808) = coalesce(t."BE USD Extended Burdened Cost",-9223372036854775808) and coalesce(n."GC Booking Amount",-9223372036854775808) = coalesce(t."GC Booking Amount",-9223372036854775808) and coalesce(n."SO Booking Amount",-9223372036854775808) = coalesce(t."SO Booking Amount",-9223372036854775808) and coalesce(n."SO Extended List Price",-9223372036854775808) = coalesce(t."SO Extended List Price",-9223372036854775808) and coalesce(n."SO Extended Burdened Cost",-9223372036854775808) = coalesce(t."SO Extended Burdened Cost",-9223372036854775808) and coalesce(n."SO Extended Discount",-9223372036854775808) = coalesce(t."SO Extended Discount",-9223372036854775808) and coalesce(n."GC Currency Code",'{null:just for join}') = coalesce(t."GC Currency Code",'{null:just for join}') and coalesce(n."SO Extended Burdened Cost2",-9223372036854775808) = coalesce(t."SO Extended Burdened Cost2",-9223372036854775808) and coalesce(n."SO Currency Code",'{null:just for join}') = coalesce(t."SO Currency Code",'{null:just for join}') and coalesce(n."BE Currency Code",'{null:just for join}') = coalesce(t."BE Currency Code",'{null:just for join}') and coalesce(n."SO to GC Conversion Rate",-9223372036854775808) = coalesce(t."SO to GC Conversion Rate",-9223372036854775808) and coalesce(n."BE USD Conversion Rate",-9223372036854775808) = coalesce(t."BE USD Conversion Rate",-9223372036854775808) and coalesce(n."AOP USD Conversion Rate",-9223372036854775808) = coalesce(t."AOP USD Conversion Rate",-9223372036854775808)
+	where t."Id" <= 17902113
+*/
+
+				// identify new records, that already exist for current record (history end date = 9999-31-12).
+				tempSqlIds = 2;
+				tempSql = 
+				  "select " + n + "." + aCol + "\n"
+				+ ", " + t + "." + aCol + " as " + is + "Existing " + autoIncrementColumn + is + "\n"
+				+ "into " + tempTable + "\n"
+				+ "from " + getTablenameQuoted() + " t\n"
+				+ "inner join " +  getTablenameQuoted() + " n\n"
+				+ "on " + n + "." + aCol + " > ?\n"
+				+ "and " + onAll + "\n"
+				+ "where " + t + "." + aCol + " <= ?\n and " + is + onColumnsHistoryEndDate + is + " = '9999-12-31'";
+				
+/*
+delete t
+from "sales_bookings" t
+inner join "#sales_bookings" n
+on t.Id = n.Id
+*/
+
+				// Delete new records, that already exist for current record (history end date = 9999-31-12).
+				deleteSqlIds = 0;
+				deleteSql =
+				  delete_t_from
+				+ getTablenameQuoted() + " t\n"
+				+ "inner join " + tempTable + " n\n"
+				+ "on " + n + "." + aCol + " = " + t + "." + aCol
+				+ delete_end;
+				
+				/** Update old records' history end date, that have changed or got deleted (use history deleted date column
+				 *  when source does not contain complete data set!).
+				 */
+
+/*
+delete t
+from (
+	select "Id"
+	, coalesce("Fiscal Date",'1970-01-01') as "Fiscal Date", coalesce("Sales Rep Participant Key",-9223372036854775808) as "Sales Rep Participant Key"
+	from "sales_bookings" t with (nolock)
+	where "Id" <= 18002113
+) t
+inner join (
+	select distinct coalesce("Fiscal Date",'1970-01-01') as "Fiscal Date", coalesce("Sales Rep Participant Key",-9223372036854775808) as "Sales Rep Participant Key"
+	from "sales_bookings" t with (nolock)
+	where "Id" > 18002113
+) o on o."Fiscal Date" = t."Fiscal Date" and o."Sales Rep Participant Key" = t."Sales Rep Participant Key"
+left outer join "#sales_bookings" n
+on n."Existing Id" = t.Id
+where n.[Existing Id] is null
+*/
+
+				// Update old records' history end date, that have changed or got deleted
+				deleteForReplaceIds = 2;
+				if (onColumnsHistoryDeletedDate == null) {
+					// no history deleted date available
+					deleteForReplace =
+						  "update t\n"
+						+ "set " + is + onColumnsHistoryEndDate + is + " = " + sql_history_end_now
+						+ "from (\n"
+						+ "	select " + aCol + "\n"
+						+ "	, " + selectOnCols + "\n"
+						+ "	from "+ getTablenameQuoted() + " t\n"
+						+ "	where " + aCol + " <= ? and " + is + onColumnsHistoryEndDate + is + " = '9999-12-31'\n"
+						+ ") t\n"
+						+ "inner join (\n"
+						+ "	select distinct " + selectOnCols + "\n"
+						+ "	from " + getTablenameQuoted() + " t\n"
+						+ "	where " + aCol + " > ?\n"
+						+ ") o on " + onSelectOnCols + "\n"
+						+ "left outer join " + tempTable + " n\n"
+						+ "on " + n + "." + is + "Existing " + autoIncrementColumn + is + " = " + t + "." + aCol + "\n"
+						+ "where " + n + "." + is + "Existing " + autoIncrementColumn + is + " is null";
+				} else {
+					// use history deleted date where available
+					deleteForReplace =
+						  "update t\n"
+						+ "set " + is + onColumnsHistoryEndDate + is + " = coalesce(" + o + "." + is + onColumnsHistoryDeletedDate + is + "," + sql_history_end_now + ")\n"
+						+ "from (\n"
+						+ "	select " + aCol + "\n"
+						+ "	, " + selectOnCols + "\n"
+						+ "	from "+ getTablenameQuoted() + " t\n"
+						+ "	where " + aCol + " <= ? and " + is + onColumnsHistoryEndDate + is + " = '9999-12-31'\n"
+						+ ") t\n"
+						+ "inner join (\n"
+						+ "	select distinct " + selectOnCols + "\n"
+						+ " , " + is + onColumnsHistoryDeletedDate + is + "\n"
+						+ " , " + is + onColumnsHistoryStartDate + is + "\n"
+						+ "	from " + getTablenameQuoted() + " t\n"
+						+ "	where " + aCol + " > ?\n"
+						+ ") o on " + onSelectOnCols + "\n"
+						+ "left outer join " + tempTable + " n\n"
+						+ "on " + n + "." + is + "Existing " + autoIncrementColumn + is + " = " + t + "." + aCol + "\n"
+						+ "where " + n + "." + is + "Existing " + autoIncrementColumn + is + " is null";
+				}
+				
+				break;
+			}
+			
+			try {
+				switch (onColumnsMode) {
+				case REPLACE_ALL:
+					break;
+					
+				case UPDATE_REMOVE_DELETED: {
+					// first remove data that don't exists anymore
+					ps = helper.getPreparedStatement(deleteGoneSql, deleteGoneSqlIds);
+					monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted() + " for old (removed) records"); 
+					int deleted = ps.executeUpdate();
+					monitor.logInfo(this + " " + deleted + " records deleted.");
+					ps.close();
+					
+					// update delete count
+					deleteCount += deleted;
+				}
+				case UPDATE: {
+					
+					ps = helper.getPreparedStatement(deleteSql, deleteSqlIds);
+					monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted() + " for new records"); 
+					int deleted = ps.executeUpdate();
+					monitor.logInfo(this + " " + deleted + " records deleted.");
+					
+					if (updateSql != null) {
+						ps.close();
+						
+						ps = helper.getPreparedStatement(updateSql, updateSqlIds);
+						monitor.logInfo(this + " executes update statement on table " + getTablenameQuoted() + " for existing records"); 
+						int updated = ps.executeUpdate();
+						monitor.logInfo(this + " " + updated + " existing records updated.");
+						
+						int deletedUpdated = 0;
+						if (updated > 0) {
+							ps.close();
+							
+							ps = helper.getPreparedStatement(deleteUpdatedSql, deleteUpdatedSqlIds);
+							monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted() + " for new records that updated existing records"); 
+							deletedUpdated = ps.executeUpdate();
+							monitor.logInfo(this + " " + deletedUpdated + " new records deleted that updated existing records.");
+						}
+						if (deletedUpdated != updated) {
+							// this should not occur as the onColumns should identify uniquely the records
+							throw new SQLException(
+								"Updated and deleted counts don't match, data wouldn't be consistent! " +
+								"Please validate unique record identification in table " + getTablenameQuoted() + " on columns " + usedOnColumns);
+						}
+
+						// update inserted and updated counts
+						insertCount -= deletedUpdated;
+						updateCount += updated;
+					}
+					
+					// update inserted count
+					insertCount -= deleted;
+					
+					break;
+				}
+				case REPLACE_NEW: {
+					
+					ps = helper.getPreparedStatement(tempSql, tempSqlIds);
+					monitor.logInfo(this + " executes identification statement on table " + getTablenameQuoted() + " for new records"); 
+					int existing = ps.executeUpdate();
+					int deleted = 0;
+					int deleted_existing = 0;
+					monitor.logInfo(this + " identified " + existing + " existing records.");
+					
+					if (existing > 0) {
+						ps.close();
+
+						ps = helper.getPreparedStatement(deleteSql, deleteSqlIds);
+						monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted() + " for new records"); 
+						deleted = ps.executeUpdate();
+						monitor.logInfo(this + " " + deleted + " records deleted.");
+						ps.close();
+					}
+
+					ps = helper.getPreparedStatement(deleteForReplace, deleteForReplaceIds);
+					monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted() + " for existing records"); 
+					deleted_existing = ps.executeUpdate();
+					monitor.logInfo(this + " " + deleted_existing + " records deleted.");
+
+					// update inserted and deleted counts
+					insertCount -= deleted;
+					deleteCount += deleted_existing;
+					
+					break;
+				}
+				case REPLACE_NEW_MAINTAIN_HISTORY: {
+					
+					ps = helper.getPreparedStatement(tempSql, tempSqlIds);
+					monitor.logInfo(this + " executes identification statement on table " + getTablenameQuoted() + " for new records"); 
+					int existing = ps.executeUpdate();
+					int deleted = 0;
+					int updated_existing = 0;
+					monitor.logInfo(this + " identified " + existing + " existing records.");
+					
+					if (existing > 0) {
+						ps.close();
+
+						ps = helper.getPreparedStatement(deleteSql, deleteSqlIds);
+						monitor.logInfo(this + " executes delete statement on table " + getTablenameQuoted() + " for new records"); 
+						deleted = ps.executeUpdate();
+						monitor.logInfo(this + " " + deleted + " records deleted.");
+						ps.close();
+					}
+
+					ps = helper.getPreparedStatement(deleteForReplace, deleteForReplaceIds);
+					monitor.logInfo(this + " executes history end date update statement on table " + getTablenameQuoted() + " for existing records"); 
+					updated_existing = ps.executeUpdate();
+					monitor.logInfo(this + " " + updated_existing + " records updated.");
+
+					// update inserted and deleted counts
+					insertCount -= deleted;
+					updateCount += updated_existing;
+					
+					break;
+				}
+				}
+				if (ps != null) {
+					PreparedStatement ps2 = ps;
+					ps = null;
+					ps2.close();
+				}
+			} finally {
+				try {
+					onColumnsLastMaxValue = onColumnsMaxValue;
+					// clear max id
+					onColumnsMaxValue = null;
+					if (ps != null) {
+						monitor.logError("Error executing prepared statement: " + psSql[0]);
+						ps.close();
+					}
+				} finally {
+					if (tempSql != null) {
+						// remove temp table
+						ps = connection.prepareStatement("drop table " + tempTable);
+						ps.execute();
+						ps.close();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param colDef
+	 * @return
+	 * @throws SQLException 
+	 */
+	protected String getColumnDefaultValueForNullOnJoin(DbColumnDef colDef) throws SQLException {
+		if (colDef.isAllowsNull()) {
+			switch (colDef.getType()) {
+			case Types.VARCHAR:
+			case Types.LONGVARCHAR:
+			case Types.CHAR:
+			case Types.CLOB:
+			case Types.NVARCHAR:
+			case Types.LONGNVARCHAR:
+			case Types.NCHAR:
+			case Types.NCLOB:
+				return "'{null:just for join}'";
+				
+			case Types.BIGINT:
+			case Types.INTEGER:
+			case Types.SMALLINT:
+			case Types.TINYINT:
+			case Types.BIT:
+			case Types.BOOLEAN:
+			case Types.DECIMAL:
+			case Types.DOUBLE:
+			case Types.FLOAT:
+			case Types.NUMERIC:
+			case Types.REAL:
+				return "-9223372036854775808"; // MS SQL min BIGINT
+			
+			case Types.DATE:
+			case Types.TIME:
+			case Types.TIMESTAMP:
+				return "'1970-01-01'";
+				
+			default:
+				throw new SQLException("Unsupport java.sql.Types " + colDef.getType() + " in column " + colDef); 
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param colDef
+	 * @return
+	 * @throws SQLException
+	 */
+	protected String getColumnDefaultValueForNull(DbColumnDef colDef) throws SQLException {
+		if (!colDef.isAllowsNull()) {
+			switch (colDef.getType()) {
+			case Types.VARCHAR:
+			case Types.LONGVARCHAR:
+			case Types.CHAR:
+			case Types.CLOB:
+			case Types.NVARCHAR:
+			case Types.LONGNVARCHAR:
+			case Types.NCHAR:
+			case Types.NCLOB:
+				return "";
+				
+			case Types.BIGINT:
+			case Types.INTEGER:
+			case Types.SMALLINT:
+			case Types.TINYINT:
+			case Types.BIT:
+			case Types.BOOLEAN:
+			case Types.DECIMAL:
+			case Types.DOUBLE:
+			case Types.FLOAT:
+			case Types.NUMERIC:
+			case Types.REAL:
+				return "0";
+			
+			case Types.DATE:
+			case Types.TIME:
+			case Types.TIMESTAMP:
+				return "1970-01-01";
+				
+			default:
+				throw new SQLException("Unsupport java.sql.Types " + colDef.getType() + " in column " + colDef); 
+			}
+		}
+		return null;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.impl.AbstractLoader#preSourceProcessing(de.xwic.etlgine.IETLContext)
 	 */
 	@Override
-	public void preSourceProcessing(IProcessContext processContext) throws ETLException {
-		super.preSourceProcessing(processContext);
+	public void preSourceProcessing(IProcessContext context) throws ETLException {
+		super.preSourceProcessing(context);
 		
 		// check target table
 		if (tablename == null) {
@@ -398,7 +1259,7 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			
 			// check table structure, adds missing columns
-			checkTableStructure();
+			checkTableStructure(true);
 			
 			if (truncateTable && !tablePurged) {
 				// truncate table only once for source processing, set to false in method initialize
@@ -411,10 +1272,10 @@ public class JDBCLoader extends AbstractLoader {
 			}
 			
 			// build prepared statement.. and Update statement.
-			buildPreparedStatements();
+			buildPreparedStatements(false);
 			
 			// set offset for batch insert/update
-			batchRecordsCountOffset = processContext.getRecordsCount();
+			batchRecordsCountOffset = context.getRecordsCount();
 			
 		} catch (SQLException se) {
 			throw new ETLException("Error initializing target database/tables: " + se, se);
@@ -435,7 +1296,7 @@ public class JDBCLoader extends AbstractLoader {
 			command = "UPDATE ";
 		}
 		
-		sql.append(command).append(getTablenameQuoted());
+		sql.append(command + getTablenameQuoted(tablename));
 		if (withTablock) {
 			sql.append(" WITH (TABLOCK)");
 		}
@@ -449,11 +1310,12 @@ public class JDBCLoader extends AbstractLoader {
 		boolean first = true;
 		for (DbColumnDef colDef : columns) {
 			
-			if (colDef.getColumn() != null || (simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn))) {
+			if (colDef.getColumn() != null 
+					|| (simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn)) 
+					|| (/* support preventNotNullError in insert mode */ insert && preventNotNullError && !colDef.isAllowsNull())) {
 				
-				// ignore identity columns for insert and update (identity is not support on ORACLE)
-				// eugen - SQL server supports identity so the last part of the check is not needed - || (!simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn) ) 
-				if (colDef.getTypeName().toLowerCase().indexOf("identity") != -1) {
+				// ignore readonly columns for insert and update (identity is not support on ORACLE)
+				if (colDef.isReadOnly() || (!simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn))) {
 					continue;
 				}
 				
@@ -465,9 +1327,9 @@ public class JDBCLoader extends AbstractLoader {
 						sql.append(", ");
 						sqlValues.append(", ");
 					}
-					sql.append(is).append(colDef.getName()).append(is);
+					sql.append(is + colDef.getName() + is);
 					if (simulatePkIdentity && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn)) {
-						sqlValues.append(is).append(pkSequence).append(is).append(".NEXTVAL");
+						sqlValues.append(is + pkSequence + is + ".NEXTVAL");
 					} else {
 						sqlValues.append("?");
 					}
@@ -479,7 +1341,7 @@ public class JDBCLoader extends AbstractLoader {
 						} else {
 							sql.append(", ");
 						}
-						sql.append(is).append(colDef.getName()).append(is).append(" = ?");
+						sql.append(is + colDef.getName() + is + " = ?");
 					}
 				}
 			}
@@ -488,11 +1350,11 @@ public class JDBCLoader extends AbstractLoader {
 		if (insert) {
 			
 			sqlValues.append(")");
-			sql.append(") VALUES").append(sqlValues);
+			sql.append(") VALUES" + sqlValues);
 			
 		} else {		
 			
-			sql.append(" WHERE ").append(is).append(pkColumn).append(is).append(" = ?");
+			sql.append(" WHERE " + is + pkColumn + is + " = ?");
 		}
 		
 		return sql.toString();
@@ -502,17 +1364,21 @@ public class JDBCLoader extends AbstractLoader {
 	 * Build prepared SQL statements
 	 * @throws SQLException 
 	 */
-	protected void buildPreparedStatements() throws SQLException {
-		String sql = buildPreparedStatement(tablename, columns.values(), Mode.INSERT, pkColumn != null ? pkColumn : "Id", pkSequence); 
+	protected void buildPreparedStatements(boolean refresh) throws SQLException {
+		String sql = buildPreparedStatement(tablename, columns.values(), Mode.INSERT, pkColumn != null ? pkColumn : autoIncrementColumn, pkSequence); 
 		String sqlUpd = buildPreparedStatement(tablename, columns.values(), Mode.UPDATE, pkColumn, null);
-
-		for (DbColumnDef colDef : columns.values()) {
-
-			if (colDef.getColumn() == null) {
-				if (!ignoredColumns.contains(colDef.getName())) {
-					monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
+		
+		if (!refresh) {
+			for (DbColumnDef colDef : columns.values()) {
+	
+				if (colDef.getColumn() == null) {
+					if (!ignoreMissingSourceColumns && !ignoredColumns.contains(colDef.getName()) && !colDef.isReadOnly()) {
+						monitor.logWarn("A column in the target table does not exist in the source and is skipped (" + colDef.getName() + ")");
+					}
 				}
 			}
+		} else {
+			monitor.logWarn("Rebuild Prepared Statement: " + sql);
 		}
 		
 		if (mode == Mode.INSERT || mode == Mode.INSERT_OR_UPDATE) {
@@ -524,17 +1390,72 @@ public class JDBCLoader extends AbstractLoader {
 			monitor.logInfo("UPDATE Statement: " + sqlUpd);
 			psUpdate = connection.prepareStatement(sqlUpd /*, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY*/);
 		}
+		
+		// added columnAddedListener
+		if (columnAddedListener == null) {
+			columnAddedListener = new IDataSetColumnAdded() {
+				@Override
+				public void onDataSetColumnAdded(IDataSet dataSet, IColumn column) throws ETLException {
+					processContext.getMonitor().logInfo("Add new column '" + column.getName() + "' to JDBCLoader on table '" + tablename + "'");
+					executeBatch();
+					try {
+						if (psInsert != null) {
+							psInsert.close();
+							psInsert = null;
+						}
+						if (psUpdate != null) {
+							psUpdate.close();
+							psUpdate = null;
+						}
+						checkTableStructure(false);
+						buildPreparedStatements(true);
+					} catch (SQLException e) {
+						throw new ETLException(e);
+					}
+				}
+			};
+			processContext.getDataSet().addOnDataSetColumnAdded(columnAddedListener);
+		}
 	}
 
+	/**
+	 * @return count of rows or null if table doesn't exist 
+	 */
+	public Integer getTableRowCount() throws SQLException {
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = metaData.getTables(catalogname == null ? connection.getCatalog() : catalogname, schemaname, tablename, null);
+		try {
+			if (!rs.next()) {
+				// table doesn't exist
+				return null;
+			}
+		} finally {
+			rs.close();
+		}
+
+		// get count of rows
+		Statement stmt = connection.createStatement();
+		try {
+			rs = JDBCUtil.executeQuery(stmt, "SELECT COUNT(*) FROM " + getTablenameQuoted());
+			rs.next();
+			return rs.getInt(1);
+		} finally {
+			rs.close();
+			stmt.close();
+		}
+
+	}
+	
 	/**
 	 * Checks if table exists and auto creates it if autoCreateTable is true.
 	 * @return DatabaseMetaData
 	 * @throws SQLException 
 	 * @throws ETLException
 	 */
-	protected DatabaseMetaData checkTableExists() throws SQLException, ETLException {
+	protected synchronized DatabaseMetaData checkTableExists() throws SQLException, ETLException {
+		String aCol = is + autoIncrementColumn + is;
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = metaData.getTables(catalogname == null ? connection.getCatalog() : catalogname, getSchemaName(), tablename, null);
+		ResultSet rs = metaData.getTables(catalogname == null ? connection.getCatalog() : catalogname, schemaname, tablename, null);
 		try {
 			if (!rs.next()) {
 				if (!autoCreateTable) {
@@ -552,6 +1473,10 @@ public class JDBCLoader extends AbstractLoader {
 							continue;
 						}
 						
+						if (excludedColumns.contains(column.getName())) {
+							continue;
+						}
+						
 						if (!column.isExclude()) {
 							DbColumnDef dbcd = getDbColumnDef(tablename, column);
 							dbColumnDefs.add(dbcd);
@@ -566,23 +1491,44 @@ public class JDBCLoader extends AbstractLoader {
 					pkSequence = getObjectAlias(null, "SEQ_" + originalTablename);
 				}
 				// table existed, check if incremental replace is enabled for INSERT mode
-				if (mode == Mode.INSERT && replaceOnColumns != null && replaceOnColumns.length > 0 && (!replaceOnColumnsOnProcessFinished || replaceOnMaxId == null)) {
+				if (mode == Mode.INSERT && (!onColumnsOnProcessFinished || onColumnsMaxValue == null)) {
 					// get max auto increment id for replace
 					Statement stmt = connection.createStatement();
-					ResultSet rs_max = stmt.executeQuery("select max(" + is + replaceOnAutoIncrementColumn + is + ") from " + getTablenameQuoted());
-					rs_max.next();
-					replaceOnMaxId = rs_max.getObject(1);
-					rs_max.close();
-					stmt.close();
-					if (replaceOnMaxId != null) {
-						StringBuilder cols = new StringBuilder();
-						for (String col : replaceOnColumns) {
-							if (cols.length() > 0) {
-								cols.append(", ");
-							}
-							cols.append("[").append(col).append("]");
+					try {
+						ResultSet rs_max = JDBCUtil.executeQuery(stmt, "select max(" + aCol + ") from " + getTablenameQuoted());
+						try {
+							rs_max.next();
+							onColumnsMaxValue = rs_max.getObject(1);
+						} finally {
+							rs_max.close();
 						}
-						monitor.logInfo("Using max(" + is + replaceOnAutoIncrementColumn + is + ") = " + replaceOnMaxId + " to replace records on columns " + cols);
+					} finally {
+						stmt.close();
+					}
+					if (onColumnsMaxValue != null) {
+						StringBuilder cols = new StringBuilder();
+						if (onColumns != null) {
+							for (String col : onColumns) {
+								if (cols.length() > 0) {
+									cols.append(", ");
+								}
+								cols.append(is + col + is);
+							}
+						}
+						if (onColumns == null) {
+							monitor.logInfo("Current max(" + aCol + ") = " + onColumnsMaxValue);
+						} else if (onColumns.length == 0) {
+							monitor.logInfo("Using max(" + aCol + ") = " + onColumnsMaxValue + " to replace records on all columns");
+						} else {
+							switch (onColumnsType) {
+							case UNIQUE:
+								monitor.logInfo("Using max(" + aCol + ") = " + onColumnsMaxValue + " to replace records on columns " + cols);
+								break;
+							case REVERSE_UNIQUE:
+								monitor.logInfo("Using max(" + aCol + ") = " + onColumnsMaxValue + " to replace records on any column except " + cols);
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -598,64 +1544,100 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException 
 	 * 
 	 */
-	protected void checkTableStructure() throws ETLException, SQLException {
+	protected void checkTableStructure(boolean autoDetectColumnTypesAllowed) throws ETLException, SQLException {
 		
-		tablename = getObjectAlias(null, tablename);
-		if (originalTablename != null && !originalTablename.equals(tablename)) {
-			monitor.logWarn("JDBCLoader uses tablename alias " + is + tablename + is + " for originally configured tablename " + is + originalTablename + is);
+		String lock = connectionName + ":" + getTablenameQuoted();
+		synchronized (SYNCHRONIZE_TABLE_ACCESS) {
+			String synchronizedLock = SYNCHRONIZE_TABLE_ACCESS.get(lock);
+			if (synchronizedLock == null) {
+				SYNCHRONIZE_TABLE_ACCESS.put(lock, lock);
+			} else {
+				lock = synchronizedLock;
+			}
 		}
 		
-		DatabaseMetaData metaData = checkTableExists();
-
-		columns = loadColumns(metaData, tablename);
-		
-		List<IColumn> missingCols = new ArrayList<IColumn>();
-		
-		// Check if the columns apply.
-		for (IColumn column : processContext.getDataSet().getColumns()) {
+		synchronized (lock) {
 			
-			// exclude "" empty columns
-			if (column.computeTargetName() == null || column.computeTargetName().isEmpty()) {
-				column.setExclude(true);
+			tablename = getObjectAlias(null, tablename);
+			if (originalTablename != null && !originalTablename.equals(tablename)) {
+				monitor.logWarn(this + " uses tablename alias " + is + tablename + is + " for originally configured tablename " + is + originalTablename + is);
 			}
 			
-			if (!column.isExclude()) {
+			DatabaseMetaData metaData = checkTableExists();
+	
+			columns = loadColumns(metaData, tablename);
+			
+			List<IColumn> missingCols = new ArrayList<IColumn>();
+			
+			// Check if the columns apply.
+			for (IColumn column : processContext.getDataSet().getColumns()) {
+				
+				// exclude "" empty columns
+				if (column.computeTargetName() == null || column.computeTargetName().isEmpty()) {
+					column.setExclude(true);
+				}
+				
+				if (excludedColumns.contains(column.getName())) {
+					continue;
+				}
+				
 				DbColumnDef dbcd = columns.get(column.computeTargetName().toUpperCase());
 				if (dbcd == null) {
 					// try column name
 					dbcd = columns.get(column.getName().toUpperCase());
 				}
-				if (dbcd == null) {
-					// try column alias
-					String originalColumnName = column.computeTargetName();
-					dbcd = columns.get(getObjectAlias(originalTablename, originalColumnName).toUpperCase());
+				if (!column.isExclude()) {
 					if (dbcd == null) {
-						// try column name
-						originalColumnName = column.getName();
+						// try column alias
+						String originalColumnName = column.computeTargetName();
 						dbcd = columns.get(getObjectAlias(originalTablename, originalColumnName).toUpperCase());
+						if (dbcd == null) {
+							// try column name
+							originalColumnName = column.getName();
+							dbcd = columns.get(getObjectAlias(originalTablename, originalColumnName).toUpperCase());
+						}
+						if (dbcd != null) {
+							//monitor.logWarn(this + " uses column alias " + is + dbcd.getName() + is + " for originally configured column " + is + originalColumnName + is);
+						}
 					}
 					if (dbcd != null) {
-						monitor.logWarn("JDBCLoader uses column alias " + is + dbcd.getName() + is + " for originally configured column " + is + originalColumnName + is);
+						dbcd.setColumn(column);
+					} else {
+						processContext.getMonitor().logWarn("Column does not exist: " + is + column.computeTargetName() + is);
+						missingCols.add(column);
 					}
-				}
-				if (dbcd != null) {
-					dbcd.setColumn(column);
-				} else {
-					processContext.getMonitor().logWarn("Column does not exist: " + is + column.computeTargetName() + is);
-					missingCols.add(column);
+				} else if (dbcd != null) {
+					// ignore this warning on excluded columns: A column in the target table does not exist in the source and is skipped
+					addIgnoreableColumns(dbcd.getName());
 				}
 			}
-		}
-		if (missingCols.size() > 0) {
-			if (autoCreateColumns) {
-				if (autoDetectColumnTypes && !(processContext.getCurrentSource() instanceof JDBCSource)) {
-					// auto-detect column types for missing columns
-					autoDetectColumnTypes(missingCols);
+			if (addColumnsToDataSet) {
+				// add additional columns in table to dataset
+				for (DbColumnDef dbCol : columns.values()) {
+					String colName = dbCol.getName();
+					if (dbCol.getColumn() == null && !dbCol.isReadOnly() && !processContext.getDataSet().containsColumn(colName)) {
+						//context.getMonitor().logInfo("Adding table column '" + colName + "' to DataSet");
+						IColumn col = new Column(colName);
+						int type = dbCol.getType();
+						int precision = dbCol.getSize();
+						int scale = dbCol.getScale();
+						JDBCUtil.updateColumn(col, type, precision, scale);
+						processContext.getDataSet().addColumn(col);
+						dbCol.setColumn(col);
+					}
 				}
-				createColumns(missingCols, columns);
-			} else {
-				if (!ignoreMissingTargetColumns) {
-					throw new ETLException("The source contains columns that do not exist in the target table.");
+			}
+			if (missingCols.size() > 0) {
+				if (autoCreateColumns) {
+					if (autoDetectColumnTypesAllowed && autoDetectColumnTypes && !(processContext.getCurrentSource() instanceof JDBCSource)) {
+						// auto-detect column types for missing columns
+						autoDetectColumnTypes(missingCols);
+					}
+					createColumns(missingCols, columns);
+				} else {
+					if (!ignoreMissingTargetColumns) {
+						throw new ETLException("The source contains columns that do not exist in the target table.");
+					}
 				}
 			}
 		}
@@ -668,25 +1650,8 @@ public class JDBCLoader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException 
 	 */
-	private Map<String, DbColumnDef> loadColumns(DatabaseMetaData metaData, String tablename) throws SQLException {
-
-		ResultSet rs = metaData.getColumns(catalogname == null ? connection.getCatalog() : catalogname, getSchemaName(), tablename, null);
-		try {
-			//dumpResultSet(rs);
-			Map<String, DbColumnDef> columns = new LinkedHashMap<String, DbColumnDef>();
-			while (rs.next()) {
-				String name = rs.getString("COLUMN_NAME");
-				int type = rs.getInt("DATA_TYPE");
-				int size = rs.getInt("COLUMN_SIZE");
-				String allowNull = rs.getString("NULLABLE");
-				String typeName = rs.getString("TYPE_NAME");
-				DbColumnDef colDef = new DbColumnDef(name, type, typeName, size, allowNull.equals("YES") || allowNull.equals("1") || allowNull.equals("TRUE"));
-				columns.put(name.toUpperCase(), colDef);
-			}
-			return columns;
-		} finally {
-			rs.close();
-		}
+	protected Map<String, DbColumnDef> loadColumns(DatabaseMetaData metaData, String tablename) throws SQLException {
+		return JDBCUtil.getColumns(metaData, schemaname, tablename, true);
 	}
 
 	/**
@@ -710,20 +1675,25 @@ public class JDBCLoader extends AbstractLoader {
 				boolean isDate = true;
 				boolean isBoolean = true;
 				int maxLength = 0;
-				int count = 0; 
+				int count = 0;
+				SimpleDateFormat dateFormat = null;
 			}
 			
 			Map<IColumn, ColumnType> columnTypes = new HashMap<IColumn, ColumnType>();
 			
 			SimpleDateFormat[] dateFormat = new SimpleDateFormat[] {
-				new SimpleDateFormat("MM/DD/yyyy"),
-				new SimpleDateFormat("DD-MMM-yyyy"),
-				new SimpleDateFormat("yyyy-MM-DD"),
-				new SimpleDateFormat("MM/DD/yy"),
-				new SimpleDateFormat("yyyy-MM-DD HH:mm:ss.S"),
+				null, // place holder for ColumnType.dateFormat
+				new SimpleDateFormat("MM/dd/yyyy hh:mm aa"),
+				new SimpleDateFormat("MM/dd/yyyy"),
+				new SimpleDateFormat("dd-MMM-yyyy"),
+				new SimpleDateFormat("MM/dd/yy"),
+				new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S"),
+				new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+				new SimpleDateFormat("yyyy-MM-dd"),
 			};
 			
 			// assume source is opened already, iterate all records
+			Calendar cal = Calendar.getInstance();
 			IRecord record;
 			while ((record = extractor.getNextRecord()) != null) {
 	
@@ -818,8 +1788,17 @@ public class JDBCLoader extends AbstractLoader {
 							boolean isDate = false;
 							for (SimpleDateFormat format : dateFormat) {
 								try {
+									if (format == null) {
+										format = columnType.dateFormat;
+									}
+									if (format == null) {
+										continue;
+									}
 									Date date = format.parse(s);
-									if (format.format(date).length() == s.length()) {
+									cal.setTime(date);
+									String test = format.format(date);
+									if (cal.get(Calendar.YEAR) >= 1969 && cal.get(Calendar.YEAR) < 2100 && test.length() >= s.length() && test.length() <= s.length() + 2) {
+										columnType.dateFormat = format;
 										isDate = true;
 									}
 									break;
@@ -876,7 +1855,7 @@ public class JDBCLoader extends AbstractLoader {
 			// invoke transformers
 			/* 2012-03-07 jbornema: deactivated, as in all cases seen so far it should not be executed and the running flag was not used yet 
 			for (ITransformer transformer : process.getTransformers()) {
-				transformer.postSourceProcessing(processContext);
+				transformer.postSourceProcessing(context);
 			}
 			*/
 	
@@ -974,10 +1953,10 @@ public class JDBCLoader extends AbstractLoader {
 				} else {
 					// create table
 					List<DbColumnDef> dbColumnsDef = new ArrayList<DbColumnDef>();
-					dbColumnsDef.add(getDbColumnDef(tablename, "PARENT", DataType.STRING, 128));
-					dbColumnsDef.add(getDbColumnDef(tablename, "NAME", DataType.STRING, 128));
-					dbColumnsDef.add(getDbColumnDef(tablename, "ALIAS", DataType.STRING, objectAliasMaxLength));
-					createTable(tablename, dbColumnsDef);
+					dbColumnsDef.add(getDbColumnDef(tablename, "PARENT", DataType.STRING, 128, true));
+					dbColumnsDef.add(getDbColumnDef(tablename, "NAME", DataType.STRING, 128, true));
+					dbColumnsDef.add(getDbColumnDef(tablename, "ALIAS", DataType.STRING, objectAliasMaxLength, true));
+					createTable(tablename, dbColumnsDef, tablename, false);
 				}
 			} finally {
 				rs_tables.close();
@@ -1029,7 +2008,7 @@ public class JDBCLoader extends AbstractLoader {
 		String keyByAlias = null;
 		int i = 0;
 		while (alias == null) {
-			String tag = i == 0 ? "…" : "…" + i + "…";
+			String tag = i == 0 ? "~" : "~" + i + "~";
 			int remove = name.length() - objectAliasMaxLength - tag.length();
 			String a = null;
 			int head = objectAliasMaxLength / 2 - tag.length() / 2;
@@ -1059,14 +2038,14 @@ public class JDBCLoader extends AbstractLoader {
 		if (sqlDialect == SqlDialect.ORACLE) {
 			pkSequence = "SEQ_" + tablename;
 		}
-		String sql = buildPreparedStatement(tablename, columns.values(), Mode.INSERT, "Id", pkSequence);
+		String sql = buildPreparedStatement(tablename, columns.values(), Mode.INSERT, autoIncrementColumn, pkSequence);
 		PreparedStatement ps = connection.prepareStatement(sql);
 		Record record = new Record(null);
 		record.setData(colParent, parentName);
 		record.setData(colName, name);
 		record.setData(colAlias, alias);		
 		try {
-			doInsert(processContext, record, columns.values(), ps, "Id");
+			doInsert(processContext, record, columns.values(), ps, autoIncrementColumn);
 		} catch (ETLException ee) {
 			if (ee.getCause() instanceof SQLException) {
 				throw (SQLException)ee.getCause();
@@ -1172,48 +2151,74 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException
 	 */
 	protected void createTable(String tablename, List<DbColumnDef> dbColumnsDef) throws SQLException {
+		createTable(tablename, dbColumnsDef, originalTablename, true);
+	}
+	
+	/**
+	 * Create table with primary key column Id (bigint identidy).
+	 * @throws SQLException
+	 */
+	protected void createTable(String tablename, List<DbColumnDef> dbColumnsDef, String originalTablename, boolean useObjectAlias) throws SQLException {
 		
+		String aCol = is + autoIncrementColumn + is;
 		boolean defaultInvocation = tablename == this.tablename;
 		
 		processContext.getMonitor().logInfo("Creating missing table: " + tablename);
 
 		Statement stmt = connection.createStatement();
-		StringBuilder sql = new StringBuilder();
-
-		StringBuilder columnsDef = new StringBuilder();
-
-		for (DbColumnDef dbcd : dbColumnsDef) {
-			if (dbcd.getName().equals("Id")) {
-				// skip default primary key column
-				continue;
+		try {
+			StringBuilder sql = new StringBuilder();
+	
+			StringBuilder columnsDef = new StringBuilder();
+	
+			for (DbColumnDef dbcd : dbColumnsDef) {
+				if (dbcd.getName().equals(autoIncrementColumn)) {
+					// skip default primary key column
+					continue;
+				}
+				columnsDef.append(", " + is + (useObjectAlias ? getObjectAlias(originalTablename, dbcd.getName()) : dbcd.getName()) + is + " " + dbcd.getTypeNameDetails());
 			}
-			columnsDef.append(", ").append(is).append(getObjectAlias(originalTablename, dbcd.getName())).append(is).append(" ").append(dbcd.getTypeNameDetails());
-		}
-		
-		switch (sqlDialect) {
-		case MSSQL :
-			sql.append("CREATE TABLE ").append(getTablenameQuoted(tablename)).append(" (");
-			sql.append("Id [bigint] IDENTITY(1,1) NOT NULL").append(columnsDef).append(", CONSTRAINT PK_").append(tablename).append(" PRIMARY KEY (Id))");
-			break;
-		case ORACLE : 
-			sql.append("CREATE TABLE ").append(getTablenameQuoted(tablename)).append(" (");
-			sql.append(is).append("Id").append(is).append(" NUMBER(20) NOT NULL").append(columnsDef).append(", CONSTRAINT ").append(is).append(getObjectAlias(null, "PK_" + originalTablename)).append(is).append(" PRIMARY KEY (").append(is).append("Id").append(is).append("))");
-			break;
-		}
-		
-		processContext.getMonitor().logInfo("Creating missing table sql: \n" + sql.toString());
-		
-		stmt.execute(sql.toString());
-		
-		if (isSimulatePkIdentity()) {
+			String pkSequence = null;
+			if (isSimulatePkIdentity()) {
+				sql.setLength(0);
+				pkSequence = defaultInvocation && this.pkSequence != null ? this.pkSequence : useObjectAlias ? getObjectAlias(null, "SEQ_" + originalTablename) : "SEQ_" + originalTablename;
+				sql.append("CREATE SEQUENCE " + is + pkSequence + is);
+				processContext.getMonitor().logInfo("Creating missing sequence for primary key column on table " + getTablenameQuoted(tablename) + ":\n" + sql.toString());
+				stmt.execute(sql.toString());
+				if (defaultInvocation) {
+					this.pkSequence = pkSequence;
+				}
+			}
+			
 			sql.setLength(0);
-			String pkSequence = this.pkSequence != null ? this.pkSequence : getObjectAlias(null, "SEQ_" + originalTablename);
-			sql.append("CREATE SEQUENCE " + is + pkSequence + is);
-			processContext.getMonitor().logInfo("Creating missing sequence for primary key column on table " + getTablenameQuoted(tablename) + ":\n" + sql.toString());
-			stmt.execute(sql.toString());
-			if (defaultInvocation) {
-				this.pkSequence = pkSequence;
+			switch (sqlDialect) {
+			case MSSQL :
+				sql.append("CREATE TABLE " + getTablenameQuoted(tablename) + " (");
+				sql.append(aCol + " BIGINT IDENTITY(1,1) NOT NULL" + columnsDef + ", CONSTRAINT " + is + "PK_" + tablename + is + " PRIMARY KEY (" + aCol + "))");
+				break;
+			case H2 : 
+				sql.append("CREATE TABLE " + getTablenameQuoted(tablename) + " (");
+				sql.append(aCol + " BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY" + columnsDef + ")");
+				break;
+			case ORACLE :
+				String seq = "";
+				if (pkSequence != null) {
+					seq = " DEFAULT " + is + pkSequence + is + ".NEXTVAL";
+				}
+				sql.append("CREATE TABLE " + getTablenameQuoted(tablename) + " (");
+				sql.append(aCol + " NUMBER(20)" + seq + " NOT NULL" + columnsDef + ", CONSTRAINT " + is + (useObjectAlias ? getObjectAlias(null, "PK_" + originalTablename) : "PK_" + originalTablename) + is + " PRIMARY KEY (" + aCol + "))");
+				break;
+			case MYSQL :
+				sql.append("CREATE TABLE " + getTablenameQuoted(tablename) + " (");
+				sql.append(aCol + " BIGINT NOT NULL AUTO_INCREMENT" + columnsDef + " , CONSTRAINT " + is + "PK_" + tablename + is + " PRIMARY KEY (" + aCol + "))");
+				break;
 			}
+			
+			processContext.getMonitor().logInfo("Creating missing table sql: \n" + sql.toString());
+			
+			stmt.execute(sql.toString());
+		} finally {
+			stmt.close();
 		}
 	}
 
@@ -1228,15 +2233,22 @@ public class JDBCLoader extends AbstractLoader {
 			int rows;
 			try {
 				// try TRUNCATE TABLE
-				ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + getTablenameQuoted());
-				rs.next();
-				rows = rs.getInt(1);
+				ResultSet rs = JDBCUtil.executeQuery(stmt, "SELECT COUNT(*) FROM " + getTablenameQuoted());
+				try {
+					rs.next();
+					rows = rs.getInt(1);
+				} finally {
+					rs.close();
+				}
 				stmt.executeUpdate("TRUNCATE TABLE " + getTablenameQuoted());
 			} catch (SQLException e) {
 				// try DELETE FROM
 				rows = stmt.executeUpdate("DELETE FROM " + getTablenameQuoted());
+			} finally {
+				stmt.close();
 			}
 			processContext.getMonitor().logInfo("TRUNCATED TABLE " + getTablenameQuoted() + " - " + rows + " rows have been deleted.");
+			deleteCount += rows;
 		} catch (SQLException e) {
 			throw new ETLException("Error truncating table: " + e, e);
 		}
@@ -1250,12 +2262,14 @@ public class JDBCLoader extends AbstractLoader {
 		try {
 			tablePurged = true;
 			Statement stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + getTablenameQuoted());
-			rs.next();
-			int rows = rs.getInt(1);
-			// try DELETE FROM
-			rows = stmt.executeUpdate("DELETE FROM " + getTablenameQuoted());
-			processContext.getMonitor().logInfo("DELETE FROM TABLE " + getTablenameQuoted() + " - " + rows + " rows have been deleted.");
+			try {
+				// try DELETE FROM
+				int rows = JDBCUtil.executeUpdate(stmt, "DELETE FROM " + getTablenameQuoted());
+				processContext.getMonitor().logInfo("DELETE FROM TABLE " + getTablenameQuoted() + " - " + rows + " rows have been deleted.");
+				deleteCount += rows;
+			} finally {
+				stmt.close();
+			}
 		} catch (SQLException e) {
 			throw new ETLException("Error deleting from table: " + e, e);
 		}
@@ -1270,11 +2284,13 @@ public class JDBCLoader extends AbstractLoader {
 	 * @return
 	 * @throws SQLException 
 	 */
-	protected DbColumnDef getDbColumnDef(String tablename, String columnName, DataType typeHint, int lengthHint) throws SQLException {
+	protected DbColumnDef getDbColumnDef(String tablename, String columnName, DataType typeHint, int lengthHint, boolean allowsNull) throws SQLException {
 		IColumn col = new Column(columnName);
 		col.setTypeHint(typeHint);
 		col.setLengthHint(lengthHint);
-		return getDbColumnDef(tablename, col);
+		DbColumnDef colDef = getDbColumnDef(tablename, col);
+		colDef.setAllowsNull(allowsNull);
+		return colDef;
 	}
 	
 	/**
@@ -1292,6 +2308,7 @@ public class JDBCLoader extends AbstractLoader {
 		String BIT = "BIT";
 		String TEXT = "TEXT";
 		String VARCHAR = "VARCHAR";
+		String BINARY = "BINARY";
 		int MAX_VARCHAR = 8000;
 		
 		if (sqlDialect == SqlDialect.ORACLE) {
@@ -1315,9 +2332,6 @@ public class JDBCLoader extends AbstractLoader {
 		
 		switch (col.getTypeHint()) {
 		case DATE:
-			typeName = DATETIME;
-			dbcd.setType(Types.TIMESTAMP);
-			break;
 		case DATETIME:
 			typeName = DATETIME;
 			dbcd.setType(Types.TIMESTAMP);
@@ -1334,13 +2348,18 @@ public class JDBCLoader extends AbstractLoader {
 			typeName = BIGINT;
 			dbcd.setType(Types.BIGINT);
 			break;
-		case BIGDECIMAL:
-			typeName = BIGINT;
-			dbcd.setType(Types.BIGINT);
-			break;	
+        case BIGDECIMAL:
+            typeName = BIGINT;
+            dbcd.setType(Types.BIGINT);
+            break;    
 		case BOOLEAN:
 			typeName = BIT;
 			dbcd.setType(Types.BIT);
+			break;
+		case BINARY:
+			typeName = BINARY;
+			dbcd.setType(Types.BINARY);
+			dbcd.setSize(col.getLengthHint() > 0 ? col.getLengthHint() : 50);
 			break;
 		default:
 			int length = col.getLengthHint();
@@ -1367,7 +2386,8 @@ public class JDBCLoader extends AbstractLoader {
 		
 		dbcd.setTypeName(typeName);
 		
-		dbcd.setAllowsNull(true);
+		// by default when preventNotNullError is true, columns won't be nullable
+		dbcd.setAllowsNull(!preventNotNullError || autoDetectColumnTypesNullable);
 		return dbcd;
 	}
 
@@ -1377,17 +2397,11 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException 
 	 */
 	private void createColumns(List<IColumn> missingCols, Map<String, DbColumnDef> columns) throws SQLException {
-        StringBuilder alterCommand = new StringBuilder();
-        alterCommand.append("ALTER TABLE ");
-        alterCommand.append(getTablenameQuoted());
-        alterCommand.append(" ADD ");
 
-		StringBuilder sql = new StringBuilder();
-        sql.append(alterCommand);
-		if (sqlDialect == SqlDialect.ORACLE) {
-			sql.append("(");
-		}
-		boolean first = true;
+		StringBuilder sqlAlter = new StringBuilder();
+		sqlAlter.append("ALTER TABLE ");
+		sqlAlter.append(getTablenameQuoted());
+		sqlAlter.append(" ADD ");
 		
 		for (IColumn col : missingCols) {
 			
@@ -1397,41 +2411,32 @@ public class JDBCLoader extends AbstractLoader {
 				DbColumnDef dbcd = getDbColumnDef(tablename, col);
 				
 				if (!originalColumnName.equals(dbcd.getName())) {
-					monitor.logWarn("JDBCLoader uses column alias " + dbcd.getName() + " for originally configured column " + originalColumnName);
+					monitor.logWarn(this + " uses column alias " + dbcd.getName() + " for originally configured column " + originalColumnName);
 				}
 				
-				if (first) {
-					first = false;
-                } else if (SqlDialect.SQLITE.equals(sqlDialect)) {
-                    sql.append(";");
-                    sql.append(alterCommand);
-				} else  {
-					sql.append(", ");
+				StringBuilder sql = new StringBuilder(sqlAlter);
+				sql.append(is + dbcd.getName() + is + " " + dbcd.getTypeNameDetails());
+				/* 2013-08-23 jbornema: Not yet tested 
+				if (!dbcd.isAllowsNull()) {
+					String defaultValue = getColumnDefaultValueForNull(dbcd);
+					sql.append(" CONSTRAINT " + is + "DF_" + tablename + "_" + dbcd.getName() + is + " DEFAULT '" + defaultValue + "'");	
 				}
+				*/
+				
+				processContext.getMonitor().logInfo("Creating missing column: \n" + sql.toString());
 
-
-			    sql.append(is).append(dbcd.getName()).append(is).append(" ").append(dbcd.getTypeNameDetails());
-
+				Statement stmt = connection.createStatement();
+				try {
+					JDBCUtil.executeUpdate(stmt, sql.toString());
+				} finally {
+					stmt.close();
+				}
+				
+				dbcd.setColumn(col);
 				columns.put(dbcd.getName(), dbcd);
 			}
 			
 		}
-		if (sqlDialect == SqlDialect.ORACLE) {
-			sql.append(")");
-		}		
-		processContext.getMonitor().logInfo("Creating missing columns: \n" + sql.toString());
-
-        if (SqlDialect.SQLITE.equals(sqlDialect)) {
-            String[] sqls = sql.toString().split(";");
-            for(String sqlLite: sqls){
-                Statement stmt = connection.createStatement();
-                stmt.execute(sqlLite);
-                stmt.close();
-            }
-        } else {
-            Statement stmt = connection.createStatement();
-            stmt.execute(sql.toString());
-        }
 	}
 
 	/**
@@ -1450,64 +2455,111 @@ public class JDBCLoader extends AbstractLoader {
 	protected String getTablenameQuoted(String tablename) {
 		StringBuilder sql = new StringBuilder();
 		// TODO missing support for other dialects like ORACLE...
-		if (sqlDialect == SqlDialect.MSSQL && catalogname != null) {
-            //RPF: added schema support here, if exists it got added, otherwise using "dbo" (was before used directly here)
-            sql.append(is).append(catalogname).append(is).append(".").append(is).append(getSchemaName() == null ? "dbo" : getSchemaName()).append(is).append(".");
+		if (sqlDialect == SqlDialect.MSSQL) {
+			if (catalogname != null) {
+				sql.append(is + catalogname + is + "." + is + schemaname != null ? schemaname : "" + is + ".");
+			} else if (schemaname != null) {
+				sql.append(is + schemaname + is + ".");
+			}
 		}
-        //RPF: check schema, if exists add on quoted notation
-        if (getSchemaName() != null) {
-            sql.append(is).append(getSchemaName()).append(is).append(".");
-        }
-
-        sql.append(is).append(tablename).append(is);
+		sql.append(is + tablename + is);
 		return sql.toString();
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.etlgine.ILoader#processRecord(de.xwic.etlgine.IETLContext, de.xwic.etlgine.IRecord)
 	 */
-	public void processRecord(IProcessContext processContext, IRecord record) throws ETLException {
-
-		try {
-			switch (mode) {
-			case INSERT:
-				doInsert(processContext, record, columns.values(), psInsert, pkColumn != null ? pkColumn : "Id");
-				break;
-			case UPDATE:
-				doUpdate(processContext, record);
-				break;
-			case INSERT_OR_UPDATE:
-				if (Validate.equals(newIdentifierValue, record.getData(newIdentifierColumn))) {
-					doInsert(processContext, record, columns.values(), psInsert, pkColumn);
-				} else {
-					doUpdate(processContext, record);
-				}
-			}
-		} catch (Throwable t) {
-			record.markInvalid(t.getLocalizedMessage());
-			String msg = "Cannot process record " + processContext.getRecordsCount();
-			if (skipError) {
-				processContext.getMonitor().logError(msg , t);
-			} else {
-				throw new ETLException(msg, t);
-			}
-		}
+	public void processRecord(IProcessContext context, IRecord record) throws ETLException {
+		
+		processRecord(context, record, true);
 		
 	}
 	
+	protected void processRecord(IProcessContext context, IRecord record, boolean retry) throws ETLException {
+		try {
+			long start = System.nanoTime();
+			switch (mode) {
+			case INSERT:
+				doInsert(context, record, columns.values(), psInsert, pkColumn != null ? pkColumn : autoIncrementColumn);
+				break;
+			case UPDATE:
+				doUpdate(context, record);
+				break;
+			case INSERT_OR_UPDATE:
+				if (Validate.equals(newIdentifierValue, record.getData(newIdentifierColumn))) {
+					doInsert(context, record, columns.values(), psInsert, pkColumn);
+				} else {
+					doUpdate(context, record);
+				}
+			}
+			processRecordCount += 1;
+			nanoTimeProcessRecord += (System.nanoTime() - start);
+		} catch (Throwable t) {
+			boolean skipFinally = false;
+			boolean closed = false;
+			try {
+				if (retry && reopenClosedConnection) {
+					closed = true;
+					try {
+						if (connection != null) {
+							closed = connection.isClosed();
+						}
+					} catch (SQLException e) {}
+					if (closed) {
+						if (connection != null) {
+							monitor.logError("Connection closed, try to reopen in 1 Minute...", t);
+							try {
+								Thread.sleep(60000);
+							} catch (InterruptedException e) {
+								throw new ETLException(e);
+							}
+						}
+						// try to open connection again
+						initConnection(context);
+						try {
+							if (columns == null) {
+								checkTableStructure(true);
+							}
+							buildPreparedStatements(true);
+						} catch (SQLException e) {
+							monitor.logError("Cannot build prepared statement ", e);
+						}
+						processRecord(context, record, false);
+						skipFinally = true;
+					}
+				}
+			} finally {
+				if (!skipFinally) {
+					if (closed) {
+						// failed to reopen connection
+						monitor.logError("Failed to reopen connection, disable reopen closed connection setting");
+						setReopenClosedConnection(false);
+					}
+					record.markInvalid(t.getLocalizedMessage());
+					String msg = "Cannot process record " + context.getRecordsCount();
+					if (skipError) {
+						context.getMonitor().logError(msg , t);
+					} else {
+						throw new ETLException(msg, t);
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Invoked after update statement received changed record data to allow customer flagging.
 	 * Must return true to update the prepared statement again. 
-	 * @param processContext
+	 * @param context
 	 * @param record
 	 * @return
 	 * @throws ETLException
 	 */
-	protected boolean onRecordUpdated(IProcessContext processContext, IRecord record) throws ETLException {
+	protected boolean onRecordUpdated(IProcessContext context, IRecord record) throws ETLException {
 		return false;
 	}
 	
-	private void doUpdate(IProcessContext processContext, IRecord record) throws ETLException {
+	private void doUpdate(IProcessContext context, IRecord record) throws ETLException {
 		boolean handleException = true;
 		try {
 			psUpdate.clearParameters();
@@ -1519,7 +2571,7 @@ public class JDBCLoader extends AbstractLoader {
 			for (int i = 0; i < 2; i++) { 
 				for (DbColumnDef colDef : columns.values()) {
 					// Identity is not support on ORACLE
-					if (colDef.getColumn() != null && !colDef.getName().equalsIgnoreCase(pkColumn) && colDef.getTypeName().toLowerCase().indexOf("identity") == -1) {
+					if (colDef.getColumn() != null && !colDef.getName().equalsIgnoreCase(pkColumn) && !colDef.isReadOnly()) {
 						
 						Object value = record.getData(colDef.getColumn());
 						setPSValue(psUpdate, idx++, value, colDef);
@@ -1534,7 +2586,7 @@ public class JDBCLoader extends AbstractLoader {
 					}
 				}
 				
-				if (modified && onRecordUpdated(processContext, record)) {
+				if (modified && onRecordUpdated(context, record)) {
 					// record updated and onRecordUpdated return true to run again
 					idx = 1;
 				} else {
@@ -1571,7 +2623,7 @@ public class JDBCLoader extends AbstractLoader {
 			}				
 		} catch (Throwable t) {
 			if (handleException) {
-				handleException(t, record, processContext.getRecordsCount(), true);
+				handleException(t, record, context.getRecordsCount(), true);
 			} else {
 				throw new ETLException(t);
 			}
@@ -1589,16 +2641,22 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws ETLException 
 	 */
 	protected void setPSValue(PreparedStatement ps, int idx, Object value, DbColumnDef colDef) throws SQLException, ETLException {
-		if (value == null || (treatEmptyAsNull && value instanceof String && ((String)value).length() == 0)) {
+		boolean emptyAsNull = treatEmptyAsNull;
+		if (preventNotNullError && value == null && !colDef.isAllowsNull()) {
+			// get value for null
+			value = getColumnDefaultValueForNull(colDef);
+			emptyAsNull = false;
+		}
+		
+		if (value == null || (emptyAsNull && value instanceof String && ((String)value).length() == 0)) {
 			ps.setNull(idx, colDef.getType());
 		} else {
 			switch (colDef.getType()) {
 			case Types.VARCHAR:
 			case Types.CHAR:
 			case Types.LONGVARCHAR:
-			case Types.CLOB:
-			case -15: //Types.NCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hard coded value here.
-			case -9: { //Types.NVARCHAR: <-- This does not exist in any java version prior to 1.6, so I use the hard coded value here.
+			case Types.NCHAR:
+			case Types.NVARCHAR: {
 				String s = value.toString();
 				if (s.length() > colDef.getSize()) {
 					if (autoDataTruncate) {
@@ -1611,6 +2669,12 @@ public class JDBCLoader extends AbstractLoader {
 						alterColumnSize(colDef, s.length());
 					}
 				}
+				ps.setString(idx, s);
+				break;
+			}
+			case Types.CLOB:
+			case Types.NCLOB: {
+				String s = value.toString();
 				ps.setString(idx, s);
 				break;
 			}
@@ -1633,10 +2697,16 @@ public class JDBCLoader extends AbstractLoader {
 							// data truncate sql exception might happen: alter pro-active the table
 							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
 							executeBatch();
-							alterColumnType(colDef, Types.FLOAT);
+							alterColumnType(colDef, Types.FLOAT, null);
 							ps.setFloat(idx, f);
 							break;
 						} catch (NumberFormatException e) {}
+						if (autoAlterColumnsMode == AutoAlterColumnsMode.ANY_TO_VARCHAR) {
+							executeBatch();
+							alterColumnType(colDef, Types.VARCHAR, value);
+							ps.setString(idx, value.toString());
+							break;
+						}
 					}
 					// add column information
 					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
@@ -1652,7 +2722,7 @@ public class JDBCLoader extends AbstractLoader {
 							// data truncate sql exception might happen: alter pro-active the table
 							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
 							executeBatch();
-							alterColumnType(colDef, Types.BIGINT);
+							alterColumnType(colDef, Types.BIGINT, null);
 						}
 						ps.setLong(idx, (Long)value);
 					} else if (value instanceof String) {
@@ -1672,7 +2742,7 @@ public class JDBCLoader extends AbstractLoader {
 							// data truncate sql exception might happen: alter pro-active the table
 							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
 							executeBatch();
-							alterColumnType(colDef, Types.BIGINT);
+							alterColumnType(colDef, Types.BIGINT, null);
 							ps.setLong(idx, l);
 							break;
 						} catch (NumberFormatException e) {}
@@ -1681,10 +2751,16 @@ public class JDBCLoader extends AbstractLoader {
 							// data truncate sql exception might happen: alter pro-active the table
 							// empty batch, TODO shared or open connections might be checked that could cause a looked situation
 							executeBatch();
-							alterColumnType(colDef, Types.FLOAT);
+							alterColumnType(colDef, Types.FLOAT, null);
 							ps.setFloat(idx, f);
 							break;
 						} catch (NumberFormatException e) {}
+						if (autoAlterColumnsMode == AutoAlterColumnsMode.ANY_TO_VARCHAR) {
+							executeBatch();
+							alterColumnType(colDef, Types.VARCHAR, value);
+							ps.setString(idx, value.toString());
+							break;
+						}
 					}
 					// add column information
 					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
@@ -1694,26 +2770,39 @@ public class JDBCLoader extends AbstractLoader {
 			case Types.FLOAT:
 			case Types.REAL:
 			case Types.NUMERIC:
-				if (value instanceof Integer) {
-					ps.setInt(idx, (Integer)value);
-				} else if (value instanceof Long) {
-					ps.setLong(idx, (Long)value);
-				} else if (value instanceof String) {
-					String s = (String)value;
-					if (s.length() == 0) {
-						ps.setNull(idx, colDef.getType());
+				try {
+					if (value instanceof Integer) {
+						ps.setInt(idx, (Integer)value);
+					} else if (value instanceof Long) {
+						ps.setLong(idx, (Long)value);
+					} else if (value instanceof String) {
+						String s = (String)value;
+						if (s.length() == 0) {
+							ps.setNull(idx, colDef.getType());
+						} else {
+							ps.setDouble(idx, Double.parseDouble(s));
+		                }
+					} else if (value instanceof Double) {
+						ps.setDouble(idx, (Double)value);
+	                } else if (value instanceof BigDecimal) {
+	                    ps.setBigDecimal(idx, (BigDecimal)value);
 					} else {
-						ps.setDouble(idx, Double.parseDouble(s));
+						// unknown value
+						ps.setObject(idx, value);
 					}
-				} else if (value instanceof Double) {
-					ps.setDouble(idx, (Double)value);
-				} else if (value instanceof BigDecimal) {
-					ps.setBigDecimal(idx, (BigDecimal)value);
-				} else {
-					// unknown value
-					ps.setObject(idx, value);
+				} catch (NumberFormatException nfe) {
+					if (autoAlterColumns) {
+						if (autoAlterColumnsMode == AutoAlterColumnsMode.ANY_TO_VARCHAR) {
+							executeBatch();
+							alterColumnType(colDef, Types.VARCHAR, value);
+							ps.setString(idx, value.toString());
+							break;
+						}
+					}
+					// add column information
+					throw new ETLException(nfe.getMessage() + ", column '" + colDef.getName() + "'", nfe);
 				}
-				break;							
+				break;
 			case Types.TIMESTAMP:
 			case Types.DATE:
 			case Types.TIME:
@@ -1761,6 +2850,9 @@ public class JDBCLoader extends AbstractLoader {
 				break;
 			case Types.OTHER:
 			case Types.JAVA_OBJECT:
+			case Types.BINARY:
+			case Types.BLOB:
+			case Types.LONGVARBINARY:
 				ps.setObject(idx, value);
 				break;
 			default:
@@ -1778,93 +2870,181 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws SQLException 
 	 */
 	protected void alterColumnSize(DbColumnDef colDef, int size) throws SQLException {
-		// set length
-		int newSize = 1;
-		for (; newSize < size; newSize *= 2);
-		
-		String typeName = colDef.getTypeName();
-		if (typeName == null) {
-			// identify column type
-			throw new SQLException("Missing column '" + colDef.getName() + "' typeName");
-		}
+		synchronized (JDBCUtil.DBCOLUMNDEF_ALTERED) {
+			
+			String globalKey = JDBCUtil.makeGlobalDbColumnDefKey(connectionName, schemaname, tablename, colDef);
+			DbColumnDef alteredDbColDef = JDBCUtil.DBCOLUMNDEF_ALTERED.get(globalKey);
 
-		// alter to new type
-		String newType = typeName + "(" + newSize + ")";
-		
-		StringBuilder sb = new StringBuilder();
-
-		switch (sqlDialect) {
-		case ORACLE: {
-			if (newSize > 4000) {
-				switch (colDef.getType()) {
-				case Types.VARCHAR:
-				case Types.NVARCHAR:
-					if (colDef.getSize() < 4000) {
-						processContext.getMonitor().logWarn("Max size for varchar is 4000, reduced " + newSize + " to 4000");
-						newType = typeName + "(4000)";
-					} else {
-						processContext.getMonitor().logError("Max size for varchar is 4000, cannot apply new size " + newSize);
-						return;
+			// set length
+			int newSize = 1;
+			for (; newSize < size; newSize *= 2);
+			
+			if (alteredDbColDef != null) {
+				if (alteredDbColDef.getSize() > newSize) {
+					newSize = alteredDbColDef.getSize();
+				}
+			}
+			
+			String typeName = colDef.getTypeName();
+			if (typeName == null) {
+				// identify column type
+				throw new SQLException("Missing column '" + colDef.getName() + "' typeName");
+			}
+	
+			String nullable = colDef.isAllowsNull() ? "NULL" : "NOT NULL";
+	
+			// alter to new type
+			String newType = typeName + "(" + newSize + ")";
+			
+			StringBuilder sb = new StringBuilder();
+	
+			switch (sqlDialect) {
+			case ORACLE: {
+				if (newSize > 4000) {
+					switch (colDef.getType()) {
+					case Types.VARCHAR:
+					case Types.NVARCHAR:
+						if (colDef.getSize() < 4000) {
+							processContext.getMonitor().logWarn("Max size for varchar is 4000, reduced " + newSize + " to 4000");
+							newType = typeName + "(4000)";
+							newSize = 4000;
+						} else {
+							processContext.getMonitor().logError("Max size for varchar is 4000, cannot apply new size " + newSize);
+							return;
+						}
+						break;
 					}
-					break;
 				}
+				sb.append("ALTER TABLE " + getTablenameQuoted() + " MODIFY " + is);
+				sb.append(colDef.getName() + is + " " + newType);
+				//.append(" " + nullable); causes ORA-01451: column to be modified to NULL cannot be modified to NULL
+				break;
 			}
-			sb.append("ALTER TABLE ").append(getTablenameQuoted()).append(" MODIFY ").append(is);
-			sb.append(colDef.getName()).append(is).append(" ").append(newType);
-			break;
-		}
-		default: {
-			// check if new type is valid: TODO Retrieve that info from jdbc meta data or so...
-			if (newSize > 8000) {
-				switch (colDef.getType()) {
-				case Types.VARCHAR:
-				case Types.NVARCHAR:
-					// convert to MAX
-					newType = typeName + "(MAX)";
-					break;
+			case MYSQL: {
+				if (newSize > 65535) {
+					switch (colDef.getType()) {
+					case Types.VARCHAR:
+					case Types.NVARCHAR:
+						if (colDef.getSize() < 65535) {
+							processContext.getMonitor().logWarn("Max size for varchar is 65535, reduced " + newSize + " to 65535");
+							newType = typeName + "(65535)";
+							newSize = 65535;
+						} else {
+							processContext.getMonitor().logError("Max size for varchar is 65535, cannot apply new size " + newSize);
+							return;
+						}
+						break;
+					}
 				}
+				sb.append("ALTER TABLE " + getTablenameQuoted() + " MODIFY " + is);
+				sb.append(colDef.getName() + is + " " + newType);
+				//.append(" " + nullable); causes ORA-01451: column to be modified to NULL cannot be modified to NULL
+				break;
 			}
-			sb.append("ALTER TABLE ").append(is).append(tablename).append(is).append(" ALTER COLUMN ").append(is);
-			sb.append(colDef.getName()).append(is).append(" ").append(newType);
-			break;
-		}
-		}
-		
-		processContext.getMonitor().logWarn("Alter column " + is + colDef.getName() + is + " size from " + colDef.getSize() + " to " + newSize);
-
-		processContext.getMonitor().logInfo(sb.toString());
-		
-		// alter column
-		Statement stmt = connection.createStatement();
-		try {
-			stmt.execute(sb.toString());
-		} finally {
-			stmt.close();
-		}
-		
-		colDef.setSize(newSize);
-		
+			default: /* Tested with MSSQL */ {
+				// check if new type is valid: TODO Retrieve that info from jdbc meta data or so...
+				if (newSize > 8000) {
+					switch (colDef.getType()) {
+					case Types.VARCHAR:
+					case Types.NVARCHAR:
+						// convert to MAX
+						newType = typeName + "(MAX)";
+						break;
+					}
+				}
+				sb.append("ALTER TABLE " + getTablenameQuoted() + " ALTER COLUMN " + is);
+				sb.append(colDef.getName() + is + " " + newType + " " + nullable);
+				break;
+			}
+			}
+			
+			processContext.getMonitor().logWarn("Alter column " + is + colDef.getName() + is + " size from " + colDef.getSize() + " to " + newSize);
+	
+			processContext.getMonitor().logInfo(sb.toString());
+			
+			// alter column
+			Statement stmt = connection.createStatement();
+			try {
+				JDBCUtil.executeUpdate(stmt, sb.toString());
+			} finally {
+				stmt.close();
+			}
+			
+			colDef.setSize(newSize);
+			if (alteredDbColDef != null) {
+				alteredDbColDef.setSize(newSize);
+			} else {
+				 JDBCUtil.DBCOLUMNDEF_ALTERED.put(globalKey, colDef);
+			}
+		}		
 	}
 
 	/**
 	 * Alter column to specified type (if supported by db).
 	 * @param colDef
 	 * @param type
+	 * @param value
 	 * @throws SQLException
 	 */
-	protected void alterColumnType(DbColumnDef colDef, int type) throws SQLException {
+	protected void alterColumnType(DbColumnDef colDef, int type, Object value) throws SQLException {
+		int size = colDef.getSize();
+		int scale = colDef.getScale();
 		String newTypeName = null;
+		String newTypeDef = null;
+		String newTypeSize = "";
 		switch (type) {
 		case Types.BIGINT:
-			newTypeName = "bigint";
+			if (sqlDialect == SqlDialect.ORACLE) {
+				newTypeName = "NUMBER(20)";
+			} else {
+				newTypeName = "bigint";
+			}
 			break;
 		case Types.FLOAT:
-			newTypeName = "float";
+			if (sqlDialect == SqlDialect.ORACLE) {
+				newTypeName = "NUMBER(38,15)";
+			} else {
+				newTypeName = "float";
+			}
+			break;
+		case Types.VARCHAR:
+			// TODO support clob for length > 8000
+			// set length
+			size = 1;
+			for (; size < value.toString().length(); size *= 2);
+			// set default length
+			if (size < 1) {
+				size = 1;
+			}
+			int maxVarchar = 8000;
+			if (sqlDialect == SqlDialect.ORACLE) {
+				maxVarchar = 4000;
+			}
+			if (size > maxVarchar && value.toString().length() <= maxVarchar) {
+				size = maxVarchar;
+			}
+			if (size > maxVarchar) {
+				throw new SQLException("Cannot alter column " + colDef + " to varchar, value to large: " + value);
+			}
+			colDef.setSize(size);
+			colDef.setScale(0);
+			if (sqlDialect == SqlDialect.ORACLE) {
+				newTypeName = "VARCHAR2";
+			} else {
+				newTypeName = "VARCHAR";
+			}
+			newTypeSize = "(" + size + ")";
 			break;
 		default:
 			throw new SQLException("Unsupported column type " + type + " for alter column " + colDef);
 		}
-		processContext.getMonitor().logWarn("Alter column '" + colDef.getName() + "' type from " + colDef.getTypeName() + " to " + newTypeName);
+		String nullable = colDef.isAllowsNull() ? " NULL" : " NOT NULL";
+		if (sqlDialect == SqlDialect.ORACLE) {
+			// not supported
+			nullable = "";
+		}
+		newTypeDef = newTypeName + newTypeSize;
+		processContext.getMonitor().logWarn("Alter table " + getTablenameQuoted() + " column " + colDef + " to " + newTypeDef + nullable);
 
 		String typeName = colDef.getTypeName();
 		if (typeName == null) {
@@ -1874,21 +3054,32 @@ public class JDBCLoader extends AbstractLoader {
 		
 		// alter column
 		Statement stmt = connection.createStatement();
-		StringBuilder sb = new StringBuilder();
-		sb.append("ALTER TABLE ").append(getTablenameQuoted()).append(" ALTER COLUMN ").append(is);
-		sb.append(colDef.getName()).append(is).append(" ").append(newTypeName);
-		
-		processContext.getMonitor().logInfo(sb.toString());
-		
-		stmt.execute(sb.toString());
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append("ALTER TABLE " + getTablenameQuoted());
+			if (sqlDialect == SqlDialect.ORACLE) {
+				sb.append(" MODIFY ");
+			} else {
+				sb.append(" ALTER COLUMN ");
+			}
+			sb.append(is + colDef.getName() + is + " " + newTypeDef + nullable);
+			
+			processContext.getMonitor().logInfo(sb.toString());
+			
+			JDBCUtil.executeUpdate(stmt, sb.toString());
+		} finally {
+			stmt.close();
+		}
 		
 		colDef.setType(type);
 		colDef.setTypeName(newTypeName);
+		colDef.setSize(size);
+		colDef.setScale(scale);
 		
 	}
 
 	
-	private void doInsert(IProcessContext processContext, IRecord record, Collection<DbColumnDef> columns, PreparedStatement ps, String pkColumn) throws ETLException {
+	private void doInsert(IProcessContext context, IRecord record, Collection<DbColumnDef> columns, PreparedStatement ps, String pkColumn) throws ETLException {
 		boolean handleException = true;
 		boolean defaultInvocation = ps == psInsert; // if defaultInvocation is false, then batch insert is not used (only used for the "Oracle" dictionary "workaround")
 		try {
@@ -1896,14 +3087,14 @@ public class JDBCLoader extends AbstractLoader {
 			
 			int idx = 1;
 			for (DbColumnDef colDef : columns) {
-				if (colDef.getColumn() != null) {
+				if (colDef.getColumn() != null || (/* support preventNotNullError */ preventNotNullError && !colDef.isAllowsNull())) {
 					
 					// ignore identity columns for insert and update (identity is not supported on ORACLE)
-					if (colDef.getTypeName().toLowerCase().indexOf("identity") != -1 || (pkColumn != null && isSimulatePkIdentity() && colDef.getName().equalsIgnoreCase(pkColumn))) {
+					if (colDef.isReadOnly() || (!isSimulatePkIdentity() && pkColumn != null && colDef.getName().equalsIgnoreCase(pkColumn))) {
 						continue;
 					}
 					
-					Object value = record.getData(colDef.getColumn());
+					Object value = colDef.getColumn() != null ? record.getData(colDef.getColumn()) : null;
 					setPSValue(ps, idx++, value, colDef);
 					
 				}
@@ -1913,7 +3104,7 @@ public class JDBCLoader extends AbstractLoader {
 				// non-batched mode
 				int count = ps.executeUpdate();
 				if (count == -2) {
-					/* For some unknown reason ASUPDW2 (Oracle, version: Oracle9i Enterprise Edition Release 9.2.0.4.0) 
+					/* For some unknown reason (Oracle, version: Oracle9i Enterprise Edition Release 9.2.0.4.0) 
 					 * using Oracle Instant Client 11.2.0.1.0 returns -2 */
 					count = 1;
 				}
@@ -1937,14 +3128,14 @@ public class JDBCLoader extends AbstractLoader {
 			
 		} catch (Throwable t) {
 			if (handleException) {
-				handleException(t, record, processContext.getRecordsCount(), true);
+				handleException(t, record, context.getRecordsCount(), true);
 			} else {
 				throw new ETLException(t);
 			}
 		}
 		
 	}
-	
+
 	/**
 	 * 
 	 * @param se
@@ -1952,7 +3143,7 @@ public class JDBCLoader extends AbstractLoader {
 	 * @throws ETLException 
 	 */
 	protected void handleException(Throwable t, IRecord record, Integer recordsCount, boolean throwException) throws ETLException {
-		if (record != null && (t instanceof DataTruncation || t.getCause() instanceof DataTruncation || t.getMessage().toLowerCase().contains("truncation"))) {
+		if (record != null && (t instanceof DataTruncation || t.getCause() instanceof DataTruncation || (t.getMessage() != null && t.getMessage().toLowerCase().contains("truncation")))) {
 			//monitor.logError("Data Truncation during INSERT record (fields with value lengths following): " + record, se);
 			// log field value lengths
 			DbColumnDef hintColDef = null;
@@ -2009,12 +3200,13 @@ public class JDBCLoader extends AbstractLoader {
 			List<IRecord> batchRecords = null;
 			try {
 				if (batchCountInsert > 0) {
+					long start = System.nanoTime();
 					batchRecords = batchInsertRecords;
 					result = psInsert.executeBatch();
 					for (int i = 0; i < result.length; i++) {
 						int count = result[i];
 						if (count == -2) {
-							/* For some unknown reason ASUPDW2 (Oracle, version: Oracle9i Enterprise Edition Release 9.2.0.4.0) 
+							/* For some unknown reason (Oracle, version: Oracle9i Enterprise Edition Release 9.2.0.4.0) 
 							 * using Oracle Instant Client 11.2.0.1.0 returns -2 */
 							count = 1;
 						}
@@ -2026,10 +3218,12 @@ public class JDBCLoader extends AbstractLoader {
 						}
 					}
 					batchCountInsert = 0;
+					nanoTimeExecuteBatch += (System.nanoTime() - start);
 				}
 				
 				// batch update
 				if (batchCountUpdate > 0) {
+					long start = System.nanoTime();
 					batchRecords = batchUpdateRecords;
 					result = psUpdate.executeBatch();
 					for (int i = 0; i < result.length; i++) {
@@ -2040,6 +3234,7 @@ public class JDBCLoader extends AbstractLoader {
 						updateCount += count;
 					}			
 					batchCountUpdate = 0;
+					nanoTimeExecuteBatch += (System.nanoTime() - start);
 				}
 			} catch (BatchUpdateException bue) {
 				// find record
@@ -2124,63 +3319,63 @@ public class JDBCLoader extends AbstractLoader {
 
 	/**
 	 * @return the tablename
+	 * @deprecated
 	 */
 	public String getTablename() {
 		return tablename;
 	}
 
 	/**
+	 * @return the tablename
+	 */
+	public String getTableName() {
+		return tablename;
+	}
+
+	/**
 	 * @param tablename the tablename to set
+	 * @deprecated
 	 */
 	public void setTablename(String tablename) {
-        //RPF: identifying, if the tablename contains a "." to separate schema and table name!
-        String schema = null;
-        String rawTableName = tablename;
-
-        if (tablename.contains(".")) {
-            schema = tablename.substring(0, tablename.indexOf("."));
-            rawTableName = tablename.substring(tablename.indexOf(".") + 1, tablename.length());
-        }
-
-        this.tablename = rawTableName;
-        setSchemaName(schema);
-	}
-
-    /**
-     * Sets the schema name, can be null (default)
-     *
-     * @param schemaName
-     */
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
-    /**
-     * @return the schema name, can be null
-     */
-    public String getSchemaName() {
-        return schemaName;
-    }
-
-	/**
-	 * @param catalogName the catalogName to set
-	 */
-	public void setCatalogName(String catalogName) {
-		this.catalogname = catalogName;
+		setTableName(tablename);
 	}
 
 	/**
-	 * @return the catalogName
+	 * @param tablename the tablename to set
 	 */
-	public String getCatalogName() {
-		return catalogname;
+	public void setTableName(String tablename) {
+		if (tablename != null && sqlDialect == SqlDialect.ORACLE) {
+			// upper case table name
+			//tablename = tablename.toUpperCase();
+		}
+		if (schemaname == null) {
+	        //RPF: identifying, if the tablename contains a "." to separate schema and table name!
+	        String schema = null;
+	        String rawTableName = tablename;
+	
+	        if (tablename.contains(".")) {
+	            schema = tablename.substring(0, tablename.indexOf("."));
+	            rawTableName = tablename.substring(tablename.indexOf(".") + 1, tablename.length());
+	        }
+	
+	        this.tablename = rawTableName;
+	        setSchemaName(schema);
+		}		
+		this.tablename = tablename;
 	}
 
 	/**
 	 * @param catalogname the catalogname to set
 	 */
-	public void setCatalogname(String catalogname) {
+	public void setCatalogName(String catalogname) {
 		this.catalogname = catalogname;
+	}
+
+	/**
+	 * @return the catalogname
+	 */
+	public String getCatalogName() {
+		return catalogname;
 	}
 
 	/**
@@ -2210,6 +3405,18 @@ public class JDBCLoader extends AbstractLoader {
 		
 	}
 
+	/**
+	 * Exclude columns from being loaded.
+	 * @param columns
+	 */
+	public void addExcludedColumns(String... columns) {
+		
+		for (String s : columns) {
+			excludedColumns.add(s);
+		}
+		
+	}
+	
 	/**
 	 * @return the ignoreMissingTargetColumns
 	 */
@@ -2508,95 +3715,127 @@ public class JDBCLoader extends AbstractLoader {
 	}
 
 	/**
+	 * @return the autoIncrementColumn
+	 */
+	public String getAutoIncrementColumn() {
+		return autoIncrementColumn;
+	}
+
+	/**
+	 * @param autoIncrementColumn the autoIncrementColumn to set
+	 */
+	public void setAutoIncrementColumn(String autoIncrementColumn) {
+		this.autoIncrementColumn = autoIncrementColumn;
+	}
+
+	/**
+	 * @deprecated use {@link #getAutoIncrementColumn()}
 	 * @return the replaceOnAutoIncrement
 	 */
 	public String getReplaceOnAutoIncrementColumn() {
-		return replaceOnAutoIncrementColumn;
+		return autoIncrementColumn;
 	}
 
 	/**
+	 * @deprecated use {@link #setAutoIncrementColumn(String)}
 	 * @param replaceOnAutoIncrement the replaceOnAutoIncrement to set
 	 */
 	public void setReplaceOnAutoIncrementColumn(String replaceOnAutoIncrement) {
-		this.replaceOnAutoIncrementColumn = replaceOnAutoIncrement;
+		this.autoIncrementColumn = replaceOnAutoIncrement;
 	}
 
 	/**
+	 * @deprecated
 	 * @return the replaceOnColumns
 	 */
 	public String[] getReplaceOnColumns() {
-		return replaceOnColumns;
+		return onColumns;
 	}
 
 	/**
+	 * @deprecated
 	 * @param replaceOnColumns the replaceOnColumns to set
 	 */
 	public void setReplaceOnColumns(String... replaceOnColumns) {
-		this.replaceOnColumns = replaceOnColumns;
+		this.onColumns = replaceOnColumns;
 	}
 
 	/**
+	 * @return the onColumnsLastMaxValue
+	 */
+	public Object getOnColumnsLastMaxValue() {
+		return onColumnsLastMaxValue;
+	}
+
+	/**
+	 * @deprecated use {@link #getReplaceOnLastMaxValue()}
 	 * @return the lastReplaceOnMaxId
 	 */
 	public Object getLastReplaceOnMaxId() {
-		return lastReplaceOnMaxId;
+		return onColumnsLastMaxValue;
 	}
 	
+	/**
+	 * @return the autoIncremenMaxValue
+	 */
+	public Object getOnColumnsMaxValue() {
+		return onColumnsMaxValue;
+	}
 
 	/**
+	 * @deprecated use {@link #getOnColumnsMaxValue()}
 	 * @return the replaceOnMaxId
 	 */
 	public Object getReplaceOnMaxId() {
-		return replaceOnMaxId;
+		return onColumnsMaxValue;
 	}
 
 	/**
-	 * @param replaceOnMaxId the replaceOnMaxId to set
-	 */
-	public void setReplaceOnMaxId(Object replaceOnMaxId) {
-		this.replaceOnMaxId = replaceOnMaxId;
-	}
-
-	/**
+	 * @deprecated
 	 * @return the replaceOnColumnsOnProcessFinished
 	 */
 	public boolean isReplaceOnColumnsOnProcessFinished() {
-		return replaceOnColumnsOnProcessFinished;
+		return onColumnsOnProcessFinished;
 	}
 
 	/**
+	 * @deprecated
 	 * @param replaceOnColumnsOnProcessFinished the replaceOnColumnsOnProcessFinished to set
 	 */
 	public void setReplaceOnColumnsOnProcessFinished(boolean replaceOnColumnsOnProcessFinished) {
-		this.replaceOnColumnsOnProcessFinished = replaceOnColumnsOnProcessFinished;
+		this.onColumnsOnProcessFinished = replaceOnColumnsOnProcessFinished;
 	}
 
 	/**
+	 * @deprecated
 	 * @return the replaceOnColumnsNullValue
 	 */
 	public String[] getReplaceOnColumnsNullValue() {
-		return replaceOnColumnsNullValue;
+		return onColumnsNullValue;
 	}
 
 	/**
+	 * @deprecated
 	 * @param replaceOnColumnsNullValue the replaceOnColumnsNullValue to set
 	 */
 	public void setReplaceOnColumnsNullValue(String... replaceOnColumnsNullValue) {
-		this.replaceOnColumnsNullValue = replaceOnColumnsNullValue;
+		this.onColumnsNullValue = replaceOnColumnsNullValue;
 	}
 
 	/**
+	 * @deprecated
 	 * @return the replaceOnColumnsCollate
 	 */
 	public String[] getReplaceOnColumnsCollate() {
-		return replaceOnColumnsCollate;
+		return onColumnsCollate;
 	}
 
 	/**
+	 * @deprecated
 	 * @param replaceOnColumnsCollate the replaceOnColumnsCollate to set
 	 */
 	public void setReplaceOnColumnsCollate(String... replaceOnColumnsCollate) {
-		this.replaceOnColumnsCollate = replaceOnColumnsCollate;
+		this.onColumnsCollate = replaceOnColumnsCollate;
 	}
 
 	/**
@@ -2632,6 +3871,7 @@ public class JDBCLoader extends AbstractLoader {
 	 */
 	public void setSqlDialect(SqlDialect sqlDialect) {
 		this.sqlDialect = sqlDialect;
+		setTableName(tablename);
 	}
 
 	/**
@@ -2682,4 +3922,348 @@ public class JDBCLoader extends AbstractLoader {
 	protected boolean isSimulatePkIdentity() {
 		return simulatePkIdentity && sqlDialect == SqlDialect.ORACLE;
 	}
+
+	/**
+	 * @deprecated use {@link #isOnColumnsOnProcessFinished()}
+	 * @return the updateOnColumnsOnProcessFinished
+	 */
+	public boolean isUpdateOnColumnsOnProcessFinished() {
+		return onColumnsOnProcessFinished;
+	}
+
+	/**
+	 * @deprecated use {@link #setOnColumnsOnProcessFinished(boolean)}
+	 * @param updateOnColumnsOnProcessFinished the updateOnColumnsOnProcessFinished to set
+	 */
+	public void setUpdateOnColumnsOnProcessFinished(boolean updateOnColumnsOnProcessFinished) {
+		this.onColumnsOnProcessFinished = updateOnColumnsOnProcessFinished;
+	}
+
+	/**
+	 * @deprecated use {@link #getOnColumns()}
+	 * @return the updateOnColumns
+	 */
+	public String[] getUpdateOnColumns() {
+		return onColumns;
+	}
+
+	/**
+	 * @deprecated use {@link #setOnColumns(String...)}
+	 * @param updateOnColumns the updateOnColumns to set
+	 */
+	public void setUpdateOnColumns(String... updateOnColumns) {
+		this.onColumns = updateOnColumns;
+	}
+
+	/**
+	 * @deprecated use {@link #getOnColumnsNullValue()}
+	 * @return the updateOnColumnsNullValue
+	 */
+	public String[] getUpdateOnColumnsNullValue() {
+		return onColumnsNullValue;
+	}
+
+	/**
+	 * @deprecated use {@link #setOnColumnsNullValue(String...)}
+	 * @param updateOnColumnsNullValue the updateOnColumnsNullValue to set
+	 */
+	public void setUpdateOnColumnsNullValue(String... updateOnColumnsNullValue) {
+		this.onColumnsNullValue = updateOnColumnsNullValue;
+	}
+
+	/**
+	 * @deprecated use {@link #getOnColumnsCollate()}
+	 * @return the updateOnColumnsCollate
+	 */
+	public String[] getUpdateOnColumnsCollate() {
+		return onColumnsCollate;
+	}
+
+	/**
+	 * @deprecated use {@link #setOnColumnsCollate(String...)}
+	 * @param updateOnColumnsCollate the updateOnColumnsCollate to set
+	 */
+	public void setUpdateOnColumnsCollate(String... updateOnColumnsCollate) {
+		this.onColumnsCollate = updateOnColumnsCollate;
+	}
+
+	/**
+	 * @deprecated use {@link #getOnColumnsLastMaxValue()}
+	 * @return the updateOnLastMaxValue
+	 */
+	public Object getUpdateOnLastMaxValue() {
+		return onColumnsLastMaxValue;
+	}
+
+	/**
+	 * @return the onColumnsMode
+	 */
+	public OnColumnsMode getOnColumnsMode() {
+		return onColumnsMode;
+	}
+
+	/**
+	 * @param onColumnsMode the onColumnsMode to set
+	 */
+	public void setOnColumnsMode(OnColumnsMode onColumnsMode) {
+		this.onColumnsMode = onColumnsMode;
+	}
+
+	/**
+	 * @return the onColumnsOnProcessFinished
+	 */
+	public boolean isOnColumnsOnProcessFinished() {
+		return onColumnsOnProcessFinished;
+	}
+
+	/**
+	 * @param onColumnsOnProcessFinished the onColumnsOnProcessFinished to set
+	 */
+	public void setOnColumnsOnProcessFinished(boolean onColumnsOnProcessFinished) {
+		this.onColumnsOnProcessFinished = onColumnsOnProcessFinished;
+	}
+
+	/**
+	 * @return the onColumns
+	 */
+	public String[] getOnColumns() {
+		return onColumns;
+	}
+
+	/**
+	 * @param onColumns the onColumns to set
+	 */
+	public void setOnColumns(String... onColumns) {
+		this.onColumns = onColumns;
+	}
+
+	/**
+	 * @return the onColumnsNullValue
+	 */
+	public String[] getOnColumnsNullValue() {
+		return onColumnsNullValue;
+	}
+
+	/**
+	 * @param onColumnsNullValue the onColumnsNullValue to set
+	 */
+	public void setOnColumnsNullValue(String... onColumnsNullValue) {
+		this.onColumnsNullValue = onColumnsNullValue;
+	}
+
+	/**
+	 * @return the onColumnsCollate
+	 */
+	public String[] getOnColumnsCollate() {
+		return onColumnsCollate;
+	}
+
+	/**
+	 * @param onColumnsCollate the onColumnsCollate to set
+	 */
+	public void setOnColumnsCollate(String... onColumnsCollate) {
+		this.onColumnsCollate = onColumnsCollate;
+	}
+
+	/**
+	 * @return the onColumnsExclude
+	 */
+	public String[] getOnColumnsExclude() {
+		return onColumnsExclude;
+	}
+
+	/**
+	 * @param onColumnsExclude the onColumnsExclude to set
+	 */
+	public void setOnColumnsExclude(String... onColumnsExclude) {
+		this.onColumnsExclude = onColumnsExclude;
+	}
+
+	/**
+	 * @return Collection of DbColumnDef 
+	 */
+	public Collection<DbColumnDef> getColumns() {
+		return columns.values();
+	}
+
+	/**
+	 * @return the preventNotNullError
+	 */
+	public boolean isPreventNotNullError() {
+		return preventNotNullError;
+	}
+
+	/**
+	 * @param preventNotNullError the preventNotNullError to set
+	 */
+	public void setPreventNotNullError(boolean preventNotNullError) {
+		this.preventNotNullError = preventNotNullError;
+	}
+	
+	/**
+	 * @return the sum of insertCount + updateCount + deleteCount
+	 */
+	public long getRecordsChangeCount() {
+		return insertCount + updateCount + deleteCount;
+	}
+
+	/**
+	 * @return the ignoreMissingSourceColumns
+	 */
+	public boolean isIgnoreMissingSourceColumns() {
+		return ignoreMissingSourceColumns;
+	}
+
+	/**
+	 * @param ignoreMissingSourceColumns the ignoreMissingSourceColumns to set
+	 */
+	public void setIgnoreMissingSourceColumns(boolean ignoreMissingSourceColumns) {
+		this.ignoreMissingSourceColumns = ignoreMissingSourceColumns;
+	}
+
+	/**
+	 * @return the insertCount
+	 */
+	public long getInsertCount() {
+		return insertCount;
+	}
+
+	/**
+	 * @param insertCount the insertCount to set
+	 */
+	public void setInsertCount(long insertCount) {
+		this.insertCount = insertCount;
+	}
+
+	/**
+	 * @return the updateCount
+	 */
+	public long getUpdateCount() {
+		return updateCount;
+	}
+
+	/**
+	 * @param updateCount the updateCount to set
+	 */
+	public void setUpdateCount(long updateCount) {
+		this.updateCount = updateCount;
+	}
+
+	/**
+	 * @return the deleteCount
+	 */
+	public long getDeleteCount() {
+		return deleteCount;
+	}
+
+	/**
+	 * @param deleteCount the deleteCount to set
+	 */
+	public void setDeleteCount(long deleteCount) {
+		this.deleteCount = deleteCount;
+	}
+
+	/**
+	 * @return the onColumnsType
+	 */
+	public OnColumnsType getOnColumnsType() {
+		return onColumnsType;
+	}
+
+	/**
+	 * @param onColumnsType the onColumnsType to set
+	 */
+	public void setOnColumnsType(OnColumnsType onColumnsType) {
+		this.onColumnsType = onColumnsType;
+	}
+
+	/**
+	 * @return the schemaname
+	 */
+	public String getSchemaName() {
+		return schemaname;
+	}
+
+	/**
+	 * @param schemaname the schemaname to set
+	 */
+	public void setSchemaName(String schemaname) {
+		this.schemaname = schemaname;
+	}
+
+	/**
+	 * @return the onColumnsIncludeMissingTargetColumns
+	 */
+	public boolean isOnColumnsIncludeMissingTargetColumns() {
+		return onColumnsIncludeMissingTargetColumns;
+	}
+
+	/**
+	 * @param onColumnsIncludeMissingTargetColumns the onColumnsIncludeMissingTargetColumns to set
+	 */
+	public void setOnColumnsIncludeMissingTargetColumns(boolean onColumnsIncludeMissingTargetColumns) {
+		this.onColumnsIncludeMissingTargetColumns = onColumnsIncludeMissingTargetColumns;
+	}
+
+	/**
+	 * @return the addColumnsToDataSet
+	 */
+	public boolean isAddColumnsToDataSet() {
+		return addColumnsToDataSet;
+	}
+
+	/**
+	 * @param addColumnsToDataSet the addColumnsToDataSet to set
+	 */
+	public void setAddColumnsToDataSet(boolean addColumnsToDataSet) {
+		this.addColumnsToDataSet = addColumnsToDataSet;
+	}
+
+	/**
+	 * @return the autoDetectColumnTypesNullable
+	 */
+	public boolean isAutoDetectColumnTypesNullable() {
+		return autoDetectColumnTypesNullable;
+	}
+
+	/**
+	 * @param autoDetectColumnTypesNullable the autoDetectColumnTypesNullable to set
+	 */
+	public void setAutoDetectColumnTypesNullable(boolean autoDetectColumnTypesNullable) {
+		this.autoDetectColumnTypesNullable = autoDetectColumnTypesNullable;
+	}
+
+	/**
+	 * @return the autoAlterColumnsMode
+	 */
+	public AutoAlterColumnsMode getAutoAlterColumnsMode() {
+		return autoAlterColumnsMode;
+	}
+
+	/**
+	 * @param autoAlterColumnsMode the autoAlterColumnsMode to set
+	 */
+	public void setAutoAlterColumnsMode(AutoAlterColumnsMode autoAlterColumnsMode) {
+		this.autoAlterColumnsMode = autoAlterColumnsMode;
+	}
+
+	@Override
+	public String toString() {
+		return "JDBCLoader[" + tablename + "]";
+	}
+
+	/**
+	 * @return the reopenClosedConnection
+	 */
+	public boolean isReopenClosedConnection() {
+		return reopenClosedConnection;
+	}
+
+	/**
+	 * @param reopenClosedConnection the reopenClosedConnection to set
+	 */
+	public void setReopenClosedConnection(boolean reopenClosedConnection) {
+		this.reopenClosedConnection = reopenClosedConnection;
+	}
+	
 }

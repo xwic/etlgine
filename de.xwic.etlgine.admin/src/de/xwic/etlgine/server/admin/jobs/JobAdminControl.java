@@ -236,6 +236,7 @@ public class JobAdminControl extends BaseContentContainer {
 	 */
 	protected void onRefresh() {
 
+		loadJobsList();
 		table.setRequireRedraw(true);
 		
 	}

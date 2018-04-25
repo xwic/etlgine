@@ -502,8 +502,10 @@ public class JDBCMonitor extends DefaultMonitor {
 			record.setData(colHostname, InetAddress.getLocalHost().getCanonicalHostName());
 			record.setData(colETLgineName, ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_INSTANCENAME, ServerContext.PROPERTY_SERVER_INSTANCENAME_DEFAULT));
             record.setData(colETLgineId, ETLgineServer.getInstance().getServerContext().getProperty(ServerContext.PROPERTY_SERVER_INSTANCEID, ServerContext.PROPERTY_SERVER_INSTANCEID_DEFAULT));
-
-			loader.processRecord(processContext, record);
+            
+            recordSetupExtensionPoint(record);
+			
+            loader.processRecord(processContext, record);
 			
 			if (duration != null || e != null) {
 				loader.executeBatch();
@@ -575,6 +577,15 @@ public class JDBCMonitor extends DefaultMonitor {
 	 */
 	public void setTablename(String tablename) {
 		this.tablename = tablename;
+	}
+	
+	
+	/**
+	 * Provides an extension point to customize the record inserted into the table
+	 * @param record
+	 */
+	protected void recordSetupExtensionPoint(IRecord record){
+		
 	}
 
 	

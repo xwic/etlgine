@@ -9,6 +9,7 @@ import groovy.lang.GroovyShell;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +58,9 @@ public class ServerContext extends Context {
 
 	protected final Log log = LogFactory.getLog(getClass());
 	
-	private Map<String, IJob> jobs = new HashMap<String, IJob>();
-	private Map<String, JobQueue> queues = new HashMap<String, JobQueue>();
-	private Map<String, String> jobToQueueMapping = new HashMap<String, String>();
+	private Map<String, IJob> jobs = Collections.synchronizedMap(new HashMap<String, IJob>());
+	private Map<String, JobQueue> queues = Collections.synchronizedMap(new HashMap<String, JobQueue>());
+	private Map<String, String> jobToQueueMapping = Collections.synchronizedMap(new HashMap<String, String>());
 	
 	private List<IServerContextListener> listeners = new ArrayList<IServerContextListener>();
 	
@@ -193,7 +194,7 @@ public class ServerContext extends Context {
 	 * @return
 	 */
 	public Collection<JobQueue> getJobQueues() {
-		return queues.values();
+		return Collections.unmodifiableCollection(queues.values());
 	}
 	
 	/**
@@ -235,7 +236,7 @@ public class ServerContext extends Context {
 	 * @return
 	 */
 	public Collection<IJob> getJobs() {
-		return jobs.values();
+		return Collections.unmodifiableCollection(jobs.values());
 	}
 	
 	public void addJobQueue(String queueName, JobQueue jobQueue) throws ETLException{

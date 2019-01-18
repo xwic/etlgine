@@ -44,6 +44,7 @@ public class JDBCExtractor extends AbstractExtractor {
 	private int colCount = 0;
 	
 	private int fetchSize = -1;
+	private int connectionTimeout = -1;
 	private int returnedCount = 0;
 	private int getNextRecordInvoked = 0;
 	
@@ -221,6 +222,15 @@ public class JDBCExtractor extends AbstractExtractor {
 			if (fetchSize > 0) {
 				stmt.setFetchSize(fetchSize);
 			}
+			// set Connection Timeout
+			if (connectionTimeout == -1) {
+				connectionTimeout = JDBCUtil.getConnectionTimeout(context, currSource.getConnectionName());
+			}
+			
+			if (connectionTimeout > 0) {
+				stmt.setQueryTimeout(connectionTimeout);
+			}
+			log.info("Connection Timeout value: " + connectionTimeout);
 			String sql = currSource.getSqlSelectString();
 			if (isLogSqlSelectString()) {
 				log.debug(sql);
@@ -329,7 +339,21 @@ public class JDBCExtractor extends AbstractExtractor {
 	public void setFetchSize(int fetchSize) {
 		this.fetchSize = fetchSize;
 	}
+	
+	/**
+	 * @return the ConnectionTimeout
+	 */
+	public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
 
+	/**
+	 * @param ConnectionTimeout the ConnectionTimeout to set
+	 */
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+	
 	/**
 	 * @return the resultSetType
 	 */

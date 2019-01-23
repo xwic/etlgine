@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -20,11 +21,11 @@ import org.apache.log4j.Logger;
 import de.xwic.etlgine.AbstractExtractor;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IColumn;
+import de.xwic.etlgine.IColumn.DataType;
 import de.xwic.etlgine.IDataSet;
 import de.xwic.etlgine.IProcessContext;
 import de.xwic.etlgine.IRecord;
 import de.xwic.etlgine.ISource;
-import de.xwic.etlgine.IColumn.DataType;
 import de.xwic.etlgine.jdbc.JDBCUtil;
 
 /**
@@ -44,6 +45,7 @@ public class JDBCExtractor extends AbstractExtractor {
 	private int colCount = 0;
 	
 	private int fetchSize = -1;
+	private int conStatementTimeout = -1;
 	private int returnedCount = 0;
 	private int getNextRecordInvoked = 0;
 	
@@ -152,8 +154,15 @@ public class JDBCExtractor extends AbstractExtractor {
 			} else {
 				endReached = true;
 			}
-		} catch (SQLException se) {
-			throw new ETLException("Error reading resultSet at column '" + col.getName() + "': " + se, se);
+		} 
+		catch (SQLTimeoutException e)
+		{
+			log.info("exception is "+ e);
+			throw new ETLException("Connection/statement timeout occurred! " + e, e);
+		} 		
+		catch (SQLException se) {
+			log.info("exception is "+ se );
+			throw new ETLException("Error reading resultSet at column '" + col.getName() + "': " + se, se );
 		}
 		
 		
@@ -221,6 +230,15 @@ public class JDBCExtractor extends AbstractExtractor {
 			if (fetchSize > 0) {
 				stmt.setFetchSize(fetchSize);
 			}
+			// set Connection Timeout
+			if (conStatementTimeout == -1) {
+				conStatementTimeout = JDBCUtil.getConStatementTimeout(context, currSource.getConnectionName());
+			}
+			
+			if (conStatementTimeout > 0) {
+				stmt.setQueryTimeout(conStatementTimeout);
+			}
+			log.info("Connection Timeout value: " + conStatementTimeout);
 			String sql = currSource.getSqlSelectString();
 			if (isLogSqlSelectString()) {
 				log.debug(sql);
@@ -309,8 +327,15 @@ public class JDBCExtractor extends AbstractExtractor {
 				toString();
 			}
 			
-		} catch (SQLException se) {
-			throw new ETLException("Error executing SQL SELECT statement " + currSource.getSqlSelectString() + ": " + se, se);
+		}
+		catch (SQLTimeoutException e)
+		{
+			log.info("exception is "+ e);
+			throw new ETLException("Connection/statement timeout occurred in sql satement! " + currSource.getSqlSelectString() + e,e);
+		} 
+		catch (SQLException se) {
+			log.info("exception is "+ se);
+			throw new ETLException("Error executing SQL SELECT statement " + currSource.getSqlSelectString() + ": " + se,se);
 		}
 		
 
@@ -328,6 +353,20 @@ public class JDBCExtractor extends AbstractExtractor {
 	 */
 	public void setFetchSize(int fetchSize) {
 		this.fetchSize = fetchSize;
+	}
+	
+	/**
+	 * @return the conStatementTimeout
+	 */
+	public int getConStatementTimeout() {
+		return conStatementTimeout;
+	}
+
+	/**
+	 * @param conStatementTimeout the conStatementTimeout to set
+	 */
+	public void setConStatementTimeout(int conStatementTimeout) {
+		this.conStatementTimeout = conStatementTimeout;
 	}
 
 	/**

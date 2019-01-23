@@ -275,6 +275,21 @@ public class JDBCUtil {
 	}
 
 	/**
+	 * Returns the Connection Timeout used for this jdbc statements.
+	 * @param context
+	 * @param name
+	 * @return
+	 */
+	public static int getConStatementTimeout(IContext context, String name) {
+		int constatementTimeout = context.getPropertyInt(name + ".connection.con_statement_timeout", 0);
+		log.info("global con_statement_timeout value: " + context.getPropertyInt("global.connection.con_statement_timeout", 0)); 
+		if(constatementTimeout==0)
+			constatementTimeout = context.getPropertyInt("global.connection.con_statement_timeout", 0);
+		
+		return constatementTimeout;
+	}
+	
+	/**
 	 * @param rs
 	 * @throws SQLException 
 	 */

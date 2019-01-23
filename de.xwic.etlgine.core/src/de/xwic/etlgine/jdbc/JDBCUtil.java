@@ -280,13 +280,13 @@ public class JDBCUtil {
 	 * @param name
 	 * @return
 	 */
-	public static int getConnectionTimeout(IContext context, String name) {
-		int connectionTimeout = context.getPropertyInt(name + ".connection.connection_timeout", 0);
-		log.info("global connection_timeout value: " + context.getPropertyInt("global.connection.connection_timeout", 0)); 
-		if(connectionTimeout==0)
-			connectionTimeout = context.getPropertyInt("global.connection.connection_timeout", 0);
+	public static int getConStatementTimeout(IContext context, String name) {
+		int constatementTimeout = context.getPropertyInt(name + ".connection.con_statement_timeout", 0);
+		log.info("global con_statement_timeout value: " + context.getPropertyInt("global.connection.con_statement_timeout", 0)); 
+		if(constatementTimeout==0)
+			constatementTimeout = context.getPropertyInt("global.connection.con_statement_timeout", 0);
 		
-		return connectionTimeout;
+		return constatementTimeout;
 	}
 	
 	/**

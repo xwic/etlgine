@@ -335,7 +335,7 @@ public class JDBCExtractor extends AbstractExtractor {
 		} 
 		catch (SQLException se) {
 			log.info("exception is "+ se);
-			throw new ETLException("Error executing SQL SELECT statement " + currSource.getSqlSelectString() + ": " + "se",se);
+			throw new ETLException("Error executing SQL SELECT statement " + currSource.getSqlSelectString() + ": " + se,se);
 		}
 		
 

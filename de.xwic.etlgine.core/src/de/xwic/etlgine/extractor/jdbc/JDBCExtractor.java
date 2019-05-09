@@ -15,6 +15,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -200,8 +201,18 @@ public class JDBCExtractor extends AbstractExtractor {
 				} catch (ClassNotFoundException e) {
 					throw new ETLException("The specified driver (" + currSource.getDriverName() + ") can not be found.", e);
 				}
-				
-				connection = DriverManager.getConnection(currSource.getConnectionUrl(), currSource.getUsername(), currSource.getPassword());
+				Properties props = new Properties();
+				props.setProperty("user", currSource.getUsername());
+				props.setProperty("password", currSource.getPassword());
+				if (currSource.getDriverName().equals("oracle.jdbc.driver.OracleDriver")) {
+					props = JDBCUtil.getConPropValue(context, currSource.getConnectionUrl(), props, true);
+				}
+				connection = DriverManager.getConnection(currSource.getConnectionUrl(), props);
+				// connection = DriverManager.getConnection(currSource.getConnectionUrl(),
+				// currSource.getUsername(), currSource.getPassword());
+			} catch (SQLTimeoutException e) {
+				log.error("exception is " + e);
+				throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -209,10 +220,14 @@ public class JDBCExtractor extends AbstractExtractor {
 			log.info("Using named connection: " + currSource.getConnectionName());
 			try {
 				if (currSource.getSharedConnectionName() != null) {
-					connection = JDBCUtil.getSharedConnection(context, currSource.getSharedConnectionName(), currSource.getConnectionName());
+					connection = JDBCUtil.getSharedConnection(context, currSource.getSharedConnectionName(),
+							currSource.getConnectionName());
 				} else {
 					connection = JDBCUtil.openConnection(context, currSource.getConnectionName());
 				}
+			} catch (SQLTimeoutException e) {
+				log.error("Connection timeout occurred while trying to get connection! " + e);
+				throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -221,7 +236,7 @@ public class JDBCExtractor extends AbstractExtractor {
 		try {
 			//stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			stmt = connection.createStatement(resultSetType, resultSetConcurrency);
-
+			
 			// set fetch size
 			if (fetchSize == -1) {
 				fetchSize = JDBCUtil.getFetchSize(context, currSource.getConnectionName());
@@ -330,7 +345,7 @@ public class JDBCExtractor extends AbstractExtractor {
 		}
 		catch (SQLTimeoutException e)
 		{
-			log.info("exception is "+ e);
+			log.info("Connection timeout occurred while trying to get connection!  "+ e);
 			throw new ETLException("Connection/statement timeout occurred in sql satement! " + currSource.getSqlSelectString() + e,e);
 		} 
 		catch (SQLException se) {

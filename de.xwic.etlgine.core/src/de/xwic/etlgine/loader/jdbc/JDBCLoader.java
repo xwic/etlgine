@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
@@ -181,12 +182,16 @@ public class JDBCLoader extends AbstractLoader {
 				} catch (ClassNotFoundException e) {
 					throw new ETLException("The specified driver (" + driverName + ") can not be found.", e);
 				}
-				
-				
+
 				properties.setProperty("user", username);
 				properties.setProperty("password", password);
-				
+				if (driverName.equals("oracle.jdbc.driver.OracleDriver")) {
+					properties = JDBCUtil.getConPropValue(processContext, connectionUrl, properties, true);
+				}
 				connection = DriverManager.getConnection(connectionUrl, properties);
+			} catch (SQLTimeoutException e) {
+				monitor.logError("Connection timeout occurred while trying to get connection! "+ e);
+				throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -201,7 +206,11 @@ public class JDBCLoader extends AbstractLoader {
 				} else {
 					connection = JDBCUtil.openConnection(processContext, connectionName);
 				}
-			} catch (SQLException e) {
+			} catch (SQLTimeoutException e) {
+				monitor.logError("exception is " + e);
+				throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
+			}  
+			catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		}

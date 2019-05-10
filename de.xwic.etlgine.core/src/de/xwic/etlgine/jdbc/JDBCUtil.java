@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -166,6 +167,12 @@ public class JDBCUtil {
 		String password = context.getProperty(name + ".connection.password");
 		int isolationLevel = context.getPropertyInt(name + ".connection.transactionIsolation", -1);
 		
+		Properties props = new Properties();
+		props.setProperty("user", username);
+		props.setProperty("password", password);
+		if (driver.equals("oracle.jdbc.driver.OracleDriver")) {
+			props = getConPropValue(context, name, props, logging);
+		}
 		if (url == null) {
 			throw new ETLException("The URL is not specified for this connection name. ('" + name + "')");
 		}
@@ -186,7 +193,7 @@ public class JDBCUtil {
 		}
 		Connection con;
 		try {
-			con = DriverManager.getConnection(url, username, password);
+			con = DriverManager.getConnection(url, props);
 		} catch (UnsatisfiedLinkError ule) {
 			if (ule.getMessage().contains("java.library.path")) {
 				String libPath = System.getProperty("java.library.path");
@@ -194,6 +201,8 @@ public class JDBCUtil {
 			} else {
 				throw new ETLException(ule);
 			}
+		}  catch (SQLException e) {
+			throw new ETLException("Error opening connect: " + e, e);
 		}
 
 		// set optional transaction isolation level
@@ -289,6 +298,44 @@ public class JDBCUtil {
 		return constatementTimeout;
 	}
 	
+	/**
+	 * If defining new property at connection level need to override the global connection property as well
+	 * numOfProperty will give the number's of properties you want to add by default it is 1
+	 * Returns Property
+	 * @param context
+	 * @param name
+	 * @return
+	 */
+	public static Properties getConPropValue(IContext context, String name, Properties props, boolean logging) {
+
+		int numOfProperty = 1;
+		String propertyName = null, propertyValue = null;
+
+		log.info("connection property name::" + name + ".connection.numOfProperty");
+		if (context.getProperty(name + ".connection.numOfProperty") != null)
+			numOfProperty = context.getPropertyInt(name + ".connection.numOfProperty", 1);
+		else
+			numOfProperty = context.getPropertyInt("global.connection.numOfProperty", 1);
+
+		for (int i = 1; i <= numOfProperty; i++) {
+			if (context.getProperty(name + ".connection.property" + i) != null)
+				propertyName = context.getProperty(name + ".connection.property" + i);
+			else if (context.getProperty("global.connection.property" + i) != null)
+				propertyName = context.getProperty("global.connection.property" + i);
+			if (propertyName != null) {
+				if (context.getProperty(name + "." + propertyName) != null)
+					propertyValue = context.getProperty(name + "." + propertyName);
+				else if (context.getProperty("global." + propertyName) != null)
+					propertyValue = context.getProperty("global." + propertyName);
+				if (logging) {
+					log.info("PropertyName:" + propertyName + "PropertyValue:" + propertyValue);
+				}
+				if (propertyValue != null)
+					props.setProperty(propertyName, propertyValue);
+			}
+		}
+		return props;
+	}
 	/**
 	 * @param rs
 	 * @throws SQLException 

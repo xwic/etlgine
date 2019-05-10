@@ -181,13 +181,14 @@ public class JDBCLoader extends AbstractLoader {
 				} catch (ClassNotFoundException e) {
 					throw new ETLException("The specified driver (" + driverName + ") can not be found.", e);
 				}
-				
-				
+
 				properties.setProperty("user", username);
 				properties.setProperty("password", password);
-				
+				if (driverName.equals("oracle.jdbc.driver.OracleDriver")) {
+					properties = JDBCUtil.getConPropValue(processContext, connectionUrl, properties, true);
+				}
 				connection = DriverManager.getConnection(connectionUrl, properties);
-			} catch (SQLException e) {
+			}  catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		} else {
@@ -201,7 +202,8 @@ public class JDBCLoader extends AbstractLoader {
 				} else {
 					connection = JDBCUtil.openConnection(processContext, connectionName);
 				}
-			} catch (SQLException e) {
+			}  
+			catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
 		}

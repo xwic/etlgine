@@ -210,9 +210,6 @@ public class JDBCExtractor extends AbstractExtractor {
 				connection = DriverManager.getConnection(currSource.getConnectionUrl(), props);
 				// connection = DriverManager.getConnection(currSource.getConnectionUrl(),
 				// currSource.getUsername(), currSource.getPassword());
-			} catch (SQLTimeoutException e) {
-				log.error("exception is " + e);
-				throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -225,9 +222,6 @@ public class JDBCExtractor extends AbstractExtractor {
 				} else {
 					connection = JDBCUtil.openConnection(context, currSource.getConnectionName());
 				}
-			} catch (SQLTimeoutException e) {
-				log.error("Connection timeout occurred while trying to get connection! " + e);
-				throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
 			} catch (SQLException e) {
 				throw new ETLException("Error opening connect: " + e, e);
 			}
@@ -236,7 +230,7 @@ public class JDBCExtractor extends AbstractExtractor {
 		try {
 			//stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			stmt = connection.createStatement(resultSetType, resultSetConcurrency);
-			
+
 			// set fetch size
 			if (fetchSize == -1) {
 				fetchSize = JDBCUtil.getFetchSize(context, currSource.getConnectionName());
@@ -345,7 +339,7 @@ public class JDBCExtractor extends AbstractExtractor {
 		}
 		catch (SQLTimeoutException e)
 		{
-			log.info("Connection timeout occurred while trying to get connection!  "+ e);
+			log.info("exception is "+ e);
 			throw new ETLException("Connection/statement timeout occurred in sql satement! " + currSource.getSqlSelectString() + e,e);
 		} 
 		catch (SQLException se) {

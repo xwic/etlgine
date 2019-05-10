@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -19,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import de.xwic.etlgine.ETLException;
 import de.xwic.etlgine.IContext;
 import de.xwic.etlgine.server.JobQueue;
-import oracle.jdbc.driver.OracleConnection;
 
 /**
  * @author Developer
@@ -203,9 +201,8 @@ public class JDBCUtil {
 			} else {
 				throw new ETLException(ule);
 			}
-		} catch (SQLTimeoutException e) {
-			log.error("Connection timeout occurred while trying to get connection!" + e);
-			throw new ETLException("Connection timeout occurred while trying to get connection! " + e, e);
+		}  catch (SQLException e) {
+			throw new ETLException("Error opening connect: " + e, e);
 		}
 
 		// set optional transaction isolation level
